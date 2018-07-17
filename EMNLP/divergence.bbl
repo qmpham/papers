@@ -1,0 +1,188 @@
+\begin{thebibliography}{24}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[{Agirre et~al.(2016)Agirre, Banea, Cer, Diab, Gonzalez-Agirre,
+  Mihalcea, Rigau, and Wiebe}]{conf/semeval/AgirreBCDGMRW16}
+Eneko Agirre, Carmen Banea, Daniel~M. Cer, Mona~T. Diab, Aitor Gonzalez-Agirre,
+  Rada Mihalcea, German Rigau, and Janyce Wiebe. 2016.
+\newblock Semeval-2016 task 1: Semantic textual similarity, monolingual and
+  cross-lingual evaluation.
+\newblock In \emph{SemEval@NAACL-HLT}, pages 497--511. The Association for
+  Computer Linguistics.
+
+\bibitem[{Bojar et~al.(2017)Bojar, Chatterjee, Federmann, Graham, Haddow,
+  Huang, Huck, Koehn, Liu, Logacheva, Monz, Negri, Post, Rubino, Specia, and
+  Turchi}]{W17-4717}
+Ond{\v{r}}ej Bojar, Rajen Chatterjee, Christian Federmann, Yvette Graham, Barry
+  Haddow, Shujian Huang, Matthias Huck, Philipp Koehn, Qun Liu, Varvara
+  Logacheva, Christof Monz, Matteo Negri, Matt Post, Raphael Rubino, Lucia
+  Specia, and Marco Turchi. 2017.
+\newblock Findings of the 2017 conference on machine translation (wmt17).
+\newblock In \emph{Proceedings of the Second Conference on Machine
+  Translation}, pages 169--214. Association for Computational Linguistics.
+
+\bibitem[{Carpuat et~al.(2017)Carpuat, Vyas, and Niu}]{W17-3209}
+Marine Carpuat, Yogarshi Vyas, and Xing Niu. 2017.
+\newblock Detecting cross-lingual semantic divergence for neural machine
+  translation.
+\newblock In \emph{Proceedings of the First Workshop on Neural Machine
+  Translation}, pages 69--79. Association for Computational Linguistics.
+
+\bibitem[{Chen et~al.(2016)Chen, Kuhn, Foster, Cherry, and
+  Huang}]{chen2016adaptation}
+Boxing Chen, Roland Kuhn, George Foster, Colin Cherry, and Fei Huang. 2016.
+\newblock Bilingual methods for adaptive training data selection for machine
+  translation.
+\newblock In \emph{Proceedings of the 12th biennial conference of the
+  Association for the Machine Translation in Americas (AMTA2016)}.
+
+\bibitem[{Chinea-Rios et~al.(2017)Chinea-Rios, Peris, and
+  Casacuberta}]{W17-4714}
+Mara Chinea-Rios, {\'A}lvaro Peris, and Francisco Casacuberta. 2017.
+\newblock Adapting neural machine translation with parallel synthetic data.
+\newblock In \emph{Proceedings of the Second Conference on Machine
+  Translation}, pages 138--147. Association for Computational Linguistics.
+
+\bibitem[{Federmann and Lewis(2016)}]{mslt-corpus-iwslt-2016-release}
+Christian Federmann and Will Lewis. 2016.
+\newblock Microsoft speech language translation (mslt) corpus: The iwslt 2016
+  release for english, french and german.
+\newblock In \emph{Proceedings of the International Workshop on Spoken Language
+  Translation (IWSLT2016)}.
+
+\bibitem[{Fung and Cheung(2004)}]{W04-3208}
+Pascale Fung and Percy Cheung. 2004.
+\newblock Mining very-non-parallel corpora: Parallel sentence and lexicon
+  extraction via bootstrapping and em.
+\newblock In \emph{Proceedings of the 2004 Conference on Empirical Methods in
+  Natural Language Processing}.
+
+\bibitem[{Goutte et~al.(2012)Goutte, carpuat, and Foster}]{goute2012}
+Cyril Goutte, marine carpuat, and Georges Foster. 2012.
+\newblock The impact of sentence alignment errors on phrase-based machine
+  translation performance.
+\newblock In \emph{The Tenth Biennial Conference of the Association for Machine
+  Translation in the Americas}.
+
+\bibitem[{Gr{\'e}goire and Langlais(2017)}]{W17-2509}
+Francis Gr{\'e}goire and Philippe Langlais. 2017.
+\newblock Bucc 2017 shared task: a first attempt toward a deep learning
+  framework for identifying parallel sentences in comparable corpora.
+\newblock In \emph{Proceedings of the 10th Workshop on Building and Using
+  Comparable Corpora}, pages 46--50. Association for Computational Linguistics.
+
+\bibitem[{Grover and Mitra(2017)}]{P17-3003}
+Jeenu Grover and Pabitra Mitra. 2017.
+\newblock Bilingual word embeddings with bucketed cnn for parallel sentence
+  extraction.
+\newblock In \emph{Proceedings of ACL 2017, Student Research Workshop}, pages
+  11--16. Association for Computational Linguistics.
+
+\bibitem[{Hassan et~al.(2018)Hassan, Aue, Chen, Chowdhary, Clark, Federmann,
+  Huang, Junczys-Dowmunt, Lewis, Li, Liu, Liu, Luo, Menezes, Qin, Seide, Tan,
+  Tian, Wu, Wu, Xia, Zhang, Zhang, and Zhou}]{Hassan2018AchievingHP}
+Hany Hassan, Anthony Aue, Chang Chen, Vishal Chowdhary, Jonathan Clark,
+  Christian Federmann, Xuedong Huang, Marcin Junczys-Dowmunt, William Lewis,
+  Mu~Li, Shujie Liu, Tie-Yan Liu, Renqian Luo, Arul Menezes, Tao Qin, Frank
+  Seide, Xu~Tan, Fei Tian, Lijun Wu, Shuangzhi Wu, Yingce Xia, Dongdong Zhang,
+  Zhirui Zhang, and Ming Zhou. 2018.
+\newblock Achieving human parity on automatic chinese to english news
+  translation.
+\newblock \emph{CoRR}, abs/1803.05567.
+
+\bibitem[{He and Lin(2016)}]{N16-1108}
+Hua He and Jimmy Lin. 2016.
+\newblock Pairwise word interaction modeling with deep neural networks for
+  semantic similarity measurement.
+\newblock In \emph{Proceedings of the 2016 Conference of the North American
+  Chapter of the Association for Computational Linguistics: Human Language
+  Technologies}, pages 937--948. Association for Computational Linguistics.
+
+\bibitem[{Legrand et~al.(2016)Legrand, Auli, and Collobert}]{W16-2207}
+Jo{\"{e}}l Legrand, Michael Auli, and Ronan Collobert. 2016.
+\newblock Neural network-based word alignment through score aggregation.
+\newblock In \emph{Proceedings of the First Conference on Machine Translation:
+  Volume 1, Research Papers}, pages 66--73. Association for Computational
+  Linguistics.
+
+\bibitem[{Li et~al.(2014)Li, Carpuat, and Nenkova}]{C14-1055}
+Junyi~Jessy Li, Marine Carpuat, and Ani Nenkova. 2014.
+\newblock Cross-lingual discourse relation analysis: A corpus study and a
+  semi-supervised classification system.
+\newblock In \emph{Proceedings of COLING 2014, the 25th International
+  Conference on Computational Linguistics: Technical Papers}, pages 577--587.
+  Dublin City University and Association for Computational Linguistics.
+
+\bibitem[{Lison and Tiedemann(2016)}]{LisonTiedemann2016}
+Pierre Lison and J{\"o}rg Tiedemann. 2016.
+\newblock Opensubtitles2016: Extracting large parallel corpora from movie and
+  tv subtitles.
+\newblock In \emph{10th International Conference on Language Resources and
+  Evaluation (LREC 2016)}, Paris, France. European Language Resources
+  Association (ELRA).
+
+\bibitem[{Mueller and Thyagarajan(2016)}]{Mueller:2016:SRA:3016100.3016291}
+Jonas Mueller and Aditya Thyagarajan. 2016.
+\newblock Siamese recurrent architectures for learning sentence similarity.
+\newblock In \emph{Proceedings of the Thirtieth AAAI Conference on Artificial
+  Intelligence}, AAAI'16, pages 2786--2792. AAAI Press.
+
+\bibitem[{Munteanu and Marcu(2005)}]{J05-4003}
+Dragos~S. Munteanu and Daniel Marcu. 2005.
+\newblock Improving machine translation performance by exploiting non-parallel
+  corpora.
+\newblock \emph{Computational Linguistics}, 31(4).
+
+\bibitem[{Pascanu et~al.(2013)Pascanu, Mikolov, and
+  Bengio}]{Pascanu:2013:DTR:3042817.3043083}
+Razvan Pascanu, Tomas Mikolov, and Yoshua Bengio. 2013.
+\newblock On the difficulty of training recurrent neural networks.
+\newblock In \emph{Proceedings of the 30th International Conference on
+  International Conference on Machine Learning - Volume 28}, ICML'13, pages
+  III--1310--III--1318. JMLR.org.
+
+\bibitem[{Sennrich et~al.(2016{\natexlab{a}})Sennrich, Haddow, and
+  Birch}]{P16-1009}
+Rico Sennrich, Barry Haddow, and Alexandra Birch. 2016{\natexlab{a}}.
+\newblock Improving neural machine translation models with monolingual data.
+\newblock In \emph{Proceedings of the 54th Annual Meeting of the Association
+  for Computational Linguistics (Volume 1: Long Papers)}, pages 86--96.
+  Association for Computational Linguistics.
+
+\bibitem[{Sennrich et~al.(2016{\natexlab{b}})Sennrich, Haddow, and
+  Birch}]{Sennrich2016}
+Rico Sennrich, Barry Haddow, and Alexandra Birch. 2016{\natexlab{b}}.
+\newblock Neural machine translation of rare words with subword units.
+\newblock In \emph{Proceedings of the 54th Annual Meeting of the Association
+  for Computational Linguistics (Volume 1: Long Papers)}, pages 1715--1725,
+  Berlin, Germany. Association for Computational Linguistics.
+
+\bibitem[{Tiedemann(2011)}]{tiedemann2011bitext}
+J{\"o}rg Tiedemann. 2011.
+\newblock \emph{Bitext Alignment}.
+\newblock Synthesis Lectures on Human Language Technologies. Morgan \& Claypool
+  Publishers.
+
+\bibitem[{Vyas et~al.(2018)Vyas, Niu, and
+  Carpuat}]{DBLP:journals/corr/abs-1803-11112}
+Yogarshi Vyas, Xing Niu, and Marine Carpuat. 2018.
+\newblock Identifying semantic divergences in parallel text without
+  annotations.
+\newblock \emph{CoRR}, abs/1803.11112.
+
+\bibitem[{Xu and Yvon(2016)}]{XU16.310}
+Yong Xu and Fran{\c{c}}ois Yvon. 2016.
+\newblock Novel elicitation and annotation schemes for sentential and
+  sub-sentential alignments of bitexts.
+\newblock In \emph{Proceedings of the Tenth International Conference on
+  Language Resources and Evaluation (LREC 2016)}, Paris, France. European
+  Language Resources Association (ELRA).
+
+\bibitem[{Zhao and Vogel(2002)}]{Zhao:2002:APS:844380.844785}
+Bing Zhao and Stephan Vogel. 2002.
+\newblock Adaptive parallel sentences mining from web bilingual news
+  collection.
+\newblock In \emph{Proceedings of the 2002 IEEE International Conference on
+  Data Mining}, ICDM '02, Washington, DC, USA. IEEE Computer Society.
+
+\end{thebibliography}
