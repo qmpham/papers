@@ -85,17 +85,28 @@ This model can be used on any parallel corpus without any manual annotation.
 
 Parallel sentence pairs are the only necessary resource to build Machine Translation (MT) systems.
 In the case of neural MT, a large neural network is trained through maximising translation performance on a given parallel corpus. 
-Therefore, the quality of an MT engine is heavily dependent upon the amount and quality of parallel sentences. 
-Note that recent work on neural MT remove completely the need of parallel data following unsupervised methods~\cite{lample2018word,artetxe2018iclr} obtaining accuracy improvements over word-by-word statistical MT systems.
+Therefore, the quality of an MT engine is heavily dependent upon the
+amount and quality of the training parallel sentences.\footnote{Note
+  that some recent work on neural MT
+  \cite{lample2018word,artetxe2018iclr} completely dispenses with the
+  need of parallel data, using unsupervised methods to obtain performance
+  improvements over word-by-word statistical MT systems. However, these systems
+  still lag far behind systems trained in a supervised fashion, as
+  considered in this work.} 
 
 Unfortunately, parallel texts are scarce resources. 
-There are relatively few language pairs for which parallel corpora of reasonable sizes are available, and even for those pairs, the corpora come mostly from few domains. 
-To alleviate the lack of parallel data several approaches have been developed in the last years.
-They range from methods using non-parallel, or comparable data ~\cite{Zhao:2002:APS:844380.844785,W04-3208,J05-4003,W17-2509,P17-3003} to techniques that produce synthetic parallel data from monolingual corpora ~\cite{P16-1009,W17-4714} using in all cases automated alignment/translation engines that are prone to the introduction of noise in the resulting parallel sentences. 
-Mismatches on parallel sentences extracted from translated texts are also reported ~\cite{tiedemann2011bitext,XU16.310}. 
-This problem is mostly ignored in machine translation, where parallel sentences are considered to convey the exact same meaning, and is particularly important for neural MT engines as suggested by~\cite{chen2016adaptation}.
+There are relatively few language pairs for which parallel corpora of
+reasonable sizes are available, and even for those pairs, the corpora
+are only representative of a small number of domains or genres. 
+To mitigate the lack of parallel data, several approaches have been developed in the last years.
+They range from methods using non-parallel, or comparable data ~\cite{Zhao:2002:APS:844380.844785,W04-3208,J05-4003,W17-2509,P17-3003} to techniques that produce synthetic parallel data from monolingual corpora ~\cite{P16-1009,W17-4714} using in all cases automated alignment/translation engines that are prone to introducing noise in the resulting parallel sentences. 
+Mismatches in parallel sentences extracted from translated texts are also reported ~\cite{tiedemann2011bitext,XU16.310}. 
+This problem is mostly ignored in MT, where parallel sentences are considered to convey the exact same meaning, but seems particularly important for neural MT engines, as noted in~\citet{chen2016adaptation}.
 
-Table~\ref{tab:examples} illustrates some examples of English-French parallel sentences which are not completely semantically equivalent. Divergencies are outlined using bold letters. Examples extracted from the OpenSubtitles corpus ~\cite{LisonTiedemann2016}. 
+Table~\ref{tab:examples} gives some examples of English-French
+parallel sentences that are not completely semantically equivalent, 
+extracted from the OpenSubtitles corpus ~\cite{LisonTiedemann2016}. 
+Divergences are outlined using bold letters. 
 
 \begin{table}[ht]
 %\begin{adjustbox}{width=0.48\textwidth}
@@ -127,17 +138,17 @@ Table~\ref{tab:examples} illustrates some examples of English-French parallel se
 \label{tab:examples}
 \end{table}
 
-Different types of translation divergencies can be found in a parallel corpus:
+Different types of translation divergences exist in a parallel corpus:
 Additional segments are included on either side of the parallel sentences (first and second rows) most likely due to errors in sentence segmentation tools;
 Some translations may be completely uncorrelated (third row);
-Inaccurate translations are also included (fourth row). 
+Inaccurate translations also exist (fourth row). 
 Note that divergent translations can be due to many different reasons ~\cite{C14-1055}, the study of which is beyond the scope of this paper. 
 
-In this work, we present an unsupervised method for building cross lingual sentence embeddings in the form of continuous vectors. 
-Embeddings are then used to measure semantic equivalence of their corresponding sentences.
-We evaluate the method on two different tasks:
-First, we show that translation accuracy can be improved after filtering out divergent sentence pairs in an English-to-French and an English-to-German translation task.
-Then, we also show competitive results when identifying parallel sentences in comparable corpora using the French-English data made available for the BUCC shared task~\cite{ZWEIGENBAUM18.12}.
+In this work, we present an unsupervised method for building cross-lingual sentence embeddings in the form of continuous vectors. 
+These embeddings are then used to measure semantic equivalence of their corresponding sentences.
+We evaluate our method on two different tasks:
+First, we show that translation accuracy can be improved after filtering out divergent sentence pairs in an English-to-French and an English-to-German translation tasks.
+Then, we also report competitive results when identifying parallel sentences in comparable corpora, using the French-English data made available for the BUCC shared task~\cite{ZWEIGENBAUM18.12}.
 
 %In addition, we  show that in some cases, divergent sentences can be fixed by removing divergent words, further boosting translation accuracy.
 
