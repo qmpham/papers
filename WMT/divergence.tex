@@ -66,12 +66,14 @@
 Corpus-based approaches to machine translation rely on the availability and quality of parallel corpora.
 In the case of neural machine translation, a large neural network is trained to maximise the translation performance on a given parallel corpus. 
 %This paper describes an unsupervised method for building cross lingual sentence embeddings, which can then be used to compute semantic similarity between sentences in different languages.
-This paper describes an unsupervised method for building cross lingual sentence embeddings that optimises word alignments. Embeddings can then be used to compute semantic similarity between sentences of different languages.
+This paper describes an unsupervised method for building cross-lingual
+sentence embeddings that optimise word alignments. Such embeddings can then be used to compute semantic similarity between sentences in different languages.
 We report competitive performance on two different tasks. 
-Firstly, sentence embeddings are used to detect translation divergencies in parallel sentence pairs, hence allowing for filtering out noisy pairs.
-Then, we use sentence embeddings to discover parallel sentences on comparable corpora.
-We evaluate the presented model for different language pairs and data resources.
-The model can be used on any parallel corpus without any manual annotation.
+Sentence embeddings are first used to detect translation divergences
+in parallel sentence pairs, therby helping to filter out noisy pairs.
+Then, sentence embeddings help to discover parallel sentences in comparable corpora.
+We evaluate our model on multiple language pairs and data resources.
+This model can be used on any parallel corpus without any manual annotation.
 
 %According to the process followed to compile a parallel corpus, it may contain multiple parallel sentences that are often not as parallel as one might assume. Examples are easily found when corpora is created from non-parallel texts or included by noisy document/sentence alignment tools.
 %This paper describes an unsupervised method for detecting translation divergencies in parallel sentence pairs. We use a deep neural network to predict word alignment scores in parallel sentences. Misaligned words are then identified allowing divergent parallel sentences to be filtered out and in some cases making sentences parallel by removing such words. 
