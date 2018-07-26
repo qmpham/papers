@@ -87,12 +87,12 @@ Parallel sentence pairs are the only necessary resource to build Machine Transla
 In the case of neural MT, a large neural network is trained through maximising translation performance on a given parallel corpus. 
 Therefore, the quality of an MT engine is heavily dependent upon the
 amount and quality of the training parallel sentences.\footnote{Note
-  that some recent work on neural MT
+  that recent works on neural MT
   \cite{lample2018word,artetxe2018iclr} completely dispenses with the
   need of parallel data, using unsupervised methods to obtain performance
   improvements over word-by-word statistical MT systems. However, these systems
-  still lag far behind systems trained in a supervised fashion, as
-  considered in this work.} 
+  lag far behind systems trained in a supervised fashion, as
+  considered here.} 
 
 Unfortunately, parallel texts are scarce resources. 
 There are relatively few language pairs for which parallel corpora of
@@ -138,77 +138,116 @@ Divergences are outlined using bold letters.
 \label{tab:examples}
 \end{table}
 
-Different types of translation divergences exist in a parallel corpus:
-Additional segments are included on either side of the parallel sentences (first and second rows) most likely due to errors in sentence segmentation tools;
+Different types of translation divergences exist in a parallel corpus.
+Additional segments are included on either side of the parallel
+sentences (first and second rows in Table~\ref{tab:examples}), most likely due to errors in sentence segmentation tools;
 Some translations may be completely uncorrelated (third row);
 Inaccurate translations also exist (fourth row). 
-Note that divergent translations can be due to many different reasons ~\cite{C14-1055}, the study of which is beyond the scope of this paper. 
+Note that divergent translations can be due to multiple reasons~\cite{C14-1055}, the study of which is beyond the scope of this paper. 
 
 In this work, we present an unsupervised method for building cross-lingual sentence embeddings in the form of continuous vectors. 
 These embeddings are then used to measure semantic equivalence of their corresponding sentences.
-We evaluate our method on two different tasks:
-First, we show that translation accuracy can be improved after filtering out divergent sentence pairs in an English-to-French and an English-to-German translation tasks.
-Then, we also report competitive results when identifying parallel sentences in comparable corpora, using the French-English data made available for the BUCC shared task~\cite{ZWEIGENBAUM18.12}.
+We evaluate our method on two different tasks. We first show that translation accuracy can be improved after filtering out divergent sentence pairs in an English-to-French and an English-to-German translation tasks.
+Then, we report competitive results when identifying parallel sentences in comparable corpora, using the French-English data made available for the BUCC shared task~\cite{ZWEIGENBAUM18.12}.
 
 %In addition, we  show that in some cases, divergent sentences can be fixed by removing divergent words, further boosting translation accuracy.
 
-The remainder of this paper is structured as follows. 
-Section~\ref{related} overviews related work. 
-We describe in detail the core of the neural similarity classifier in Section~\ref{sec:similarity}. 
-We report experiments with the presented model on two different tasks in Section~\ref{experiments}.
-Section~\ref{sec:results} evaluates results. 
+The remainder of this paper is structured as follows:
+Section~\ref{related} overviews related work;
+we describe in detail the core of the neural similarity classifier in Section~\ref{sec:similarity}. 
+We report experiments with the presented model on two different tasks
+in Section~\ref{experiments}, and further discuss our results in Section~\ref{sec:results}. 
 Finally, conclusions are drawn in Section~\ref{conclusions} and further work is outlined in Section~\ref{further}.
 All the code used in this paper is freely available\footnote{https://github.com/anonymised}.
 
 \section{Related Work}
 \label{related}
 
-\subsection{Translation Divergencies}
+\subsection{Translation Divergences}
 
-Prior work on translation divergencies focused on reflecting that translation of one language into another results in very different forms ~\cite{J94-4004} according to several categories (e.g. lexical, structural, categorical). 
+Prior work on translation divergences focused on reflecting that translation of one language into another results in very different forms ~\cite{J94-4004} according to several categories (e.g. lexical, structural, categorical). 
 
-Attempts to measure the impact of translation divergencies in MT systems have focused on the introduction of noise in sentence alignments ~\cite{goute2012}, showing that statistical MT systems are highly tolerant to noise, and that performance only degrades seriously at very high noise levels. In constrast, neural MT engines seem to be more sensitive~\cite{chen2016adaptation}, as they tend to assign high probabilities to rare events~\cite{Hassan2018AchievingHP}.
+Attempts to measure the impact of translation divergencies in MT
+systems are based on the introduction of noise in sentence
+alignments~\cite{goute2012}, showing that statistical MT systems are
+highly tolerant to noise, and that performance only degrades seriously
+at very high noise levels. In constrast, neural MT engines seem to be
+more sensitive to noise~\cite{chen2016adaptation}, as they tend to assign high probabilities to rare events~\cite{Hassan2018AchievingHP}.
 
-Efforts have been devoted to characterising the degree of semantic equivalence between two snippets of text in the same or different languages~\cite{conf/semeval/AgirreBCDGMRW16}, a workshop devoted to an objective similar to our work. In~\cite{Mueller:2016:SRA:3016100.3016291}, a monolingual sentence similarity network is proposed, making use of a simple LSTM layer to compute sentence representations. The authors show that a simple SVM classifier can be built on top of the sentence representations to achieve state-of-the-art results in a semantic entailment classification task. With the same objective, the system presented in~\cite{N16-1108} uses multiple convolutional layers and models pairwise word interactions. %Our work differs from the previous as we build a different network and use it to measure similarity of sentences in different languages. 
+Efforts have also been devoted to characterising the degree of
+semantic equivalence between two snippets of text in the same or in
+different languages (see notably~\cite{conf/semeval/AgirreBCDGMRW16}, a workshop devoted to an objective similar to our work). In~\cite{Mueller:2016:SRA:3016100.3016291}, a monolingual sentence similarity network is proposed, making use of a simple LSTM layer to compute sentence representations. The authors show that a simple SVM classifier can be built on top of the sentence representations to achieve state-of-the-art results in a semantic entailment classification task. Aiming similar goals, the system presented in~\cite{N16-1108} uses multiple convolutional layers and models pairwise word interactions. %Our work differs from the previous as we build a different network and use it to measure similarity of sentences in different languages. 
 
-Our work is inspired by~\cite{W17-3209} where the authors train a cross-lingual divergence detector using word alignments and sentence length features to train a linear SVM classifier. Their work shows that an NMT system trained only on non-divergent sentences yields slightly higher translation quality scores and requires clearly less training time. The same authors have recently updated their work in~\cite{DBLP:journals/corr/abs-1803-11112}. The objective is the same as the neural network presented in~\cite{N16-1108} and their network further outperforms their previous work. Our work differs from the previous as we make use of a network with different topology. We model sentence similarity by means of optimising word alignment and in addition, we propose a simple method that employs alignment scores to not only detect but correct divergent sentences.
+Our work is mostly inspired by~\citet{W17-3209}, who train a
+cross-lingual divergence detector using word alignments and sentence
+length features to train a linear SVM classifier. Their work shows
+that an NMT system trained only on non-divergent sentences yields
+slightly higher translation quality scores and also requires less
+training time. The same authors have recently updated their work
+in~\cite{DBLP:journals/corr/abs-1803-11112}. Using an objective
+similar to the neural network presented in~\cite{N16-1108}, they were
+able to improve their previous results. Our work differs from these
+prior art in several ways, as we make use of a network with different
+topology and we model sentence similarity by means of optimising word
+alignment. In addition, we propose a simple method that employs
+alignment scores to not only detect but also correct divergent sentences.
 
 \subsection{Extracting Parallel Sentences}
 
-As previously outlined, parallel texts are scarce resources as well as the only necessary resource to build Machine Translation systems. In contrast, there is an increasing amount of comparable corpora available on the Internet, a potential solution to alleviate the data scarcity problem.
+As previously outlined, Machine Translation systems depend on the
+availability of parallel texts, which are scarce resources. In contrast, there is an vast amount of comparable corpora available on the Internet, a potential solution to mitigate the data scarcity problem.
 
-Several approaches exist to extract parallel sentences from comparable corpora. 
-In~\cite{J05-4003} is presented a maximum entropy classifier that can reliably determine whether a pair of sentences are translations of each other. 
-A similar approach is proposed by~\cite{E09-1003}, where a SMT system is used to translate the source language side of a comparable corpus to find candidate sentences on the target side. 
-Word error rate and translation error rate measures are used to decide when a candidate is finally considered parallel. 
-More recently,~\cite{W17-2508} present a method based on seed lexical translations, simple set expansion operations and the Jaccard similarity coefficient. The method obtains state-of-the-art results in the task of parallel sentence extraction from comparable corpora.
+Several approaches have been proposed to extract parallel sentences from comparable corpora. 
+In~\cite{J05-4003} is presented a maximum entropy classifier that can
+reliably assess whether a pair of sentences are mutual translations. 
+A similar approach is proposed by~\cite{E09-1003}, where a SMT system
+is used to translate the source language side of a comparable corpus
+to find candidate sentences on the target side. Word error rate and
+translation error rate measures are used to decide whether a candidate
+pair is finally deemed parallel. 
+More recently,~\cite{W17-2508} present a method based on seed lexical
+translations, simple set expansion operations and the Jaccard
+similarity coefficient. The method obtains state-of-the-art results in
+the task of mining parallel sentence extraction from comparable corpora.
 
-Closely related to the method proposed in this paper, different works employ continuous vector sentence representations as a preceding step to compute sentence similarity. 
-In~\cite{W15-1521}, word representations from bilingual word embeddings are used to build a convolutional network that predicts wether a sentence pair is aligned or not.
-~\cite{W17-2509} propose a recurrent network to estimate sentence embeddings followed by dense layers that estimates the conditional probability distribution that two sentences are parallel.
+Several works employ continuous vector sentence representations as a
+preceding step to compute sentence similarity, an approach we also
+adopt in this paper. In~\cite{W15-1521}, word representations from
+bilingual word embeddings are used to build a convolutional network
+that predicts wether a sentence pair is parallel or not. \citet{W17-2509} propose a recurrent network to estimate sentence embeddings followed by dense layers that estimates the conditional probability distribution that two sentences are parallel.
 
-These approaches are different from ours FINISH
+% These approaches are different from ours FINISH
 
-This strong interest in comparable corpora was further boosted after the apparition of the BUCC workshop series on Building and Using Comparable Corpora\footnote{https://comparable.limsi.fr/bucc2018/} which helped to provide a task definition, datasets and evaluation methods to assess the state of the art. 
+This strong interest in comparable corpora was further boosted after
+the apparition of the BUCC \footnote{Building and Using Comparable
+  Corpora  - https://comparable.limsi.fr/bucc2018/} evaluation
+campaign which helped to provide a task definition, datasets and
+evaluation methods to improve the state-of-the-art. 
 
 \section{Neural Similarity Classifier}
 \label{sec:similarity}
 
-In this section we describe the architecture of our model, very much inspired by the work on Word Alignment in~\cite{W16-2207}. Figure~\ref{network} illustrates the network.
- 
-In the following, we consider a source-target sentence pair $(s,t)$ with $s=(s_1,...,s_I)$ and $t=(t_1,...,t_J)$. The model is composed of 2 Bi-directional LSTM subnetworks, $net_s$ and $net_t$, which respectively encode source and target sentences. Since both $net_s$ and $net_t$ take the same form we describe only the source architecture.
+In this section, we describe the architecture of our model, drawing
+inspiration from the work of~\citet{W16-2207} on word alignment.
 
-The source-sentence Bi-LSTM network outputs forward and backward hidden states, $\overrightarrow{h}^{src}_i$ and $\overleftarrow{h}^{src}_i$, which are then concatenated into a single vector encoding the $i^{th}$ word of the source sentence, 
+ 
+In the following, we consider a source-target sentence pair $(s,t)$
+with $s=(s_1,...,s_I)$ and $t=(t_1,...,t_J)$. The model is composed of
+2 Bi-directional LSTM subnetworks, $net_s$ and $net_t$, which
+respectively encode source and target sentences (see Figure~\ref{network}). Since both $net_s$ and $net_t$ take the same form, we describe only the source architecture.
+
+The source-sentence Bi-LSTM network outputs forward and backward hidden states, $\overrightarrow{h}^{src}_i$ and $\overleftarrow{h}^{src}_i$, which are concatenated into a single vector encoding the $i^{th}$ word in the source sentence, 
 $h^{src}_i = [ \overrightarrow{h}^{src}_i ; \overleftarrow{h}^{src}_i ]$.
 %$h^{src}_i = \left( \begin{array}{cc} \overrightarrow{h}_i \\ \overleftarrow{h}_i \\ \end{array} \right)$.
 
-In addition, the last forward/backward hidden states (outlined using dark grey in Figure~\ref{network}) are also concatenated into a single vector  to represent whole sentences 
+In addition, the last forward/backward hidden states (outlined in dark grey in Figure~\ref{network}) are also concatenated into a single vector to represent whole sentences 
 $h_{src} = [ \overrightarrow{h}^{src}_I ; \overleftarrow{h}^{src}_1 ]$.
 %$h_{src} = \left( \begin{array}{cc} \overrightarrow{h}^{src}_I \\ \overleftarrow{h}^{src}_1 \\ \end{array} \right)$.
-At this point a measure of similarity between sentence pairs can be obtained by cosine similarity: 
+At this point, a measure of similarity between sentence pairs can be
+obtained by by computing the cosine between these representations: 
 
 \begin{equation}
-    sim(h_{src}, h_{tgt}) = \frac{h_{src} \cdotp h_{tgt}}{||h_{src}|| * ||h_{tgt}||}
+    sim(h_{src}, h_{tgt}) = \frac{h_{src} \cdotp h_{tgt}}{||h_{src}|| * ||h_{tgt}||},
     \label{cosine}
 \end{equation}
 \noindent where two vectors (embeddings) with the same orientation have a cosine similarity of $1$, while two vectors with opposed orientation have a similarity of $-1$, independent of their magnitude.
