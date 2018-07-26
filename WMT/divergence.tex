@@ -183,9 +183,11 @@ We model sentence similarity by means of optimising word alignment and in additi
 \section{Neural Similarity Classifier}
 \label{sec:similarity}
 
-In this section we describe the architecture of our model, very much inspired by the work on Word Alignment in~\cite{W16-2207}. Figure~\ref{network} illustrates the network.
+In this section we describe the architecture of our model, inspired by the work on word alignment of~\citet{W16-2207}.
  
-In the following, we consider a source-target sentence pair $(s,t)$ with $s=(s_1,...,s_I)$ and $t=(t_1,...,t_J)$. The model is composed of 2 Bi-directional LSTM subnetworks, $net_s$ and $net_t$, which respectively encode source and target sentences. Since both $net_s$ and $net_t$ take the same form we describe only the source architecture.
+In the following, we consider a source-target sentence pair $(s,t)$
+with $s=(s_1,...,s_I)$ and $t=(t_1,...,t_J)$. The model is composed of
+2 Bi-directional LSTM subnetworks (see Figure~\ref{network}), $net_s$ and $net_t$, which respectively encode source and target sentences. Since both $net_s$ and $net_t$ take the same form, we only describe the source architecture.
 
 The source-sentence Bi-LSTM network outputs forward and backward hidden states, $\overrightarrow{h}^{src}_i$ and $\overleftarrow{h}^{src}_i$, which are then concatenated into a single vector encoding the $i^{th}$ word of the source sentence, 
 $h^{src}_i = [ \overrightarrow{h}^{src}_i ; \overleftarrow{h}^{src}_i ]$.
@@ -194,10 +196,10 @@ $h^{src}_i = [ \overrightarrow{h}^{src}_i ; \overleftarrow{h}^{src}_i ]$.
 In addition, the last forward/backward hidden states (outlined using dark grey in Figure~\ref{network}) are also concatenated into a single vector  to represent whole sentences 
 $h_{src} = [ \overrightarrow{h}^{src}_I ; \overleftarrow{h}^{src}_1 ]$.
 %$h_{src} = \left( \begin{array}{cc} \overrightarrow{h}^{src}_I \\ \overleftarrow{h}^{src}_1 \\ \end{array} \right)$.
-At this point a measure of similarity between sentence pairs can be obtained by cosine similarity: 
-
+At this point, a measure of similarity between sentence pairs is the
+cosine of their represention vector: 
 \begin{equation}
-    sim(h_{src}, h_{tgt}) = \frac{h_{src} \cdotp h_{tgt}}{||h_{src}|| * ||h_{tgt}||}
+    sim(h_{src}, h_{tgt}) = \frac{h_{src} \cdotp h_{tgt}}{||h_{src}|| * ||h_{tgt}||},
     \label{cosine}
 \end{equation}
 \noindent where two vectors (embeddings) with the same orientation have a cosine similarity of $1$, while two vectors with opposed orientation have a similarity of $-1$, independent of their magnitude.
@@ -205,18 +207,18 @@ At this point a measure of similarity between sentence pairs can be obtained by 
 \begin{figure}[h]
 \center
     \includegraphics[width=1.0\linewidth]{network}
-    \caption{Illustration of the model. The network is composed of source and target word embedding lookup tables ($LT_s$ and $LT_t$) and two identical subnetworks ($net_s$ and $net_t$) that compute in context representations of source ($s_i$) and target words ($t_j$).} 
+    \caption{Description of our model. The network is composed of source and target word embedding lookup tables ($LT_s$ and $LT_t$) and two identical subnetworks ($net_s$ and $net_t$) that compute in context representations of source ($s_i$) and target words ($t_j$).} 
     \label{network}
 \end{figure}
 %The similarity function outputs the level of semantic similarity between source and target sentences.
 
 %Figure~\ref{net_lstm} illustrates the first component of our network. In order to optimise our model we follow the functions depicted in Figure~\ref{net_align}.
 
-Similar to ~\cite{W16-2207} our model extracts context information from source and target sentences and then computes simple dot-products to estimate word alignments. 
-The objective function is computed at the level of words. 
-To enable unsupervised training, we use an aggregation operation that summarizes the alignment scores for a given target word. 
-A soft-margin objective increases scores for true target words while decreasing scores for target words that are not present.
-The aggregation function combines the scores of all source (or target) words for a particular target (or source) word and promotes source words which are likely to be aligned with a given target word according to the knowledge the model has learned so far.
+Similar to ~\cite{W16-2207} our model extracts context information from source and target sentences and then computes simple dot-products to estimate word alignments. The objective function is computed at the level of words. 
+To enable unsupervised training, we use an aggregation operation
+($aggr()$) that summarizes the alignment scores for any given target word. 
+A soft-margin objective increases scores for true target words, while decreasing scores for target words that are not present.
+The aggregation function combines the scores of all source (resp.\ target) words for a particular target (resp.\ source) word and promotes source words which are likely to be aligned with a given target word according to the knowledge the model has learned so far.
 Alignment scores $S(i,j)$ are given by the dot-product $S(i,j) = h_i^{src} \cdotp h_j^{tgt}$, while aggregation functions are defined as:
 
 \begin{equation}
@@ -294,13 +296,13 @@ The loss function is defined as:
 \subsection{Training with Negative Examples}
 \label{training}
 
-Training is performed by minimising Equation~\ref{loss_wemb}, for which examples with annotations for source $\mathcal{Y}_i^{src}$ and target $\mathcal{Y}_j^{tgt}$ words are needed.
+Training is performed by minimising the loss in Equation~\eqref{loss_wemb}, for which examples with annotations for source $\mathcal{Y}_i^{src}$ and target $\mathcal{Y}_j^{tgt}$ words are needed.
 Different kind of examples are used to train our network:
 \begin{itemize}
 
-\item As positive examples we use paired sentences of the parallel corpus. In this case, all words of the pair of sentences are labelled as parallel, $\mathcal{Y}_i^{src}=-1$ and $\mathcal{Y}_j^{tgt}=-1$. 
+\item As positive examples, we use paired sentences of the parallel corpus. In this case, all words in the pair of sentences are labelled as parallel, $\mathcal{Y}_i^{src}=-1$ and $\mathcal{Y}_j^{tgt}=-1$. 
 
-\item As negative examples we use random unpaired sentences. In this case, all words are labelled as divergent, $\mathcal{Y}_i^{src}=+1$ and $\mathcal{Y}_j^{tgt}=+1$. 
+\item As negative examples, we use random unpaired sentences. In this case, all words are labelled as divergent, $\mathcal{Y}_i^{src}=+1$ and $\mathcal{Y}_j^{tgt}=+1$. 
 Since negative examples may be very easy to classify and we want our network to detect less obvious divergencies, we further create negative examples following the next two methods:
 
 \item We replace random sequences of words on either side of the sentence pair by a sequence of words with the same part-of-speeches. 
@@ -424,7 +426,7 @@ For divergence correction, we use $\mathcal{N}=20$ and $\tau=3$.
 In addition to the basic tokenisation detailed in Section~\ref{divergence} we perform Byte-Pair Encoding~\cite{Sennrich2016} with $30000$ merge operations learned joined from both language sides.
 Neural MT systems are based on the open-source project  \texttt{OpenNMT}. 
 We use a Transformer model with same configuration than in paper~\cite{vaswani2017attention}, i.e, both encoder and decoder have $6$ layers; Multi-head attention is performed over $8$ heads. 
-Hidden layer’s size is $512$. 
+Hidden layer's size is $512$. 
 The inner layer of feed forward network is of size $2048$. 
 Word embeddings have $512$ cells. We set the dropout probability to $0.1$. 
 Batch size is set to $3072$.
