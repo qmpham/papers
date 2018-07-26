@@ -230,7 +230,7 @@ As negative examples we use random {\bf (U)}npaired sentences.
 In this case, all words are labelled as divergent ($+1$). %, $sign_i=+1$ and $sign_j=+1$. 
 Since negative pairs may be very easy to classify and we want our network to detect less obvious divergences, we further create negative examples following: % the next two methods:
 
-We {\bf (R)}eplace random sequences of words by a sequence of words with same part-of-speeches. 
+We {\bf (R)}eplace random sequences of words by a sequence of words with same parts-of-speech. 
 The rationale behind this method is to keep the new sentences as grammatical as possible. 
 %Otherwise the network can learn to detect non-grammatical sentences to predict divergence.
 Words that are not replaced are considered parallel ($-1$) while those replaced are assigned the divergent label ($+1$). 
@@ -348,10 +348,9 @@ For divergence correction, we used $\mathcal{N}=20$ and $\tau=3$.
 \label{translation}
 
 In addition to the basic tokenisation detailed in Section~\ref{divergence} we perform Byte-Pair Encoding~\cite{Sennrich2016} with $30,000$ merge operations learned from both English and French data.
-Neural MT systems are based on the open-source project \texttt{OpenNMT}\footnote{http://opennmt.net}. We use a bidirectional RNN encoder with $4$ LSTM layers with each containing $1,000$ cells. 
-Word embeddings have a size of $300$ cells. We set the dropout probability to $0.3$. Batch size is set to $64$. The maximum length of both source and target sentences is set to $80$. % and we limit the vocabulary size to $50K$ words for both source and target languages.
-The default optimiser is SGD with the starting learning rate of $1.0$. We start to decay the learning rate from epoch $10$ or when we detect increasing perplexity as compared to the previous epoch on a validation set. We stop training after $20$ epochs.
+Neural MT systems are based on the open-source project \texttt{OpenNMT}\footnote{http://opennmt.net}. We use a Transformer model with same configuration in paper \cite{Transformer2017}, i.e, both encoder and decoder have 6 layers; Multi-head attention is performed over 8 heads. Hidden layer's size is 512. The inner layer of feedforward network is of size $2048$. Word embeddings have a size of $512$ cells. We set the dropout probability to $0.1$. Batch size is set to $3072$. The maximum length of both source and target sentences is set to $80$ and we limit the vocabulary size to $50K$ words for both source and target languages.
 
+The optimiser is Adam avec learning rate that was introduced in paper \cite{Transformer2017} with $\beta_1 = 0.9$, $\beta_2 = 0.98$, $\eta = 10^{-9}$, $warmup\_steps = 4000$. We stop training after 30 epochs.
 
 \section{Results}
 \label{sec:results}
