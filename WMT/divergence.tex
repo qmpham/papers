@@ -58,12 +58,21 @@
 
 Corpus-based approaches to machine translation rely on the availability and quality of parallel corpora.
 In the case of neural machine translation, a large neural network is trained to maximise the translation performance on a given parallel corpus. 
-This paper describes an unsupervised method for building cross-lingual sentence embeddings that optimise word alignments. 
-Such embeddings can then be used to compute semantic similarity between sentences in different languages.
-We first use sentence embeddings to detect translation divergences in parallel sentence pairs, thereby helping to filter out noisy pairs.
-Then, word similarity scores predicted by the network are used to identify and fix some divergences guiding to collect additional parallel segments.
-We evaluate our model on multiple language pairs and data resources.
-This model can be used on any parallel corpus without any manual annotation.
+Such resource is not naturally existing, and because of the process necessary to compile a parallel corpus, it may contain multiple sentence pairs that are often not as parallel as one might assume.
+%%
+This paper describes an unsupervised method for detecting translation divergences in parallel sentences.
+We present a neural network to predict sentence similarity that minimises a loss function based on word divergence.
+We show that accurate predictions are obtained allowing divergent sentences to be filtered out.
+Furthermore, word similarity scores predicted by the network are used to identify and fix some divergences guiding to collect additional parallel segments.
+We evaluate the presented method on  English-French and  English-German machine translation tasks.
+Results show that neural MT systems trained on the filtered/corrected corpus outperform the MT systems trained on the original data.
+%%
+%This paper describes an unsupervised method for building cross-lingual sentence embeddings that optimise word alignments. 
+%Such embeddings can then be used to compute semantic similarity between sentences in different languages.
+%We first use sentence embeddings to detect translation divergences in parallel sentence pairs, thereby helping to filter out noisy pairs.
+%Then, word similarity scores predicted by the network are used to identify and fix some divergences guiding to collect additional parallel segments.
+%We evaluate our model on multiple language pairs and data resources.
+%This model can be used on any parallel corpus without any manual annotation.
 
 %According to the process followed to compile a parallel corpus, it may contain multiple parallel sentences that are often not as parallel as one might assume. Examples are easily found when corpora is created from non-parallel texts or included by noisy document/sentence alignment tools.
 %This paper describes an unsupervised method for detecting translation divergencies in parallel sentence pairs. We use a deep neural network to predict word alignment scores in parallel sentences. Misaligned words are then identified allowing divergent parallel sentences to be filtered out and in some cases making sentences parallel by removing such words. 
@@ -85,11 +94,6 @@ To mitigate the lack of parallel data, several approaches have been developed in
 They range from methods using non-parallel, or comparable data ~\cite{Zhao:2002:APS:844380.844785,W04-3208,J05-4003,W17-2509,P17-3003,P18-2037} to techniques that produce synthetic parallel data from monolingual corpora ~\cite{P16-1009,W17-4714} using in all cases automated alignment/translation engines that are prone to introducing noise in the resulting parallel sentences. 
 Mismatches in parallel sentences extracted from translated texts are also reported ~\cite{tiedemann2011bitext,XU16.310}. 
 This problem is mostly ignored in MT, where parallel sentences are considered to convey the exact same meaning, but seems particularly important for neural MT engines, as noted in~\citet{chen2016adaptation}.
-
-Table~\ref{tab:examples} gives some examples of English-French
-parallel sentences that are not completely semantically equivalent, 
-extracted from the OpenSubtitles corpus ~\cite{LisonTiedemann2016}. 
-Divergences are outlined using bold letters. 
 
 \begin{table}[ht]
 %\begin{adjustbox}{width=0.48\textwidth}
@@ -121,6 +125,10 @@ Divergences are outlined using bold letters.
 \label{tab:examples}
 \end{table}
 
+Table~\ref{tab:examples} gives some examples of English-French
+parallel sentences that are not completely semantically equivalent, 
+extracted from the OpenSubtitles corpus ~\cite{LisonTiedemann2016}. 
+Divergences are outlined using bold letters. 
 Different types of translation divergences exist in a parallel corpus:
 Additional segments are included on either side of the parallel sentences (first and second rows) most likely due to errors in sentence segmentation tools;
 Some translations may be completely uncorrelated (third row);
@@ -128,7 +136,7 @@ Inaccurate translations also exist (fourth row).
 Note that divergent translations can be due to many different reasons ~\cite{C14-1055}, the study of which is beyond the scope of this paper. 
 
 In this work, we present an unsupervised method for building cross-lingual sentence embeddings based on modelling word similarity. % in the form of continuous vectors. 
-The architecture of our network allows us to distinguish between different types of divergences common to many bi-texts.
+The architecture of our network allows us to distinguish between different types of divergences which are common to many existing bi-texts.
 The resulting sentence embeddings are then used to measure semantic equivalence of the corresponding sentences.
 To evaluate our method we show that translation accuracy can be improved after filtering out divergent sentence pairs in an English-to-French and an English-to-German translation tasks.
 Then, we  show that in some cases, divergent sentences can be fixed by removing divergent words, further boosting translation accuracy.
@@ -167,30 +175,13 @@ As in the previous works we also use a recurrent network to build sentence embed
 Thus, enabling fine grained divergence prediction at the level of words.
 In addition, we propose a simple method that employs word similarity scores to not only detect but to correct divergent sentences, which allows to reuse additional sentence pairs in the context of neural machine translation.
 
-%As previously outlined, parallel texts are scarce resources as well as the only necessary resource to build Machine Translation systems. In contrast, there is an increasing amount of comparable corpora available on the Internet, a potential solution to alleviate the data scarcity problem.
-%Several approaches exist to extract parallel sentences from comparable corpora. 
-%In~\cite{J05-4003} is presented a maximum entropy classifier that can reliably determine whether a pair of sentences are translations of each other. 
-%A similar approach is proposed by~\cite{E09-1003}, where a SMT system is used to translate the source language side of a comparable corpus to find candidate sentences on the target side. 
-%Word error rate and translation error rate measures are used to decide when a candidate is finally considered parallel. 
-%More recently,~\cite{W17-2508} present a method based on seed lexical translations, simple set expansion operations and the Jaccard similarity coefficient. The method obtains state-of-the-art results in the task of parallel sentence extraction from comparable corpora.
-%Closely related to the method proposed in this paper, different works employ continuous vector sentence representations as a preceding step to compute sentence similarity. 
-%In~\cite{W15-1521}, word representations from bilingual word embeddings are used to build a convolutional network that predicts wether a sentence pair is aligned or not.
-%~\cite{W17-2509} propose a recurrent network to estimate sentence embeddings followed by dense layers that estimates the conditional probability distribution that two sentences are parallel.
-%These approaches are different from ours FINISH
-%This strong interest in comparable corpora was further boosted after the apparition of the BUCC workshop series on Building and Using Comparable Corpora\footnote{https://comparable.limsi.fr/bucc2018/} which helped to provide a task definition, datasets and evaluation methods to assess the state of the art. 
 
 \section{Neural Similarity Classifier}
 \label{sec:similarity}
 
 In this section we describe the architecture of our model, very much inspired by the work on Word Alignment in~\cite{W16-2207}. Figure~\ref{network} illustrates the network.
+In the following, we consider a source-target sentence pair $(s,t)$ with $s=(s_1,...,s_I)$ and $t=(t_1,...,t_J)$. 
  
-In the following, we consider a source-target sentence pair $(s,t)$ with $s=(s_1,...,s_I)$ and $t=(t_1,...,t_J)$. The model is composed of 2 Bi-directional LSTM subnetworks, $net_s$ and $net_t$, which respectively encode source and target sentences. Since both $net_s$ and $net_t$ take the same form we describe only the source architecture.
-The source-sentence Bi-LSTM network outputs forward and backward hidden states, $\overrightarrow{h}^{src}_i$ and $\overleftarrow{h}^{src}_i$, which are then concatenated into a single vector encoding the $i^{th}$ word of the source sentence, 
-$h^{src}_i = [ \overrightarrow{h}^{src}_i ; \overleftarrow{h}^{src}_i ]$.
-
-In addition, the last forward/backward hidden states (outlined using dark grey in Figure~\ref{network}) are also concatenated into a single vector  to represent whole sentences 
-$h_{src} = [ \overrightarrow{h}^{src}_I ; \overleftarrow{h}^{src}_1 ]$.
-
 \begin{figure}[h!]
 \center
     \includegraphics[width=1.0\linewidth]{network}
@@ -198,7 +189,11 @@ $h_{src} = [ \overrightarrow{h}^{src}_I ; \overleftarrow{h}^{src}_1 ]$.
     \label{network}
 \end{figure}
 
-
+The model is composed of 2 Bi-directional LSTM subnetworks, $net_s$ and $net_t$, which respectively encode source and target sentences. Since both $net_s$ and $net_t$ take the same form we describe only the source architecture.
+The source-sentence Bi-LSTM network outputs forward and backward hidden states, $\overrightarrow{h}^{src}_i$ and $\overleftarrow{h}^{src}_i$, which are then concatenated into a single vector encoding the $i^{th}$ word of the source sentence, 
+$h^{src}_i = [ \overrightarrow{h}^{src}_i ; \overleftarrow{h}^{src}_i ]$.
+In addition, the last forward/backward hidden states (outlined using dark grey in Figure~\ref{network}) are also concatenated into a single vector  to represent whole sentences 
+$h_{src} = [ \overrightarrow{h}^{src}_I ; \overleftarrow{h}^{src}_1 ]$.
 At this point a measure of similarity between sentences can be obtained by cosine similarity: 
 \begin{equation}
     sim(h_{src}, h_{tgt}) = \frac{h_{src} \cdotp h_{tgt}}{||h_{src}|| * ||h_{tgt}||}
@@ -457,6 +452,10 @@ The optimiser is Lazy Adam with $\beta_1 = 0.9$, $\beta_2 = 0.98$, $\epsilon = 1
 \section{Results}
 \label{sec:results}
 
+In this section we evaluate the performance of our neural similarity classifier and correction algorithm detailed in Section~\ref{sec:similarity}.
+
+\subsection{Divergence Prediction}
+
 We evaluate first the ability of our similarity classifier to predict different types of divergencies at the level of words. 
 We use the test set manually annotated for that purpose and train our model on the OpenSubtitles corpus.
 A word is considered divergent when associated to a negative aggregation score (see Equation~\ref{aggregation}).
@@ -494,8 +493,9 @@ Again, models that were trained with the corresponding examples (\texttt{R} and 
 Column \texttt{PURI} shows accuracy results over the entire test set. This is, mixing all type of examples. 
 As expected, the best accuracy is also obtained by the system trained on all type of  examples. 
 
-%The test set was annotated after looking at the entire train set and looking for these type of examples. 
-%Existance and distribution of types of 
+Figure~\ref{matrix} illustrates the output of our network when trained using \texttt{PU} examples (right) and \texttt{PURI} examples (left).  
+The former (right) fails to predict some word divergences, most likely because in training it never saw sentences mixing divergent and non-divergent words in the same example. 
+Furthermore, the network trained over \texttt{PURI} examples (left) correctly assigns a lower similarity score to the sentence pair as both sentences do not convey the exact same meaning.
 
 \begin{figure}[h]
 \centering
@@ -505,9 +505,7 @@ As expected, the best accuracy is also obtained by the system trained on all typ
 \label{matrix}
 \end{figure}
 
-Figure~\ref{matrix} illustrates the output of our network when trained using \texttt{PU} examples (right) and \texttt{PURI} examples (left).  
-The former (right) fails to predict some word divergences, most likely because in training it never saw sentences mixing divergent and non-divergent words in the same example. 
-Furthermore, the network trained over \texttt{PURI} examples (left) correctly assigns a lower similarity score to the sentence pair as both sentences do not convey the exact same meaning.
+\subsection{Neural Machine Translation}
 
 Next, we evaluate the ability of our neural similarity classifier to detect divergent sentence pairs. 
 Since we lack of a gold standard test set to directly evaluate sentence similarity, 
@@ -517,8 +515,10 @@ Consider for instance the example of Figure~\ref{matrix}.
 Despite not conveying the exact same meaning it still contains useful information to train a neural MT engine. 
 It is not the case of the example in the third row of Table~\ref{tab:examples}.
 
-Table~\ref{results_wemb} shows BLEU~\cite{P02-1040} scores of the same neural MT network when trained over different samples of the OpenSubtitles corpus.
-Samples result from filtering sentences of the original corpus using different similarity thresholds.
+Table~\ref{results_wemb} shows BLEU~\cite{P02-1040} scores of the same neural MT network when trained over different subsets of the OpenSubtitles data set.
+Subsets result from filtering sentences of the original corpus using different similarity thresholds as computed by Equation~\ref{cosine} of our similarity classifier.
+As it can be seen, the best performing subset is obtained when using sentence pairs with similarity score in the range $[0.100, +\infty)$. 
+This is, training with the most similar $15.5$ million sentences of the original data set. 
 
 \begin{table}[h]
 \small
@@ -530,23 +530,27 @@ Samples result from filtering sentences of the original corpus using different s
 $(-\infty,+\infty)$   & 27.2 & 42.18 \\ %& 26.60  \\
 $[0.000,+\infty)$   & 24.0 & 42.68 \\ %& 26.87  \\
 $[0.003,+\infty)$   & 21.5 & 42.56 \\ %&  \\
-$[0.076,+\infty)$   & 18.0 & \bf 43.19 \\ %& 26.38 \\
-$[0.100,+\infty)$   & 15.5 & 43.12 \\
+$[0.076,+\infty)$   & 18.0 & 43.19 \\ %& 26.38 \\
+$[0.100,+\infty)$   & 15.5 & 43.12\\%&  \\
 \hline
 \end{tabular}
 \caption{BLEU scores obtained by a neural MT network when trained over the OpenSubtitles corpus filtered using different similarity thresholds.}
 \label{results_wemb}
 \end{table}
 
-As it can be seen, the best performing training sample is obtained when using sentence pairs with similarity score in the range $[0.076, +\infty)$. 
-This is, training with the most similar $18$ million sentences of the original data set. 
-Note that despite assigned a positive similarity score, sentence pairs in the range $[0, 0.076]$ (almost $10$ million sentences) does not seem to contribute when training a neural MT network. 
-On the contrary, when added as training data the MT accuracy is reduced.
+Note that sentences in the range $[0.076, 0.100]$ ($2.5$ million sentences) does not contribute to increase the accuracy of the resulting neural MT system.
+%The BLEU score of the system that considers these sentences in training remains unchanged.
+Furthermore, sentences in the range $[0, 0.076]$ (about $6$ million sentences) despite assigned a positive similarity score they degrade the overall performance of the network.
 
-Table~\ref{results} shows BLEU results for our neural MT engine trained over different data configurations:
-The entire\footnote{The original Paracrawl corpus contains more than $100$ million sentences. We reduced its size to $22.2$ millions using standard filtering techniques.} data sets (\texttt{all}) of both corpora; 
-Most similar pairs after as predicted by our network (\texttt{sim}); 
-Finally, we apply the correction algorithm detailed in Section~\ref{correction} (\texttt{sim+fix}).
+%Note that despite assigned a positive similarity score, sentence pairs in the range $[0, 0.076]$ (aobut $6$ million sentences) does not seem to contribute when training a neural MT network. 
+%On the contrary, when added as training data the MT accuracy is reduced.
+
+Finally, table~\ref{results} shows BLEU results for our neural MT engine trained over different data configurations:
+\begin{itemize}
+\item The entire\footnote{The original Paracrawl corpus contains more than $100$ million sentences. We reduced its size to $22.2$ millions using standard filtering techniques.} data sets (\texttt{all}) of both corpora,
+\item The most similar pairs as predicted by our network (\texttt{sim}),
+\item After applying the correction algorithm detailed in Section~\ref{correction} (\texttt{sim+fix}).
+\end{itemize}
 Columns Ref and Fix indicate the number of original and corrected sentences (in millions) considered to train the neural MT system.
 
 \begin{table}[h!]
@@ -578,13 +582,13 @@ Columns Ref and Fix indicate the number of original and corrected sentences (in 
 \label{results}
 \end{table}
 
-Results obtained after filtering sentence pairs by our network, \texttt{sim}, clearly outperform the baseline \texttt{all} by $+0.94$ and $+2.25$ BLEU respectively.
+Results obtained after filtering sentence pairs by our network (\texttt{sim}) clearly outperform the baseline (\texttt{all}) by $+0.94$ and $+2.25$ BLEU respectively.
 
 Regarding OpenSubtitles, when fixing $2.5$ million sentences ($4^{th}$ row) the accuracy is further boosted to $+2.01$, while the same sentence pairs does not show any improvement when added in their original form ($3^{rd}$ row).
 %results are further improved $+2.01$ when fixing $2.5$ million sentences ($4^{th}$ row). 
 %The same $2.5$ million sentences did not show any improvement when added in their original form 
 
-Similar results are obtained over the Paracrawl corpus. Results after fixing $2.5$ million sentences ($4^{th} row$) outperform those obtained by the same same sentence pairs when used by the neural MT system in their original form ($3^{rd} row$).
+Similar results are obtained over the Paracrawl corpus. Results after fixing $2.5$ million sentences ($4^{th} row$) outperform those obtained by the same sentence pairs when used by the neural MT system in their original form ($3^{rd} row$).
 
 \section{Conclusions}
 \label{conclusions}
