@@ -27,7 +27,7 @@
 \usepackage{graphicx}
 \usepackage{array,multirow}
 
-%\aclfinalcopy % Uncomment this line for the final submission
+\aclfinalcopy % Uncomment this line for the final submission
 
 \setlength\titlebox{5cm}
 % You can expand the titlebox if you need extra space
@@ -42,19 +42,11 @@
 \title{Fixing Translation Divergences in Parallel Corpora for Neural MT}
 %\title{A Recurrent Network for Parallel Corpora Divergence Analysis}
 
-\author{%Minh Pham, \ Fran\c cois Yvon\\
-  First author\\
-  Affiliation / Address line 1\\
-  Affiliation / Address line 2\\
-  Affiliation / Address line 3\\
-  {\tt email@domain}  
-  \And
-  %Josep Crego, \ Jean Senellart\\
-  Second author\\
-  Affiliation / Address line 1\\
-  Affiliation / Address line 2\\
-  Affiliation / Address line 3\\
-  {\tt email@domain}}
+\author{MinhQuang Pham$^{\dag\ddag}$, \ \ Josep Crego$^\dag$,\ \ Jean Senellart$^\dag$ ,\ \ Fran\c cois Yvon$^\ddag$\\
+  $^\dag$SYSTRAN / 5 rue Feydeau, 75002 Paris, France\\
+  {\tt firstname.lastname@systrangroup.com}\\
+  $^\ddag$LIMSI-CNRS / Universit\'e Paris-Saclay 91405 Orsay, France\\
+  {\tt firstname.lastname@limsi.fr}} 
 
 \date{}
 
@@ -64,19 +56,16 @@
 
 %http://www.airccj.org/CSCP/vol4/csit42503.pdf
 
-Corpus-based approaches to machine translation rely on the availability of parallel corpora.
-%and their performance is highly linked to the quality of the parallel data. 
-According to the process followed to compile a parallel corpus, it may contain multiple parallel sentences that are often not as parallel as one might assume. 
-%Examples are easily found when corpora is created from non-parallel texts or included by noisy document/sentence alignment tools.
-This paper describes an unsupervised method for detecting translation divergences in parallel sentences. 
-%We use a deep neural network to predict word alignment scores in parallel sentences. 
-We present a neural network to predict sentence similarity that minimises a loss function based on word alignments.
-We show that accurate predictions are obtained allowing divergent sentences to be filtered out. 
-Furthermore, word similarity scores predicted by the network are used to identify and fix some divergences guiding to more parallel segments.
-%Misaligned words are then identified allowing divergent parallel sentences to be filtered out and in some cases making sentences parallel by removing such words. 
-We evaluate the presented method on an English-French and an English-German machine translation tasks. 
+Corpus-based approaches to machine translation rely on the availability and quality of parallel corpora.
+%In the case of neural machine translation, a large neural network is trained to maximise the translation performance on a given parallel corpus. 
+Such resource is not naturally existing, and because of the process necessary to compile a parallel corpus, it may contain multiple sentence pairs that are often not as parallel as one might assume.
+This paper describes an unsupervised method for detecting translation divergences in parallel sentences.
+We present a neural network to predict sentence similarity that minimises a loss function based on word divergence.
+We show that accurate predictions are obtained allowing divergent sentences to be filtered out.
+Furthermore, word similarity scores predicted by the network are used to identify and fix some divergences guiding to collect additional parallel segments.
+We evaluate the presented method on  English-French and  English-German machine translation tasks.
 Results show that neural MT systems trained on the filtered/corrected corpus outperform the MT systems trained on the original data.
-%This method can be used on any parallel corpus without any manual annotation.
+
 
 \end{abstract}
 
@@ -84,19 +73,15 @@ Results show that neural MT systems trained on the filtered/corrected corpus out
 
 Parallel sentence pairs are the only necessary resource to build Machine Translation (MT) systems. 
 In the case of Neural MT, a large neural network is trained through maximising translation performance on a given parallel corpus. 
-Therefore, the quality of an MT engine is heavily dependent upon the amount and quality of parallel sentences. 
-Unfortunately, parallel texts are scarce resources. 
-There are relatively few language pairs for which parallel corpora of reasonable sizes are available, and even for those pairs, the corpora come mostly from few domains. 
-To alleviate the lack of parallel data several approaches have been developed in the last years. 
-They range from methods using non-parallel, or comparable data ~\cite{Zhao:2002:APS:844380.844785,W04-3208,J05-4003,W17-2509,P17-3003} to techniques that produce synthetic parallel data from monolingual corpora ~\cite{P16-1009,W17-4714} using in all cases automated alignment/translation engines that are prone to the introduction of noise in the resulting parallel sentences. 
-Mismatches on parallel sentences extracted from translated texts are also reported ~\cite{tiedemann2011bitext,XU16.310}. 
-This problem is mostly ignored in machine translation, where parallel sentences are considered to convey the exact same meaning, and is particularly important for neural MT engines as suggested by~\cite{chen2016adaptation}.
+Therefore, the quality of an MT engine is heavily dependent upon the amount but also the quality of parallel sentences.\footnote{Note that  recent work on neural MT~\cite{lample2018word,artetxe2018iclr} completely dispenses with the need of parallel data, using unsupervised methods to obtain performance improvements over word-by-word statistical MT systems. However, these systems still lag far behind systems trained in a supervised fashion, as considered in this work.} 
 
-Table~\ref{tab:examples} illustrates some examples of English-French parallel sentences which are not completely semantically equivalent. Examples are extracted from the OpenSubtitles corpus~\cite{LisonTiedemann2016}. 
-Divergences are outlined using bold letters. 
-Additional segments are included on either side of the parallel sentences (first and second rows). 
-Some translations may be completely uncorrelated (third row) or inaccurate (fourth row).
-Note that divergent translations are due to many different reasons ~\cite{C14-1055}, the study of which is beyond the scope of this paper.
+Unfortunately, parallel texts are scarce resources. 
+There are relatively few language pairs for which parallel corpora of large sizes are available, and even for those pairs, the corpora come mostly from few restricted domains. 
+To alleviate the lack of parallel data, several approaches have been developed in the last years. 
+They range from methods using non-parallel, or comparable data 
+~\cite{Zhao:2002:APS:844380.844785,W04-3208,J05-4003,GregoireL18,P17-3003,P18-2037} to techniques that produce synthetic parallel data from monolingual corpora ~\cite{P16-1009,W17-4714} using in all cases automated alignment/translation engines that are prone to the introduction of noise in the resulting parallel sentences. 
+Mismatches in parallel sentences extracted from translated texts are also reported ~\cite{tiedemann2011bitext,XU16.310}. 
+This problem is mostly ignored in machine translation, where parallel sentences are considered to convey the exact same meaning, and is particularly important for neural MT engines as suggested by~\cite{chen2016adaptation}.
 
 \begin{table}[ht]
 \small
@@ -124,33 +109,45 @@ Note that divergent translations are due to many different reasons ~\cite{C14-10
 \label{tab:examples}
 \end{table}
 
-In this work, we present a neural divergence classifier aimed at detecting words on either side of parallel sentences for which the corresponding meaning is not present on the translated counterpart. 
-We evaluate the classifier on an English-French and an English-German translation tasks showing that translation accuracy can be improved by filtering out divergent sentence pairs.
-In addition, we  show that some divergent sentences can be fixed by removing divergent words, further boosting translation accuracy. 
+Table~\ref{tab:examples} gives some examples of English-French parallel sentences that are not completely semantically equivalent, extracted from the OpenSubtitles corpus ~\cite{LisonTiedemann2016}. 
+Divergences are outlined using bold letters. 
+Different types of translation divergences exist in a parallel corpus:
+Additional segments are included on either side of the parallel sentences (first and second rows) most likely due to errors in sentence segmentation tools;
+Some translations may be completely uncorrelated (third row);
+Inaccurate translations also exist (fourth row). 
+Note that divergent translations can be due to many different reasons ~\cite{C14-1055}, the study of which is beyond the scope of this paper. 
 
-The remainder of this paper is structured as follows. Section~\ref{related} overviews related work. 
-We describe in detail the core of the neural divergence classifier and the correction algorithm in Section~\ref{sec:divergence}. 
-Section~\ref{experiments} details the experiments conducted to measure the ability of the presented classifier to identify and fix divergent sentences.
+In this work, we present an unsupervised method for building cross-lingual sentence embeddings based on modelling word similarity. % in the form of continuous vectors. 
+The architecture of our network allows us to distinguish between different types of divergences which are common to many existing bi-texts.
+The resulting sentence embeddings are then used to measure semantic equivalence of the corresponding sentences.
+To evaluate our method we show that translation accuracy can be improved after filtering out divergent sentence pairs in an English-to-French and an English-to-German translation tasks.
+Then, we  show that in some cases, divergent sentences can be fixed by removing divergent words, further boosting translation accuracy.
+
+The remainder of this paper is structured as follows. 
+Section~\ref{related} overviews related work. 
+We describe in detail the core of the neural divergence classifier in Section~\ref{sec:divergence}. 
+We report experiments with the presented model in Section~\ref{experiments}.
 Section~\ref{sec:results} evaluates results. 
-Finally, conclusions are drawn in Section~\ref{conclusions} while further work is outlined in Section~\ref{further}.
-All the code used in this paper as well as a human annotated test set are freely available\footnote{\texttt{https://github.com/anonymised}}.
+Finally, conclusions are drawn in Section~\ref{conclusions} and further work is outlined in Section~\ref{further}.
+All the code used in this paper is freely available\footnote{https://github.com/jmcrego/similarity}.
+
 
 \section{Related Work}
 \label{related}
 
-Attempts to measure the impact of translation divergences in MT systems have focused on the introduction of noise in sentence alignments ~\cite{goute2012}, showing that statistical MT systems are highly tolerant to noise, and that performance only degrades seriously at very high noise levels. 
-In constrast, neural MT engines seem to be more sensitive~\cite{chen2016adaptation}, as they tend to assign high probabilities to rare events~\cite{Hassan2018AchievingHP}.
+Attempts to measure the impact of translation divergences in MT systems have focused on the introduction of noise in sentence alignments~\cite{goute2012}, showing that statistical MT systems are highly tolerant to noise, and that performance only degrades seriously at very high noise levels. 
+In contrast, neural MT engines seem to be more sensitive~\cite{chen2016adaptation}, as they tend to assign high probabilities to rare events~\cite{Hassan2018AchievingHP}.
 
-Efforts have been devoted to characterise the degree of semantic equivalence between two snippets of text in the same or different languages~\cite{conf/semeval/AgirreBCDGMRW16}, a workshop devoted to an objective similar to our work. 
+Efforts have been devoted to characterising the degree of semantic equivalence between two snippets of text in the same or different languages~\cite{conf/semeval/AgirreBCDGMRW16}, a workshop devoted to an objective similar to our work. 
 In~\cite{Mueller:2016:SRA:3016100.3016291}, a monolingual sentence similarity network is proposed, making use of a simple LSTM layer to compute sentence representations. 
 The authors show that a simple SVM classifier can be built on top of the sentence representations to achieve state-of-the-art results in a semantic entailment classification task. 
 With the same objective, the system presented in~\cite{N16-1108} uses multiple convolutional layers and models pairwise word interactions. %Our work differs from the previous as we build a different network and use it to measure similarity of sentences in different languages. 
 
 Our work is inspired by~\cite{W17-3209} where the authors train a cross-lingual divergence detector using word alignments and sentence length features to train a linear SVM classifier. 
 Their work shows that an NMT system trained only on non-divergent sentences yields slightly higher translation quality scores and requires clearly less training time. 
-The same authors have recently updated their work in~\cite{DBLP:journals/corr/abs-1803-11112}. 
+The same authors have recently updated their work in~\cite{N18-1136}. 
 The objective is the same as the neural network presented in~\cite{N16-1108} and their network further outperforms their previous work. 
-Our work differs from the previous as we make use of a network with different topology. 
+Our work differs from the previous as we make use of a network with a different topology. 
 We model sentence similarity by means of optimising a loss function based on word alignments. 
 Furthermore, the network predicts word similarity scores that we further use to correct divergent sentences.
 
@@ -183,13 +180,8 @@ At this point, a measure of similarity between sentence pairs can be obtained by
 \end{equation}
 %\noindent where two vectors (embeddings) with the same orientation have a cosine similarity of $1$, while two vectors with opposed orientation have a similarity of $-1$, independent of their magnitude.
 
-Our model can be optimised following two different objective functions:
-
-\begin{description}
-    \item[wemb] 
- 
-Maximise the word alignment scores between words of both sentences using aggregation functions that summarise the alignment scores for each source/target word. 
-Similar to~\cite{W16-2207} alignment scores $s(i,j)$ are given by the dot-product $S(i,j) = h_i^{src} \cdotp h_j^{tgt}$, while aggregation functions are defined as:   
+Our model is optimised through maximising word alignment scores between words of both sentences using aggregation functions that summarise the alignment scores for each source/target word. 
+Similar to~\cite{W16-2207} alignment scores $S(i,j)$ are given by the dot-product $S(i,j) = h_i^{src} \cdotp h_j^{tgt}$, and aggregation functions are defined:   
 \begin{equation}
 \begin{split}
     aggr_s(i,S) = \frac{1}{r} \ log \left( \displaystyle \sum_{j=1}^{J} e^{r * S(i,j)}\right) \\
@@ -204,84 +196,73 @@ The loss function is defined as:
 \begin{equation}
 \begin{split}
 \mathcal{L}(src,tgt) = \ \ \ \ & \\
-    \sum_{i=1}^I log(1+e&^{s_{aggr}(i,tgt) * sign_i}) \ \ +\\
- + \sum_{j=1}^J log(1+e&^{s_{aggr}(src,j) * sign_j})
+    \sum_{i=1}^I log(1+e&^{aggr_s(i,S) * sign_i}) \ \ +\\
+ + \sum_{j=1}^J log(1+e&^{aggr_t(j,S) * sign_j})
 \end{split}
 \label{loss_wemb}
 \end{equation}
 %\vspace{-8mm}
 
-
-    \item[semb] Maximise the similarity score of  both sentence embeddings as computed by Equation~\ref{cosine}. With loss function defined as: 
-%\vspace{-5mm}
-\begin{equation}
-\mathcal{L}(src,tgt) = log(1+e^{sim(src,tgt) * sign}) % where $sign(src,tgt) =1
-\label{loss_semb}
-\end{equation}
-
-\end{description}
-
 \subsection{Training with Negative Examples}
 \label{negative}
 
 Training is performed by minimising Equation~\ref{loss_wemb}, for which examples with annotations for source $sign_i$ and target $sign_j$ words are needed.
-As positive examples we use {\bf (P)}aired sentences of a parallel corpus. All words in paired sentences are labelled as parallel ($-1$). %, $sign_i=-1$ and $sign_j=-1$. 
-As negative examples we use random {\bf (U)}npaired sentences. 
+Different kind of examples are used to train our network:
+\begin{itemize}
+
+\item As positive examples we use paired sentences of a parallel corpus. All words in paired sentences are labelled as parallel ($-1$). %, $sign_i=-1$ and $sign_j=-1$. 
+\item As negative examples we use random unpaired sentences. 
 In this case, all words are labelled as divergent ($+1$). %, $sign_i=+1$ and $sign_j=+1$. 
-Since negative pairs may be very easy to classify and we want our network to detect less obvious divergences, we further create negative examples following: % the next two methods:
+Since negative pairs may be very easy to classify and we want our network to detect less obvious divergences, we further create negative examples following the next two methods:
 
-We {\bf (R)}eplace random sequences of words by a sequence of words with same parts-of-speech. 
+\item We replace random sequences of words on either side of the sentence pair by a sequence of words with the same part-of-speeches. 
 The rationale behind this method is to keep the new sentences as grammatical as possible. 
-%Otherwise the network can learn to detect non-grammatical sentences to predict divergence.
+Otherwise, to predict divergence the network can learn to detect non-grammatical sentences.
 Words that are not replaced are considered parallel ($-1$) while those replaced are assigned the divergent label ($+1$). 
-Words aligned to any replaced word are also assigned the divergent label ($+1$). For instance, given the original sentence pair:
+Words aligned to some replaced words are also assigned the divergent label ($+1$). For instance, given the original sentence pair:
 
 \begin{table}[h]
-\small
 \center
 \begin{tabular}{ll}
-$src$: & { \small \texttt{What do you feel ?}} \\
-$tgt$: & { \small \texttt{Que ressentez-vous ?}} \\
+src: & { \small \texttt{What do you feel ?}} \\
+tgt: & { \small \texttt{Que ressentez-vous ?}} \\
 \end{tabular}
 \end{table}
 
-We may replace '\texttt{you feel}', with tags '\texttt{PRP VB}', by another with same tags (i.e. '\texttt{we want}'):
+We may replace '\texttt{you feel}', with part-of-speech tags '\texttt{PRP VB}', by another sequence with same tags (i.e. '\texttt{we want}'):
 
 \begin{table}[h]
-\small
 \center
 \begin{tabular}{ll}
-$src$: & { \small \texttt{What do {\bf we \ want} ?}} \\
-$sign_i$: & { \small \texttt{-1 \ \  -1 {\bf +1\ \ +1} \ \  -1}} \\
-$tgt$: & { \small \texttt{Que {\bf ressentez-vous} ?}} \\
-$sign_j$: & { \small \texttt{-1\ \ {\bf +1}\ \ \ \ \ \ \ \ \ -1}} \\
+src: & { \small \texttt{What do {\bf we \ want} ?}} \\
+$\mathcal{Y}^{src}$: & { \small \texttt{-1 \ \  -1 {\bf +1\ \ +1} \ \  -1}} \\
+tgt: & { \small \texttt{Que {\bf ressentez-vous} ?}} \\
+$\mathcal{Y}^{tgt}$: & { \small \texttt{-1\ \ {\bf +1}\ \ \ \ \ \ \ \ \ -1}} \\
 \end{tabular}
 \end{table}
 
-%Divergent words are shown in bold. 
-%Note that new sentences are not assured to be grammatical after replacing sequences with the same part-of-speech.
-Word alignments are used to identify '\texttt{ressentez-vous}' as divergent, since it is aligned to '\texttt{you feel}'.
+Divergent words are shown in bold. 
+Note that the new sentences are not assured to be grammatical after replacing sequences with the same part-of-speech.
+We use word alignments to identify as divergent the sequence '\texttt{ressentez-vous}' since it is aligned to '\texttt{you feel}' in the original sentence pair.
 
-Motivated by sentence segmentation errors observed in many corpora, we also build negative examples by {\bf (I)}nserting a second sentence following/preceding an %at the beginning (or end) of the source (or target) pair. 
-original sentence. Only inserted words are considered divergent ($+1$).
-Following with our example, we may add the sentence '\texttt{Not .}' at the end of the original source sentence:
+\item Finally, motivated by sentence segmentation errors observed in many corpora, we also build negative examples by inserting a second sentence at the beginning (or end) of the source (or target) sentence pair. 
+Words in the original sentence pair are assigned the parallel label ($-1$) while the new words inserted are considered divergent ($+1$).
+Given the original sentence pair previously shown, we may want to build the next negative example by inserting the sentence '\texttt{Not .}' at the end of the original source sentence:
 
 \begin{table}[h]
-\small
 \center
 \begin{tabular}{ll}
-$src$: & { \small \texttt{What do you want ? {\bf Not \ .}}} \\
-$sign_i$: & { \small \texttt{-1 \ \  -1 -1 \ -1  \ \ -1 {\bf +1\ \ \  +1}}} \\
-$tgt$: & { \small \texttt{Que ressentez-vous ?}} \\
-$sign_j$: & { \small \texttt{-1\ \ -1\ \ \ \ \ \ \ \ \ \ \ \ \ -1}} \\
+src: & { \small \texttt{What do you want ? {\bf Not \ .}}} \\
+$\mathcal{Y}^{src}$: & { \small \texttt{-1 \ \  -1 -1 \ -1  \ \ -1 {\bf +1\ \ \  +1}}} \\
+tgt: & { \small \texttt{Que ressentez-vous ?}} \\
+$\mathcal{Y}^{tgt}$: & { \small \texttt{-1\ \ -1\ \ \ \ \ \ \ \ \ \ \ \ \ -1}} \\
 \end{tabular}
 \end{table}
+
+\end{itemize}
 
 Replace and insert methods are applied on either side of the sentence pairs.
 To avoid that negative examples are easily predicted by using the difference in length of sentences, we restrict negative examples to have a difference in length not exceeding a ratio of $2.0$ ($3.0$ for shortest sentences).
-
-The loss function of Equation~\ref{loss_semb} uses a single label for each sentence pair. 
-Positive examples are labelled $sign=-1$ while any of the previous negative examples are labelled $sign=+1$.
 
 \subsection{Divergence Correction}
 \label{correction}
@@ -289,16 +270,16 @@ Positive examples are labelled $sign=-1$ while any of the previous negative exam
 We observed in our training corpora that many divergent sentences follow a common pattern, consisting of adding some extra leading/trailing words. % (as in the first and second examples of table~\ref{tab:examples}). 
 Accordingly, we implemented a simple algorithm that discards sequences of leading/trailing words on both sides. 
 Hence considering as parallel $s_u^v$ and $t_x^y$. 
-To find the optimal source ($u, v$) and target ($x, y$) indexes that enclose the parallel segments within the original sentence, we implement:
+To find optimal source ($u, v$) and target ($x, y$) indices that enclose parallel segments within the original sentence, we implement:
 \begin{equation*}
 \underset{u, v, x, y}{\arg\max} \Big \{      \underset{u \le I \le v}{\sum} \underset{x \le j \le y}{\max} \{ S(i,j) \}    \Big \}
 \end{equation*}
 
-The $\mathcal{N}$-best sequences following the previous function ($s_u^v$, $t_x^y$) are considered as valid corrections, but only the highest ranked according to their similarity score is used as replacement for the original $(s_1^I, t_1^J)$.
+The $\mathcal{N}$-best sequences following the previous function ($s_u^v$, $t_x^y$) are considered as valid corrections, but only the highest ranked according to its similarity score is used as replacement for the original $(s_1^I, t_1^J)$.
 Short sentences are not considered. This is, $v - u > \tau$ and $y - x > \tau $. 
 Figure~\ref{matrix} (left) shows an example of an alignment matrix $S(i,j)$ for a given sentence pair. 
 An acceptable correction is: \textit{Que ressentez-vous ? $\Leftrightarrow$ What do you feel ?}. 
-Hence, with indexes $u=1$, $v=5$, $x=1$ and $y=3$.
+Hence, with indices $u=1$, $v=5$, $x=1$ and $y=3$.
 
 
 \section{Experiments}
@@ -309,59 +290,60 @@ Hence, with indexes $u=1$, $v=5$, $x=1$ and $y=3$.
 \subsection{Corpora}
 \label{corpora}
 
-We filter out divergences found in the English-French OpenSubtitles corpus~\cite{LisonTiedemann2016}, which consists of a collection of movie and TV subtitles. We also use the English-German Paracrawl\footnote{http://paracrawl.eu/} corpus. 
+We filter out divergences found in the English-French OpenSubtitles corpus~\cite{LisonTiedemann2016}, which consists of a collection of movie and TV subtitles. 
+We also use the very noisy English-German Paracrawl\footnote{http://paracrawl.eu/} corpus. 
 Both corpora present many potential divergences.
 To evaluate English-French performance we use the En-Fr Microsoft Spoken Language Translation corpus, created from actual conversations over Skype~\cite{mslt-corpus-iwslt-2016-release}. 
-English-German performance is evaluated on the publicly available newstest-2017 En-De test set, corresponding to news stories selected from online sources~\cite{W17-4717}.
-In order to better assess the quality of our classifier when facing different types of word divergences we collected and annotated at the word level $500$ sentences from the original OpenSubtitles corpus, containing:
+English-German performance is evaluated on the publicly available newstest-2017 En-De test set~\cite{W17-4717}, corresponding to news stories selected from online sources.
+
+In order to better assess the quality of our classifier when facing different word divergences we collected from the original OpenSubtitles corpus $500$ sentences containing different types of examples:
 $200$ paired sentences;
 $100$ unpaired sentences;
 $100$ sentences with replace examples; and
 $100$ sentences with insert examples as detailed in Section~\ref{negative}.
-
-
-%For training, our systems use a random selection ($3$ million sentence pairs) of the OpenSubtitles corpus~\cite{LisonTiedemann2016} which consists of a collection of movie and TV subtitles. %, aligned at the sentence level after a number of automatic preprocessing steps. 
-%The corpus presents many potential divergences as outlined in Table~\ref{tab:examples}.
-
-%We evaluated the suitability of the filtering systems on the En-Fr Microsoft Spoken Language Translation task ({\bf MSLT}), created from actual conversations~\cite{mslt-corpus-iwslt-2016-release}. We also tested on a second domain, using the publicly available newstest-2013 En-Fr test set ({\bf NEWS}), corresponding to news stories selected from online sources~\cite{WMT:2013}.
+All data is preprocessed with \texttt{OpenNMT}\footnote{http://opennmt.net}, performing minimal tokenisation. %, basically splitting-off punctuation.
 
 \subsection{Neural Divergence}
 \label{divergence}
 
-All data is preprocessed with an in-house toolkit that performs minimal tokenisation. %, basically splitting-off punctuation.
 After tokenisation, each out-of-vocabulary word is mapped to a special UNK token.
 Vocabularies consist of the $50,000$ more frequent words.
-%Our divergence classifier is described in Section~\ref{divergence}. 
-Word embeddings are initialised using \texttt{fastText}\footnote{https://github.com/facebookresearch/fastText}. %, further aligned by means of \texttt{MUSE}\footnote{https://github.com/facebookresearch/MUSE} following the unsupervised method detailed in~\cite{lample2018word}. 
+Word embeddings are initialised using \texttt{fastText}\footnote{https://github.com/facebookresearch/fastText}, further aligned by means of \texttt{MUSE}\footnote{https://github.com/facebookresearch/MUSE} following the unsupervised method detailed in~\cite{lample2018word}. 
 Size of embeddings is $E_s=E_t=256$ cells. 
 Both Bi-LSTM use $256$-dimensional hidden representations ($E=512$).
 We use $r=1.0$. 
 Network optimization is done using the SGD method along with gradient clipping~\cite{Pascanu:2013:DTR:3042817.3043083}. 
 For each epoch we randomly select $1$ million sentence pairs that we place in batches of $32$ examples.  
 We run $10$ epochs and start decaying at each epoch by $0.8$ when the loss on validation set increases. 
-Two versions of the network are evaluated. 
-The first optimises the loss shown by equation~\ref{loss_wemb}, the second optimises the loss shown by equation~\ref{loss_semb}. 
-Divergence is always computed following equation~\ref{cosine}. 
-For divergence correction, we used $\mathcal{N}=20$ and $\tau=3$.
+Divergence is computed following equation~\ref{cosine}. 
+For divergence correction, we use $\mathcal{N}=20$ and $\tau=3$.
+The same number of examples are always generated for each type of example ({\texttt P}aired, {\texttt U}npaired, {\texttt R}eplace and {\texttt I}nsert). 
+Alignments needed for {\texttt R}eplace and {\texttt I}nsert methods are performed using \texttt{fast\_align}\footnote{https://github.com/clab/fast\_align}.
 
 \subsection{Neural Translation}
 \label{translation}
 
-In addition to the basic tokenisation detailed in Section~\ref{divergence} we perform Byte-Pair Encoding~\cite{Sennrich2016} with $30,000$ merge operations learned from both English and French data.
-Neural MT systems are based on the open-source project \texttt{OpenNMT}\footnote{http://opennmt.net}. We use a Transformer model with same configuration in paper \cite{Transformer2017}, i.e, both encoder and decoder have 6 layers; Multi-head attention is performed over 8 heads. Hidden layer's size is 512. The inner layer of feedforward network is of size $2048$. Word embeddings have a size of $512$ cells. We set the dropout probability to $0.1$. Batch size is set to $3072$. The maximum length of both source and target sentences is set to $80$ and we limit the vocabulary size to $50K$ words for both source and target languages.
-
-The optimiser is Adam avec learning rate that was introduced in paper \cite{Transformer2017} with $\beta_1 = 0.9$, $\beta_2 = 0.98$, $\eta = 10^{-9}$, $warmup\_steps = 4000$. We stop training after 30 epochs.
+In addition to the basic tokenisation detailed in Section~\ref{divergence} we perform Byte-Pair Encoding~\cite{Sennrich2016} with $30000$ merge operations learned by joining both language sides.
+Neural MT systems are based on the open-source project  \texttt{OpenNMT}. 
+We use a Transformer model with same configuration than in paper~\cite{vaswani2017attention}, i.e, both encoder and decoder have $6$ layers; Multi-head attention is performed over $8$ heads. 
+Hidden layer size is $512$. 
+The inner layer of feed forward network is of size $2048$. 
+Word embeddings have $512$ cells. We set the dropout probability to $0.1$. 
+Batch size is set to $3072$.
+%The maximum length of both source and target sentences is set to $80$ and we limit the vocabulary size to $50,000$ words for both source and target languages. 
+The optimiser is Lazy Adam with $\beta_1 = 0.9$, $\beta_2 = 0.98$, $\epsilon = 10^{-9}$, $warmup\_steps = 4000$. We stop training after $30$ epochs.
 
 \section{Results}
 \label{sec:results}
 
-%We evaluate first the ability of our similarity classifier to predict different types of divergencies. 
-%We use the test set manually annotated for that purpose and train our model on the OpenSubtitles corpus.
-
+We evaluate first the ability of our divergence classifier to predict different types of divergences at the level of words. 
+We use the test set manually annotated for that purpose and train our model on the OpenSubtitles corpus.
+A word is considered divergent when associated to a negative aggregation score (see Equation~\ref{aggregation}).
 Table~\ref{results_puri} shows accuracies obtained by our model when trained over different combinations of negative examples.
-We use the test set with manual annotations of word divergences.
-In training, the same number of examples are always generated for each type of example (P, U, R and I). 
-A word is considered divergent if it has a negative aggregation score, Equation~\ref{aggregation}.
+
+As it can be seen, non-divergent words in parallel and unpaired sentences (columns \texttt{P} and \texttt{U}) are easy to identify, as far as the model has seen these types of examples in training. 
+However, the accuracy drops dramatically when the model is not trained with unpaired sentences (rows  \texttt{PR}, \texttt{PI} and \texttt{PRI}).
+Regarding columns \texttt{R} and \texttt{I}, accuracies are lower since these sentences contain a mix of divergent and non-divergent words. 
 
 \begin{table}[h]
 \small
@@ -380,35 +362,33 @@ A word is considered divergent if it has a negative aggregation score, Equation~
  &  \texttt{PURI} & \bf 0.995 & \bf 0.980 & \bf 0.916 & \bf 0.788 & \bf 0.942 \\
 \hline
 \end{tabular}
-\caption{Word divergence accuracies according to different type of examples used in train/test.}% for networks trained with different combinations of negative examples. P, U, R and I stand respectively for pair, unpair, replace and insert.}
+\caption{Word divergence accuracies according to different type of examples used in train/test.}
 \label{results_puri}
 \end{table}
 
-As it can be seen, non-divergent words in parallel and unpaired sentences (columns \texttt{P} and \texttt{U}) are easy to identify, as far as the model has seen these types of examples in training. 
-Regarding columns \texttt{R} and \texttt{I}, accuracies are lower since these sentences contain a mix of divergent and non-divergent words. 
-%Hence, word divergence is more difficult to predict. 
-Again, models that were trained with the corresponding examples obtain the highest accuracies (outlined in bold letters).
+Again, models that were trained with the corresponding examples (\texttt{R} and \texttt{I}) obtain the highest accuracies (outlined in bold letters).
 Column \texttt{PURI} shows results over the entire test set, mixing all type of examples. 
-The best accuracy is obtained by the system trained on all type of examples. 
+As expected, the best accuracy is also obtained by the system trained on all type of  examples. 
 
+Figure~\ref{matrix} illustrates the output of our network when trained using \texttt{PU} examples (right) and \texttt{PURI} examples (left).  
+The former (right) fails to predict some word divergences, most likely because in training it never saw sentences mixing divergent and non-divergent words in the same example. 
+
+%\vspace{-3mm}
 \begin{figure}[h]
 \centering
     \includegraphics[width=0.35\linewidth]{feel}    
     \includegraphics[width=0.35\linewidth]{feel_pu}    
-\caption{Sentence pair with similarity scores produced by our model when trained over PU examples (right) and over PURI examples (left). Aggregation scores (Equation~\ref{aggregation}) are shown next to words. Matrices contain alignment scores. Sentence similarities (Equation~\ref{cosine})  shown below matrices.}
+\caption{Sentence pair with similarity scores produced by our model when trained over \texttt{PU} examples (right) and over \texttt{PURI} examples (left). Aggregation scores (Equation~\ref{aggregation}) are shown next to words. Matrices contain alignment scores. Sentence similarities (Equation~\ref{cosine})  shown below matrices.}
 \label{matrix}
 \end{figure}
 
-Figure~\ref{matrix} illustrates the output of our network when trained using PU examples (right) and PURI examples (left).  
-The former (right) fails to predict some word divergences, most likely because in training it never saw sentences mixing divergent and non-divergent words in the same example. 
-%Furthermore, the latter (right) correctly assigns a lower similarity score to the sentence pair as both sentences do not convey the exact same meaning.
+Furthermore, the network trained over \texttt{PURI} examples (left) correctly assigns a lower similarity score to the sentence pair as both sentences do not convey the exact same meaning.
 
-Table~\ref{results} shows BLEU results for our neural MT engine trained over different data configurations:
-The entire\footnote{The original Paracrawl corpus contains more than $100$ million sentences. We reduced its size to $22.2$ millions using standard filtering techniques.} data (\texttt{all}); 
-Most similar pairs after optimising equation~\ref{loss_semb} (\texttt{semb}); 
-Most similar pairs after optimising equation~\ref{loss_wemb} (\texttt{wemb}); 
-Finally, we apply the correction algorithm detailed in Section~\ref{correction} (\texttt{wemb+fix}).
-Columns Ref and Fix indicate the number of original and corrected sentences (in millions) considered to train NMT.
+Finally, table~\ref{results} shows BLEU results for our neural MT engine trained over different data configurations:
+The entire\footnote{The original Paracrawl corpus contains more than $100$ million sentences. We reduced its size to $22.2$ millions using standard filtering techniques.} data sets (\texttt{all}) of both corpora; 
+Most similar pairs after optimising equation~\ref{loss_wemb} (\texttt{sim}); 
+Finally, we apply the correction algorithm detailed in Section~\ref{correction} (\texttt{sim+fix}).
+Columns Ref and Fix indicate the number of original and corrected sentences (in millions) considered to train our NMT system.
 
 \begin{table}[h!]
 \small
@@ -418,40 +398,39 @@ Columns Ref and Fix indicate the number of original and corrected sentences (in 
 \bf Data & \bf Ref (M) & \bf Fix (M) & \bf Test (BLEU) \\ %MSLT & \bf NEWS \\
 \hline
 \multicolumn{3}{c}{\scriptsize{OpenSubtitles English-French}} \\
-\texttt{all}                  & 27.2 & - & 42.18 \\
-\texttt{semb}            & 18.0 & - & 41.95\\
-\texttt{wemb}           & 15.5 & - & 43.12  ($+0.94$)\\
-%\texttt{wemb}           & 21.5 & - & 42.56 \\
-\texttt{wemb+fix}   & 15.5 & 2.5 & 44.19 \\
-\texttt{wemb}           & 18.0 & - & 43.19  ($+1.01$)\\
-%\texttt{wemb+fix}   & 15.5 & 5.0 & \\
+\texttt{all}                   & 27.2 & - & 42.18 \\
+%\texttt{semb}             & 18.0 & - & \\
+\texttt{sim}            & 15.5 & - & 43.12  ($+0.94$)\\
+%\texttt{sim}           & 21.5 & - & 42.56 \\
+\texttt{sim}           & 18.0 & - & 43.19  ($+1.01$)\\
+\texttt{sim+fix}     & 15.5 & 2.5 & \bf 44.19 ($+2.01$)\\
+%\texttt{sim+fix}   & 15.5 & 5.0 & \\
 \hline
 \multicolumn{3}{c}{\scriptsize{Paracrawl English-German}} \\
 %\texttt{all}                  & 100.0 & 12.56 \\ 
 \texttt{all}                  & 22.2 & - & 19.27 \\ 
-\texttt{semb}            & 15.0 & - & 20.23\\
-\texttt{wemb}           & 15.0 & - & 21.52 ($+2.25$)\\
-\texttt{wemb}           & 17.5 & - & 21.97   \\
-\texttt{wemb+fix}   & 15 & 2.5 & 22.42\\
+%\texttt{semb}            & 15.0 & - & \\
+\texttt{sim}           & 15.0 & - & 21.52 ($+2.25$)\\
+\texttt{sim}           & 17.5 & - & 21.97 ($+2.70$)\\
+\texttt{sim+fix}   & 15.0 & 2.5 & \bf 22.42 ($+3.15$) \\
 \hline
 \end{tabular}
 \caption{BLEU scores obtained by neural MT using different subsets of the OpenSubtitles and Paracrawl corpora.}
 \label{results}
 \end{table}
 
-Results for \texttt{wemb} clearly outperform the baseline \texttt{all} ($1^{st}$ rows) by about $+1.0$ and $+2.25$ BLEU ($3^{rd}$ rows). 
-In contrast, \texttt{semb} does not improve over the baseline ($2^{nd}$ rows).
-Regarding OpenSubtitles, an additional gain of $+X.X$ is found when fixing $2.5$ million sentences ($4^{th}$ row). 
-The same $2.5$ million sentences did not show any improvement when added in their original form ($5^{th}$ row).
+Results obtained after filtering sentence pairs by our network (\texttt{sim}) clearly outperform the baseline (\texttt{all}) by $+0.94$ and $+2.25$ BLEU respectively.
+Regarding OpenSubtitles, when fixing $2.5$ million sentences ($4^{th}$ row) the accuracy is further boosted to $+2.01$, while the same sentence pairs does not show any improvement when added in their original form ($3^{rd}$ row).
+Similar results are obtained over the Paracrawl corpus. Results after fixing $2.5$ million sentences ($4^{th} row$) outperform those obtained by the same sentence pairs when used by the neural MT system in their original form ($3^{rd} row$).
 
-At this moment experiments showing correction results regarding Paracrawl  are not yet finished.
 
 \section{Conclusions}
 \label{conclusions}
 
 We presented an unsupervised method based on deep neural networks for detecting translation divergences in parallel sentence pairs. 
-Our model also predicts misaligned words that can then be filtered out allowing for reusing some divergent sentences.
-We evaluated our model on two neural machine translation tasks, showing improvements when compared to training over the entire data set. 
+Our model optimises word alignments. Hence, allowing for fine grained divergence prediction at the level of words. 
+Misaligned/divergent words can then be filtered out allowing for reusing some divergent sentences. 
+We evaluated our model on two neural machine translation tasks, showing significant improvements when compared to training over the entire data set. 
 %The method can be used on any parallel corpus without any manual annotation.
 
 \section{Further Work}
@@ -461,8 +440,11 @@ We evaluated our model on two neural machine translation tasks, showing improvem
 %as well as to measure the impact of using less noisy data when learning the similarity model
 %We also would like to evaluate the impact of using less noisy (already filtered) data to learn the similarity model. 
 %We would also like to use our model to predict other types of divergences 
-We plan to use our model to predict sentence embeddings over monolingual corpora allowing to collect parallel pairs through vector similarity measures.
-%We also plan to study the use of a neural network to predict divergent words, as a replacement for the algorithm detailed in Section~\ref{correction}.
+We plan to use our model to predict sentence embeddings over monolingual corpora, allowing to collect parallel pairs through vector similarity measures.
+%We also plan to further evaluate the correction algorithm.
+In addition, we would like to measure the performance of our model after applying subword tokenisation,
+%when working with a reduced vocabulary set, as a result of applying any subword tokenisation,
+as well as using multiple LSTM layers, which is well known to capture hierarchical structure in the context of MT.
 
 %\section*{Acknowledgements}
 %We are grateful to Jo\"el Legrand for his fruitful comments when building the neural divergence classifier.
