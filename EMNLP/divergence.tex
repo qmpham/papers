@@ -56,14 +56,10 @@
 \begin{abstract}
 %http://www.airccj.org/CSCP/vol4/csit42503.pdf
 
-Corpus-based approaches to machine translation rely on the availability and quality of parallel corpora.
+Corpus-based approaches to machine translation rely on the availability of clean parallel corpora.
 %In the case of neural machine translation, a large neural network is trained to maximise the translation performance on a given parallel corpus. 
-Such resources are scarce, and because of the processes involved in their preparation, they may contain sentence pairs that are not as parallel as one would expect.
-This paper describes an unsupervised method for detecting such translation divergences in parallel sentences. We rely on a  neural network trained
-to predict sentence similarity that minimises a loss function based on word divergence. Its predictions are sufficiently accurate to effectively filtered out divergent translations.
-Furthermore, word similarity scores predicted by the network are used to identify and fix some partial divergences, yielding additional parallel segments.
-We evaluate these methods for  English-French and  English-German machine translation tasks: 
-neural MT systems trained on the filtered/corrected corpora outperform the MT systems trained on the original data.
+Such resources are scarce, and because of the automatic processes involved in their preparation, they are often noisy. % may contain sentence pairs that are not as parallel as one would expect.
+This paper describes an unsupervised method for detecting translation divergences in parallel sentences. We rely on a neural network that computes cross-lingual sentence similarity scores, which are then used to effectively filter out divergent translations. Furthermore, similarity scores predicted by the network are used to identify and fix some partial divergences, yielding additional parallel segments. We evaluate these methods for English-French and English-German machine translation tasks,  and show that using filtered/corrected corpora actually improves MT performance.
 
 \end{abstract}
 
@@ -116,10 +112,11 @@ Inaccurate translations also exist (fourth row).
 Note that divergent translations can be due various reasons~\cite{C14-1055}, the study of which is beyond the scope of this paper. 
 
 In this work, we present an unsupervised method for building cross-lingual sentence embeddings based on modelling word similarity,  % in the form of continuous vectors. 
-relying on a neural architecture (see \textsection~\ref{sec:divergence}) that is able to identify several types of common cross-lingual divergences. % which are common to many existing bi-texts.
+relying on a neural architecture (see \textsection~\ref{sec:divergence}) that is able to identify several types of common cross-lingual divergences. 
+% which are common to many existing bi-texts.
 The resulting embeddings are then used to measure semantic equivalence between sentences.
 To evaluate our method, we show in \textsection~\ref{experiments} that translation accuracy can be improved after filtering out divergent sentence pairs in an English-to-French and an English-to-German translation tasks.
-We also show that in some cases, divergent sentences can be fixed by removing divergent words, further boosting translation accuracy. All the code used in this paper is freely available.\footnote{https://github.com/jmcrego/similarity}
+We also show that in some cases, divergent sentences can be fixed by removing divergent segments, further increasing translation quality. All the code used in this paper is freely available.\footnote{https://github.com/jmcrego/similarity}
 
 % Useless for a short
 % The remainder of this paper is structured as follows. 
@@ -256,7 +253,7 @@ To find optimal source ($u, v$) and target ($x, y$) indices that enclose paralle
 \begin{equation*}
 \underset{u, v, x, y}{\arg\max} \Big \{      \underset{u \le I \le v}{\sum} \underset{x \le j \le y}{\max} \{ S(i,j) \}    \Big \}
 \end{equation*}
-The $\mathcal{N}$-best sequences ($s_u^v$, $t_x^y$) are considered as likely corrections, in which we use the one having the highest similarity score to replace the original $(s_1^I, t_1^J)$.
+The $\mathcal{N}$-best sequences ($s_u^v$, $t_x^y$) are considered as likely corrections, in which we select the one having the highest sentence-level similarity to replace the original $(s_1^I, t_1^J)$.
 Note that short sentences are not considered and we enforce $v - u > \tau$ and $y - x > \tau $. 
 Figure~\ref{matrix} (left) displays an example of an alignment matrix $S(i,j)$.
 An acceptable correction is: \textit{Que ressentez-vous ? $\Leftrightarrow$ What do you feel ?}. 
@@ -351,14 +348,14 @@ Furthermore, the network trained with \texttt{PURI} examples correctly assigns a
 \centering
     \includegraphics[width=0.35\linewidth]{feel}    
     \includegraphics[width=0.35\linewidth]{feel_pu}    
-\caption{Sentence pair with similarity scores produced by our model when trained over \texttt{PU} examples (right) and over \texttt{PURI} examples (left). Aggregation scores (Equation~\ref{aggregation}) are shown next to words. Matrices contain alignment scores. Sentence similarities (Equation~\ref{cosine})  shown below matrices.}
+\caption{Sentence pair with similarity scores produced by our model when trained with \texttt{PU} examples (right) and over \texttt{PURI} examples (left). Aggregation scores (Eq.~\eqref{aggregation}) are shown next to words. Matrices contain alignment scores. Sentence similarities (Eq.~\eqref{cosine}) are below matrices.}
 \label{matrix}
 \end{figure}
 
-Finally, table~\ref{results} gives BLEU results when training our MT with varying data configurations:
-The entire\footnote{Paracrawl contains more than $100$M sentences. We reduced its size to $22.2$M using standard filtering techniques.} data sets (\texttt{all}) of both corpora; 
-The most similar pairs after optimizing equation~\eqref{loss_wemb} (\texttt{sim}); 
-After applying the correction algorithm of Section~\ref{correction} (\texttt{sim+fix}).
+Finally, BLEU scores obtained with varying training data configurations are in Table~\ref{results}:
+The entire\footnote{Paracrawl contains more than $100$M sentences. We reduced its size to $22.2$M using standard filtering techniques.} data sets (\texttt{all}); 
+The most similar pairs after optimizing Eq.~\eqref{loss_wemb} (\texttt{sim}); 
+After applying the correction algorithm of \textsection~\ref{correction} (\texttt{sim+fix}).
 Columns Ref and Fix indicate the number of original and corrected sentences (in millions) used in training.
 
 \begin{table}[h!]
@@ -398,10 +395,10 @@ Similar results are obtained for the Paracrawl corpus. Results after fixing $2.5
 \section{Conclusions and outlook}
 \label{conclusions+further}
 
-We presented an unsupervised method based on deep neural networks for detecting translation divergences in parallel sentence pairs. 
-Our model optimises word alignments. Hence, allowing for fine grained divergence prediction at the level of words. 
-Misaligned/divergent words can then be filtered out allowing for reusing some divergent sentences. 
-We evaluated our model on two neural machine translation tasks, showing significant improvements when compared to training over the entire data set. 
+We presented an unsupervised method based on deep neural networks for detecting translation divergences in parallel corpora. 
+Our model optimizes word alignments, and computes a fine grained divergence prediction at the level of words. 
+Misaligned/divergent words can then be filtered out, yielding larger and better training sets. 
+Our experiments on two machine translation tasks show significant improvements in comparison to training with the entire data set. 
 %The method can be used on any parallel corpus without any manual annotation.
 
 %We plan to further evaluate divergence classification under different data noise levels. %and on additional language pairs. 
