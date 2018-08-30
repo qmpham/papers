@@ -1,0 +1,33 @@
+26/mar/2018
+* Repondre au type qui gère les contrats du limsi
+* Envoyer FY lettre de Caroline
+* Send dossier to ANR
+* Domains (minh recherche corpora)
+* GitHub latex bibliography (minh)
+
+30/apr/2018
+* Everything sent to ANRT... we must wait for up to 3 months
+* Overcoming catastrophic forgetting in neural networks (to read avec minh)
+* Hal daume III: Frustratingly Easy Domain Adaptation (to read avec minh)
+* SEQ2SEQ-VIS: A Visual Debugging Tool for Sequence-to-Sequence Models
+* Prepare corpora for controlled experiment on domain adaptation “trouver les mots qui restent invariables dans deux domains (un seul sense) ou ceux qui varie (polisemics)”, étudier les voisins, ex: monitor (verb) et monitor (noun). Corpus de 100k medical/finance?
+* Transformer !
+
+29/may/2018 9h30
+* Minh prepare deux articles pour les expliquer (minh explique l'article emnlp18)
+* Evaluer les alignements avec un corpus annotée a la main (osub) disponible au limsi
+* Idee: back-propagation avec plusieurs references (indices de debut/fin) (factoriser les calculs)
+* Controlled experiment 2 domains 3 embeddings:
+ * medical
+ * finance
+ * generic
+Qui s’actualisent: toujours (generic) avec des examples médicaux (medical) ou financiers (finance)
+Evaluer les embeddings finaux...
+
+4/Jul/2018 9h30
+* ANRT en juillet il y a une nouvelle reunion?
+* etat de l’art!!
+* use larger (domain) datasets. 
+* babelfyce (etude mots polysemics)
+* eviter catastrphic forgetting!!!! [context these]
+* utiliser github minh pour compte rendu
