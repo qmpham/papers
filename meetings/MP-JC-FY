@@ -44,11 +44,12 @@ Evaluer les embeddings finaux...
   - common (no domain)
 - Evaluate different ways to include domain information into the model:
   - Generic (all data mixed)
+  - Continuation (luong, Hai-son Le)
   - Use of additional token (sennrich, kobus)
   - LHUC (vilar)
   - Embedding (pham):
     + Embeddings size: fixed Vs as a function of the amount of data 
-    + can a sentence be assigned to multiple domains?
+    + can a sentence belong to multiple domains?
 * Catastrophic forgetting: does not seem to apply to our previous experiment... we will check! [continue reading]
 * ÉTAT DE L'ART
 * Next meeting 10/oct/2018 10h
