@@ -29,7 +29,7 @@
 
 \newcommand\BibTeX{B{\sc ib}\TeX}
 
-\title{Le titre}
+\title{Sparse Word Embedding for Multi-domain Machine Translation}
 
 \author{Minh Quang Pham\\
   Affiliation / Address line 1 \\
@@ -49,14 +49,15 @@
 \begin{abstract}
 \end{abstract}
 
-
 \section{Introduction}
 
-
 \section{Related Work}
+Multi-domain Machine Translation has largely interested NLP community by its promising application in industry and its relation to fundamental problem in theory. Researchers have proposed a large range of techniques from Data centric methods to Model centric methods \cite{C18-1111}; \cite{P17-2061}. Data centric methods aim to augment in-domain training data by using data selection techniques such as 
+The problem is recently investigated by several interesting works presented in EMNLP 2018 such as \cite{D18-1039}; \cite{D18-1041}. \cite{D18-1041} create in the encoder Domain-specific gate $g^r_i$and Domain-shared gate $g^s_i$ which are generated from domain-specific and domain-shared semantic representations of source sentence $E_r(x)$ and $E_s(x)$ respectively and which select information from units of hidden states $h_i$ by elementwise product $h^r_i = g^r_i \odot h_i$; $h^s_i = g^s_i \odot h_i$. $h^r_i$ and $h^s_i$ will be fed to Domain-specific and Domain-shared attentional mechanisms respectively. While introducing new features in the architecture, \cite{D18-1041} introduces also new objective which is sum of word-level weighted MT objective and objectives of Domain-classifier in source side and target side and Adversarial Domain-classifier in source side. The author have very good approach to well seperate Domain-shared information flow and Domain-specify information flow and determine their contributions to the inference that mitigates the catastrophic interference happens in the network during forward step. 
+
 
 \section{The Model}
-
+There is not any changes in the architecture of Neural Machine Translation network except the construction of word embedding. 
 
 \section{Experiments}
 
