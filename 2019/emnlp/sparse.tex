@@ -27,6 +27,11 @@
 \newtheorem{definition}{Definition}[section]
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\floatname{algorithm}{Procedure}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
 %\aclfinalcopy % Uncomment this line for the final submission
 %\def\aclpaperid{***} %  Enter the acl Paper ID here
 
@@ -177,8 +182,30 @@ Task & Corpora & Train & Dev & Test & Vocabulary \\ \hline
 \end{table}
 \subsection{NMT model configuration}
 We evaluate our method on 2 popular architecture: Transformer of and Attentional Birectional Long Short-Term Memmory (LSTM).\\
-More precisely, for Transformer we use the same setting as described in \cite{NIPS2017_7181}.For Attentional Birectional Long Short-Term Memmory, in order to fairly compare to the work of \cite{D18-1041}, we use standard configuration with: 1 layer bidirectional LSTM with hidden size 1024 in encoder; 1 layer attentional unidirectional LSTM with same hidden size in decoder; and word embedding of size 512. The code use Tensorflow and OpenNMT \cite{P17-4012}.\\
+More precisely, for Transformer we use the same setting as described in \cite{NIPS2017_7181}.For Attentional Birectional Long Short-Term Memmory, in order to fairly compare to the work of \cite{D18-1041}, we use standard configuration with: 1 layer bidirectional LSTM with hidden size 1024 in encoder; 1 layer attentional unidirectional LSTM with same hidden size in decoder; and word embedding of size 512. The implementation can be found in OpenNMT-tf \cite{P17-4012}.\\
 For sparse embedding implementation, we split vector embedding of size 512 into 4 regions $[8,8,8,488]$ corresponding to EMEA, EPPS, ECB domain and generic region. If sentence comes from domain $i$, Domain regions $j,\forall j \neq i$ will be masked as 0. We then use a dense layer of size 512 to fuse active domain region and generic region.
+
+\begin{algorithm}[H]
+\caption{Multi-domain Training}
+\label{algo:1}
+\begin{algorithmic}[1]
+\REQUIRE {Corpora $C_i, i\in [1,..,d]$ for d domains}
+\REPEAT 
+\STATE{Randomly pick $i \in [1,..,d]$ w.r.t multinomial distribution $[\frac{|C_i|}{\displaystyle{\mathop{\sum}_{i\in [1,..,d]}|C_i|}}]$.}
+\STATE{Randomly pick a batch of sentences from corpora $C_i$.}
+\STATE{Using only generic activate embedding and domain activate embedding for this batch of sentences, i.e, we will have 2 batches of word embedding.}
+\STATE{Pass the batch of word embedding to a dense layer to fuse regions.}
+\STATE{Apply backpropagation as usual.}
+\UNTIL{convergence}
+\end{algorithmic}
+\end{algorithm}
+
+Each iteration of algorithm \ref{algo:1}, the batch is doubled because it contains 2 types of word embedding for each sentence (using only generic region; using generic region and active domain region). The reason to do this is to minimize simultaneously both losses \\
+$\theta^*_{s} = \displaystyle{\mathop{\argmin}_{\theta_s}}E_{(x,y) \sim D(\displaystyle{\mathop{\cup}_{i \in [1,..,d]}}C_{i})}[-log(p_{\theta_s}(y|x))]$ \\ 
+$ \theta^*_{i} =\displaystyle{\mathop{\argmin}_{\theta_i}}E_{(x,y) \sim D(C_{i})}[-log(p_{\theta_i,\theta^*_s}(y|x,i))]
+$ 
+We admit that this is not the optimal way. However, this procdedure make the training very simple.\\
+We also take in account the problem of overfitting that could occur for small corpora. Indeed, real data are not always balanced for every domain. For instance, in our experiments, the size of corpora are very different where EPPS is largest with approximately 2 millions sentences, EMEA contains about 1 million sentences and ECB is the smallest with only 200 000 sentences for English French and 100 000 for English German. If we train each corpora with same number of batches, ECB will be trained too oftenly, that easily leads to overfitting. Therefore, we perform backpropagation on corpora with frequencies according to sizes of corpora.
 \subsection{Results}
 \begin{figure}[H]
 \begin{center}
