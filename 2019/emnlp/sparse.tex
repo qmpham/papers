@@ -157,8 +157,8 @@ E_{(x,y) \sim p_{rel}}[-log(p_{\theta}(y|x))] &= \\
 \end{split}
 \end{equation}.
 
-Where $p_{\theta}(y|x) = p(y|x,\theta)$ or $p_{\theta}(y|x) = p(y,\theta | x)$ \\
-In this equation, the domain is $p_{rel}(x,y)$. One aims to approximate to model to target domain $p_{rel}$. The more the domain of training data close to the domain of test sets, the higher score it could achieve. \\
+Where $p_{\theta}(y|x) = p(y|x,\theta)$ \\
+In this equation, the domain is $p_{rel}(x,y)$. One aims to approximate to model to target domain $p_{rel}$. The more the domain of training data close to the domain of test set, the better performance it could achieve over test set.\\
 In the training of a generic model, the $p_{rel}$ is oftenly a general domain, noted $p_{gen}$ which is defined by a set of several corpora which belongs to different topics (e.g medical, banking, adminstration). Therefore the generic model is not usually good enough for translating by topic in which one is more interested. In order to specialize the model, one usually finetunes generic model by continue the traing from $\theta^*$, which was optimized on general domain, with corpora of the interested topic. However, there is always a dramatical shift from generic domain $p_{gen}$ to specialization domain $p_{spec}$, that usually leads to catastrophic forgetting in neural network using backpropagation \cite{Michael1989Catastrophic}. The finetuned model has lower performance in translating sentences, which are more related to other topic, than generic model. Indeed, the translation $(x,y)$ could be very different in different topic. For instance, in financial document, to translate "security" into "titre financier" is more likely than to translate it into "securit\'e" but in IT document. Therefore, the shift from general domain containing these two corpora to one of them is not negligible. \\
 In order to conduct the model translating by a certain topic, we might use conditional probability conditioned by the given topic $p(y|x,d)$. Given a set of training corpora, we assume that there are a limited d engendering topic, i.e, there are d corpora $C_i$ $i \in [1,..,d]$ representing d topical domains $D(C_i)$ respectively. We are then interested in approximating $p(y,x|i)$ for $i \in [1,..,d]$ and use $p(y|x,i)$ for the inference in topic $i$. From now, we formalize the multi-domain problem for machine translation in following equation
 \begin{equation}
@@ -279,7 +279,7 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  Sparse(1) & 70.45 & 38.23 & 54.69 & 34.66 & 31.24 & 21.36 & 28.12 & 26.02 \\
  \hline
- Sparse(2) & 69.91 & 38.05 & 54.2 & 35.22 & 31.25 & 21.36 & & 26.02 \\
+ Sparse(2) & 69.91 & 38.05 & 54.2 & 35.22 & 31.25 & 21.36 & 28.12 & 26.02 \\
  \hline
  Sparse(3) &  &  &  &  &  &  &  & \\
  \hline
@@ -297,7 +297,7 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
- Mixed & 64.57 & 26.47 & 68.67 & 21.77 & 23.50 & 13.9 & 17.04 & \\
+ Mixed & 64.57 & 26.47 & 68.67 & 21.77 & 23.50 & 13.9 & 17.04 & 18.85 \\
  \hline
  EMEA-finetuned & & & & & & & & \\
  \hline
@@ -305,7 +305,9 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  ECB-finetuned & & & & & & & & \\
  \hline
- Sparse(1) & 70.55 & 26.17 & 68.07 & 21.50 & 23.30 & & & \\
+ Sparse(1) & 70.55 & 26.17 & 68.07 & 21.50 & 23.30 & 14.05 & 16.64 & 19.04\\
+ \hline
+ Sparse(2) & 70.67 & 26.24 & 66.97 & & & 14.05 & 16.64 & 19.04 \\
  \hline
  Domain Control & & & & & & & & \\
  \hline
@@ -317,27 +319,27 @@ We also take in account the problem of overfitting that could occur for small co
 
 \begin{figure}[H]
 \begin{center}
- \resizebox{\columnwidth}{!}{\begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X ||} 
+ \resizebox{\columnwidth}{!}{\begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
  \hline
- Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & IWSLT test 2010 \\ [0.5ex] 
+ Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
- Mixed & & & & & & & \\
+ Mixed & & & & & & & & \\
  \hline
- EMEA-finetuned & & & & & & & \\
+ EMEA-finetuned & & & & & & & & \\
  \hline
- EPPS-finetuned & & & & & & & \\
+ EPPS-finetuned & & & & & & & & \\
  \hline
- ECB-finetuned & & & & & & & \\
+ ECB-finetuned & & & & & & & & \\
  \hline
- Sparse & & & & & & & \\
+ Sparse & & & & & & & & \\
  \hline
- Domain Control & & & & & & & \\
+ Domain Control & & & & & & & & \\
  \hline
- WDCMT (conditional GRU) & & & & & & & \\
+ WDCMT (conditional GRU) & 68.76 & 35.71 & 52.75 & 32.03 & 29.81 & 19.58 & 24.63 & 23.28 \\
  \hline 
 \end{tabularx}}
 \end{center}
-\caption{bpe-detokenized BLEU score for Recurrent network architecture on language pair English-French. Notations as same as figure \ref{tab:1} except that other models from WDCMT of \cite{D18-1041} use Bidirectional-GRU}
+\caption{bpe-detokenized BLEU score for Recurrent network architecture on language pair English-French. Notations as same as figure \ref{tab:1} except that other models from WDCMT of \cite{D18-1041} use Bidirectional-LSTM}
 \label{tab:3}
 \end{figure}
 
