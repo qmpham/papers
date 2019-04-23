@@ -72,7 +72,7 @@ mitigate the catastrophic interference happens during the training over differen
 
 \section{Introduction}
 \fyTodo{Merge refs and order chronologically} \fyTodo{Homogeneize cite keys, avoid arxiv}
-Despite fast developpement thanks to new architectures \cite{NIPS2017_7181} \cite{bahdanau2014neural} \cite{D13-1176} \cite{Sutskever2014Sequence}, Machine Translation (MT) still struggles with data scarcity. Domain adaptation, or it's special case Multi-domain, is the situation where in-domain data (such as banking) is rare while out-domain data such as news are plenty, one aims to leverage out-domain data to improve quality of Machine Translation system which is perfectible while being trained with only the in-domain dataset. Traditionally, ones train a generic model using a very large corpora then use in-domain dataset to fine-tune the model. It is ubiquitous that the bias to the in-domain dataset used in fine-tuning makes model worse in translating other domains, thus that we have not been able to fine-tune a model to several domains at once. This phenomenon can be implied by well-known problem in Machine Learning, Catastrophic Interference \cite{Michael1989Catastrophic}. When there is a shift in the distribution of training data, standard backpropagation neural network\fyTodo{Generic ? backprop or NN problem ?} gradually lose information learned from other domains while learning only target domain.
+Despite fast developpement thanks to new architectures \cite{D13-1176, Sutskever2014Sequence, bahdanau2014neural, NIPS2017_7181}, Machine Translation (MT) still struggles with data scarcity. Domain adaptation, or it's special case Multi-domain, is the situation where in-domain data (such as banking) is rare while out-domain data such as news are plenty, one aims to leverage out-domain data to improve quality of Machine Translation system which is perfectible while being trained with only the in-domain dataset. Traditionally, ones train a generic model using a very large corpora then use in-domain dataset to fine-tune the model. It is ubiquitous that the bias to the in-domain dataset used in fine-tuning makes model worse in translating other domains, thus that we have not been able to fine-tune a model to several domains at once. This phenomenon can be implied by well-known problem in Machine Learning, Catastrophic Interference \cite{Michael1989Catastrophic}. When there is a shift in the distribution of training data, standard backpropagation neural network\fyTodo{Generic ? backprop or NN problem ?} gradually lose information learned from other domains while learning only target domain.
 
 In Multi-domain Machine Translation, ones have to deal with polysemies whose meaning can be totally different in different domains, for example, the word "chair" means an household tool in "if you are taking a medicine which may cause low blood pressure when rising from a chair or bed " (extracted from medical corpora EMEA \cite{Tiedemann2009RANLP5}) while the word "chair" means to preside over a meeting in following sentence "The President of the ECB or , in his absence , the Vice-President , chairs the meetings of the Governing Council , the Executive Board and the General Council of the ECB. " (extracted from European Central Bank corpora \cite{Tiedemann2009RANLP5}). Using context information is not sufficient to differ these polysemies. Therefore using the same word embedding for polysemies obstructs the model from differentiating the meaning of a polysemy in one domain from it's other meaning in the other domain.
 \begin{table}[h]
@@ -112,7 +112,8 @@ The increasing number of central banks using the same IT platform for their own 
 \label{table:polysemy}
 \end{table}
 \fyTodo{Typical plan: the problems, existing solutions and their limits, our idea and contributions}
-In this work, we present a new design for word embedding that is composed of different regions which are activate and deactivate corresponding to domains. To evaluate, we use several test sets representing each domains and two other general test sets.
+In this work, we present a new design for word embedding that is composed of different regions which are activate and deactivate corresponding to domains. 
+\\ To evaluate, we use 3 corpora of 3 different domains: Medical, Banking and Administration and 2 different architectures: Transformer and Attentional recurrent network. The test sets are selectioned from shared task each domains and two other general test sets such as news commentary and IWSLT. The reader could find more details in Experimetal section \ref{subsec:data}
 \fyTodo{More precise: two architectures, two languages pairs, multiple domains, also improves generic}
 
 \section{Related Work \label{sec:related_work}}
@@ -121,16 +122,16 @@ In this work, we present a new design for word embedding that is composed of dif
 Multi-domain Machine Translation has largely interested NLP community by its promising applications in industry and its relation to fundamental problems in theory. Researchers have proposed a large range of techniques from Data centric methods to Model centric methods \cite{C18-1111}; \cite{P17-2061}.\\ Data centric category attempts to collect related-domain data from large existing in-domain corpora. The methods in this category can be listed as following:
 \fyTodo{Organize refs}
 \begin{itemize}
-	\item score relatedness of sentences to the target domain by Language Model \cite{P10-2041}; \cite{D11-1033}; \cite{P13-2119}.
-	\item generating pseudo parallel data \cite{P03-1010}; \cite{C16-1295}; \cite{D14-1023}
+	\item score relatedness of sentences to the target domain by Language Model \cite{P10-2041,D11-1033,P13-2119}.
+	\item generating pseudo parallel data \cite{P03-1010,C16-1295,D14-1023}
 \end{itemize}
 On the other hand, Model centric approaches focus on NMT models that are specialized for domain adaptation. The novelty can be among following features
 \begin{itemize}
-	\item Trainining objective \cite{Luong2015SNMT}; \cite{P16-1009}; \cite{D17-1155}; \cite{W17-3205}; \cite{D17-1156}; \cite{C18-1269}
-	\item Architecture \cite{R17-1049}; \cite{gulcehre2016monolingual}; \cite{W17-4712}, \cite{Biao2017CARENMT}; \cite{N18-2080}; \cite{W18-6313}; \cite{C16-1170}; \cite{P18-2050}.
-	\item The decoding algorithm \cite{gulcehre2016monolingual}. \cite{I17-2004}
+	\item Trainining objective \cite{Luong2015SNMT,P16-1009,D17-1155,W17-3205,D17-1156,C18-1269}
+	\item Architecture \cite{gulcehre2016monolingual,C16-1170,R17-1049,W17-4712,Biao2017CARENMT,N18-2080,W18-6313,P18-2050}.
+	\item The decoding algorithm \cite{gulcehre2016monolingual,I17-2004}
 \end{itemize} 
-Beside these works, we could also consider works in other tasks such as sequence labeling tasks \cite{P07-1033}; learning multiple visual domains \cite{NIPS2017_6654}. The problem is recently investigated by several interesting works presented in EMNLP 2018 such as \cite{D18-1039}; \cite{D18-1041}. \citet{D18-1041} creates in the encoder Domain-specific gate $g^r_i$and Domain-shared gate $g^s_i$ which are generated from domain-specific and domain-shared semantic representations of source sentence $E_r(x)$ and $E_s(x)$ respectively and which select information from units of hidden states $h_i$ by elementwise product $h^r_i = g^r_i \odot h_i$; $h^s_i = g^s_i \odot h_i$. $h^r_i$ and $h^s_i$ will be fed to Domain-specific and Domain-shared attentional mechanisms respectively. While introducing new features in the architecture, \cite{D18-1041} also introduces new loss function which is sum of word-level weighted MT loss and losses of Domain-classifier in source side and target side; Adversarial Domain-classifier in source side. The authors have very good approach to seperate Domain-shared information flow and Domain-specify information flow and to determine their contributions to the inference thus mitigate the catastrophic interference occuring in training with backpropagation. \cite{D18-1039} has other idea to circumvent the catastrophic interference. They supposed that parameters of each domain specialized model could be generated from a universal parameter-generator. By introducing domain embedding (or Language embedding in the original paper), they could conduct domain related error in backpropagation toward domain embedding thus mitigates catastrophic interference between domains during training.
+Beside these works, we could also consider works in other tasks such as sequence labeling tasks \cite{P07-1033}; learning multiple visual domains \cite{NIPS2017_6654}. The problem is recently investigated by several interesting works presented in EMNLP 2018 such as \cite{D18-1039}; \cite{D18-1041,D18-1041} creates in the encoder Domain-specific gate $g^r_i$and Domain-shared gate $g^s_i$ which are generated from domain-specific and domain-shared semantic representations of source sentence $E_r(x)$ and $E_s(x)$ respectively and which select information from units of hidden states $h_i$ by elementwise product $h^r_i = g^r_i \odot h_i$; $h^s_i = g^s_i \odot h_i$. $h^r_i$ and $h^s_i$ will be fed to Domain-specific and Domain-shared attentional mechanisms respectively. While introducing new features in the architecture, \cite{D18-1041} also introduces new loss function which is sum of word-level weighted MT loss and losses of Domain-classifier in source side and target side; Adversarial Domain-classifier in source side. The authors have very good approach to seperate Domain-shared information flow and Domain-specify information flow and to determine their contributions to the inference thus mitigate the catastrophic interference occuring in training with backpropagation. \cite{D18-1039} has other idea to circumvent the catastrophic interference. They supposed that parameters of each domain specialized model could be generated from a universal parameter-generator. By introducing domain embedding (or Language embedding in the original paper), they could conduct domain related error in backpropagation toward domain embedding thus mitigates catastrophic interference between domains during training.
 
 Compared to \cite{D18-1039}, our sparse embedding is a bit similar to the idea. However, our method gives much more free degree for domain embedding since we give each word a domain region while the author uses only one vector domain embedding for each parameter set(encoder, decoder).
 
@@ -144,9 +145,8 @@ more generic, since sparse embedding can be implemented for every neural archite
 \fyTodo{Use math for notation, label equations and such}
 \begin{definition}{Domain}
 \label{def:domain}
-A domain is a hypothetical probability distribution that generates a set of corpora. We will denote $D(C)$ the domain of the set of corpora $C$.
+A domain is probabilistic distribution of translation $(x,y)$ in a given corpora. Given corpora $C$, we denote $D(C)$ the domain of $C$.
 \end{definition}
-
 \fyTodo{We need more: the source, the target, etc}
 In machine translation, the loss function for training is:
 \begin{equation}
@@ -157,9 +157,10 @@ E_{(x,y) \sim p_{rel}}[-log(p_{\theta}(y|x))] &= \\
 \end{split}
 \end{equation}.
 
-Where $p_{\theta}(y|x)) = p(y|x,\theta)$ or $p_{\theta}(y|x)) = p(y,\theta | x)$
-In this quantity, domain is exactly $p_{rel}(x,y)$. However, in the inference or translation, the most important goal is to predict target sentence given source sentence, i.e, to well approximate the conditional probability $p_{rel}(y|x)$. \fyTodo{Transition is abrupt - this is more a motivating than a modeling aspect}
-However, this relation could be very different if consider 2 domains generating 2 corpora of different topic. Indeed, in financial document, to translate "security" into "titre financier" is more likely than to translate it into "securit\'e" but in IT document. In reality, to translate correctly with respect to the topic of sentence is very important. We formalize the multi-domain problem for machine translation in following equation
+Where $p_{\theta}(y|x) = p(y|x,\theta)$ or $p_{\theta}(y|x) = p(y,\theta | x)$ \\
+In this equation, the domain is $p_{rel}(x,y)$. One aims to approximate to model to target domain $p_{rel}$. The more the domain of training data close to the domain of test sets, the higher score it could achieve. \\
+In the training of a generic model, the $p_{rel}$ is oftenly a general domain, noted $p_{gen}$ which is defined by a set of several corpora which belongs to different topics (e.g medical, banking, adminstration). Therefore the generic model is not usually good enough for translating by topic in which one is more interested. In order to specialize the model, one usually finetunes generic model by continue the traing from $\theta^*$, which was optimized on general domain, with corpora of the interested topic. However, there is always a dramatical shift from generic domain $p_{gen}$ to specialization domain $p_{spec}$, that usually leads to catastrophic forgetting in neural network using backpropagation \cite{Michael1989Catastrophic}. The finetuned model has lower performance in translating sentences, which are more related to other topic, than generic model. Indeed, the translation $(x,y)$ could be very different in different topic. For instance, in financial document, to translate "security" into "titre financier" is more likely than to translate it into "securit\'e" but in IT document. Therefore, the shift from general domain containing these two corpora to one of them is not negligible. \\
+In order to conduct the model translating by a certain topic, we might use conditional probability conditioned by the given topic $p(y|x,d)$. Given a set of training corpora, we assume that there are a limited d engendering topic, i.e, there are d corpora $C_i$ $i \in [1,..,d]$ representing d topical domains $D(C_i)$ respectively. We are then interested in approximating $p(y,x|i)$ for $i \in [1,..,d]$ and use $p(y|x,i)$ for the inference in topic $i$. From now, we formalize the multi-domain problem for machine translation in following equation
 \begin{equation}
 \begin{split}
 \theta^* = \argmin_{\theta} E_{(x,y) \sim D(C_{i})} [-log & (p_{\theta}(y|x,i))] \; \forall i \in [1..d]
@@ -185,7 +186,7 @@ This section explains a new design for word embedding used in multi-domain model
 \begin{figure}[h]
 \center
     \includegraphics[width=0.8\linewidth]{Sparse1}
-    \caption{Sparse word embeddings. The red region contains units that are activated only when an input from the corresponding domain is presented; the other (green) regions are deactivated; the bleu (generic) region is always activated.} 
+    \caption{Sparse word embeddings. The red region contains units that are activated only when an input from the corresponding domain is presented; the other (green) regions are deactivated; the blue (generic) region is always activated.} 
     \label{fig:network}
   \end{figure}
 \fyTodo{Explain vanishing ?}
@@ -208,7 +209,7 @@ The complex structure of State-of-the-art architecture Transformer \cite{NIPS201
 Furthermore, because word embeddings are involved in three parts of standard encoder-decoder structure, which are input of encoder, input of decoder and projection before softmax, we have 7 possibilities to apply sparse embedding. However, due to high memory cost, we only want to apply sparse embedding on the source side. \fyTodo{Explain this. Future work ?}
 
 \section{Experiments}
-\subsection{Domains and data}
+\subsection{Domains and data \label{subsec:data}}
 To evaluate the performance of proposed architecture, we design experiments in which we want to train an NMT for 3 domains such as medical, administrative documents and business briefly denoted by EMEA, EPPS, ECB according to training corpora name respectively. We use 3 corpora for training: European Medicines Agency; European Central Bank and European Parliament \cite{Tiedemann2009RANLP5}. We randomly split those 3 corpora into training, validation and test set with size described in table \ref{table:Corpora}. We use validation sets for choosing the best model according to the average BLEU score on 3 validation sets. We also realize that the test sets origined from same corpora as training sets are likely easy for trained model, thus can not provide fair evaluation. Therefore, we we use Khresmoi-test; newstest2009 and test2007 for domains: EMEA, EPPS. Unfortunately, we could not find any official test sets for ECB domain. We also want to evaluate the generalization of trained model. The model is also required to achieve comparable performance to generic model. To do so, we use newstest 2009 and IWSLT 2010 whose contain does not particularly belong to any domain.\fyTodo{Clarify / simplify text}
 
 \begin{table}[H]
@@ -244,9 +245,13 @@ For the implementation of sparse embeddings, we split the vector embedding of si
 \REPEAT 
 \STATE{Randomly pick $i \in [1,..,d]$ w.r.t multinomial distribution $[\frac{|C_i|}{\displaystyle{\mathop{\sum}_{i\in [1,..,d]}|C_i|}}]$.}
 \STATE{Randomly pick a batch of sentences from corpora $C_i$.}
-\STATE{Using only generic activate embedding and domain activate embedding for this batch of sentences, i.e, we will have 2 batches of word embedding.\fyTodo{why 2 }}
+\STATE{Activating only generic activate embedding to create generic embedding batch, denoted $W_g$}
+\STATE{Pass the batch of word embedding to a dense layer to fuse regions}
+\STATE{Computing gradient of $\theta_s$, $\frac{\partial L}{\partial \theta_s}$ using generic batch $W_g$}
+\STATE{Activating corresponding domain region and generic region to create domain embedding batch}
 \STATE{Pass the batch of word embedding to a dense layer to fuse regions.}
-\STATE{Apply backpropagation as usual.}
+\STATE{Computing gradient of domain parameters $\theta_i$, $\frac{\partial L}{\partial \theta_i}$ using domain batch }
+\STATE{Apply backprogation using computed gradients $\frac{\partial L}{\partial \theta_s}$ and $\frac{\partial L}{\partial \theta_i}$}
 \UNTIL{convergence}
 \end{algorithmic}
 \end{algorithm}
@@ -292,7 +297,7 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
- Mixed & 64.57 & 26.47 & 68.67 & 21.77 & 23.50 & 13.9 & 10.10 & \\
+ Mixed & 64.57 & 26.47 & 68.67 & 21.77 & 23.50 & 13.9 & 17.04 & \\
  \hline
  EMEA-finetuned & & & & & & & & \\
  \hline
@@ -300,7 +305,7 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  ECB-finetuned & & & & & & & & \\
  \hline
- Sparse & & & & & & & & \\
+ Sparse(1) & 70.55 & 26.17 & 68.07 & 21.50 & 23.30 & & & \\
  \hline
  Domain Control & & & & & & & & \\
  \hline
@@ -316,7 +321,7 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
- Mixed & 64.57 & 26.47 & 68.67 & & & & \\
+ Mixed & & & & & & & \\
  \hline
  EMEA-finetuned & & & & & & & \\
  \hline
@@ -328,9 +333,11 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  Domain Control & & & & & & & \\
  \hline
+ WDCMT (conditional GRU) & & & & & & & \\
+ \hline 
 \end{tabularx}}
 \end{center}
-\caption{bpe-detokenized BLEU score for Recurrent network architecture on language pair English-French. Notations as same as figure \ref{tab:1} except that other models from WDCMT of \cite{D18-1041} use Bidirectional-LTSM}
+\caption{bpe-detokenized BLEU score for Recurrent network architecture on language pair English-French. Notations as same as figure \ref{tab:1} except that other models from WDCMT of \cite{D18-1041} use Bidirectional-GRU}
 \label{tab:3}
 \end{figure}
 
