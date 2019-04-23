@@ -119,6 +119,8 @@ In this work, we present a new design for word embedding that is composed of dif
 \section{Related Work \label{sec:related_work}}
 \fyTodo{Add standard labels to sections}
 \fyTodo{Related work goes last}
+\fyTodo{Compare also to Peng 2017}
+
 Multi-domain Machine Translation has largely interested NLP community by its promising applications in industry and its relation to fundamental problems in theory. Researchers have proposed a large range of techniques from Data centric methods to Model centric methods \cite{C18-1111}; \cite{P17-2061}.\\ Data centric category attempts to collect related-domain data from large existing in-domain corpora. The methods in this category can be listed as following:
 \fyTodo{Organize refs}
 \begin{itemize}
@@ -230,6 +232,9 @@ Task & Corpora & Train & Dev & Test & Vocabulary \\ \hline
 \caption{Corpora }
 \label{table:Corpora}
 \end{table}
+\subsection{Baselines \label{ssec:baselines}}
+\fyTodo{Describe baselines}
+
 \subsection{NMT model configuration}
 We evaluate our method on two state-of-the-art encoder-decoder architectures: a recurrent architecture based on attentional birectional Long Short-Term Memory (LSTM) cells and the Transformer architecture of \citet{NIPS2017_7181}.
 More precisely, for the Transformer we use the same settings as described in \cite{NIPS2017_7181}. For the recurrent architecture, in order to fairly compare to the work of \citet{D18-1041}, we use a standard configuration with one layer bidirectional LSTM with a encoder hidden size of 1024; one attentional unidirectional LSTM layer with same hidden size in decoder; and word embeddings of size 512. The implementation can be found in OpenNMT-tf \cite{P17-4012}.
@@ -261,7 +266,7 @@ $\theta^*_{s}=\displaystyle{\mathop{\argmin}_{\theta_s}}E_{(x,y) \sim D(\display
 $ \theta^*_{i}=\displaystyle{\mathop{\argmin}_{\theta_i}}E_{(x,y) \sim D(C_{i})}[-log(p_{\theta_i,\theta^*_s}(y|x,i))]
 $ 
 We admit that this is not the optimal way. However, this procdedure make the training very simple.\\
-We also take in account the problem of overfitting that could occur for small corpora. Indeed, real data are not always balanced for every domain. For instance, in our experiments, the size of corpora are very different where EPPS is largest with approximately 2 millions sentences, EMEA contains about 1 million sentences and ECB is the smallest with only 200 000 sentences for English French and 100 000 for English German. If we train each corpora with same number of batches, ECB will be trained too oftenly, that easily leads to overfitting. Therefore, we perform backpropagation on corpora with frequencies according to sizes of corpora.
+We also take in account the problem of overfitting that could occur for small corpora. Indeed, real data are not always balanced for every domain. For instance, in our experiments, the size of corpora are very different where EPPS is largest with approximately 2 millions sentences, EMEA contains about 1 million sentences and ECB is the smallest with only 200 000 sentences for English French and 100 000 for English-German. If we train each corpora with same number of batches, ECB will be trained too oftenly, that easily leads to overfitting. Therefore, we perform backpropagation on corpora with frequencies according to sizes of corpora.
 \subsection{Results}
 \begin{figure}[H]
 \begin{center}
@@ -287,7 +292,7 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
 \end{tabularx}}
 \end{center}
-\caption{bpe-detokenized BLEU score in language pair English - French. Sparse(1) uses correponding domain tag for EMEA, EPPS, ECB test sets and generic tag for newstest and IWSLT. Sparse(2) uses generic tag for all of test sets. Sparse(3) uses tag predicted by pretrained domain classififer}
+\caption{BPE-detokenized BLEU score in language pair English - French. Sparse(1) uses correponding domain tag for EMEA, EPPS, ECB test sets and generic tag for newstest and IWSLT. Sparse(2) uses generic tag for all of test sets. Sparse(3) uses tag predicted by pretrained domain classififer}
 \label{tab:1}
 \end{figure}
 
@@ -365,12 +370,13 @@ We also take in account the problem of overfitting that could occur for small co
  \hline 
 \end{tabularx}}
 \end{center}
-\caption{BLEU score for Recurrent network on language pair English - German. The notation is same as figure \ref{tab:3}}
+\caption{BLEU score for Recurrent network on language pair English - German. Notations are the same as for figure~\ref{tab:3}}
 \label{tab:4}
 \end{figure}
 \subsection{Word embedding analysis}
 
 \section{Conclusions}
+\fyTodo{natural continuations: go beyond words; learn the projection matrix at the word level; other ?}
 
 \section*{Acknowledgments}
 
