@@ -37,8 +37,10 @@
 %\aclfinalcopy % Uncomment this line for the final submission
 %\def\aclpaperid{***} %  Enter the acl Paper ID here
 
-\newcommand{\fyTodo}[1]{\Todo[FY>]{\textcolor{orange}{#1}}}
-\newcommand{\fyDone}[1]{\done[FY]\Todo[FY>]{\textcolor{orange}{#1}}}
+\newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyTodostar}[1]{\Todo*[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyDonestar}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
 
 %\setlength\titlebox{5cm}
 % You can expand the titlebox if you need extra space
@@ -48,7 +50,7 @@
 
 \title{Sparse Word Embedding for Multi-domain Machine Translation}
 
-\author{Minh Quang Pham\\
+\author{First Author \\% Minh Quang Pham\\
   Affiliation / Address line 1 \\
   Affiliation / Address line 2 \\
   Affiliation / Address line 3 \\
@@ -64,6 +66,7 @@
 \begin{document}
 \maketitle
 
+\fyTodo{s/naacl/EMNLP/g}
 \fyTodo{Too long, selfcontained, noref, rewrite}
 \begin{abstract}
 Fine-tuning a generic neural machine translation model to a certain domain usually degrade its performance on the other domains, thus it's very difficult to build a unique model which is best for all. Indeed, Catastrophic Forgetting, well-known problem in Machine Learning, states that standard backprogation neural network suffers a lot while there is a shift in training data distribution. However, Finetuning is very costly and unefficient in the industry therefore one best model is always desired. In this paper, we introduce an application of an old technique \cite{P07-1033} in Multi-Domain Neural Machine Translation. By defining general information encoding region and domain-specific encoding region in word embedding vector, we are able to seperate domain-related information flows in forward and backward propagation during training thus to
@@ -71,10 +74,12 @@ mitigate the catastrophic interference happens during the training over differen
 \end{abstract}
 
 \section{Introduction}
-\fyTodo{Merge refs and order chronologically} \fyTodo{Homogeneize cite keys, avoid arxiv}
+\fyTodo{Merge refs and order chronologically}
+\fyTodo{Homogeneize cite keys, avoid arxiv}
+
 Despite fast developpement thanks to new architectures \cite{D13-1176, Sutskever2014Sequence, bahdanau2014neural, NIPS2017_7181}, Machine Translation (MT) still struggles with data scarcity. Domain adaptation, or it's special case Multi-domain, is the situation where in-domain data (such as banking) is rare while out-domain data such as news are plenty, one aims to leverage out-domain data to improve quality of Machine Translation system which is perfectible while being trained with only the in-domain dataset. Traditionally, ones train a generic model using a very large corpora then use in-domain dataset to fine-tune the model. It is ubiquitous that the bias to the in-domain dataset used in fine-tuning makes model worse in translating other domains, thus that we have not been able to fine-tune a model to several domains at once. This phenomenon can be implied by well-known problem in Machine Learning, Catastrophic Interference \cite{Michael1989Catastrophic}. When there is a shift in the distribution of training data, standard backpropagation neural network\fyTodo{Generic ? backprop or NN problem ?} gradually lose information learned from other domains while learning only target domain.
 
-In Multi-domain Machine Translation, ones have to deal with polysemies whose meaning can be totally different in different domains, for example, the word "chair" means an household tool in "if you are taking a medicine which may cause low blood pressure when rising from a chair or bed " (extracted from medical corpora EMEA \cite{Tiedemann2009RANLP5}) while the word "chair" means to preside over a meeting in following sentence "The President of the ECB or , in his absence , the Vice-President , chairs the meetings of the Governing Council , the Executive Board and the General Council of the ECB. " (extracted from European Central Bank corpora \cite{Tiedemann2009RANLP5}). Using context information is not sufficient to differ these polysemies. Therefore using the same word embedding for polysemies obstructs the model from differentiating the meaning of a polysemy in one domain from it's other meaning in the other domain.
+In \fyTodostar{Specify DA}{Multi-domain Machine Translation}, ones have to deal with polysemies whose meaning can be totally different in different domains, for example, the word "chair" means an household tool in "if you are taking a medicine which may cause low blood pressure when rising from a chair or bed " (extracted from medical corpora EMEA \cite{Tiedemann2009RANLP5}) while the word "chair" means to preside over a meeting in following sentence "The President of the ECB or , in his absence , the Vice-President , chairs the meetings of the Governing Council , the Executive Board and the General Council of the ECB. " (extracted from European Central Bank corpora \cite{Tiedemann2009RANLP5}). Using context information is not sufficient to differ these polysemies. Therefore using the same word embedding for polysemies obstructs the model from differentiating the meaning of a polysemy in one domain from it's other meaning in the other domain.
 \begin{table}[h]
 \resizebox{\columnwidth}{!}{
 \begin{tabular}{|l|l|l|}
@@ -141,7 +146,7 @@ Compared to the work of \cite{D18-1041}, our approach is much simpler and
 more generic, since sparse embedding can be implemented for every neural architecture while domain-specific gate and domain-shared gate can only be applied for recurrent architectures. However, during inference, the model of \cite{D18-1041} can infer the domain that is the closest to the input sentence and that will be used in special gates; while our method needs to know in which domain the inference is executed. To circumvent this disadvantage, we could use a domain classifier or simply use only the generic region. For more detail, the reader could refer to the Section \ref{sec:sparse_embeddings}.
 
 \section{Sparse embeddings \label{sec:sparse_embeddings}}
-\fyTodo{Use meaningful titles}
+\fyDone{Use meaningful titles throughout}
 
 \subsection{Problem statement}
 \fyTodo{Use math for notation, label equations and such}
@@ -206,12 +211,13 @@ Assume $x_{t}$ belongs to domain $i$, thus $w_j(t) = 0 \forall j \neq i$. Denote
 \end{split} 
 \forall j \neq i
 \end{equation}
-\subsection{Detailed implementation}
+\subsection{Implementation Details}
 The complex structure of State-of-the-art architecture Transformer \cite{NIPS2017_7181} and popular recurrent network \cite{bahdanau2014neural} makes the implementation of sparse embedding non-obvious. Indeed, Transformer involve positional embedding and residual connections which are not homogeneous for domain-regions. Therefore, in our first implementation, we used an dense layer to fuse domain-region and generic region before applying positional embedding and residual connection. This implementation limits the finetuning effect at only word level.\\
 Furthermore, because word embeddings are involved in three parts of standard encoder-decoder structure, which are input of encoder, input of decoder and projection before softmax, we have 7 possibilities to apply sparse embedding. However, due to high memory cost, we only want to apply sparse embedding on the source side. \fyTodo{Explain this. Future work ?}
 
-\section{Experiments}
-\subsection{Domains and data \label{subsec:data}}
+\section{Experiments \label{sec:experiments}}
+
+\subsection{Domains and data \label{ssec:data}}
 To evaluate the performance of proposed architecture, we design experiments in which we want to train an NMT for 3 domains such as medical, administrative documents and business briefly denoted by EMEA, EPPS, ECB according to training corpora name respectively. We use 3 corpora for training: European Medicines Agency; European Central Bank and European Parliament \cite{Tiedemann2009RANLP5}. We randomly split those 3 corpora into training, validation and test set with size described in table \ref{table:Corpora}. We use validation sets for choosing the best model according to the average BLEU score on 3 validation sets. We also realize that the test sets origined from same corpora as training sets are likely easy for trained model, thus can not provide fair evaluation. Therefore, we we use Khresmoi-test; newstest2009 and test2007 for domains: EMEA, EPPS. Unfortunately, we could not find any official test sets for ECB domain. We also want to evaluate the generalization of trained model. The model is also required to achieve comparable performance to generic model. To do so, we use newstest 2009 and IWSLT 2010 whose contain does not particularly belong to any domain.\fyTodo{Clarify / simplify text}
 
 \begin{table}[H]
@@ -265,8 +271,10 @@ Each iteration of algorithm \ref{algo:1}, the batch is doubled because it contai
 $\theta^*_{s}=\displaystyle{\mathop{\argmin}_{\theta_s}}E_{(x,y) \sim D(\displaystyle{\mathop{\cup}_{i \in [1,..,d]}}C_{i})}[-log(p_{\theta_s}(y|x))]$ \\ 
 $ \theta^*_{i}=\displaystyle{\mathop{\argmin}_{\theta_i}}E_{(x,y) \sim D(C_{i})}[-log(p_{\theta_i,\theta^*_s}(y|x,i))]
 $ 
-We admit that this is not the optimal way. However, this procdedure make the training very simple.\\
-We also take in account the problem of overfitting that could occur for small corpora. Indeed, real data are not always balanced for every domain. For instance, in our experiments, the size of corpora are very different where EPPS is largest with approximately 2 millions sentences, EMEA contains about 1 million sentences and ECB is the smallest with only 200 000 sentences for English French and 100 000 for English-German. If we train each corpora with same number of batches, ECB will be trained too oftenly, that easily leads to overfitting. Therefore, we perform backpropagation on corpora with frequencies according to sizes of corpora.
+We admit that this is not the optimal way. However, this procedure makes training very simple.\fyTodo{Explain technicalities - future work ?}
+
+We also take in account the problem of overfitting that could occur for small corpora. Indeed, real data are not always balanced for every domain. For instance, in our experiments, the size of corpora are very different where EPPS is largest with approximately 2 millions sentences, EMEA contains about 1 million sentences and ECB is the smallest with only 200 000 sentences for English French and 100 000 for English-German. If we train each corpora with same number of batches, ECB will be trained too oftenly, that easily leads to overfitting. Therefore, we perform backpropagation on corpora with frequencies according to sizes of corpora. \fyTodo{Refs on this ?}
+
 \subsection{Results}
 \begin{figure}[H]
 \begin{center}
@@ -379,7 +387,7 @@ We also take in account the problem of overfitting that could occur for small co
 \fyTodo{natural continuations: go beyond words; learn the projection matrix at the word level; other ?}
 
 \section*{Acknowledgments}
-
+\fyTodo{Homegenize refs - urls, addresses, etc}
 \bibliography{naaclhlt2019}
 \bibliographystyle{plainnat}
 
