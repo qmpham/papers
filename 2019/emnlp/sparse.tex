@@ -48,7 +48,7 @@
 % smaller than 5cm (the original size); we will check this
 % in the camera-ready version and ask you to change it back.
 
-\title{Sparse Word Embedding for Multi-domain Machine Translation}
+\title{Sparse Word Embeddings for Multi-domain Machine Translation}
 
 \author{First Author \\% Minh Quang Pham\\
   Affiliation / Address line 1 \\
@@ -120,6 +120,14 @@ The increasing number of central banks using the same IT platform for their own 
 In this work, we present a new design for word embedding that is composed of different regions which are activate and deactivate corresponding to domains. 
 \\ To evaluate, we use 3 corpora of 3 different domains: Medical, Banking and Administration and 2 different architectures: Transformer and Attentional recurrent network. The test sets are selectioned from shared task each domains and two other general test sets such as news commentary and IWSLT. The reader could find more details in Experimetal section \ref{subsec:data}
 \fyTodo{More precise: two architectures, two languages pairs, multiple domains, also improves generic}
+
+\section{Introduction \label{sec:introduction}}
+% The problem
+Owing to the development of flexible and powerful architectures based on neural networks \cite{bahdanau2014neural;Vaswani17attention}, Machine Translation (MT) has made significant progress over the past years, and constitute the standard for most production engines to-date. One issue which repeatedly pops up with neural MT is the need to perform training with large parallel corpus, typically consisting of millions of parallel sentences as close as possible to the application domain. A lot of the recent research effort has focused on building MT systems in low data conditions for instance building multi-lingual \cite{} MTs or even building systems without any data \cite{}.
+
+Another important scenario for industrial MT systems is to adapt an neural system trained using a parallel data in one  domain to the peculiarity of other domains. Domain Adaption (DA) in MT is an ancient issue \cite{Foster07amixture,Axelrod11domain}, which comes in various guise, and for which a number of solutions has been studied \cite{Chu18asurvey}. The typical setting is \emph{supervised adaptation}, where a (small) amount of data of the target domain of interest is used to fine-tuned the parameters of a system trained on a large amount of texts in a source domain. We study here a different scenario, multi-domain adaptation \cite{Farajian17multidomain}, where we would like to use heterogenous data sources to train a unique system that would work well for all domains. 
+
+Multi-domain adaptation is conceptually close to multi-lingual MT\cite{}, or more generally to multi-task learning \cite{}, and can be approached in a number of ways. 
 
 \section{Sparse embeddings \label{sec:sparse_embeddings}}
 \fyDone{Use meaningful titles throughout}
