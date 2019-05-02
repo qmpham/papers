@@ -12,10 +12,24 @@
 %% and that of ACL 08 by Joakim Nivre and Noah Smith
 
 \documentclass[11pt,a4paper]{article}
-\usepackage[hyperref]{naaclhlt2019}
+\usepackage[hyperref]{emnlp-ijcnlp-2019}
 \usepackage{times}
-\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
 \usepackage{latexsym}
+
+\usepackage{url}
+
+%\aclfinalcopy % Uncomment this line for the final submission
+
+%\setlength\titlebox{5cm}
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+\newcommand\BibTeX{B{\sc ib}\TeX}
+\newcommand\confname{EMNLP-IJCNLP 2019}
+\newcommand\conforg{SIGDAT}
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
 \usepackage{graphicx}
 \usepackage{multirow}
 \usepackage{url}
@@ -321,13 +335,39 @@ We also take in account the problem of overfitting that could occur for small co
 \label{tab:2}
 \end{table}
 
-\begin{table}[H]
+\begin{figure}[H]
 \begin{center}
  \resizebox{\columnwidth}{!}{\begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
  \hline
  Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
- Mixed & & & & & & & & \\
+ Mixed & 65.42 & 34.7 & 51.38 & 29.27 & 28.95 & 17.82 & 22.21 & 21.63 \\
+ \hline
+ EMEA-finetuned & & & & & & & & \\
+ \hline
+ EPPS-finetuned & & & & & & & & \\
+ \hline
+ ECB-finetuned & & & & & & & & \\
+ \hline
+ Sparse & 68.51 & 35.75 & 51.19 & 28.88 & 28.92 & 17.89 & 22.73 & 21.08\\
+ \hline
+ Domain Control & & & & & & & & \\
+ \hline
+ WDCMT (conditional GRU) & 68.76 & 35.71 & 52.75 & 32.03 & 29.81 & 19.58 & 24.63 & 23.28 \\
+ \hline 
+\end{tabularx}}
+\end{center}
+\caption{bpe-detokenized BLEU score for Recurrent network architecture on language pair English-French. Notations as same as figure \ref{tab:1} except that other models from WDCMT of \cite{D18-1041} use Bidirectional-LSTM}
+\label{tab:3}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+ \resizebox{\columnwidth}{!}{\begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
+ \hline
+ Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
+ \hline\hline
+ Mixed & 62.63 & 23.91 & 66.95 & 16.92 & 21.29 & 10.9 & & 14.19 \\
  \hline
  EMEA-finetuned & & & & & & & & \\
  \hline
@@ -339,39 +379,13 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  Domain Control & & & & & & & & \\
  \hline
- WDCMT (conditional GRU) & 68.76 & 35.71 & 52.75 & 32.03 & 29.81 & 19.58 & 24.63 & 23.28 \\
+ WDCMT (conditional GRU) & & & & & & & & \\
  \hline 
 \end{tabularx}}
 \end{center}
-\caption{bpe-detokenized BLEU score for Recurrent network architecture on language pair English-French. Notations as same as figure \ref{tab:1} except that other models from WDCMT of \cite{D18-1041} use Bidirectional-LSTM}
-\label{tab:3}
-\end{table}
-
-\begin{table}[H]
-\begin{center}
- \resizebox{\columnwidth}{!}{\begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X ||} 
- \hline
- Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & IWSLT test 2010 \\ [0.5ex] 
- \hline\hline
- Mixed & & & & & & & \\
- \hline
- EMEA-finetuned & & & & & & & \\
- \hline
- EPPS-finetuned & & & & & & & \\
- \hline
- ECB-finetuned & & & & & & & \\
- \hline
- Sparse & & & & & & & \\
- \hline
- Domain Control & & & & & & & \\
- \hline
- WDCMT (conditional GRU) & & & & & & & \\
- \hline 
-\end{tabularx}}
-\end{center}
-\caption{BLEU scores for RNN architecture on English-German. Notations are the same as for figure~\ref{tab:3}}
+\caption{BLEU score for Recurrent network on language pair English - German. The notation is same as figure \ref{tab:3}}
 \label{tab:4}
-\end{table}
+\end{figure}
 
 \subsection{Word embedding analysis}
 
@@ -404,7 +418,6 @@ more generic, since sparse embedding can be implemented for every neural archite
 
 \section*{Acknowledgments}
 \fyTodo{Homegenize refs - urls, addresses, etc}
-\bibliography{naaclhlt2019}
-\bibliographystyle{plainnat}
-
+\bibliography{emnlp-ijcnlp-2019}
+\bibliographystyle{acl_natbib}
 \end{document}
