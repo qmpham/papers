@@ -287,9 +287,9 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
- Mixed & 67.69 & 37.5 & 53.49 & 34.86 & 30.96 & 20.98 &  & 25.7 \\
+ Mixed & 67.69 & 37.5 & 53.49 & 34.86 & 30.96 & 20.98 & 28.56 & 25.7 \\
  \hline
- EMEA-finetuned & 76.77 & 17.16 & 11.99 & 29.58 & 14.25 & 9.92 &  & 11.10 \\
+ EMEA-finetuned & 76.77 & 17.16 & 11.99 & 29.58 & 14.25 & 9.92 & 11.64 & 11.10 \\
  \hline
  EPPS-finetuned & 20.86 & 37.04 & 24.53 & 31.86 & 30.97 & 20.72 &  & 11.1 \\
  \hline
@@ -343,13 +343,15 @@ We also take in account the problem of overfitting that could occur for small co
  \hline\hline
  Mixed & 65.42 & 34.7 & 51.38 & 29.27 & 28.95 & 17.82 & 22.21 & 21.63 \\
  \hline
- EMEA-finetuned & & & & & & & & \\
+ EMEA-finetuned  & & & & & & & & \\
  \hline
  EPPS-finetuned & & & & & & & & \\
  \hline
  ECB-finetuned & & & & & & & & \\
  \hline
- Sparse & 68.51 & 35.75 & 51.19 & 28.88 & 28.92 & 17.89 & 22.73 & 21.08\\
+ Sparse (1) & 68.51 & 35.75 & 51.19 & 28.88 & 28.92 & 17.89 & 22.73 & 21.08 \\
+ \hline
+ Sparse (2) & & & & & & & & \\
  \hline
  Domain Control & & & & & & & & \\
  \hline
@@ -367,15 +369,17 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
- Mixed & 62.63 & 23.91 & 66.95 & 16.92 & 21.29 & 10.9 & & 14.19 \\
+ Mixed & 57.37 & 23.1 & 63.54 & 17.39 & 20.65 & 10.69 & 11.51 & 14.29 \\
  \hline
- EMEA-finetuned & & & & & & & & \\
+ EMEA-finetuned & 65.64 & 12.36 & 15.93 & 15.38 & 11.1 & 5.54 & 6.22 & 7.6 \\
  \hline
  EPPS-finetuned & & & & & & & & \\
  \hline
  ECB-finetuned & & & & & & & & \\
  \hline
- Sparse & & & & & & & & \\
+ Sparse (1) & 63.43 & 22.66 & 64.4 & 16.99 & 20.63 & 10.89 & 11.45 & 14.26 \\
+ \hline
+ Sparse (2) & 63.27 & 22.62 & 63.7 & 17.26 & 20.69 & 10.89 & 11.45 & 14.26 \\
  \hline
  Domain Control & & & & & & & & \\
  \hline
