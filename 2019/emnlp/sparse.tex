@@ -138,8 +138,7 @@ In this work, we present a new design for word embedding that is composed of dif
 \section{Introduction \label{sec:introduction}}
 % The problem
 Owing to the development of flexible and powerful architectures based on neural networks \cite{Cho14properties,bahdanau2014neural,Ghering17convolutional,Vaswani17attention}, Machine Translation (MT) has made significant progress over the past years, and constitute the standard for most production engines to-date. One issue which repeatedly pops up with neural MT is the need to perform training with large parallel corpora, typically consisting of millions of parallel sentences deemed to be as close as possible to the application domain. A lot of the recent research effort has thus focused on developping MT systems in low data conditions, for instance building multi-lingual MTs enabling zero-shot translation\cite{Firat16multiway,Johnson17google} or even building systems without any data \cite{Artetxe18unsupervised,Lample18unsupervised}.
-
-Another important scenario for industrial MT systems is to adapt an neural system trained using a parallel data in one  domain to the peculiarity of other domains. Domain Adaption (DA) in MT is an old issue \cite{Foster07mixture,Axelrod11domain}, which comes in various guises, and for which a number of solutions have been studied (see the recent survey of \cite{Chu18asurvey} for neural MT). The typical setting is \emph{supervised adaptation}, where a (small) amount of data of the target domain of interest is used to fine-tuned the parameters of a system trained on a large amount of texts in a source domain. We study here a different scenario, multi-domain adaptation \cite{}Farajian17multidomain}, where we would like to use heterogenous data sources to train a unique system that would work well for all domains. This allows us to be both data efficient (all data is used to train all domains) and compuationally efficient (we only need to train one domain). In our setting, we assume that the domain of test documents is known in advance.
+Another important scenario for industrial MT systems is to adapt an neural system trained using a parallel data in one  domain to the peculiarity of other domains. Domain Adaption (DA) in MT is an old issue \cite{Foster07mixture,Axelrod11domain}, which comes in various guises, and for which a number of solutions have been studied (see the recent survey of \cite{Chu18asurvey} for neural MT). The typical setting is \emph{supervised adaptation}, where a (small) amount of data of the target domain of interest is used to fine-tuned the parameters of a system trained on a large amount of texts in a source domain. We study here a different scenario, multi-domain adaptation \cite{Farajian17multidomain}, where we would like to use heterogenous data sources to train a unique system that would work well for all domains. This allows us to be both data efficient (all data is used to train all domains) and compuationally efficient (we only need to train one domain). In our setting, we assume that the domain of test documents is known in advance.
 
 Multi-domain adaptation is conceptually close to multi-lingual MT, or more generally to multi-task learning \cite{Caruana97multitask}, and can be approached in a number of ways. We adapt here the feature-expansion framework of \cite{Daume07frustratingly} to neural MT, in an attempt to confine the differences between domains at the lexical level, while the rest of the parameters is shared between domains. Our main hypothesis is that most of the differences between domains take place at the lexical level, due to massive cross-domain polysemy. By contrast, the deeper layers, which arguably model more abstract linguistic phenomena, should be made shareable across domains.
 To this end, we make sure to design word embeddings in such that they will contain a generic as well as a domain-specific region. We perform experiments with three domains, two architectures and two language pairs and find that our technique can effectively build multi-domain NMT, outperforming several baselines. Our contribution is thus twofold:
@@ -253,7 +252,7 @@ More precisely, for the Transformer we use the same settings as described in \ci
 \fyTodo{Motivate the split - discuss experimentally embedding size}
 For the implementation of sparse embeddings, we split the vector embedding of size 512 into four regions $[8,8,8,488]$, corresponding respectively to EMEA, EPPS, ECB domain and generic region. If sentence comes from domain $i$, regions for domains $j,\forall j \neq i$ will be masked as 0. We then use a dense layer of size 512 to fuse the active domain region and the generic region.
 
-\begin{algorithm}[H]
+\begin{algorithm}[h]
 \caption{Multi-domain Training}
 \label{algo:1}
 \begin{algorithmic}[1]
@@ -335,7 +334,7 @@ We also take in account the problem of overfitting that could occur for small co
 \label{tab:2}
 \end{table}
 
-\begin{table}[H]
+\begin{figure}[H]
 \begin{center}
  \resizebox{\columnwidth}{!}{\begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
  \hline
@@ -361,9 +360,9 @@ We also take in account the problem of overfitting that could occur for small co
 \end{center}
 \caption{bpe-detokenized BLEU score for Recurrent network architecture on language pair English-French. Notations as same as figure \ref{tab:1} except that other models from WDCMT of \cite{Zeng18multidomain} use Bidirectional-LSTM}
 \label{tab:3}
-\end{table}
+\end{figure}
 
-\begin{table}[H]
+\begin{figure}[H]
 \begin{center}
  \resizebox{\columnwidth}{!}{\begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
  \hline
@@ -389,7 +388,7 @@ We also take in account the problem of overfitting that could occur for small co
 \end{center}
 \caption{BLEU score for Recurrent network on language pair English - German. The notation is same as figure \ref{tab:3}}
 \label{tab:4}
-\end{table}
+\end{figure}
 
 \subsection{Word embedding analysis}
 
