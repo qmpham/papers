@@ -247,7 +247,7 @@ Task & Corpora & Train & Dev & Test & Vocabulary \\ \hline
 
 \subsection{NMT model configuration}
 We evaluate our method on two state-of-the-art encoder-decoder architectures: a recurrent architecture based on attentional birectional Long Short-Term Memory (LSTM) cells and the Transformer architecture of \citet{Vaswani17attention}.
-More precisely, for the Transformer we use the same settings as described in \cite{Vaswani17attention}. For the recurrent architecture, in order to fairly compare to the work of \citet{Zeng18multidomain}, we use a standard configuration with one layer bidirectional LSTM with a encoder hidden size of 1024; one attentional unidirectional LSTM layer with same hidden size in decoder; and word embeddings of size 512. The implementation can be found in OpenNMT-tf \cite{P17-4012}.
+More precisely, for the Transformer we use the same settings as described in \cite{Vaswani17attention}. For the recurrent architecture, in order to fairly compare to the work of \citet{Zeng18multidomain}, we use a standard configuration with one layer bidirectional LSTM with a encoder hidden size of 1024; one attentional unidirectional LSTM layer with same hidden size in decoder; and word embeddings of size 512. The implementation can be found in OpenNMT-tf \cite{Klein2017OpenNMT}.
 \fyTodo{Language pairs, BPE number, optimizer}
 \fyTodo{Motivate the split - discuss experimentally embedding size}
 For the implementation of sparse embeddings, we split the vector embedding of size 512 into four regions $[8,8,8,488]$, corresponding respectively to EMEA, EPPS, ECB domain and generic region. If sentence comes from domain $i$, regions for domains $j,\forall j \neq i$ will be masked as 0. We then use a dense layer of size 512 to fuse the active domain region and the generic region.
@@ -397,11 +397,11 @@ We also take in account the problem of overfitting that could occur for small co
 \fyDone{Related work goes last}
 \fyTodo{Compare also to Peng 2017}
 
-Multi-domain Machine Translation has largely interested NLP community by its promising applications in industry and its relation to fundamental problems in theory. Researchers have proposed a large range of techniques from Data centric methods to Model centric methods \cite{Chu18asurvey}; \cite{P17-2061}.\\ Data centric category attempts to collect related-domain data from large existing in-domain corpora. The methods in this category can be listed as following:
+Multi-domain Machine Translation has largely interested NLP community by its promising applications in industry and its relation to fundamental problems in theory. Researchers have proposed a large range of techniques from Data centric methods to Model centric methods \cite{Chu18asurvey}; \cite{Chu2017comparison}.\\ Data centric category attempts to collect related-domain data from large existing in-domain corpora. The methods in this category can be listed as following:
 \fyTodo{Organize refs}
 \begin{itemize}
-\item score relatedness of sentences to the target domain by Language Model \cite{P10-2041,D11-1033,P13-2119}.
-\item generating pseudo parallel data \cite{P03-1010,C16-1295,D14-1023}
+\item score relatedness of sentences to the target domain by Language Model \cite{Moore2010selection,Axelrod2011domain,Duh2013selection}.
+\item generating pseudo parallel data \cite{Utiyama2003measure,Wang2016connecting,Wang2014neural}
 \end{itemize}
 On the other hand, Model centric approaches focus on NMT models that are specialized for domain adaptation. The novelty can be among following features
 \begin{itemize}
