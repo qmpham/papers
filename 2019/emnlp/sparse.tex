@@ -15,7 +15,6 @@
 \usepackage[hyperref]{emnlp-ijcnlp-2019}
 \usepackage{times}
 \usepackage{latexsym}
-\usepackage{graphicx}
 
 \usepackage{url}
 
@@ -281,9 +280,9 @@ We admit that this is not the optimal way. However, this procedure makes trainin
 We also take in account the problem of overfitting that could occur for small corpora. Indeed, real data are not always balanced for every domain. For instance, in our experiments, the size of corpora are very different where EPPS is largest with approximately 2 millions sentences, EMEA contains about 1 million sentences and ECB is the smallest with only 200 000 sentences for English French and 100 000 for English-German. If we train each corpora with same number of batches, ECB will be trained too oftenly, that easily leads to overfitting. Therefore, we perform backpropagation on corpora with frequencies according to sizes of corpora. \fyTodo{Refs on this ? or contrast ?}
 
 \subsection{Results}
-\begin{table}[H]
+\begin{table*}
 \begin{center}
- \resizebox{\columnwidth}{!}{\begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
+ \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
  \hline
  Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
@@ -295,11 +294,7 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  ECB-finetuned & 9.2 & 18.39 & 55.45 & 12.13 & 16.12 & 8.71 &  & 7.19 \\
  \hline
- Sparse(1) & 70.45 & 38.23 & 54.69 & 34.66 & 31.24 & 21.36 & 28.12 & 26.02 \\
- \hline
  Sparse(1) & 74.26 & 37.67 & 54.07 & 33.85 & 30.86 & 20.97 & 28.11 & 25.70 \\
- \hline
- Sparse(2) & 69.91 & 38.05 & 54.2 & 35.22 & 31.25 & 21.36 & 28.12 & 26.02 \\
  \hline
  Sparse(2) & 73.97 & 37.81 & 53.67 & 34.17 & 30.93 & 20.97 & 28.11 & 25.7 \\
  \hline
@@ -307,110 +302,74 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  Domain Control & 67.87 & 37.31 & 54.14 & 33.63 & 31.09 &  & & \\
  \hline
-\end{tabularx}}
+\end{tabularx}
 \end{center}
+
 \caption{BPE-detokenized BLEU score for English-French with the Transformer architecture. Sparse(1) uses correponding domain tag for EMEA, EPPS, ECB test sets and generic tag for newstest and IWSLT. Sparse(2) uses generic tag for all of test sets. Sparse(3) uses tag predicted by a pre-trained domain classififer}
 \label{tab:1}
-\end{table}
-
-%jmc
+\end{table*}
 
 \begin{table*}
 \begin{center}
-\begin{tabular}{l|ccc|ccccc}
- \hline
- Models & EMEA & EPPS & ECB & khresmoi & t2007 & nt2009 & nt2014 & i2010 \\ %[0.5ex] 
- \hline
-  \multicolumn{9}{c}{\it English-to-French} \\
- \hline
- mixed & 67.69 & 37.5 & 53.49 & 34.86 & 30.96 & 20.98 & 28.56 & 25.7 \\
- + ft$_{EMEA}$ & \bf 76.77 & 17.16 & 11.99 & 29.58 & 14.25 & 9.92 & 11.64 & 11.10 \\
- + ft$_{EPPS}$ & 20.86 & \bf 37.04 & 24.53 & 31.86 & 30.97 & 20.72 &  & 11.1 \\
- + ft$_{ECB}$ & 9.2 & 18.39 & \bf 55.45 & 12.13 & 16.12 & 8.71 &  & 7.19 \\
- \hline
- sparse$_{notag}$ & 73.97 & \bf 37.81 & 53.67 & 34.17 & 30.93 & 20.97 & 28.11 & 25.7 \\
- sparse$_{oracle}$ & \bf 74.26 & 37.67 & \bf 54.07 & 33.85 & 30.86 & 20.97 & 28.11 & 25.70 \\
- sparse$_{tfidf}$ &  &  &  &  &  &  &  & \\
- \hline
- DC$_{oracle}$ & 67.87 & 37.31 & 54.14 & 33.63 & 31.09 &  & & \\
- \hline
-  \multicolumn{9}{c}{\it English-to-German} \\
- \hline
- mixed & 64.57 & 26.47 & 68.67 & 21.77 & 23.50 & 13.9 & 17.04 & 18.85 \\
- + ft$_{EMEA}$ & & & & & & & & \\
- + ft$_{EPPS}$ & & & & & & & & \\
- + ft$_{ECB}$ & & & & & & & & \\
- \hline
- sparse$_{notag}$ & 70.67 & 26.24 & 66.97 & & & 14.05 & 16.64 & 19.04 \\
- sparse$_{oracle}$ & 70.55 & 26.17 & 68.07 & 21.50 & 23.30 & 14.05 & 16.64 & 19.04\\
- sparse$_{tfidf}$ &  &  &  &  &  &  &  & \\
- \hline
- DC$_{oracle}$ & & & & & & & & \\
- \hline
-
-\end{tabular}
-\end{center}
-\caption{BPE-detokenized BLEU score with the Transformer architecture. Sparse(1) uses correponding domain tag for EMEA, EPPS, ECB test sets and generic tag for newstest and IWSLT. Sparse(2) uses generic tag for all of test sets. Sparse(3) uses tag predicted by a pre-trained domain classififer}
-\label{tab:1b}
-\end{table*}
-
-\begin{table}[H]
-\begin{center}
- \resizebox{\columnwidth}{!}{\begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
+ \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
  \hline
  Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
  Mixed & 64.57 & 26.47 & 68.67 & 21.77 & 23.50 & 13.9 & 17.04 & 18.85 \\
  \hline
- EMEA-finetuned & & & & & & & & \\
+ EMEA-finetuned & 68.35 & 17.02 & 32.87 & 21.15 & 15.94 & 8.92 & 11.21 & 13.49 \\
  \hline
- EPPS-finetuned & & & & & & & & \\
+ EPPS-finetuned & 36.19 & 26.29 & 40.71 & 19.67 & 23.69 & 14.08 & 16.47 & 19.24 \\
  \hline
- ECB-finetuned & & & & & & & & \\
+ ECB-finetuned &  & & & & & & & \\
  \hline
- Sparse(1) & 70.55 & 26.17 & 68.07 & 21.50 & 23.30 & 14.05 & 16.64 & 19.04\\
+ Sparse(1) & 70.9 & 26.30 & 68.9 & 21.42 & 23.73 & 13.99 & 16.57 & 18.82 \\
  \hline
- Sparse(2) & 70.67 & 26.24 & 66.97 & & & 14.05 & 16.64 & 19.04 \\
+ Sparse(2) & 70.86 & 26.14 & 68.59 & 21.95 & 23.79 & 13.99 & 16.57 & 18.82 \\
  \hline
- Domain Control & & & & & & & & \\
+ Sparse (3) &  &  &  &  &  &  &  & \\
  \hline
-\end{tabularx}}
+ Domain Control & 63.48 & 26.27 & 66.95 & 21.45 & 23.95 & & & \\
+ \hline
+\end{tabularx}
 \end{center}
 \caption{BLEU score for Transformer in language pair English - German. Notations are same as Table~\ref{tab:1}}
 \label{tab:2}
-\end{table}
+\end{table*}
 
-\begin{figure}[H]
+\begin{table*}
 \begin{center}
- \resizebox{\columnwidth}{!}{\begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
+ \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
  \hline
  Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
  Mixed & 65.42 & 34.7 & 51.38 & 29.27 & 28.95 & 17.82 & 22.21 & 21.63 \\
  \hline
- EMEA-finetuned  & & & & & & & & \\
+ EMEA-finetuned  & 72.06 & 18.62 & 16.78 & 25.88 & 13.38 & 9.26 & 10.94 & 5.73 \\
  \hline
  EPPS-finetuned & & & & & & & & \\
  \hline
- ECB-finetuned & & & & & & & & \\
+ ECB-finetuned & 21.93 & 22.6 & 51.53 & 14.74 & 20.23 & 9.74 & 12.10 & 10.47 \\
  \hline
- Sparse (1) & 70.59 & 35.21 & 50.91 & 29.62 & 29.05 & 17.92 & 23.00 & 20.96 \\
+ Sparse (1) & 71.73 & 35.21 & 50.91 & 29.62 & 29.05 & 17.92 & 23.00 & 20.96 \\
  \hline
- Sparse (2) & 71.73 & 35.22 & 49.68 & 29.51 & 29.32 & 17.89 & 22.97 & 21.09 \\
+ Sparse (2) & 70.59 & 35.22 & 49.68 & 29.51 & 29.32 & 17.89 & 22.97 & 21.09 \\
  \hline
- Domain Control & & & & & & & & \\
+ Sparse (3) &  &  &  &  &  &  &  & \\
+ \hline
+ Domain Control & 68.26 & 35.13 & 50.09 & 27.86 & 29.34 & & & \\
  \hline
  WDCMT (conditional GRU) & 68.76 & 35.71 & 52.75 & 32.03 & 29.81 & 19.58 & 24.63 & 23.28 \\
  \hline 
-\end{tabularx}}
+\end{tabularx}
 \end{center}
 \caption{bpe-detokenized BLEU score for Recurrent network architecture on language pair English-French. Notations as same as figure \ref{tab:1} except that other models from WDCMT of \cite{Zeng18multidomain} use Bidirectional-LSTM}
 \label{tab:3}
-\end{figure}
+\end{table*}
 
-\begin{figure}[H]
+\begin{table*}
 \begin{center}
- \resizebox{\columnwidth}{!}{\begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
+ \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
  \hline
  Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
@@ -426,15 +385,18 @@ We also take in account the problem of overfitting that could occur for small co
  \hline
  Sparse (2) & 63.27 & 22.62 & 63.7 & 17.26 & 20.69 & 10.89 & 11.45 & 14.26 \\
  \hline
- Domain Control & & & & & & & & \\
+ Sparse (3) &  &  &  &  &  &  &  & \\
+ \hline
+ Domain Control & 62.53 & 23.74 & 65.71 & 16.88 & 21.85 & & & \\
  \hline
  WDCMT (conditional GRU) & & & & & & & & \\
  \hline 
-\end{tabularx}}
+\end{tabularx}
 \end{center}
 \caption{BLEU score for Recurrent network on language pair English - German. The notation is same as figure \ref{tab:3}}
 \label{tab:4}
-\end{figure}
+\end{table*}
+
 \section{Discussion}
 \subsection{Word embedding analysis}
 
