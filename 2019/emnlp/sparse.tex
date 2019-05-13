@@ -153,7 +153,7 @@ then optimize each $\theta_i$ (as additional factor used for fine-tuning the mod
 \begin{equation}
 \theta^*_{i} = \displaystyle{\mathop{\argmin}_{\theta_i}}E_{(x,y) \sim D(C_{i})}[-log(p_{\theta_i,\theta^*_s}(y|x,i))]
 \end{equation} 
-Our first approach to multi-domain machine translation is to build such trivial solution in calibrating positions and sizes of domain paramters $\theta_i$ and shared parameters $\theta_s$ inside one architecture.
+Our first approach to multi-domain machine translation is to build such trivial solution by assigning different regions of word embedding vector to set of domain paramters $\theta_i$ and set of shared parameters $\theta_s$ while keep sharing other parameters between domains.
 \subsection{Sparse word embedding}
 \label{sec:sparse}
 This section explains a new design for word embedding used in multi-domain model. As mentioned above, we separate parameter set into $D+1$ parameter sets correspond to D domains and one shared paramater set. Our first attempt is to split standard vector word embedding into $D+1$ regions named $\theta_i$ for $i \in [1,..,D]$ and $\theta_s$.
@@ -164,21 +164,19 @@ This section explains a new design for word embedding used in multi-domain model
     \label{fig:network}
   \end{figure}
 \fyTodo{Explain vanishing ?}
-Figure~\ref{fig:network} presents our proposed design. During backprogation, the \fyTodo{fix notation}{projection matrix $P$} receives vanishing gradient at regions corresponding to deactivated regions in the word embedding. Those regions are also vanished in forward step, thus do not interfere the training on the domain to which they do not correspond.
+Figure~\ref{fig:network} presents our proposed design. During backprogation, the \fyTodo{fix notation}{projection matrix $M$} receives gradient 0 at regions corresponding to deactivated regions in the word embedding. Those regions are also masked in forward step, thus do not interfere the training on the domain to which they are not assigned.
 
-Denote
-$p_{t} = P * w_{t} = P_g \omega_g(t) + \displaystyle{\mathop{\sum}_{i \in [1,..,d]} P_i * \omega_i(t)}$\\
-where $w_{t}$ is word embedding of token $x_{t}$  is projection of word embedding (Transformer \cite{Vaswani17attention}, recurrent \cite{bahdanau2014neural})
-Assume $x_{t}$ belongs to domain $i$, thus $w_j(t) = 0 \forall j \neq i$. Denote $P_j$ the rows of the projection matrix $P$ corresponding to the deactivated region $w_j$.
+Let $\tilde{x}_{t} = M * e_{t} = M_g e_g(t) + \displaystyle{\mathop{\sum}_{i \in [1,..,d]} M_i * e_i(t)}$ be the projection of word embedding where $e_{t}$ is word embedding of token $x_{t}$, M is projection matrix, $M_j \forall j \in [1...d]$ is row block corresponding to domain region $j$ (Transformer \cite{Vaswani17attention}, recurrent \cite{bahdanau2014neural})\\
+Assume the batch belongs to domain $i$, then $e_j(t) = 0$ $\forall j \neq i$,$\forall t$. 
 \begin{equation}
 \begin{split}
-\frac{\partial L(y_t,x_t)}{\partial P_j} &=\frac{\partial L}{\partial p}(p_t) * \frac{\partial p_t}{\partial P_j} \\
-								&= \frac{\partial L}{\partial p}(p_t) * w_j(t)\\
+\frac{\partial L(x,y)}{\partial M_j} &= \sum_{t}\frac{\partial L}{\partial \tilde{x}_t}(x_t) * \frac{\partial \tilde{x}_t}{\partial M_j} \\
+								&= \sum_{t} \frac{\partial L}{\partial \tilde{x}_t}(x_t) * e_j(t)\\
 									&=0
 \end{split} 
 \forall j \neq i
 \end{equation}
-\subsection{Implementation Details}
+
 The complex structure of State-of-the-art architecture Transformer \cite{Vaswani17attention} and popular recurrent network \cite{bahdanau2014neural} makes the implementation of sparse embedding non-obvious. Indeed, Transformer involve positional embedding and residual connections which are not homogeneous for domain-regions. Therefore, in our first implementation, we used an dense layer to fuse domain-region and generic region before applying positional embedding and residual connection. This implementation limits the finetuning effect at only word level.\\
 Furthermore, because word embeddings are involved in three parts of standard encoder-decoder structure, which are input of encoder, input of decoder and projection before softmax, we have 7 possibilities to apply sparse embedding. However, due to high memory cost, we only want to apply sparse embedding on the source side. \fyTodo{Explain this. Future work ?}
 
@@ -201,9 +199,9 @@ Task & Corpora & Train & Dev & Test & Vocabulary \\ \hline
 \caption{Corpora }
 \label{table:Corpora}
 \end{table*}
-To reduce size of vocabulary, we apply Byte-Pair Encoding with 30000 merge operations, then select approximately 30000 frequent words to build vocabulary for each language. 
+To reduce size of vocabulary, we apply Byte-Pair Encoding with 30000 merge operations, then select approximately 30000 the most frequent words to build vocabulary for each language. 
 \subsection{Baselines \label{ssec:baselines}}
-To validate our findings, we compared sparse embedding model with standard models using State-of-the-Art Transformer \cite{Vaswani17attention} architecture and Attention Recurrent Neural Network architecture. Our baselines consist of generic models trained with mixed corpora (denoted mixed in the table of scores); models finetuned to each domain using 15000 iterations over in-domain data (denoted $+ft_{EMEA}$, $+ft_{EPPS}$, $+ft_{ECB}$ in the table of scores); models using Domain features of \cite{Kobus17domaincontrol} (noted DC in the table of scores) and multi-domain model proposed by \cite{Zeng18multidomain} (denoted WDCMT in the table of scores). \\
+To validate our findings, we compared sparse embedding model with standard models using State-of-the-Art Transformer \cite{Vaswani17attention} architecture and Attention Recurrent Neural Network architecture. Our baselines consist of generic models trained with mixed corpora (denoted mixed in the table of scores); models finetuned to each domain using (10000, 15000, 5000) iterations over in-domain data (denoted $+ft_{EMEA}$, $+ft_{EPPS}$, $+ft_{ECB}$ in the table of scores); models using Domain features of \cite{Kobus17domaincontrol} (noted DC in the table of scores) and multi-domain model proposed by \cite{Zeng18multidomain} (denoted WDCMT in the table of scores). \\
 For all of models, we set size of word embedding equal to 512; size of hidden layers equal to 1024 for Recurrent Neural Network and 512 for Transformer. 
 \begin{itemize}
 	\item Transformer: size of word embedding: 512; size of hidden layers: 512; size of inner feed forward layer: 2048; Multi-head: 8; number of layers: 6.
@@ -211,10 +209,11 @@ For all of models, we set size of word embedding equal to 512; size of hidden la
 	\item DC: size of domain embedding:2 ; same settings for both architecture: Transformer and Attention Recurrent Neural Network.
 	\item WDCMT: Bidirection Gated recurrent units (denoted GRU) encoder, unidirectional conditional GRU decoder, size of word embedding: 512; size of hidden layers: 1024; size of domain layers: 300; number of layers: 1
 \end{itemize}
+To train NMT systems, we use Adam($\beta_1=0.9$, $\beta_2 = 0.999$, $\alpha=0.0005$) for Attention Recurrent Neural Network; and Adam with $\beta_1=0.9$, $\beta_2= 0.98$, with Noam decay \cite{Vaswani17attention} ($warmup\_steps=4000$) for Transformer.
 The implementation can be found in OpenNMT-tf\cite{Klein2017OpenNMT} and \url{https://github.com/DeepLearnXMU/WDCNMT}
 \subsection{Sparse NMT model configuration}
 \fyTodo{Motivate the split - discuss experimentally embedding size}
-For the implementation of sparse embeddings, we split the vector embedding of size 512 into four regions with size $[8,8,8,488]$ for instance, the choice will be dicussed in \ref{secc:region_size}. If sentence comes from domain $i$, regions for domains $j,\forall j \neq i$ will be masked as 0 while generic region is always activated. We then use a dense layer of size 512 to fuse the active domain region and the generic region.
+For the implementation of sparse embeddings, we split the vector embedding of size 512 into four regions: 3 domain specific and 1 generic, with size $[8,8,8,488]$, the choice will be dicussed in \ref{secc:region_size}. If sentence comes from domain $i$, regions for domains $j \neq i$ will be masked as 0 while generic region is always activated. We then use a dense layer of size 512 to fuse the active domain region and the generic region.
 
 \begin{algorithm}[h]
 \caption{Multi-domain Training}
@@ -235,11 +234,11 @@ For the implementation of sparse embeddings, we split the vector embedding of si
 \end{algorithmic}
 \end{algorithm}
 
-Each iteration of algorithm \ref{algo:1}, the batch contains 2 types of word embedding for each sentence: using only generic region; using generic region and present domain region. The reason to do this is to minimize simultaneously both losses: \\
+In the training, we use same optimization algorithm as the baselines.
+Each iteration of algorithm \ref{algo:1}, we use 2 batches: generic batch using only generic region; and domain batch using generic region and domain region. The reason to do that is to minimize simultaneously both losses: \\
 $\theta^*_{s}=\displaystyle{\mathop{\argmin}_{\theta_s}}E_{(x,y) \sim D(\displaystyle{\mathop{\cup}_{i \in [1,..,d]}}C_{i})}[-log(p_{\theta_s}(y|x))]$ \\ 
 $ \theta^*_{i}=\displaystyle{\mathop{\argmin}_{\theta_i}}E_{(x,y) \sim D(C_{i})}[-log(p_{\theta_i,\theta^*_s}(y|x,i))]
 $ 
-We admit that this is not the optimal way. However, this procedure makes training very simple. \fyTodo{Explain technicalities - future work ?}
 
 We also take into account the problem of overfitting that could occur for small corpora. Indeed, real data are not always balanced for every domain. For instance, in our experiments, the size of corpora are very different where EPPS is largest with approximately 2 millions sentences, EMEA contains about 1 million sentences and ECB is the smallest with only 200 000 sentences for English French and 100 000 for English-German. If we train each corpora with same number of batches, ECB will be trained too oftenly, that easily leads to overfitting. Therefore, we select batches from each corpora with frequencies proportional to its size. \fyTodo{Refs on this ? or contrast ?}
 
@@ -252,19 +251,19 @@ We also take into account the problem of overfitting that could occur for small 
  \hline\hline
  Mixed & 67.69 & 37.5 & 53.49 & 34.86 & 30.96 & 20.98 & 28.56 & 25.7 \\
  \hline
- EMEA-finetuned & 76.77 & 17.16 & 11.99 & 29.58 & 14.25 & 9.92 & 11.64 & 11.10 \\
+ EMEA-finetuned & 76.77 & 17.16 & 11.99 & 29.58 & 14.25 & 9.92 & 11.64 & 11.1 \\
  \hline
- EPPS-finetuned & 20.86 & 37.04 & 24.53 & 31.86 & 30.97 & 20.72 &  & 11.1 \\
+ EPPS-finetuned & 20.86 & 37.04 & 24.53 & 31.86 & 30.97 & 20.72 & 28.33 & 11.1 \\
  \hline
  ECB-finetuned & 26.93 & 27.09 & 56.52 & 22.04 & 22.92 & 12.94 & 17.51 & 13.99 \\
  \hline
- Sparse(1) & 74.26 & 37.67 & 54.07 & 33.85 & 30.86 & 20.97 & 28.11 & 25.70 \\
+ Sparse(1) & 74.26 & 37.67 & 54.07 & 33.85 & 30.86 & 20.97 & 28.11 & 25.7 \\
  \hline
  Sparse(2) & 73.97 & 37.81 & 53.67 & 34.17 & 30.93 & 20.97 & 28.11 & 25.7 \\
  \hline
  Sparse(3) &  &  &  &  &  &  &  & \\
  \hline
- Domain Control & 67.87 & 37.31 & 54.14 & 33.63 & 31.09 &  & & \\
+ Domain Control & 67.87 & 37.31 & 54.14 & 33.63 & 31.09 &  20.1 & 26.52 & 24.81\\
  \hline
 \end{tabularx}
 \end{center}
@@ -293,7 +292,7 @@ We also take into account the problem of overfitting that could occur for small 
  \hline
  Sparse (3) &  &  &  &  &  &  &  & \\
  \hline
- Domain Control & 63.48 & 26.27 & 66.95 & 21.45 & 23.95 & & & \\
+ Domain Control & 63.48 & 26.27 & 66.95 & 21.45 & 23.95 & 13.94 & 16.45 & 18.78  \\
  \hline
 \end{tabularx}
 \end{center}
@@ -321,7 +320,7 @@ We also take into account the problem of overfitting that could occur for small 
  \hline
  Sparse (3) &  &  &  &  &  &  &  & \\
  \hline
- Domain Control & 68.26 & 35.13 & 50.09 & 27.86 & 29.34 & & & \\
+ Domain Control & 68.26 & 35.13 & 50.09 & 27.86 & 29.34 & 16.25 & 20.95 & 21.16 \\
  \hline
  WDCMT (conditional GRU) & 68.76 & 35.71 & 52.75 & 32.03 & 29.81 & 19.58 & 24.63 & 23.28 \\
  \hline 
@@ -343,7 +342,7 @@ We also take into account the problem of overfitting that could occur for small 
  \hline
  EPPS-finetuned & 24.9 & 22.98 & 26.26 & 13.55 & 20.95 & 10.58 & 11.33 & 14.32 \\
  \hline
- ECB-finetuned & & & & & & & & \\
+ ECB-finetuned & 41.8 & 15.97 & 71.07 & 10.77 & 14.67 & 7.06 & 7.66 & 8.07 \\
  \hline
  Sparse (1) & 63.43 & 22.66 & 64.4 & 16.99 & 20.63 & 10.89 & 11.45 & 14.26 \\
  \hline
@@ -351,9 +350,9 @@ We also take into account the problem of overfitting that could occur for small 
  \hline
  Sparse (3) &  &  &  &  &  &  &  & \\
  \hline
- Domain Control & 62.53 & 23.74 & 65.71 & 16.88 & 21.85 & & & \\
+ Domain Control & 62.53 & 23.74 & 65.71 & 16.88 & 21.85 & 9.24 & 11.15 & 14.97 \\
  \hline
- WDCMT (conditional GRU) & & & & & & & & \\
+ WDCMT (conditional GRU) & 64.05 & 22.82 & 67 & 15.94 & 20.57 & 10.15 & 11.45 & 13.66 \\
  \hline 
 \end{tabularx}
 \end{center}
@@ -362,6 +361,8 @@ We also take into account the problem of overfitting that could occur for small 
 \end{table*}
 
 \section{Discussion\label{sec:Discussion}}
+\subsection{Sparse's performance}
+The 4 table show remarquable improvement in EMEA translation which is comparable with finetuned model. Sparse model 
 \subsection{Region's size \label{secc:region_size}}
 \subsection{Word embedding analysis}
 
