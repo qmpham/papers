@@ -159,7 +159,7 @@ Our first approach to multi-domain machine translation is to build such trivial 
 This section explains a new design for word embedding used in multi-domain model. As mentioned above, we separate parameter set into $D+1$ parameter sets correspond to D domains and one shared paramater set. Our first attempt is to split standard vector word embedding into $D+1$ regions named $\theta_i$ for $i \in [1,..,D]$ and $\theta_s$.
 \begin{figure}[h]
 \center
-    \includegraphics[width=0.8\linewidth]{Sparse1}
+    \includegraphics[width=\linewidth]{embeddings}
     \caption{Sparse word embeddings. The red region contains units that are activated only when an input from the corresponding domain is presented; the other (green) regions are deactivated; the blue (generic) region is always activated.} 
     \label{fig:network}
   \end{figure}
