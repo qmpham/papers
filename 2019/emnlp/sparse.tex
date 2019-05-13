@@ -219,17 +219,19 @@ For the implementation of sparse embeddings, we split the vector embedding of si
 \caption{Multi-domain Training}
 \label{algo:1}
 \begin{algorithmic}[1]
-\REQUIRE {Corpora $C_i, i\in [1,..,d]$ for d domains}
+\REQUIRE {Corpora $C_i, i\in [1,..,d]$ for d domains, Optimization algorithm Opt}
 \REPEAT 
 \STATE{Randomly pick $i \in [1,..,d]$ w.r.t multinomial distribution $[\frac{|C_i|}{\displaystyle{\mathop{\sum}_{i\in [1,..,d]}|C_i|}}]$.}
 \STATE{Randomly pick a batch of sentences from corpora $C_i$.}
-\STATE{Activating only generic activate embedding to create generic embedding batch, denoted $W_g$}
-\STATE{Pass the batch of word embedding to a dense layer to fuse regions}
-\STATE{Computing gradient of $\theta_s$, $\frac{\partial L}{\partial \theta_s}$ using generic batch $W_g$}
+\STATE{Activating only generic region to create generic embedding batch, denoted $W_g$}
+\STATE{Pass the generic embedding batch to a dense layer.}
+\STATE{Computing gradient of $\theta_s$, $\frac{\partial L}{\partial \theta_s}$ using generic embedding batch $W_g$}
 \STATE{Activating corresponding domain region and generic region to create domain embedding batch}
-\STATE{Pass the batch of word embedding to a dense layer to fuse regions.}
-\STATE{Computing gradient of domain parameters $\theta_i$, $\frac{\partial L}{\partial \theta_i}$ using domain batch }
-\STATE{Apply backprogation using computed gradients $\frac{\partial L}{\partial \theta_s}$ and $\frac{\partial L}{\partial \theta_i}$}
+\STATE{Pass the batch of domain embedding to a dense layer}
+\STATE{Computing gradient of domain parameters $\theta_i$, $\frac{\partial L}{\partial \theta_i}$ using domain batch}
+\STATE{Apply learning rules using computed gradients: 
+$$ \theta_s = \theta_s - Opt(\frac{\partial L}{\partial \theta_s}(W_g))$$ 
+$$ \theta_i = \theta_i - Opt(\frac{\partial L}{\partial \theta_i}(W_d))$$}
 \UNTIL{convergence}
 \end{algorithmic}
 \end{algorithm}
@@ -257,11 +259,11 @@ We also take into account the problem of overfitting that could occur for small 
  \hline
  ECB-finetuned & 26.93 & 27.09 & 56.52 & 22.04 & 22.92 & 12.94 & 17.51 & 13.99 \\
  \hline
- Sparse(1) & 74.26 & 37.67 & 54.07 & 33.85 & 30.86 & 20.97 & 28.11 & 25.7 \\
+ Sparse (1) & 74.26 & 37.67 & 54.07 & 33.85 & 30.86 & 20.97 & 28.11 & 25.7 \\
  \hline
- Sparse(2) & 73.97 & 37.81 & 53.67 & 34.17 & 30.93 & 20.97 & 28.11 & 25.7 \\
+ Sparse (2) & 73.97 & 37.81 & 53.67 & 34.17 & 30.93 & 20.97 & 28.11 & 25.7 \\
  \hline
- Sparse(3) &  &  &  &  &  &  &  & \\
+ Sparse (3) &  &  &  &  &  &  &  & \\
  \hline
  Domain Control & 67.87 & 37.31 & 54.14 & 33.63 & 31.09 &  20.1 & 26.52 & 24.81\\
  \hline
@@ -362,7 +364,9 @@ We also take into account the problem of overfitting that could occur for small 
 
 \section{Discussion\label{sec:Discussion}}
 \subsection{Sparse's performance}
-The 4 table show remarquable improvement in EMEA translation which is comparable with finetuned model. Sparse model 
+First, we analyze the performance of models on inner test sets which are created by randomly splited from same corpora as training set. The 4 table show remarquable improvement 6 points BLEU in average in EMEA translation which is comparable with finetuned model. In all most the cases, Sparse model has slightly higher score on EPPS test and ECB test than mixed and finetuned models. Sparse model also achieve comparable scores with Domain Control and WDCMT in average. In considering the score of finetuned model on out-of-domain test sets, we observed a fast catastrophic forgetting while the out-of-domain scores drop dramatically compared to mixed model. Taking into account the average score on 3 inner test sets, Sparse achieved far better score than all finetuned models. \\
+Secondly, we compare performance of models on IWSLT test 2010 and newstest 2014 which are more general than inner test sets. On these test sets, mixed, Sparse has approximately same score in Transformer and are a little better than Domain Control while in Recurrent Net Work architecture, WDCMT is better than mixed, Sparse and Domain Control for English -French pair. We also noted a quick fall of performance in finetuned model.
+
 \subsection{Region's size \label{secc:region_size}}
 \subsection{Word embedding analysis}
 
