@@ -81,18 +81,21 @@
 \maketitle
 
 \fyDone{s/naacl/EMNLP/g}
-\fyTodo{Too long, selfcontained, noref, rewrite}
+\fyDone{Too long, selfcontained, noref, rewrite}
 \begin{abstract}
-Fine-tuning a generic neural machine translation model to a certain domain usually degrade its performance on the other domains, thus it's very difficult to build a unique model which is best for all. Indeed, Catastrophic Forgetting, well-known problem in Machine Learning, states that standard backprogation neural network suffers a lot while there is a shift in training data distribution. However, Finetuning is very costly and unefficient in the industry therefore one best model is always desired. In this paper, we introduce an application of an old technique \cite{Daume07frustratingly} in Multi-Domain Neural Machine Translation. By defining general information encoding region and domain-specific encoding region in word embedding vector, we are able to seperate domain-related information flows in forward and backward propagation during training thus to
+  Supervised machine translation is well suited to the case where the train and test data are from the same domain. When this is not the case, \emph{domain adaptation} techniques help ensure that the knowledge of the out-of-domain data generalizes properly to target domain texts. We study a related setting, multi-domain adaptation, where the number of domains is potentially large, and where adapting separately to each domain woud waste training resources. Our proposal transposes to neural machine translation the feature expansion technique of (Daum\'e, 2007), and isolates domain-agnostic from domain-specific lexical representations, while sharing the rest of the network across domains. Our experiments use two architectures and two language pairs: they show that our approach, while remaining simple and computationally unexpensive, outperforms several strong baselines, and delivers a multi-domain system that can sucessfully process heterogeneous input sentences.
+
+  THIS IS THE OLD ABSTRACT 
+  Fine-tuning a generic neural machine translation model to a certain domain usually degrade its performance on the other domains, thus it's very difficult to build a unique model which is best for all. Indeed, Catastrophic Forgetting, well-known problem in Machine Learning, states that standard backprogation neural network suffers a lot while there is a shift in training data distribution. However, Finetuning is very costly and unefficient in the industry therefore one best model is always desired. In this paper, we introduce an application of an old technique \cite{Daume07frustratingly} in Multi-Domain Neural Machine Translation. By defining general information encoding region and domain-specific encoding region in word embedding vector, we are able to seperate domain-related information flows in forward and backward propagation during training thus to
 mitigate the catastrophic interference happens during the training over different domains. Empirically, we achieved a unique model that has comparable score to finetuned models for every domains. Furthermore, our method is simple and could be applied to any architecture.
 \end{abstract}
 
 \section{Introduction \label{sec:introduction}}
 % The problem
-Owing to the development of flexible and powerful architectures based on neural networks \cite{Cho14properties,bahdanau2014neural,Ghering17convolutional,Vaswani17attention}, Machine Translation (MT) has made significant progress over the past years, and constitute the standard for most production engines to-date. One issue which repeatedly pops up with neural MT is the need to perform training with large parallel corpora, typically consisting of millions of parallel sentences deemed to be as close as possible to the application domain. A lot of the recent research effort has thus focused on developping MT systems in low data conditions, for instance building multi-lingual MTs enabling zero-shot translation\cite{Firat16multiway,Johnson17google} or even building systems without any data \cite{Artetxe18unsupervised,Lample18unsupervised}.
+Owing to the development of flexible and powerful architectures based on neural networks \cite{Cho14properties,bahdanau2014neural,Ghering17convolutional,Vaswani17attention}, Machine Translation (MT) has made significant progress over the past years, and constitute the standard for most production engines to-date. One issue which repeatedly pops up with MT, be it neural or statistical, is the need to perform training with large parallel corpora, typically consisting of millions of parallel sentences deemed to be as close as possible to the application domain. A lot of the recent research effort has thus focused on developping MT systems in low data conditions, for instance building multilingual MTs, thereby enabling zero-shot translation \cite{Firat16multiway,Johnson17google} or even building systems without any parallel data \cite{Artetxe18unsupervised,Lample18unsupervised}.
 Another important scenario for industrial MT systems is to adapt an neural system trained using a parallel data in one  domain to the peculiarity of other domains. Domain Adaption (DA) in MT is an old issue \cite{Foster07mixture,Axelrod11domain}, which comes in various guises, and for which a number of solutions have been studied (see the recent survey of \cite{Chu18asurvey} for neural MT). The typical setting is \emph{supervised adaptation}, where a (small) amount of data of the target domain of interest is used to fine-tuned the parameters of a system trained on a large amount of texts in a source domain. We study here a different scenario, multi-domain adaptation \cite{Farajian17multidomain}, where we would like to use heterogenous data sources to train a unique system that would work well for all domains. This allows us to be both data efficient (all data is used to train all domains) and compuationally efficient (we only need to train one domain). In our setting, we assume that the domain of test documents is known in advance.
 
-Multi-domain adaptation is conceptually close to multi-lingual MT, or more generally to multi-task learning \cite{Caruana97multitask}, and can be approached in a number of ways. We adapt here the feature-expansion framework of \cite{Daume07frustratingly} to neural MT, in an attempt to confine the differences between domains at the lexical level, while the rest of the parameters is shared between domains. Our main hypothesis is that most of the differences between domains take place at the lexical level, due to massive cross-domain polysemy. By contrast, the deeper layers, which arguably model more abstract linguistic phenomena, should be made shareable across domains.
+Multi-domain adaptation is conceptually close to multilingual MT, or more generally to multi-task learning \cite{Caruana97multitask}, and can be approached in a number of ways. We adapt here the of \cite{Daume07frustratingly} to neural MT, in an attempt to confine the differences between domains at the lexical level, while the rest of the parameters is shared between domains. Our main hypothesis is that most of the differences between domains take place at the lexical level, due to massive cross-domain polysemy. By contrast, the deeper layers, which arguably model more abstract linguistic phenomena, should be made shareable across domains.
 To this end, we make sure to design word embeddings in such that they will contain a generic as well as a domain-specific region. We perform experiments with three domains, two architectures and two language pairs and find that our technique can effectively build multi-domain NMT, outperforming several baselines. Our contribution is thus twofold:
 \begin{itemize}
 \item methods to adapt the ideas of \cite{Daume07frustratingly} for two NMT architectures;
@@ -183,22 +186,30 @@ Furthermore, because word embeddings are involved in three parts of standard enc
 \section{Experiments \label{sec:experiments}}
 
 \subsection{Domains and data \label{ssec:data}}
-In our experiments, there are 3 domains such as medical, administrative documents and business briefly denoted by EMEA, EPPS, ECB according to training corpora name respectively and 2 language pairs: English-French, English-German. We use 3 corpora for training: European Medicines Agency; European Central Bank and European Parliament \cite{Tiedemann2009RANLP5}. We randomly split those 3 corpora into training, validation and test set with size described in table \ref{table:Corpora}. We use validation sets for choosing the best model according to the average BLEU score on 3 validation sets. We also realize that the test sets origined from same corpora as training sets are likely easy for trained model, thus can not provide fair evaluation. Therefore, we we use Khresmoi-test; newstest2009 and test2007 for domains: EMEA, EPPS. Unfortunately, we could not find any official test sets for ECB domain. We also want to evaluate the generalization of trained model. The model is also required to achieve comparable performance to generic model. To do so, we use newstest 2009 and IWSLT 2010 whose contain does not particularly belong to any domain. \fyTodo{Clarify / simplify text}
-\begin{table*}
-  \begin{tabular}{ |l|l|l|l|l|l| }
-\hline
-Task & Corpora & Train & Dev & Test & Vocabulary \\ \hline
-\multirow{5}{*}{$En \rightarrow Fr$} & EMEA & 1090568 & 1000 & 1000 & English: 30164, French: 30398\\
- & ECB & 191960 & 1000 & 1000 &\\
- & EPPS & 2005723 & 1000 & 1000 & \\ \hline
-\multirow{5}{*}{$En \rightarrow Ge$} & EMEA & 1108752 & 1000 & 1000 & English: 30159, German: 30698\\
- & ECB & 111174 & 1000 & 1000 &\\
- & EPPS & 1920209 & 1000 & 1000 & \\ \hline
-\hline
+We perform our experiments with two language pairs (English-French, English-German )and data originating from three domains, corresponding to texts from three European institutions: from the European Parlement (EPPS) \cite{Koehn05europarl}, the European Medicines Agency (EMEA), and the European Central Bank (ECB) \cite{Tiedemann2009RANLP5}. We randomly split those corpora into training, validation and test sets (see statistics in Table~\ref{table:Corpora}). The validation sets are used to chose the best model according to the average BLEU score. Using internal test sets provides us with somewhat ideal conditions; for contrast experiments, we also use supplementary test sets from other, related, domains: the official Khresmoi-test \fyTodo{REF needed}, which is close to EMEA, and News test 2009 \cite{WMT2009}. This enables us to evaluate the loss in performance when the test set is from a different domain.
+% The model is also required to achieve comparable performance to generic model. To do so, we use newstest 2009 and IWSLT 2010 whose contain does not particularly belong to any domain.
+\fyTodo{Check which corpus are useful}
+\begin{table}
+  \centering
+  \begin{tabular}{ *{4}{|r|}}
+    \hline
+    Corpus & Train & Dev & Test \\ \hline
+    \multicolumn{4}{|l|}{$En \rightarrow Fr$ }\\
+    \multicolumn{4}{|l|}{Vocab: En 30,165, Fr: 30,398}\\
+    \hline
+    EMEA  & 1,09M & 1000 & 1000 \\
+    ECB    & 0,19M & 1000 & 1000     \\
+    EPPS   & 2,0M  & 1000 & 1000  \\ \hline \hline
+    \multicolumn{4}{|l|}{$En \rightarrow Ge$}\\
+    \multicolumn{4}{|l|}{ Vocab: En 30,159, Ge: 30,698}\\ \hline
+    EMEA  & 1,11M & 1000 & 1000 \\
+    ECB     &  0,11M & 1000 & 1000  \\
+    EPPS   & 1,92M & 1000 & 1000 \\ \hline
 \end{tabular}
 \caption{Corpora }
-\label{table:Corpora}
-\end{table*}
+\label{table:Corpora from three domains}
+\end{table}
+
 To reduce size of vocabulary, we apply Byte-Pair Encoding with 30000 merge operations, then select approximately 30000 the most frequent words to build vocabulary for each language. 
 \subsection{Baselines \label{ssec:baselines}}
 To validate our findings, we compared sparse embedding model with standard models using State-of-the-Art Transformer \cite{Vaswani17attention} architecture and Attention Recurrent Neural Network architecture. Our baselines consist of generic models trained with mixed corpora (denoted mixed in the table of scores); models finetuned to each domain using (10000, 15000, 5000) iterations over in-domain data (denoted $+ft_{EMEA}$, $+ft_{EPPS}$, $+ft_{ECB}$ in the table of scores); models using Domain features of \cite{Kobus17domaincontrol} (noted DC in the table of scores) and multi-domain model proposed by \cite{Zeng18multidomain} (denoted WDCMT in the table of scores). \\
