@@ -98,7 +98,7 @@
 
 \section{Introduction \label{sec:introduction}}
 % The problem
-Owing to the development of flexible and powerful architectures based on neural networks \cite{Cho14properties,bahdanau2014neural,Ghering17convolutional,Vaswani17attention}, Machine Translation (MT) has made significant progresses over the past years, and constitute to date the standard for most production engines. One issue which repeatedly pops up with MT, be it neural or statistical, is the need to perform training with large parallel corpora, typically consisting of millions of parallel sentences deemed to be as close as possible to the application domain. A lot of the recent research effort has thus focused on developping MT systems in restricted data conditions, for instance building multilingual MTs which enable zero-shot translation \cite{Firat16multiway,Johnson17google}; or even building systems without any parallel data \cite{Artetxe18unsupervised,Lample18unsupervised}.
+Owing to the development of flexible and powerful architectures based on neural networks \cite{Cho14properties,Bahdanau15learning,Ghering17convolutional,Vaswani17attention}, Machine Translation (MT) has made significant progresses over the past years, and constitute to date the standard for most production engines. One issue which repeatedly pops up with MT, be it neural or statistical, is the need to perform training with large parallel corpora, typically consisting of millions of parallel sentences deemed to be as close as possible to the application domain. A lot of the recent research effort has thus focused on developping MT systems in restricted data conditions, for instance building multilingual MTs which enable zero-shot translation \cite{Firat16multiway,Johnson17google}; or even building systems without any parallel data \cite{Artetxe18unsupervised,Lample18unsupervised}.
 Another important scenario for industrial MT systems is to adapt a neural system trained using parallel data in one domain to the peculiarity of other domains. Domain Adaption (DA) in MT is an old issue \cite{Foster07mixture,Axelrod11domain}, which comes in various guises, and for which a number of solutions have been studied (see the recent survey of \cite{Chu18asurvey} for neural MT). The typical setting is \emph{supervised adaptation}, where a (small) amount of data of the target domain of interest is used to fine-tuned the parameters of a system trained on a large amount of texts in a source domain. We study here a different scenario, multi-domain adaptation \cite{Sennrich13multidomain,Farajian17multidomain}, where we would like to use heterogenous data sources to train a unique system that would work well for all domains. This allows us to be both data efficient (all data is used to train all domains) and compuationally efficient (we only need to train one domain). In our setting, we assume that the domain of test documents is known in advance.
 
 Multi-domain adaptation is conceptually close to multilingual MT, or more generally to multi-task learning \cite{Caruana97multitask}, and can be approached in a number of ways. We adapt here theideas of \cite{Daume07frustratingly} to neural MT, in an attempt to confine the differences between domains at the lexical level, while the rest of the parameters is shared between domains. Our main hypothesis is that most of the differences between domains take place at the lexical level, due to cross-domain polysemy. By contrast, the deeper layers, which arguably model more abstract linguistic phenomena, are made shareable across domains.
@@ -175,7 +175,7 @@ This section explains a new design for word embedding used in multi-domain model
 \fyTodo{Explain vanishing ?}
 Figure~\ref{fig:network} presents our proposed design. During backprogation, the \fyTodo{fix notation}{projection matrix $M$} receives gradient 0 at regions corresponding to deactivated regions in the word embedding. Those regions are also masked in forward step, thus do not interfere the training on the domain to which they are not assigned.
 
-Let $\tilde{x}_{t} = M * e_{t} = M_g e_g(t) + \displaystyle{\mathop{\sum}_{i \in [1,..,d]} M_i * e_i(t)}$ be the projection of word embedding where $e_{t}$ is word embedding of token $x_{t}$, M is projection matrix, $M_j \forall j \in [1...d]$ is row block corresponding to domain region $j$ (Transformer \cite{Vaswani17attention}, recurrent \cite{bahdanau2014neural})\\
+Let $\tilde{x}_{t} = M * e_{t} = M_g e_g(t) + \displaystyle{\mathop{\sum}_{i \in [1,..,d]} M_i * e_i(t)}$ be the projection of word embedding where $e_{t}$ is word embedding of token $x_{t}$, M is projection matrix, $M_j \forall j \in [1...d]$ is row block corresponding to domain region $j$ (Transformer \cite{Vaswani17attention}, recurrent \cite{Bahdanau15learning})\\
 Assume the batch belongs to domain $i$, then $e_j(t) = 0$ $\forall j \neq i$,$\forall t$. 
 \begin{equation}
 \begin{split}
@@ -186,14 +186,14 @@ Assume the batch belongs to domain $i$, then $e_j(t) = 0$ $\forall j \neq i$,$\f
 \forall j \neq i
 \end{equation}
 
-The complex structure of State-of-the-art architecture Transformer \cite{Vaswani17attention} and popular recurrent network \cite{bahdanau2014neural} makes the implementation of sparse embedding non-obvious. Indeed, Transformer involve positional embedding and residual connections which are not homogeneous for domain-regions. Therefore, in our first implementation, we used an dense layer to fuse domain-region and generic region before applying positional embedding and residual connection. This implementation limits the finetuning effect at only word level.\\
+The complex structure of State-of-the-art architecture Transformer \cite{Vaswani17attention} and popular recurrent network \cite{Bahdanau15learning} makes the implementation of sparse embedding non-obvious. Indeed, Transformer involve positional embedding and residual connections which are not homogeneous for domain-regions. Therefore, in our first implementation, we used an dense layer to fuse domain-region and generic region before applying positional embedding and residual connection. This implementation limits the finetuning effect at only word level.\\
 Furthermore, because word embeddings are involved in three parts of standard encoder-decoder structure, which are input of encoder, input of decoder and projection before softmax, we have 7 possibilities to apply sparse embedding. However, due to high memory cost, we only want to apply sparse embedding on the source side. \fyTodo{Explain this. Future work ?}
 
 \section{Experiments \label{sec:experiments}}
 
 \subsection{Domains and data \label{ssec:data}}
 
-We experiment with two language pairs (English-French, English-German )and data originating from three domains, corresponding to texts from three European institutions: from the European Parlement (EPPS) \cite{Koehn05europarl}, the European Medicines Agency (EMEA), and the European Central Bank (ECB) \cite{Tiedemann2009RANLP5}. We randomly split those corpora into training, validation and test sets (see statistics in Table~\ref{table:Corpora}). The validation sets are used to chose the best model according to the average BLEU score. Using internal test sets provides us with somewhat ideal conditions; for contrast experiments, we also use supplementary test sets from other, related, domains: the official Khresmoi-test \fyTodo{REF needed}, which is close to EMEA, and News test 2009 \cite{WMT2009}. This enables us to evaluate the loss in performance when the test set is from a different domain.
+We experiment with two language pairs (English-French, English-German )and data originating from three domains, corresponding to texts from three European institutions: from the European Parlement (EPPS) \cite{Koehn05europarl}, the European Medicines Agency (EMEA), and the European Central Bank (ECB) \cite{Tiedemann2009RANLP5}. We randomly split those corpora into training, validation and test sets (see statistics in Table~\ref{tab:Corpora}). The validation sets are used to chose the best model according to the average BLEU score. Using internal test sets provides us with somewhat ideal conditions; for contrast experiments, we also use supplementary test sets from other, related, domains: the official Khresmoi-test \fyTodo{REF needed}, which is close to EMEA, and News test 2014 \fyTodo{REF needed}. This enables us to evaluate the loss in performance when the test set is from a different domain.
 % The model is also required to achieve comparable performance to generic model. To do so, we use newstest 2009 and IWSLT 2010 whose contain does not particularly belong to any domain.
 \fyTodo{Check which corpus are useful}
 \begin{table}
@@ -213,8 +213,8 @@ We experiment with two language pairs (English-French, English-German )and data 
     ECB     &  0,11M & 1000 & 1000  \\
     EPPS   & 1,92M & 1000 & 1000 \\ \hline
 \end{tabular}
-\caption{Corpora }
-\label{table:Corpora from three domains}
+\caption{Corpora}
+\label{tab:Corpora}
 \end{table}
 
 To reduce the vocabulary, we apply Byte-Pair Encoding \cite{Sennrich16BPE} with 30,000 merge operations, then select approximately 30,000 the most frequent words to build vocabulary for each language.\fyTodo{I need explanations here}
@@ -390,7 +390,61 @@ First, we analyze the performance of models on inner test sets which are created
 Secondly, we compare performance of models on IWSLT test 2010 and newstest 2014 which are more general than inner test sets. On these test sets, mixed, Sparse has approximately same score in Transformer and are a little better than Domain Control while in Recurrent Net Work architecture, WDCMT is better than mixed, Sparse and Domain Control for English -French pair. We also noted a quick fall of performance in finetuned model.
 
 \subsection{Region's size \label{secc:region_size}}
+We also test different setting of region size in word embedding. However, we limit our research in 4 settings: $[4,4,4,496]$, $[8,8,8,488]$, $[16,16,16,464]$, $[32,32,32,32,416]$. We test those settings with the same condition as above. The scores is showed in table \ref{tab:5}
+\begin{table*}
+\begin{center}
+ \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X | X ||} 
+ \hline
+ Models & EMEA test & EMEA excluded & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
+ \hline\hline 
+ Sparse - 4 & 74.65 & 49.61 & 37.42 & 54.49 & 33.68 & 31.01 & 20.71 & 28.03 & 25.28 \\
+ \hline
+ Sparse - 8 & 74.26 & 49.9 & 37.67 & 54.07 & 33.85 & 30.86 & 20.97 & 28.11 & 25.7 \\
+ \hline
+ Sparse - 16 & 74.15 & 49.1 & 37.78 & 54.56 & 33.4 & 30.93 & 20.73 & 28.1 & 25.33 \\
+ \hline
+ Sparse - 32 & 75.1 & 48.61 & 37.64 & 54.29 & 33.2 & 30.94 & 21.07 & 27.99 & 25.44 \\
+ \hline
+\end{tabularx}
+\end{center}
+\caption{BPE-detokenized BLEU score for English-French with the Transformer architecture}
+\label{tab:5}
+\end{table*}
+
 \subsection{Word embedding analysis}
+We analyze neigborhood in word embedding space of polysemies.
+
+\begin{table}
+  \centering
+  \begin{tabular}{*{4}{|r|}}
+    \hline
+    Domain & Word & Neighbor & Cosinus distance \\ \hline
+    \multirow{5}{*}{EMEA} & \multirow{5}{*}{joint} 
+    & Joint & 0.371 \\  
+    &  & jointly & 0.545 \\
+    &  & artic￭ & 0.605 \\
+    &  & joints & 0.607 \\
+	&  & collective & 0.609 \\
+	\hline
+	\multirow{5}{*}{EPPS} & \multirow{5}{*}{joint} 
+	& Joint & 0.365 \\
+	& & jointly & 0.497 \\
+	& & join￭ & 0.606 \\
+	& & common & 0.607 \\
+	& & collective & 0.626 \\
+	& & artic￭ & 0.633\\
+	\hline
+	\multirow{5}{*}{ECB} & \multirow{5}{*}{joint}
+	& Joint & 0.423 \\
+	& & jointly & 0.467 \\
+	& & common & 0.601 \\
+	& & together & 0.632 \\
+	& & artic￭ & 0.663 \\
+	& & coordinated & 0.668 \\
+\end{tabular}
+\caption{Corpora}
+\label{tab:Polysemy}
+\end{table}
 
 \section{Related Work \label{sec:related_work}}
 \fyDone{Add standard labels to sections}
