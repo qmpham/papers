@@ -63,6 +63,7 @@
 % in the camera-ready version and ask you to change it back.
 
 \title{Sparse Word Embeddings for Multi-domain Machine Translation}
+\title{Lexicalized Domain Embeddings for Multi-domain Machine Translation}
 
 \author{First Author \\% Minh Quang Pham\\
   Affiliation / Address line 1 \\
@@ -216,7 +217,7 @@ We experiment with two language pairs (English-French, English-German )and data 
 \label{table:Corpora from three domains}
 \end{table}
 
-To reduce the vocabulary, we apply Byte-Pair Encoding \cite{Sennrich16 }with 30,000 merge operations, then select approximately 30000 the most frequent words to build vocabulary for each language.\fyTodo{I need explanations here}
+To reduce the vocabulary, we apply Byte-Pair Encoding \cite{Sennrich16BPE} with 30,000 merge operations, then select approximately 30,000 the most frequent words to build vocabulary for each language.\fyTodo{I need explanations here}
 
 \subsection{Baselines \label{ssec:baselines}}
 To validate our findings, we compared sparse embedding models with standard models using both attentional Recurrent Neural Networks (RNNs) \cite{Bahdanau15learning} and the recent Transformer architecture of \citet{Vaswani17attention}. Our baselines consist of generic models trained with a simple concatenation of all corpora (denoted \texttt{mixed} in the score tables below); models finetuned separately to each domain using (10000, 15000, 5000) iterations over in-domain data (denoted $+ft_{EMEA}$, $+ft_{EPPS}$, $+ft_{ECB}$ below); models using domain tags as in \cite{Kobus17domaincontrol} (noted \texttt{DC} below) and as well as the multi-domain model of \citet{Zeng18multidomain} (denoted \texttt{WDCMT} in the tables below).
@@ -402,7 +403,7 @@ Multi-domain Machine Translation has largely interested NLP community by its pro
 \item score relatedness of sentences to the target domain by Language Model \cite{Moore2010selection,Axelrod2011domain,Duh2013selection}.
 \item generating pseudo parallel data \cite{Utiyama2003measure,Wang2016connecting,Wang2014neural}
 \end{itemize}
-On the other hand, Model centric approaches focus on NMT models that are specialized for domain adaptation. The novelty can be among following features
+On the other hand, model-centric approaches focus on NMT models that are specialized for domain adaptation. The novelty can be among following features
 \begin{itemize}
 \item Trainining objective \cite{Luong2015SNMT,Senrich2016Mono,Wang2017Instance,Chen2017Cost,Miceli2017Regularize,Zhang18sentence}
 \item Architecture \cite{gulcehre2016monolingual,Zhang16topicinformed,Kobus17domaincontrol,Britz2017mixing,Biao2017CARENMT,Britz2017mixing,Thompson18freezing,Michel2018extreme}.
@@ -411,9 +412,13 @@ On the other hand, Model centric approaches focus on NMT models that are special
 
 Beside these works, we could also consider works in other tasks such as sequence labeling tasks \cite{Daume07frustratingly}; learning multiple visual domains \cite{Rebuffi2017Visual}.
 
-The multi-domain scenario has been studied in a number of recent work. \citet{Farajian17multidomain} learn a generic system, and propose to dynamically adapt the network weights using a small sample of training data that resembles the test data; their main contribution is to propose a method to relate the amount of adaptation of the network parameters to the similarity between the adaptation sample and the test sentence: the higher the similarity, the more agressive the adaptation.
+%% HERE
 
-Similarly to our approach, \cite{Zeng18multidomain} tries to separate on the encoder side domain-specific representation from generic representations in two different sub-networks, where shared versus domain-specific representations automatically emerge from two adversarial networks. The decoder side can thus attend separately to these two representations to generate its output. In this approach, the shared and domain-specific part kept separated in the deeper layers of the network, whereas we try to localize the differences between domain to take place at the lexical level.
+The multi-domain scenario has been studied in a number of recent works. \citet{Farajian17multidomain} learn a generic system and propose to dynamically adapt the network weights using a small sample of training data that resembles the test data, an idea already explored in \cite{Sennrich13multidomain}. Their main contribution is to propose a method to relate the amount of adaptation of the network parameters to the similarity between the adaptation sample and the test sentence: the higher the similarity, the more agressive the adaptation.
+
+By analogy with multilingual NMT, \citet{Kobus17domaincontrol} and \citet{Chu18multilingual} separately propose to extend the representation of the source text with a domain tag (or its embedding). Our model also modifies input representations, but allows for each source word to have its own domain representation, thereby improving training of the shared parts of the network.\fyTodo{Talk about target embeddings somewhere.} 
+
+Similarly to our approach, \cite{Zeng18multidomain} tries to separate on the encoder side domain-specific representation from generic representations in two different sub-networks, where shared versus domain-specific representations automatically emerge from two adversarial networks. The decoder side can thus attend separately to these two representations to generate its output. In this approach, the shared and domain-specific part kept separated in the deeper layers of the network, whereas we try to localize the differences between domains at the lexical level, based on a much cheaper computational architecture.
 
 creates in the encoder Domain-specific gate $g^r_i$and Domain-shared gate $g^s_i$ which are generated from domain-specific and domain-shared semantic representations of source sentence $E_r(x)$ and $E_s(x)$ respectively and which select information from units of hidden states $h_i$ by elementwise product $h^r_i = g^r_i \odot h_i$; $h^s_i = g^s_i \odot h_i$. $h^r_i$ and $h^s_i$ will be fed to Domain-specific and Domain-shared attentional mechanisms respectively. While introducing new features in the architecture, \cite{Zeng18multidomain} also introduces new loss function which is sum of word-level weighted MT loss and losses of Domain-classifier in source side and target side; Adversarial Domain-classifier in source side. The authors have very good approach to seperate Domain-shared information flow and Domain-specify information flow and to determine their contributions to the inference thus mitigate the catastrophic interference occuring in training with backpropagation.
 
