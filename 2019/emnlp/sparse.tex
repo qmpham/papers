@@ -193,9 +193,9 @@ Furthermore, because word embeddings are involved in three parts of standard enc
 
 \subsection{Domains and data \label{ssec:data}}
 
-We experiment with two language pairs (English-French, English-German )and data originating from three domains, corresponding to texts from three European institutions: from the European Parlement (EPPS) \cite{Koehn05europarl}, the European Medicines Agency (EMEA), and the European Central Bank (ECB) \cite{Tiedemann2009RANLP5}. We randomly split those corpora into training, validation and test sets (see statistics in Table~\ref{tab:Corpora}). The validation sets are used to chose the best model according to the average BLEU score. Using internal test sets provides us with somewhat ideal conditions; for contrast experiments, we also use supplementary test sets from other related domains: the official Khresmoi-test \cite{Khresmoi17test}, which is close to EMEA, and News test 2014 \cite{Bojar14findings}. This enables us to evaluate the loss in performance when the test set is from a different domain.
+We experiment with two language pairs (English-French, English-German) and data originating from three domains, corresponding to texts from three European institutions: from the European Parlement (EPPS) \cite{Koehn05europarl}, the European Medicines Agency (EMEA), and the European Central Bank (ECB) \cite{Tiedemann2009RANLP5}. We randomly split those corpora into training, validation and test sets (see statistics in Table~\ref{tab:Corpora}). The validation sets are used to chose the best model according to the average BLEU score. Using internal test sets provides us with somewhat ideal conditions; for contrast experiments, we also use supplementary test sets from other related domains: the official Khresmoi-test \cite{Khresmoi17test}, which is close to EMEA, News test 2014 \cite{Bojar14findings}, IWSLT 2010 (Ted Talks) \cite{}. This enables us to evaluate the loss in performance when the test set is from a different domain.
 % The model is also required to achieve comparable performance to generic model. To do so, we use newstest 2009 and IWSLT 2010 whose contain does not particularly belong to any domain.
-\fyTodo{Check which corpus are useful}
+\fyDone{Check which corpus are useful}
 \begin{table}
   \centering
   \begin{tabular}{ *{4}{|r|}}
@@ -217,7 +217,7 @@ We experiment with two language pairs (English-French, English-German )and data 
 \label{tab:Corpora}
 \end{table}
 
-To reduce the vocabulary, we apply Byte-Pair Encoding \cite{Sennrich16BPE} with 30,000 merge operations, then select approximately 30,000 the most frequent words to build vocabulary for each language.\fyTodo{I need explanations here}
+To reduce the vocabulary, we apply Byte-Pair Encoding \cite{Sennrich16BPE} with 30,000 merge operations separately for each language. \fyDone{I need explanations here}
 
 \subsection{Baselines \label{ssec:baselines}}
 To validate our findings, we compared sparse embedding models with standard models using both attentional Recurrent Neural Networks (RNNs) \cite{Bahdanau15learning} and the recent Transformer architecture of \citet{Vaswani17attention}. Our baselines consist of generic models trained with a simple concatenation of all corpora (denoted \texttt{mixed} in the score tables below); models finetuned separately to each domain using (10000, 15000, 5000) iterations over in-domain data (denoted $+ft_{EMEA}$, $+ft_{EPPS}$, $+ft_{ECB}$ below); models using domain tags as in \cite{Kobus17domaincontrol} (noted \texttt{DC} below) and as well as the multi-domain model of \citet{Zeng18multidomain} (denoted \texttt{WDCMT} in the tables below).
@@ -231,9 +231,9 @@ For all models, we set the size of word embeddings equal to 512; the size of hid
 \item WDCMT: Bidirection Gated recurrent units (denoted GRU) encoder, unidirectional conditional GRU decoder, size of word embedding: 512; size of hidden layers: 1024; size of domain layers: 300; number of layers: 1
 \end{itemize}
 To train NMT systems, we use Adam($\beta_1=0.9$, $\beta_2 = 0.999$, $\alpha=0.0005$) for RNNs; and Adam with $\beta_1=0.9$, $\beta_2= 0.98$, with Noam decay \cite{Vaswani17attention} ($warmup\_steps=4000$) for Transformer.
-Our implementation is from OpenNMT-tf\cite{Klein2017OpenNMT}, except for WDCMT where we use the authors implementation\footnote{\url{https://github.com/DeepLearnXMU/WDCNMT}.}.
+Our implementation is from OpenNMT-tf\cite{Klein2017OpenNMT}, except for WDCMT where we use the authors implementation.\footnote{\url{https://github.com/DeepLearnXMU/WDCNMT}.}
 
-\subsection{Sparse NMT model configuration}
+\subsection{Sparse NMT model configuration}\fyTodo{Change sparse.}
 \fyTodo{Motivate the split - discuss experimentally embedding size}
 For the implementation of sparse embeddings, we split the vector embedding of size 512 into four regions: 3 domain specific and 1 generic, with size $[8,8,8,488]$, the choice will be dicussed in \ref{secc:region_size}. If sentence comes from domain $i$, regions for domains $j \neq i$ will be masked as 0 while generic region is always activated. We then use a dense layer of size 512 to fuse the active domain region and the generic region.
 
@@ -267,11 +267,28 @@ $
 We also take into account the problem of overfitting that could occur for small corpora. Indeed, real data are not always balanced for every domain. For instance, in our experiments, the size of corpora are very different where EPPS is largest with approximately 2 millions sentences, EMEA contains about 1 million sentences and ECB is the smallest with only 200 000 sentences for English French and 100 000 for English-German. If we train each corpora with same number of batches, ECB will be trained too oftenly, that easily leads to overfitting. Therefore, we select batches from each corpora with frequencies proportional to its size. \fyTodo{Refs on this ? or contrast ?}
 
 \subsection{Results}
+Discussion 1:
+\begin{itemize}
+\item transformer better than RNN
+\item Fine tuning is the best strategy - but subject to catastrophic
+\item Sparse better than joint - better than domain control
+\item Across th board / language \& architecture - always good for EMEA , less good for EPPS, varying for ECB
+\item better ? than domain control ? WMCD ?
+\end{itemize}
+
+Discussion 2:
+\begin{itemize}
+\item Sparse 1 > Sparse 2
+\item out of domain better than Mixed
+\item Sparse 3 ??
+\item ajouter Sparse 4
+\end{itemize}
+
 \begin{table*}
 \begin{center}
  \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
  \hline
- Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
+ Models & EMEA & EPPS & ECB & Khresmoi & test 2007 (EPPS domain) & newstest 2009 & Newstest 2014 & IWSLT 2010 \\ [0.5ex] 
  \hline\hline
  Mixed & 67.69 & 37.5 & 53.49 & 34.86 & 30.96 & 20.98 & 28.56 & 25.7 \\
  \hline
@@ -292,7 +309,7 @@ We also take into account the problem of overfitting that could occur for small 
 \end{tabularx}
 \end{center}
 
-\caption{BPE-detokenized BLEU score for English-French with the Transformer architecture. Sparse(1) uses correponding domain tag for EMEA, EPPS, ECB test sets and generic tag for newstest and IWSLT. Sparse(2) uses generic tag for all of test sets. Sparse(3) uses tag predicted by a pre-trained domain classififer}
+\caption{BPE-detokenized BLEU score for English-French with the Transformer architecture. Sparse(1) uses correponding domain tag for EMEA, EPPS, ECB test sets and generic tag for newstest and IWSLT. Sparse (2) uses generic tag for all of test sets. Sparse (3) uses tag predicted by a pre-trained domain classififer}
 \label{tab:1}
 \end{table*}
 
@@ -390,7 +407,11 @@ First, we analyze the performance of models on inner test sets which are created
 Secondly, we compare performance of models on IWSLT test 2010 and newstest 2014 which are more general than inner test sets. On these test sets, mixed, Sparse has approximately same score in Transformer and are a little better than Domain Control while in Recurrent Net Work architecture, WDCMT is better than mixed, Sparse and Domain Control for English -French pair. We also noted a quick fall of performance in finetuned model.
 
 \subsection{Region's size \label{secc:region_size}}
-We also test different setting of region size in word embedding. However, we limit our research in 4 settings: $[4,4,4,496]$, $[8,8,8,488]$, $[16,16,16,464]$, $[32,32,32,32,416]$. We test those settings with the same condition as above. The scores is showed in table \ref{tab:5}
+
+We also test different setting of region size in word embedding. However, we limit our research in 4 settings: $[4,4,4,496]$, $[8,8,8,488]$, $[16,16,16,464]$, $[32,32,32,32,416]$. We test those settings with the same condition as above. The scores are in Table~\ref{tab:embedding-size}.\fyTodo{Comment, homegenize captions.}
+
+Results are very close so we pick 8.\fyTodo{Experiment with 64}. 
+
 \begin{table*}
 \begin{center}
  \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X | X ||} 
@@ -422,24 +443,24 @@ We analyze neigborhood in word embedding space of polysemies.
     \multirow{5}{*}{EMEA} & \multirow{5}{*}{joint} 
     & Joint & 0.371 \\  
     &  & jointly & 0.545 \\
-    &  & artic￭ & 0.605 \\
+    &  & artic- & 0.605 \\
     &  & joints & 0.607 \\
 	&  & collective & 0.609 \\
 	\hline
 	\multirow{5}{*}{EPPS} & \multirow{5}{*}{joint} 
 	& Joint & 0.365 \\
 	& & jointly & 0.497 \\
-	& & join￭ & 0.606 \\
+	& & join- & 0.606 \\
 	& & common & 0.607 \\
 	& & collective & 0.626 \\
-	& & artic￭ & 0.633\\
+	& & artic- & 0.633\\
 	\hline
 	\multirow{5}{*}{ECB} & \multirow{5}{*}{joint}
 	& Joint & 0.423 \\
 	& & jointly & 0.467 \\
 	& & common & 0.601 \\
 	& & together & 0.632 \\
-	& & artic￭ & 0.663 \\
+	& & artic- & 0.663 \\
 	& & coordinated & 0.668 \\
 \end{tabular}
 \caption{Corpora}
