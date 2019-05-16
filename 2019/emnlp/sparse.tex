@@ -63,7 +63,7 @@
 % in the camera-ready version and ask you to change it back.
 
 \title{Sparse Word Embeddings for Multi-domain Machine Translation}
-\title{Lexicalized Domain Embeddings for Multi-domain Machine Translation}
+\title{Lexicalized Domain Representation for Neural Machine Translation}
 
 \author{First Author \\% Minh Quang Pham\\
   Affiliation / Address line 1 \\
@@ -286,25 +286,27 @@ Discussion 2:
 
 \begin{table*}
 \begin{center}
- \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
+ \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X | X ||} 
  \hline
- Models & EMEA & EPPS & ECB & Khresmoi & test 2007 (EPPS domain) & newstest 2009 & Newstest 2014 & IWSLT 2010 \\ [0.5ex] 
+ Models & EMEA & EMEA non-included & EPPS & ECB & Khresmoi & test 2007 (EPPS domain) & newstest 2009 & Newstest 2014 & IWSLT 2010 \\ [0.5ex] 
  \hline\hline
- Mixed & 67.69 & 37.5 & 53.49 & 34.86 & 30.96 & 20.98 & 28.56 & 25.7 \\
+ Mixed & 67.69 & 47.6 & 37.5 & 53.49 & 34.86 & 30.96 & 20.98 & 28.56 & 25.7 \\
  \hline
- EMEA-finetuned & 76.77 & 17.16 & 11.99 & 29.58 & 14.25 & 9.92 & 11.64 & 11.1 \\
+ EMEA-finetuned & 76.77 & 49.43 & 17.16 & 11.99 & 29.58 & 14.25 & 9.92 & 11.64 & 11.1 \\
  \hline
- EPPS-finetuned & 20.86 & 37.04 & 24.53 & 31.86 & 30.97 & 20.72 & 28.33 & 11.1 \\
+ EPPS-finetuned & 20.86 & & 37.04 & 24.53 & 31.86 & 30.97 & 20.72 & 28.33 & 11.1 \\
  \hline
- ECB-finetuned & 26.93 & 27.09 & 56.52 & 22.04 & 22.92 & 12.94 & 17.51 & 13.99 \\
+ ECB-finetuned & 26.93 & & 27.09 & 56.52 & 22.04 & 22.92 & 12.94 & 17.51 & 13.99 \\
  \hline
- Sparse (1) & 74.26 & 37.67 & 54.07 & 33.85 & 30.86 & 20.97 & 28.11 & 25.7 \\
+ Sparse (1) & 74.26 & 49.9 & 37.67 & 54.07 & 33.85 & 30.86 & 20.97 & 28.11 & 25.7 \\
  \hline
- Sparse (2) & 73.97 & 37.81 & 53.67 & 34.17 & 30.93 & 20.97 & 28.11 & 25.7 \\
+ Sparse (2) & 73.97 & 49.54 & 37.81 & 53.67 & 34.17 & 30.93 & 20.97 & 28.11 & 25.7 \\
  \hline
- Sparse (3) &  &  &  &  &  &  &  & \\
+ Sparse (3) &  &  &  & &  &  &  &  & \\
  \hline
- Domain Control & 67.87 & 37.31 & 54.14 & 33.63 & 31.09 &  20.1 & 26.52 & 24.81\\
+ Sparse (4) & 72.95 & 49.78 & 37.62 & 53.35 &  &  &  &  & \\
+ \hline
+ Domain Control & 67.87 & 45.42 & 37.31 & 54.14 & 33.63 & 31.09 &  20.1 & 26.52 & 24.81\\
  \hline
 \end{tabularx}
 \end{center}
@@ -315,25 +317,27 @@ Discussion 2:
 
 \begin{table*}
 \begin{center}
- \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
+ \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X | X ||} 
  \hline
- Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
+ Models & EMEA test & EMEA non-included & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
- Mixed & 64.57 & 26.47 & 68.67 & 21.77 & 23.50 & 13.9 & 17.04 & 18.85 \\
+ Mixed & 64.57 & 42.99 & 26.47 & 68.67 & 21.77 & 23.50 & 13.9 & 17.04 & 18.85 \\
  \hline
- EMEA-finetuned & 68.35 & 17.02 & 32.87 & 21.15 & 15.94 & 8.92 & 11.21 & 13.49 \\
+ EMEA-finetuned & 68.35 & & 17.02 & 32.87 & 21.15 & 15.94 & 8.92 & 11.21 & 13.49 \\
  \hline
- EPPS-finetuned & 36.19 & 26.29 & 40.71 & 19.67 & 23.69 & 14.08 & 16.47 & 19.24 \\
+ EPPS-finetuned & 36.19 & & 26.29 & 40.71 & 19.67 & 23.69 & 14.08 & 16.47 & 19.24 \\
  \hline
- ECB-finetuned & 24.72 & 18.36 & 74.05 & 11.31 & 16.64 & 9.11 & 10.8 & 11.0 \\
+ ECB-finetuned & 24.72 & & 18.36 & 74.05 & 11.31 & 16.64 & 9.11 & 10.8 & 11.0 \\
  \hline
- Sparse(1) & 70.9 & 26.30 & 68.9 & 21.42 & 23.73 & 13.99 & 16.57 & 18.82 \\
+ Sparse(1) & 70.9 & 46.12 & 26.30 & 68.9 & 21.42 & 23.73 & 13.99 & 16.57 & 18.82 \\
  \hline
- Sparse(2) & 70.86 & 26.14 & 68.59 & 21.95 & 23.79 & 13.99 & 16.57 & 18.82 \\
+ Sparse(2) & 70.86 & 45.6 & 26.14 & 68.59 & 21.95 & 23.79 & 13.99 & 16.57 & 18.82 \\
  \hline
- Sparse (3) &  &  &  &  &  &  &  & \\
+ Sparse (3) &  &  &  &  &  &  &  &  & \\
  \hline
- Domain Control & 63.48 & 26.27 & 66.95 & 21.45 & 23.95 & 13.94 & 16.45 & 18.78  \\
+ Sparse (4) & 69.51 & 43.5 & 26.31 & 66.86 &  &  &  &  & \\
+ \hline
+ Domain Control & 63.48 & 42.98 & 26.27 & 66.95 & 21.45 & 23.95 & 13.94 & 16.45 & 18.78  \\
  \hline
 \end{tabularx}
 \end{center}
@@ -343,27 +347,29 @@ Discussion 2:
 
 \begin{table*}
 \begin{center}
- \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
+ \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X | X ||} 
  \hline
- Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
+ Models & EMEA test & EMEA non-included & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
- Mixed & 65.42 & 34.7 & 51.38 & 29.27 & 28.95 & 17.82 & 22.21 & 21.63 \\
+ Mixed & 65.42 & 45.11 & 34.7 & 51.38 & 29.27 & 28.95 & 17.82 & 22.21 & 21.63 \\
  \hline
- EMEA-finetuned  & 72.06 & 18.62 & 16.78 & 25.88 & 13.38 & 9.26 & 10.94 & 5.73 \\
+ EMEA-finetuned  & 72.06 & & 18.62 & 16.78 & 25.88 & 13.38 & 9.26 & 10.94 & 5.73 \\
  \hline
- EPPS-finetuned & 35.47 & 34.61 & 39.56 & 27.11 & 28.8 & 17.3 & 21.85 & 20.61 \\
+ EPPS-finetuned & 35.47 & & 34.61 & 39.56 & 27.11 & 28.8 & 17.3 & 21.85 & 20.61 \\
  \hline
- ECB-finetuned & 21.93 & 22.6 & 51.53 & 14.74 & 20.23 & 9.74 & 12.10 & 10.47 \\
+ ECB-finetuned & 21.93 & & 22.6 & 51.53 & 14.74 & 20.23 & 9.74 & 12.10 & 10.47 \\
  \hline
- Sparse (1) & 71.73 & 35.21 & 50.91 & 29.62 & 29.05 & 17.92 & 23.00 & 20.96 \\
+ Sparse (1) & 71.73 & 46.3 & 35.21 & 50.91 & 29.62 & 29.05 & 17.92 & 23.00 & 20.96 \\
  \hline
- Sparse (2) & 70.59 & 35.22 & 49.68 & 29.51 & 29.32 & 17.92 & 23.00 & 20.96 \\
+ Sparse (2) & 70.59 & 46.37 & 35.22 & 49.68 & 29.51 & 29.32 & 17.92 & 23.00 & 20.96 \\
  \hline
- Sparse (3) &  &  &  &  &  &  &  & \\
+ Sparse (3) &  &  &  &  & &  &  &  & \\
  \hline
- Domain Control & 68.26 & 35.13 & 50.09 & 27.86 & 29.34 & 16.25 & 20.95 & 21.16 \\
+ Sparse (4) & 62.1 & 43.29 & 34.17 & 48.79 &  &  &  &  & \\
  \hline
- WDCMT (conditional GRU) & 68.76 & 35.71 & 52.75 & 32.03 & 29.81 & 19.58 & 24.63 & 23.28 \\
+ Domain Control & 68.26 & 43.76 & 35.13 & 50.09 & 27.86 & 29.34 & 16.25 & 20.95 & 21.16 \\
+ \hline
+ WDCMT (conditional GRU) & 68.76 & 45.29 & 35.71 & 52.75 & 32.03 & 29.81 & 19.58 & 24.63 & 23.28 \\
  \hline 
 \end{tabularx}
 \end{center}
@@ -373,27 +379,29 @@ Discussion 2:
 
 \begin{table*}
 \begin{center}
- \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X ||} 
+ \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X | X ||} 
  \hline
- Models & EMEA test & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
+ Models & EMEA test & EMEA non-included & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
  \hline\hline
- Mixed & 57.37 & 23.1 & 63.54 & 17.39 & 20.65 & 10.69 & 11.51 & 14.29 \\
+ Mixed & 57.37 & 37.94 & 23.1 & 63.54 & 17.39 & 20.65 & 10.69 & 11.51 & 14.29 \\
  \hline
- EMEA-finetuned & 65.64 & 12.36 & 15.93 & 15.38 & 11.1 & 5.54 & 6.22 & 7.6 \\
+ EMEA-finetuned & 65.64 & & 12.36 & 15.93 & 15.38 & 11.1 & 5.54 & 6.22 & 7.6 \\
  \hline
- EPPS-finetuned & 24.9 & 22.98 & 26.26 & 13.55 & 20.95 & 10.58 & 11.33 & 14.32 \\
+ EPPS-finetuned & 24.9 & & 22.98 & 26.26 & 13.55 & 20.95 & 10.58 & 11.33 & 14.32 \\
  \hline
- ECB-finetuned & 41.8 & 15.97 & 71.07 & 10.77 & 14.67 & 7.06 & 7.66 & 8.07 \\
+ ECB-finetuned & 41.8 & & 15.97 & 71.07 & 10.77 & 14.67 & 7.06 & 7.66 & 8.07 \\
  \hline
- Sparse (1) & 63.43 & 22.66 & 64.4 & 16.99 & 20.63 & 10.89 & 11.45 & 14.26 \\
+ Sparse (1) & 63.43 & 40.04 & 22.66 & 64.4 & 16.99 & 20.63 & 10.89 & 11.45 & 14.26 \\
  \hline
- Sparse (2) & 63.27 & 22.62 & 63.7 & 17.26 & 20.69 & 10.89 & 11.45 & 14.26 \\
+ Sparse (2) & 63.27 & 39.75 & 22.62 & 63.7 & 17.26 & 20.69 & 10.89 & 11.45 & 14.26 \\
  \hline
- Sparse (3) &  &  &  &  &  &  &  & \\
+ Sparse (3) &  &  &  &  & &  &  &  & \\
  \hline
- Domain Control & 62.53 & 23.74 & 65.71 & 16.88 & 21.85 & 9.24 & 11.15 & 14.97 \\
+ Sparse (4) & 56.84 & 37.05 & 22.06 & 61.66 &  &  &  &  & \\
  \hline
- WDCMT (conditional GRU) & 64.05 & 22.82 & 67 & 15.94 & 20.57 & 10.15 & 11.45 & 13.66 \\
+ Domain Control & 62.53 & 39.25 & 23.74 & 65.71 & 16.88 & 21.85 & 9.24 & 11.15 & 14.97 \\
+ \hline
+ WDCMT (conditional GRU) & 64.05 & 38.54 & 22.82 & 67 & 15.94 & 20.57 & 10.15 & 11.45 & 13.66 \\
  \hline 
 \end{tabularx}
 \end{center}
