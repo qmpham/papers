@@ -192,7 +192,7 @@ Furthermore, because word embeddings are involved in three parts of standard enc
 
 \subsection{Domains and data \label{ssec:data}}
 
-We experiment with two language pairs (English-French, English-German) and data originating from three domains, corresponding to texts from three European institutions: from the European Parlement (EPPS) \cite{Koehn05europarl}, the European Medicines Agency (EMEA), and the European Central Bank (ECB) \cite{Tiedemann2009RANLP5}. We randomly split those corpora into training, validation and test sets (see statistics in Table~\ref{tab:Corpora}). The validation sets are used to chose the best model according to the average BLEU score. Using internal test sets provides us with somewhat ideal conditions; for contrast experiments, we also use supplementary test sets from other related domains: the official Khresmoi-test \cite{Khresmoi17test}, which is close to EMEA, News test 2014 \cite{Bojar14findings}, IWSLT 2010 (Ted Talks) \cite{}. This enables us to evaluate the loss in performance when the test set is from a different domain.
+We experiment with two language pairs (English-French, English-German) and data originating from three domains, corresponding to texts from three European institutions: from the European Parlement (EPPS) \cite{Koehn05europarl}, the European Medicines Agency (EMEA), and the European Central Bank (ECB) \cite{Tiedemann2009RANLP5}. We randomly split those corpora into training, validation and test sets (see statistics in Table~\ref{tab:Corpora}). The validation sets are used to chose the best model according to the average BLEU score. Using internal test sets provides us with somewhat ideal conditions; for contrast experiments, we also use supplementary test sets from other domains: the official Khresmoi testset \cite{Khresmoi17test}, which is close to EMEA, News test 2014 \cite{Bojar14findings}, and IWSLT 2010 (Talk track) \cite{Paul10overview}. This enables us to evaluate the loss in performance when the test set is from a domain not seen in training.
 % The model is also required to achieve comparable performance to generic model. To do so, we use newstest 2009 and IWSLT 2010 whose contain does not particularly belong to any domain.
 \fyDone{Check which corpus are useful}
 \begin{table}
@@ -212,56 +212,57 @@ We experiment with two language pairs (English-French, English-German) and data 
     ECB     &  0,11M & 1000 & 1000  \\
     EPPS   & 1,92M & 1000 & 1000 \\ \hline
 \end{tabular}
-\caption{Corpora}
+\caption{Train and test corpora}
 \label{tab:Corpora}
 \end{table}
-
-To reduce the vocabulary, we apply Byte-Pair Encoding \cite{Sennrich16BPE} with 30,000 merge operations separately for each language. \fyDone{I need explanations here}
+To reduce the number of lexical units and make our systems open-vocabulary, we apply Byte-Pair Encoding \cite{Sennrich16BPE} separately for each language with 30,000 merge operations. \fyDone{I need explanations here}
 
 \subsection{Baselines \label{ssec:baselines}}
-To validate our findings, we compared sparse embedding models with standard models using both attentional Recurrent Neural Networks (RNNs) \cite{Bahdanau15learning} and the recent Transformer architecture of \citet{Vaswani17attention}. Our baselines consist of generic models trained with a simple concatenation of all corpora (denoted \texttt{mixed} in the score tables below); models finetuned separately to each domain using (10000, 15000, 5000) iterations over in-domain data (denoted $+ft_{EMEA}$, $+ft_{EPPS}$, $+ft_{ECB}$ below); models using domain tags as in \cite{Kobus17domaincontrol} (noted \texttt{DC} below) and as well as the multi-domain model of \citet{Zeng18multidomain} (denoted \texttt{WDCMT} in the tables below).
+To validate our findings, we compared sparse embedding models with standard models using both attentional Recurrent Neural Networks (RNNs) \cite{Bahdanau15learning} and the recent Transformer architecture of \citet{Vaswani17attention}. Our baselines consist of generic models trained with a simple concatenation of all corpora (denoted \texttt{mixed} in the score tables below); models finetuned separately to each domain using (10000, 15000, 5000) iterations over in-domain data (denoted \texttt{+ft(EMEA)}, \texttt{+ft(EPPS)}, \texttt{+ft(ECB)} below); models using domain tags as in \cite{Kobus17domaincontrol} (noted \texttt{DC} below); and finally the multi-domain model of \citet{Zeng18multidomain} (denoted \texttt{WDCMT} below).\fyTodo{Change names in tables}
 
-For all models, we set the size of word embeddings equal to 512; the size of hidden layers is equal to 1024 for RNNs and 512 for Transformer.
-\fyTodo{Improve this}
+For all models, we set the size of word embeddings equal to 512; the size of hidden layers is equal to 1024 for RNNs and 512 for Transformer. Other important configuration details that were kept fixed throughout are as follows:
+\fyDone{Improve this}
 \begin{itemize}
-\item Transformer: size of word embedding: 512; size of hidden layers: 512; size of inner feed forward layer: 2048; Multi-head: 8; number of layers: 6.
-\item Attention Recurrent Neural Network: Bidirection LSTM encoder, unidirectional LSTM decoder, Luong Attention Mechanism, size of word embedding: 512; size of hidden layers: 1024; number of layers: 1
-\item DC: size of domain embedding:2 ; same settings for both architecture: Transformer and Attention Recurrent Neural Network.
-\item WDCMT: Bidirection Gated recurrent units (denoted GRU) encoder, unidirectional conditional GRU decoder, size of word embedding: 512; size of hidden layers: 1024; size of domain layers: 300; number of layers: 1
+\item Our Transformer models use multi-head attention with 8 heads in each of the 6 layers; the inner feedforward layer contains 2048 components; 
+%  size of word embedding: 512; size of hidden layers: 512; size of inner feed forward layer: 2048; Multi-head: 8; number of layers: 6.
+\item Our RNN models use 1 layer on both sides: a bidirectional LSTM encoder and a unidirectional LST decoder with attention;
+%  Attention Recurrent Neural Network: Bidirection LSTM encoder, unidirectional LSTM decoder, Luong Attention Mechanism, size of word embedding: 512; size of hidden layers: 1024; number of layers: 1
+\item The domain control systems are exactly as their baseline counterpart (RNN and Transformer), with an additional 2 cells encoding the domain on the input layer.\fyTodo{Check This!}
+  % C: size of domain embedding:2 ; same settings for both architecture: Transformer and Attention Recurrent Neural Network.
+\item The \texttt{WDCMT} system also has one layer on the encoder side (a bidirectional Gated recurrent units (GRU)), as well as one layer on the decoder side (a unidirectional conditional GRU); the dimension of ``domain'' layers is 300.
 \end{itemize}
-To train NMT systems, we use Adam($\beta_1=0.9$, $\beta_2 = 0.999$, $\alpha=0.0005$) for RNNs; and Adam with $\beta_1=0.9$, $\beta_2= 0.98$, with Noam decay \cite{Vaswani17attention} ($warmup\_steps=4000$) for Transformer.
-Our implementation is from OpenNMT-tf\cite{Klein2017OpenNMT}, except for WDCMT where we use the authors implementation.\footnote{\url{https://github.com/DeepLearnXMU/WDCNMT}.}
+To train NMT systems, we use Adam, with parameters $\beta_1=0.9$, $\beta_2 = 0.999$, $\alpha=0.0005$ for RNNs; with parameters $\beta_1=0.9$, $\beta_2= 0.98$, with Noam decay \cite{Vaswani17attention} ($warmup\_steps=4000$) for Transformer. Our implementation is from OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein2017OpenNMT}, except for WDCMT where we use the authors' implementation.\footnote{\noindent\url{http://github.com/DeepLearnXMU/WDCNMT}}\fyTodo{batch size}
 
 \subsection{Sparse NMT model configuration}\fyTodo{Change sparse.}
 \fyTodo{Motivate the split - discuss experimentally embedding size}
-For the implementation of sparse embeddings, we split the vector embedding of size 512 into four regions: 3 domain specific and 1 generic, with size $[8,8,8,488]$, the choice will be dicussed in \ref{secc:region_size}. If sentence comes from domain $i$, regions for domains $j \neq i$ will be masked as 0 while generic region is always activated. We then use a dense layer of size 512 to fuse the active domain region and the generic region.
+For the implementation of lexicalized domain embeddings, we split the embedding vector (of size 512) into four regions: 3 are domain specific and 1 is generic, with respective sizes $[8,8,8,488]$, a choice that will be dicussed in Section~\ref{secc:region_size}. If a sentence originates from domain $i$, the domain specific regions for all domains $j \neq i$ will be zeroed out; while the other regions are activated. We then use a dense layer of size~512 to fuse the region for the active domain and the ``generic'' region. Training is formalized in algorithm~\ref{alg:multidomain}.\fyTodo{Notation B for batch size}
 
 \begin{algorithm}[h]
 \caption{Multi-domain Training}
-\label{algo:1}
+\label{alg:multidomain}
 \begin{algorithmic}[1]
-\REQUIRE {Corpora $C_i, i\in [1,..,d]$ for d domains, Optimization algorithm Opt}
+\REQUIRE {Corpora $C_i, i\in [1,..,d]$ for $d$ domains, Optimization algorithm Opt}
 \REPEAT 
 \STATE{Randomly pick $i \in [1,..,d]$ w.r.t multinomial distribution $[\frac{|C_i|}{\displaystyle{\mathop{\sum}_{i\in [1,..,d]}|C_i|}}]$.}
-\STATE{Randomly pick a batch of sentences from corpora $C_i$.}
-\STATE{Activating only generic region to create generic embedding batch, denoted $W_g$}
+\STATE{Randomly pick $B$ sentences from $C_i$.}
+\STATE{Activate only generic region to create generic embedding batch, denoted $W_g$.}
 \STATE{Pass the generic embedding batch to a dense layer.}
-\STATE{Computing gradient of $\theta_s$, $\frac{\partial L}{\partial \theta_s}$ using generic embedding batch $W_g$}
-\STATE{Activating corresponding domain region and generic region to create domain embedding batch}
-\STATE{Pass the batch of domain embedding to a dense layer}
-\STATE{Computing gradient of domain parameters $\theta_i$, $\frac{\partial L}{\partial \theta_i}$ using domain batch}
+\STATE{Compute gradient of $\theta_s$, $\frac{\partial L}{\partial \theta_s}$ using $W_g$.}
+\STATE{Activate domain region and generic region to create domain embedding batch $W_i$}
+\STATE{Pass $W_i$ to a dense layer}
+\STATE{Compute gradient of domain-specific parameters $\theta_i$, $\frac{\partial L}{\partial \theta_i}$ using $W_d$.}
 \STATE{Apply learning rules using computed gradients: 
 $$ \theta_s = \theta_s - Opt(\frac{\partial L}{\partial \theta_s}(W_g))$$ 
-$$ \theta_i = \theta_i - Opt(\frac{\partial L}{\partial \theta_i}(W_d))$$}
+$$ \theta_i = \theta_i - Opt(\frac{\partial L}{\partial \theta_i}(W_i))$$}
 \UNTIL{convergence}
 \end{algorithmic}
 \end{algorithm}
 
-In the training, we use same optimization algorithm as the baselines.
-Each iteration of algorithm \ref{algo:1}, we use 2 batches: generic batch using only generic region; and domain batch using generic region and domain region. The reason to do that is to minimize simultaneously both losses: \\
-$\theta^*_{s}=\displaystyle{\mathop{\argmin}_{\theta_s}}E_{(x,y) \sim D(\displaystyle{\mathop{\cup}_{i \in [1,..,d]}}C_{i})}[-log(p_{\theta_s}(y|x))]$ \\ 
-$ \theta^*_{i}=\displaystyle{\mathop{\argmin}_{\theta_i}}E_{(x,y) \sim D(C_{i})}[-log(p_{\theta_i,\theta^*_s}(y|x,i))]
-$ 
+In training, we use same optimization algorithm as for the baselines. Note that each iteration of algorithm \ref{alg:multidomain} uses 2 batches: generic batch using only generic region; and domain batch using generic region and domain region. The reason to do that is to minimize simultaneously two losses:
+\begin{align*}
+\theta^*_{s}=&\displaystyle{\mathop{\argmin}_{\theta_s}}E_{(x,y) \sim D(\displaystyle{\mathop{\cup}_{i \in [1,..,d]}}C_{i})}[-log(p_{\theta_s}(y|x))] \\ 
+ \theta^*_{i}=&\displaystyle{\mathop{\argmin}_{\theta_i}}E_{(x,y) \sim D(C_{i})}[-log(p_{\theta_i,\theta^*_s}(y|x,i))]
+\end{align*} 
 
 We also take into account the problem of overfitting that could occur for small corpora. Indeed, real data are not always balanced for every domain. For instance, in our experiments, the size of corpora are very different where EPPS is largest with approximately 2 millions sentences, EMEA contains about 1 million sentences and ECB is the smallest with only 200 000 sentences for English French and 100 000 for English-German. If we train each corpora with same number of batches, ECB will be trained too oftenly, that easily leads to overfitting. Therefore, we select batches from each corpora with frequencies proportional to its size. \fyTodo{Refs on this ? or contrast ?}
 
