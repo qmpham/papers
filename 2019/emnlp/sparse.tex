@@ -385,25 +385,26 @@ We also test different setting of region size in word embedding. However, we lim
 
 Results are very close so we pick 8.\fyTodo{Experiment with 64}. 
 
-\begin{table*}
+\begin{table*}[!h]
 \begin{center}
- \begin{tabularx}{\textwidth}{|| X | X | X | X | X | X | X | X | X | X ||} 
- \hline
- Models & EMEA test & EMEA non-included & EPPS test & ECB test & khresmoi (EMEA domain) & test 2007 (EPPS domain) & newstest 2009 & newstest 2014 & IWSLT test 2010 \\ [0.5ex] 
- \hline\hline 
- Sparse - 4 & 74.65 & 49.61 & 37.42 & 54.49 & 33.68 & 31.01 & 20.71 & 28.03 & 25.28 \\
- \hline
- Sparse - 8 & 74.26 & 49.9 & 37.67 & 54.07 & 33.85 & 30.86 & 20.97 & 28.11 & 25.7 \\
- \hline
- Sparse - 16 & 74.15 & 49.1 & 37.78 & 54.56 & 33.4 & 30.93 & 20.73 & 28.1 & 25.33 \\
- \hline
- Sparse - 32 & 75.1 & 48.61 & 37.64 & 54.29 & 33.2 & 30.94 & 21.07 & 27.99 & 25.44 \\
- \hline
-\end{tabularx}
+\scalebox{1.0}{
+\begin{tabular}{|l|ccc|ccc|}
+\hline
+$LDR$ & EMEA & EPPS & ECB & khreshmoi & newstest2014 & iwslt2010 \\
+\hline
+\multicolumn{7}{l}{English$\rightarrow$French} \\
+\hline
+ size=4   & 74.65 $_{49.61}$ & 37.42 & 54.49 & 33.68 & 28.03 & 25.28 \\
+ size=8   & 74.26 $_{49.90}$ & 37.67 & 54.07 & 33.85 & 28.11 & 25.70 \\
+ size=16 & 74.15 $_{49.10}$ & 37.78 & 54.56 & 33.40 & 28.10 & 25.33 \\
+ size=32 & 75.10 $_{48.61}$ & 37.64 & 54.29 & 33.20 & 27.99 & 25.44 \\
+\hline
+\end{tabular}
+} %scalebox
 \end{center}
-\caption{BPE-detokenized BLEU score for English-French with the Transformer architecture}
-\label{tab:5}
+\caption{BPE-detokenized BLEU scores for the RNN architecture over test sets.}
 \end{table*}
+
 
 \subsection{Word embedding analysis}
 We analyze neigborhood in word embedding space of polysemies.
