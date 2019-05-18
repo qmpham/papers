@@ -192,7 +192,7 @@ Furthermore, because word embeddings are involved in three parts of standard enc
 
 \subsection{Domains and data \label{ssec:data}}
 
-We experiment with two language pairs (English-French, English-German) and data originating from three domains, corresponding to texts from three European institutions: from the European Parlement (EPPS) \cite{Koehn05europarl}, the European Medicines Agency (EMEA), and the European Central Bank (ECB) \cite{Tiedemann2009RANLP5}. We randomly split those corpora into training, validation and test sets (see statistics in Table~\ref{tab:Corpora}). The validation sets are used to chose the best model according to the average BLEU score. Using internal test sets provides us with somewhat ideal conditions; for contrast experiments, we also use supplementary test sets from other domains: the official Khresmoi testset \cite{Khresmoi17test}, which is close to EMEA, News test 2014 \cite{Bojar14findings}, and IWSLT 2010 (Talk track) \cite{Paul10overview}. This enables us to evaluate the loss in performance when the test set is from a domain not seen in training.
+We experiment with two language pairs (English-French, English-German) and data originating from three domains, corresponding to texts from three European institutions: from the European Parlement (EPPS) \cite{Koehn05europarl}, the European Medicines Agency (EMEA), and the European Central Bank (ECB) \cite{Tiedemann2009RANLP5}. We randomly split those corpora into training, validation and test sets (see statistics in Table~\ref{tab:Corpora}).\footnote{The EMEA dataset as distributed on the OPUS site contains many duplicates. We therefore report two numbers: the first is comparable to what has been published on earlier studies (eg.\ \fyTodo{Missing ref}), the second one is obtained by making the test set entirely disjoint from the train.} The validation sets are used to chose the best model according to the average BLEU score. Using internal test sets provides us with somewhat ideal conditions; for contrast experiments, we also use supplementary test sets from other domains: the official Khresmoi testset \cite{Khresmoi17test}, which is close to EMEA, News test 2014 \cite{Bojar14findings}, and IWSLT 2010 (Talk track) \cite{Paul10overview}. This enables us to evaluate the loss in performance when the test set is from a domain not seen in training.
 % The model is also required to achieve comparable performance to generic model. To do so, we use newstest 2009 and IWSLT 2010 whose contain does not particularly belong to any domain.
 \fyDone{Check which corpus are useful}
 \begin{table}
@@ -203,7 +203,7 @@ We experiment with two language pairs (English-French, English-German) and data 
     \multicolumn{4}{|l|}{$En \rightarrow Fr$ }\\
     \multicolumn{4}{|l|}{Vocab: En 30,165, Fr: 30,398}\\
     \hline
-    EMEA  & 1,09M & 1000 & 1000 \\
+    EMEA  & 1,09M & 1000 & 1000 [300]\\
     ECB    & 0,19M & 1000 & 1000     \\
     EPPS   & 2,0M  & 1000 & 1000  \\ \hline \hline
     \multicolumn{4}{|l|}{$En \rightarrow Ge$}\\
@@ -446,7 +446,7 @@ We analyze neigborhood in word embedding space of polysemies.
 \fyDone{Related work goes last}
 \fyTodo{Compare also to Peng 2017}
 
-Multi-domain Machine Translation has largely interested NLP community by its promising applications in industry and its relation to fundamental problems in theory. Researchers have proposed a large range of techniques from Data centric methods to Model centric methods \cite{Chu18asurvey}; \cite{Chu2017comparison}.\\ Data centric category attempts to collect related-domain data from large existing in-domain corpora. The methods in this category can be listed as following:
+Multi-domain Machine Translation has largely interested NLP community by its promising applications in industry and its relation to fundamental problems in theory. Researchers have proposed a large range of techniques from Data centric methods to Model centric methods \cite{;.\\ Data centric category attempts to collect related-domain data from large existing in-domain corpora. The methods in this category can be listed as following:
 \fyTodo{Organize refs}
 \begin{itemize}
 \item score relatedness of sentences to the target domain by Language Model \cite{Moore2010selection,Axelrod2011domain,Duh2013selection}.
@@ -462,8 +462,11 @@ On the other hand, model-centric approaches focus on NMT models that are special
 Beside these works, we could also consider works in other tasks such as sequence labeling tasks \cite{Daume07frustratingly}; learning multiple visual domains \cite{Rebuffi2017Visual}.
 
 %% HERE
+Domain adaptation (DA)is a vexing problem in NLP that correspond to a wide range of practical situations and data scenarios (eg.\ supervised vs. unsupervised adaptation), and  has been thoroughly  studied from a number of perspectives, ranging from theoretical analysis to more applied work, and for which many solutions have been proposed. The literature of DA for Machine Translation reflects this diversity, and is typically organized in data-based approaches vs model-based approaches \cite{Chu2017comparison,Chu18asurvey}. The standard scenario is using (mostly) out-of-domain training data while testing on a low-resource domain.  In this setting, data-based approaches aim to bias the distribution of the train (out-of-domain) data towards matching that of the target domain, using data selection or instance weighting techniques  \cite{Moore2010selection,Axelrod2011domain,Duh2013selection}, or generating adapted pseudo-parallel data through back-translation  \cite{Utiyama2003measure,Wang2014neural,Wang2016connecting}. Model-centring approaches ...
 
-The multi-domain scenario has been studied in a number of recent works. \citet{Farajian17multidomain} learn a generic system and propose to dynamically adapt the network weights using a small sample of training data that resembles the test data, an idea already explored in \cite{Sennrich13multidomain}. Their main contribution is to propose a method to relate the amount of adaptation of the network parameters to the similarity between the adaptation sample and the test sentence: the higher the similarity, the more agressive the adaptation.
+Our scenario is a bit different as we aim to train a unique system that will work well for several domains. This corresponds to a practical scenario in the industry, where one would like to maintain one single multi-domain engine, trained on all the available (heteregeneous) sources of data. Our primary source of inspiration is the proposal of \citet{Daume07frustratingly} who proposes to use several copies of the same features (one ``generic'' shared across domains, and one for each domain), letting the training adjust their respective weights. This work has been reanalyzed in a Bayesian framework in \cite{Finkel09hierarchical}, and revisited notably in \cite{Chang10necessity}. The recent proposal of \cite{ZengYang15multidomain}
+
+The multi-domain translation scenario has been studied in a number of recent works. \citet{Farajian17multidomain} learn a generic system and propose to dynamically adapt the network weights in an unsupervised manner using a small sample of training data that resembles the test data, an idea already explored in \cite{Sennrich13multidomain}. Their main contribution is to propose an a method to relate the amount of adaptation of the network parameters to the similarity between the adaptation sample and the test sentence: the higher the similarity, the more agressive the adaptation.
 
 By analogy with multilingual NMT, \citet{Kobus17domaincontrol} and \citet{Chu18multilingual} separately propose to extend the representation of the source text with a domain tag (or its embedding). Our model also modifies input representations, but allows for each source word to have its own domain representation, thereby improving training of the shared parts of the network.\fyTodo{Talk about target embeddings somewhere.} 
 
