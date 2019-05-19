@@ -451,8 +451,9 @@
 \newcommand\newcite{\citet}	% to get "Author (Year)" with natbib    
 
 % DK/IV: Workaround for annoying hyperref pagewrap bug 
+% See - https://tex.stackexchange.com/questions/487428/patch-failed-in-emnlp-style-template
 \RequirePackage{etoolbox}
-\patchcmd\@combinedblfloats{\box\@outputbox}{\unvbox\@outputbox}{}{\errmessage{\noexpand patch failed}}
+% \patchcmd\@combinedblfloats{\box\@outputbox}{\unvbox\@outputbox}{}{\errmessage{\noexpand patch failed}}
 
 % bibliography
 
