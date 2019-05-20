@@ -165,9 +165,9 @@ Our first approach to multi-domain machine translation is to build such trivial 
 \subsection{Sparse word embedding}
 \label{sec:sparse}
 This section explains a new design for word embedding used in multi-domain model. As mentioned above, we separate parameter set into $D+1$ parameter sets correspond to D domains and one shared paramater set. Our first attempt is to split standard vector word embedding into $D+1$ regions named $\theta_i$ for $i \in [1,..,D]$ and $\theta_s$.
-\begin{figure}[h]
+\begin{figure}
 \center
-    \includegraphics[width=\linewidth]{embeddings}
+    \includegraphics[width=0.5\linewidth]{embeddings}
     \caption{Sparse word embeddings. The red region contains units that are activated only when an input from the corresponding domain is presented; the other (green) regions are deactivated; the blue (generic) region is always activated.} 
     \label{fig:network}
   \end{figure}
@@ -293,33 +293,35 @@ Model & EMEA & EPPS & ECB & khreshmoi & newstest2014 & iwslt2010 & Avg. \\
 \hline
 \multicolumn{8}{l}{English$\rightarrow$French} \\
 \hline
-$Mixed$ & 67.69 $_{47.60}$ & 37.50 & 53.49 & 34.86 & 28.56 & 25.70 & avg \\
+$Mixed$ & 67.69$_{47.60}$ & 37.50 & 53.49 & 34.86 & 28.56 & 25.70 & avg \\
 \hline
-$FT_{EMEA}$ & 76.77 $_{49.43}$ & 17.16 & 11.99 & 29.58 & 11.64 & 11.10 & avg \\
-$FT_{EPPS}$ & 20.86 $$ & 37.04 & 24.53 & 31.86 & 28.33 & 11.10 & avg \\
+$FT_{EMEA}$ & 76.77$_{49.43}$ & 17.16 & 11.99 & 29.58 & 11.64 & 11.10 & avg \\
+$FT_{EPPS}$ & 20.86 & 37.04 & 24.53 & 31.86 & 28.33 & 11.10 & avg \\
 $FT_{ECB}$   & 26.93 & 27.09 & 56.52 & 22.04 & 17.51 & 13.99 & avg \\
 \hline
-$DC$ & 67.87 $_{45.42}$ & 37.31 & 54.14 & 33.63 & 26.52 & 24.81 & avg\\
+$DC$ & 67.87$_{45.42}$ & 37.31 & 54.14 & 33.63 & 26.52 & 24.81 & avg\\
 \hline
-$LDR_{oracle}$   & 74.26 $_{49.90}$ & 37.67 & 54.07 & 33.85 & 28.11 & 25.70 & avg \\
-$LDR_{generic}$ & 73.97 $_{49.54}$ & 37.81 & 53.67 & 34.17 & 28.11 & 25.70 & avg \\
+$LDR_{oracle}$   & 74.26$_{49.90}$ & 37.67 & 54.07 & 33.85 & 28.11 & 25.70 & avg \\
+$LDR^{v2}_{oracle}$   & 74.95$_{49.38}$ & 37.35 & 55.91 & 33.57 & 27.59 & 25.27 & avg \\
+$LDR_{generic}$ & 73.97$_{49.54}$ & 37.81 & 53.67 & 34.17 & 28.11 & 25.70 & avg \\
 $LDR_{rnn}$ & EMEA & EPPS & ECB & khreshmoi & newstest & iwslt & avg \\
-$LDR_{wrong}$ & 72.95 $_{49.78}$ & 37.62 & 53.35 & khreshmoi & newstest & iwslt & avg\\
+$LDR_{wrong}$ & 72.95$_{49.78}$ & 37.62 & 53.35 & khreshmoi & newstest & iwslt & avg\\
 \hline
-\multicolumn{8}{l}{English$\rightarrow$German} \\
+\multicolumn{8}{l}{English $\rightarrow$German} \\
 \hline
-$Mixed$ & 64.57 $_{42.99}$ & 26.47 & 68.67 & 21.77 & 17.04 & 18.85 & avg \\
+$Mixed$ & 64.57$_{42.99}$ & 26.47 & 68.67 & 21.77 & 17.04 & 18.85 & avg \\
 \hline
-$FT_{EMEA}$ & 68.35 $$ & 17.02 & 32.87 & 21.15 & 11.21 & 13.49 & avg\\
+$FT_{EMEA}$ & 68.35 & 17.02 & 32.87 & 21.15 & 11.21 & 13.49 & avg\\
 $FT_{EPPS}$ & 36.19 & 26.29 & 40.71 & 19.67 & 16.47 & 19.24 & avg \\
 $FT_{ECB}$   & 24.72 & 18.36 & 74.05 & 11.31  & 10.8 & 11.00 & avg \\
 \hline
-$DC$ & 63.48 $_{42.98}$ & 26.27 & 66.95 & 21.45 & 16.45 & 18.78 & avg \\
+$DC$ & 63.48$_{42.98}$ & 26.27 & 66.95 & 21.45 & 16.45 & 18.78 & avg \\
 \hline
-$LDR_{oracle}$ & 70.9 $_{46.12}$ & 26.30 & 68.9 & 21.42 & 16.57 & 18.82 & avg\\
-$LDR_{generic}$ & 70.86 $_{45.60}$ & 26.14 & 68.59 & 21.95 & 16.57 & 18.82 & avg\\
+$LDR_{oracle}$ & 70.9$_{46.12}$ & 26.30 & 68.9 & 21.42 & 16.57 & 18.82 & avg \\
+$LDR^{v2}_{oracle}$ & 71.31$_{45.23}$ & 25.98 & 73.74 & 21.6 & 16.37 & 19.2 & avg \\
+$LDR_{generic}$ & 70.86$_{45.60}$ & 26.14 & 68.59 & 21.95 & 16.57 & 18.82 & avg\\
 $LDR_{rnn}$ & EMEA & EPPS & ECB & khreshmoi & newstest & iwslt & avg \\
-$LDR_{wrong}$ & 69.51 $_{43.50}$ & 26.31 & 66.86 & khreshmoi & newstest & iwslt & avg \\
+$LDR_{wrong}$ & 69.51$_{43.50}$ & 26.31 & 66.86 & khreshmoi & newstest & iwslt & avg \\
 \hline
 \end{tabular}
 } %scalebox
@@ -336,11 +338,11 @@ Model & EMEA & EPPS & ECB & khreshmoi & newstest2014 & iwslt2010 & Avg. \\
 \hline
 \multicolumn{8}{l}{English$\rightarrow$French} \\
 \hline
-$Mixed$               & 65.42 $_{45.11}$ & 34.7 & 51.38 & 29.27 & 22.21 & 21.63 & avg \\
+$Mixed$               & 65.42$_{45.11}$ & 34.7 & 51.38 & 29.27 & 22.21 & 21.63 & avg \\
 \hline
-$FT_{EMEA}$     & 72.06 $$ & 18.62 & 16.78 & 25.88 & 10.94 & 5.73 & avg \\
-$FT_{EPPS}$      & 35.47 $$ & 34.61 & 39.56 & 27.11 & 21.85 & 20.61 & avg \\
-$FT_{ECB}$        & 21.93 $$ & 22.6 & 51.53 & 14.74 & 12.10 & 10.47 & avg \\
+$FT_{EMEA}$     & 72.06 $ $ & 18.62 & 16.78 & 25.88 & 10.94 & 5.73 & avg \\
+$FT_{EPPS}$      & 35.47 $ $ & 34.61 & 39.56 & 27.11 & 21.85 & 20.61 & avg \\
+$FT_{ECB}$        & 21.93 $ $ & 22.6 & 51.53 & 14.74 & 12.10 & 10.47 & avg \\
 \hline
 $DC$                   & 68.26 $_{43.76}$ & 35.13 & 50.09 & 27.86 & 20.95 & 21.16 & avg \\
  \hline
@@ -355,9 +357,9 @@ $LDR_{wrong}$   & 62.1 $_{43.29}$ & 34.17 & 48.79 & khreshmoi & newstest & iwslt
 \hline
 $Mixed$               & 57.37 $_{37.94}$ & 23.1 & 63.54 & 17.39 & 11.51 & 14.29 & avg\\
 \hline
-$FT_{EMEA}$      & 65.64 $$ & 12.36 & 15.93 & 15.38 & 6.22 & 7.6  & avg\\
-$FT_{EPPS}$       & 24.90 $$ & 22.98 & 26.26 & 13.55 & 11.33 & 14.32 & avg \\
-$FT_{ECB}$         & 41.8 $$ & 15.97 & 71.07 & 10.77 & 7.66 & 8.07 & avg\\
+$FT_{EMEA}$      & 65.64 $ $ & 12.36 & 15.93 & 15.38 & 6.22 & 7.6  & avg\\
+$FT_{EPPS}$       & 24.90 $ $ & 22.98 & 26.26 & 13.55 & 11.33 & 14.32 & avg \\
+$FT_{ECB}$         & 41.8 $ $ & 15.97 & 71.07 & 10.77 & 7.66 & 8.07 & avg\\
 \hline
 $DC$                    & 62.53 $_{39.25}$ & 23.74 & 65.71 & 16.88 & 11.15 & 14.97 & avg\\
 \hline
@@ -398,6 +400,7 @@ $LDR$ & EMEA & EPPS & ECB & khreshmoi & newstest2014 & iwslt2010 \\
  size=8   & 74.26 $_{49.90}$ & 37.67 & 54.07 & 33.85 & 28.11 & 25.70 \\
  size=16 & 74.15 $_{49.10}$ & 37.78 & 54.56 & 33.40 & 28.10 & 25.33 \\
  size=32 & 75.10 $_{48.61}$ & 37.64 & 54.29 & 33.20 & 27.99 & 25.44 \\
+ size=64 & 74.5 $_{50.17}$ & 37.27 & 54.5 & 33.26 & 27.95 & 25.65 \\
 \hline
 \end{tabular}
 } %scalebox
@@ -446,20 +449,22 @@ We analyze neigborhood in word embedding space of polysemies.
 \fyDone{Related work goes last}
 \fyTodo{Compare also to Peng 2017}
 
-Multi-domain Machine Translation has largely interested NLP community by its promising applications in industry and its relation to fundamental problems in theory. Researchers have proposed a large range of techniques from Data centric methods to Model centric methods \cite{;.\\ Data centric category attempts to collect related-domain data from large existing in-domain corpora. The methods in this category can be listed as following:
+Multi-domain Machine Translation has largely interested NLP community by its promising applications in industry and its relation to fundamental problems in theory. Researchers have proposed a large range of techniques from Data centric methods to Model centric methods \cite{Chu18asurvey}.\\ Data centric category attempts to collect related-domain data from large existing in-domain corpora. The methods in this category can be listed as following:
 \fyTodo{Organize refs}
+
 \begin{itemize}
 \item score relatedness of sentences to the target domain by Language Model \cite{Moore2010selection,Axelrod2011domain,Duh2013selection}.
 \item generating pseudo parallel data \cite{Utiyama2003measure,Wang2016connecting,Wang2014neural}
 \end{itemize}
 On the other hand, model-centric approaches focus on NMT models that are specialized for domain adaptation. The novelty can be among following features
+
 \begin{itemize}
-\item Trainining objective \cite{Luong2015SNMT,Senrich2016Mono,Wang2017Instance,Chen2017Cost,Miceli2017Regularize,Zhang18sentence}
-\item Architecture \cite{gulcehre2016monolingual,Zhang16topicinformed,Kobus17domaincontrol,Britz2017mixing,Biao2017CARENMT,Britz2017mixing,Thompson18freezing,Michel2018extreme}.
-\item The decoding algorithm \cite{gulcehre2016monolingual,Khayrallah2017lattice}
+\item Trainining objective\cite{Luong2015SNMT,Senrich2016Mono,Wang2017Instance,Chen2017Cost,Miceli2017Regularize,Zhang18sentence}
+\item Architecture %\cite{gulcehre2016monolingual,Zhang16topicinformed,Kobus17domaincontrol,Britz2017mixing,Biao2017CARENMT,Britz2017mixing,Thompson18freezing,Michel2018extreme}.
+\item The decoding algorithm %\cite{gulcehre2016monolingual,Khayrallah2017lattice}
 \end{itemize}
 
-Beside these works\fyTdodo{Works= oeuvres d'art}, we could also consider works in other tasks such as sequence labeling tasks \cite{Daume07frustratingly}; learning multiple visual domains \cite{Rebuffi2017Visual}.
+%Beside these works \fyTdodo{Works= oeuvres d'art}, we could also consider works in other tasks such as sequence labeling tasks \cite{Daume07frustratingly}; learning multiple visual domains \cite{Rebuffi2017Visual}.
 
 %% HERE
 Domain adaptation (DA) is a vexing problem in NLP, which appears in a wide range of practical situations and data scenarios (eg.\ supervised vs. unsupervised adaptation), and  has been thoroughly  studied from a number of perspectives, ranging from theoretical analysis to more applied work, and for which many solutions have been proposed. The literature of DA for Machine Translation reflects this diversity and typically distinguishes data-based approaches from model-based approaches \cite{Chu2017comparison,Chu18asurvey}.
