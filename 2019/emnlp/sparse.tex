@@ -100,8 +100,9 @@
 Owing to the development of flexible and powerful architectures based on neural networks \cite{Cho14properties,Bahdanau15learning,Ghering17convolutional,Vaswani17attention}, Machine Translation (MT) has made significant progresses over the past years, and constitute to date the standard for most production engines. The development of MT systems, be they neural or statistical, require very large parallel corpora consisting of millions of sentence pairs, a resource that only exist in very few application domains and language pairs. A lot of the recent research effort has thus focused on developping MT systems in restricted data conditions, for instance building multilingual MTs which enable zero-shot translation \cite{Firat16multiway,Ha16towards,Johnson17google}; or even building systems without any parallel data \cite{Artetxe18unsupervised,Lample18unsupervised}.
 Another important scenario for industrial MT is to adapt a neural system trained using parallel data in one domain to the peculiarity of other domains. Domain Adaption (DA) in MT is an old issue \cite{Foster07mixture,Axelrod11domain}, which comes in various guises, and for which a number of solutions have been studied (see the recent survey of \cite{Chu18asurvey} for neural MT). The typical setting is \emph{supervised adaptation}, where a (small) amount of data of the target domain of interest is used to fine-tuned the parameters of a system trained on a large amount of texts in a source domain. We study here a different scenario, \emph{multi-domain adaptation} \cite{Sennrich13multidomain,Farajian17multidomain}, where we would like to use heterogenous data sources to train a unique system that would work well for all domains. This allows us to be both data efficient (all data is used to train all domains) and computationally efficient (we only train one system). In our setting, we assume that the domain of test documents is known.
 
-Multi-domain adaptation is conceptually close to multilingual MT, or more generally to multi-task learning \cite{Caruana97multitask}, and can be approached in a number of ways. We adapt here ideas of \citet{Daume07frustratingly} to neural MT, in an attempt to confine the differences between domains at the lexical level, while the rest of the parameters is shared between domains. Our main hypothesis is that most of the differences between domains take place at the lexical level, due to cross-domain polysemy. By contrast, the deeper layers, which arguably model more abstract linguistic phenomena, are made shareable across domains.
-To this end, we design word embeddings made of a generic as well as several domain-specific regions. We perform experiments with three domains, two neural architectures and two language pairs and find that our technique can effectively build multi-domain NMT, outperforming several baselines. Our contribution is thus as follows:
+Multi-domain adaptation is conceptually close to multilingual MT, or more generally to multi-task learning \cite{Caruana97multitask}, and can be approached in a number of ways. We adapt here ideas of \citet{Daume07frustratingly} to neural MT.
+% in an attempt to confine the differences between domains at the lexical level, while the rest of the parameters is shared between domains.
+Our main hypothesis is that domains mostly differ at the lexical level, due to cross-domain polysemy, which motivates domain specific embeddings. By contrast, the deeper layers, which arguably model more abstract linguistic phenomena, are made shareable across domains. To this end, we design word embeddings containing a generic and several domain-specific regions. We experiment with three domains, two neural architectures and two language pairs and find that our technique yields effective multi-domain NMTs, outperforming several baselines. Our contribution is thus as follows:
 \begin{itemize}
 \item we implement the ideas of \cite{Daume07frustratingly} for two NMT architectures;
 \item we provide experimental evidence that suggest the effectiveness of this technique;
@@ -110,7 +111,7 @@ To this end, we design word embeddings made of a generic as well as several doma
 \fyDone{can we train in random order ? can we get away with catastrophic forgetting ?}
 \fyDone{how to analyze the embeddings ? how can we test or claim ?}
 
-\section{Lexicalize domain representations\label{sec:lexicalized_embeddings}}
+\section{Lexicalized domain representations\label{sec:lexicalized_embeddings}}
 \fyDone{Use meaningful titles throughout}
 
 \subsection{Problem statement \label{ssec:statement}}
@@ -242,19 +243,19 @@ For the implementation of lexicalized domain representations, we split the embed
 \caption{Multi-domain Training}
 \label{alg:multidomain}
 \begin{algorithmic}[1]
-\REQUIRE {Corpora $C_i, i\in [1,..,d]$ for $d$ domains, Batch size $B$, Optimization algorithm $\operatorname{Opt}$}
+\REQUIRE {Corpora $C_i, i\in [1,..,d]$ for $d$ domains, Batch size $B$}%, Optimization algorithm $\operatorname{Opt}$}
 \REPEAT 
-\STATE{Randomly pick $i \in [1,..,d]$ w.r.t the multinomial distribution $[\frac{|C_i|}{\displaystyle{\mathop{\sum}_{i\in [1,..,d]}|C_i|}}]$.}
+\STATE{Randomly pick $i \in [1,..,d]$ w.r.t the multinomial distribution $[\frac{|C_i|}{\sum_{i\in [1,..,d]}|C_i|}]$.}
 \STATE{Randomly pick $B$ sentences from $C_i$.}
-\STATE{Activate only generic region to create generic embedding batch, denoted $W_g$.}
-\STATE{Pass the generic embedding batch to a dense layer.}
+\STATE{Activate only generic region to create generic batch, denoted $W_g$.}
+% \STATE{Pass the generic embedding batch to a dense layer.}
 \STATE{Compute gradient of $\theta_s$, $\frac{\partial L}{\partial \theta_s}$ using $W_g$.}
-\STATE{Activate domain region and generic region to create domain embedding batch $W_i$}
-\STATE{Pass $W_i$ to a dense layer}
+\STATE{Activate domain-specific and generic regions to create domain-specific batch $W_i$}
+% \STATE{Pass $W_i$ to a dense layer}
 \STATE{Compute gradient of domain-specific parameters $\theta_i$, $\frac{\partial L}{\partial \theta_i}$ using $W_d$.}
-\STATE{Apply learning rules using computed gradients: 
-$$ \theta_s = \theta_s - \operatorname{Opt}(\frac{\partial L}{\partial \theta_s}(W_g))$$ 
-$$ \theta_i = \theta_i - \operatorname{Opt} (\frac{\partial L}{\partial \theta_i}(W_i))$$}
+\STATE{Update parameters $\theta_s$ using $\frac{\partial L}{\partial \theta_s}(W_g)$ and $\theta_i$ using $\frac{\partial L}{\partial \theta_i}(W_i)$}
+% $$ \theta_s = \theta_s - \operatorname{Opt}(\frac{\partial L}{\partial \theta_s}(W_g))$$ 
+% $$ \theta_i = \theta_i - \operatorname{Opt} (\frac{\partial L}{\partial \theta_i}(W_i))$$}
 \UNTIL{convergence}
 \end{algorithmic}
 \end{algorithm}
@@ -266,8 +267,8 @@ In training, we use same optimization algorithm as for the baselines. Note that 
 \end{align*} 
 
 % We also take into account the problem of overfitting that could occur for small corpora. Indeed, real data are not always balanced for every domain. For instance, in our experiments, the size of corpora are very different where EPPS is largest with approximately 2 millions sentences, EMEA contains about 1 million sentences and ECB is the smallest with only 200 000 sentences for English French and 100 000 for English-German. If we train each corpora with same number of batches, ECB will be trained too oftenly, that easily leads to overfitting. Therefore, we select batches from each corpora with frequencies proportional to its size.
-The batch selection procedure (step~2 of algorithm~\ref{alg:multidomain}) ensures that each domain is represented according to its frequency in the training data. In our experiments, this means that sentences from the Europarl domain will be selected more frequently that the two other domains. In an attempt to build a more balanced training procedure, we have also experimented with an alternative selection procedure, where $i$ is selected according to the multinomial distribution $[\frac{\sqrt{|C_i|}}{\displaystyle{\mathop{\sum}_{i\in [1,..,d]}\sqrt{|C_i|}}}]$.
-\fyTodo{Refs on this ? or contrast ?}
+The batch selection procedure (step~2 of algorithm~\ref{alg:multidomain}) ensures that each domain is represented according to its frequency in the training data. In our experiments, this means that sentences from the Europarl domain will be selected more frequently that the two other domains. In an attempt to build a more balanced training sample, we also consider an alternative selection procedure, where $i$ is selected according to the distribution $[\frac{\sqrt{|C_i|}}{\sum_{i\in [1,..,d]}\sqrt{|C_i|}}]$.
+% \fyTodo{Refs on this ? or contrast ?}
 
 \subsection{Results \label{ssec:results}}
 % Discussion 1:
@@ -295,7 +296,7 @@ For these test sets, our proposal (\texttt{LDR}$_{oracle}$) is consistently bett
   % (LSTMs vs. conditional GRUs),
   etc.} \fyDone{More on this.}
 As expected, ignoring the domain label yields a drop in performance for the two fallback strategies considered in this study. The first, \texttt{LDR}$_{generic}$, only uses the generic part of the embeddings. The second, \texttt{LDR}$_{pred}$, resorts to automatically predicted domain labels\footnote{Our domain classifier uses a bi-LSTM RNN encoder, followed by a simple softmax layer. Its precision on a development set are higher than 95\%.}
-\fyTodo{Explain how} Note that this decrease is however quite limited (and hardly significant for \texttt{LDR}$_{pred}$), showing that our architecture is quite robust to noisy labels. Even in the worst case scenario where all domain tags are intently wrong (\texttt{LDR}$_{wrong}$), we see that the generic part still ensures a satisfying level of performance. A last contrast is with \texttt{LDR}$_{oracle}^{0.5}$ where we change the distribution of training sentence to increase the number of ECB samples: as a result, we see a small decrease for EMEA and EPPS, and a large boost for ECB. This shows that our technique can be used in conjunction to other well known strategies for performing domain adaptation. 
+\fyDone{Explain how} Note that this decrease is however quite limited (and hardly significant for \texttt{LDR}$_{pred}$), showing that our architecture is quite robust to noisy labels. Even in the worst case scenario where all domain tags are intently wrong (\texttt{LDR}$_{wrong}$), we see that the generic part still ensures a satisfying level of performance. A last contrast is with \texttt{LDR}$_{oracle}^{0.5}$ where we change the distribution of training sentence to increase the number of ECB samples: as a result, we see a small decrease for EMEA and EPPS, and a large boost for ECB. This shows that our technique can be used in conjunction to other well known strategies for performing domain adaptation. 
 
 % \fyTodo{Comment V2 from Minh}
 
@@ -521,7 +522,7 @@ Our scenario is a bit different as we aim to train a unique system that will wor
 
 The multi-domain scenario in NMT has been studied in a number of recent works. \citet{Farajian17multidomain} learn a generic system and propose to dynamically adapt the network weights in an unsupervised manner using a small sample of training data that resembles the test data, an idea already explored in \cite{Sennrich13multidomain}. Their main contribution is to propose an a method to relate the amount of adaptation of the network parameters to the similarity between the adaptation sample and the test sentence: the higher the similarity, the more agressive the adaptation.
 
-By analogy with the proposal of \citet{Johnson17google} for multilingual NMT, \citet{Kobus17domaincontrol} and \citet{Chu18multilingual} separately propose to extend the representation of the source text with a domain tag. Our model also modifies input representations, but allows each source word to have its own domain-specific representation, thereby improving training of the shared parts of the network.\fyTodo{Talk about target embeddings somewhere.} 
+By analogy with the proposal of \citet{Johnson17google} for multilingual NMT, \citet{Kobus17domaincontrol} and \citet{Chu18multilingual} separately propose to extend the representation of the source text with a domain tag. Our model also modifies input representations, but allows each source word to have a domain-specific representation, thereby improving training of the shared parts of the network.\fyDone{Talk about target embeddings somewhere.} 
 
 Similarly to our approach, \cite{Zeng18multidomain} attempts to separate on the encoder side domain-specific representation from generic representations in two different sub-networks, where generic versus domain-specific representations automatically emerge from two adversarial networks. The decoder side can thus attend separately to these two representations to generate its output. In this approach, the shared and domain-specific part kept separated in the deeper layers of the network, whereas we try to localize the differences between domains at the lexical level, based on a much cheaper computational architecture. Another trait of this proposal is the ability to automatically infer domain information for test sentences; as we have shown, our architecture can also effectively accomodate sentences lacking domain information.
 
