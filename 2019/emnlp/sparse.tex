@@ -194,7 +194,7 @@ Furthermore, because word embeddings are involved in three parts of standard enc
 
 \subsection{Domains and data \label{ssec:data}}
 
-We experiment with two language pairs (English-French, English-German) and data originating from three domains, corresponding to texts from three European institutions: from the European Parlement (EPPS) \cite{Koehn05europarl}, the European Medicines Agency (EMEA), and the European Central Bank (ECB) \cite{Tiedemann2009RANLP5}. We randomly split those corpora into training, validation and test sets (see statistics in Table~\ref{tab:Corpora}).\footnote{The EMEA dataset as distributed on the OPUS site contains many duplicates. We therefore report two numbers: the first is comparable to what has been published on earlier studies (eg.\ \cite{Zeng18multidomain}), the second one is obtained by making the test set entirely disjoint from the train.} The validation sets are used to chose the best model according to the average BLEU score. Using internal test sets provides us with somewhat ideal conditions; for contrast experiments, we also use supplementary test sets from other domains: the official Khresmoi testset \cite{Khresmoi17test}, which is close to EMEA, News test 2014 \cite{Bojar14findings}, and IWSLT 2010 (Talk track) \cite{Paul10overview}. This enables us to evaluate the loss in performance when the test set is from a domain not seen in training.
+We experiment with two language pairs (English-French, English-German) and data originating from three domains, corresponding to texts from three European institutions: from the European Parlement (EPPS) \cite{Koehn05europarl}, the European Medicines Agency (EMEA), and the European Central Bank (ECB) \cite{Tiedemann2009RANLP5}. We randomly split those corpora into training, validation and test sets (see statistics in Table~\ref{tab:Corpora}).\footnote{The EMEA dataset as distributed on the OPUS site contains many duplicates. We therefore report two numbers: the first is comparable to what has been published on earlier studies (eg.\ \cite{Zeng18multidomain}), the second one is obtained by making the test set entirely disjoint from the train.} The validation sets are used to chose the best model according to the average BLEU score \cite{Papineni02bleu}. Using internal test sets corresponds to somewhat ideal conditions; for contrast experiments, we also use supplementary test sets from three other domains: the official Khresmoi testset \cite{Khresmoi17test}, which is close to EMEA, News test 2014 \cite{Bojar14findings}, and IWSLT 2010 (Talk track) \cite{Paul10overview}. This enables us to evaluate the loss in performance when the test set is from a domain not seen in training.
 % The model is also required to achieve comparable performance to generic model. To do so, we use newstest 2009 and IWSLT 2010 whose contain does not particularly belong to any domain.
 \fyDone{Check which corpus are useful}
 \begin{table}
@@ -233,11 +233,11 @@ For all models, we set the size of word embeddings equal to 512; the size of hid
   % C: size of domain embedding:2 ; same settings for both architecture: Transformer and Attention Recurrent Neural Network.
 \item The \texttt{WDCMT} system also has one layer on the encoder side (a bidirectional Gated recurrent units (GRU) layer), as well as one layer on the decoder side (a unidirectional conditional GRU layer); the dimension of ``domain'' layers is~300.
 \end{itemize}
-To train NMT systems, we use Adam, with parameters $\beta_1=0.9$, $\beta_2 = 0.999$, $\alpha=0.0005$ for RNNs; with parameters $\beta_1=0.9$, $\beta_2= 0.98$, with Noam decay \cite{Vaswani17attention} for Transformer (using $warmup\_steps=4000$). For all systems, we use a batch size of~128. Our implementation is from OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein2017OpenNMT}, except for WDCMT where we use the authors' implementation.\footnote{\noindent\url{http://github.com/DeepLearnXMU/WDCNMT}}\fyDone{batch size}
+To train NMT systems, we use Adam, with parameters $\beta_1=0.9$, $\beta_2 = 0.999$, $\alpha=0.0005$ for RNNs; with parameters $\beta_1=0.9$, $\beta_2= 0.98$, with Noam decay \cite{Vaswani17attention} for Transformer (using $warmup\_steps=4000$). For all systems, we use a batch size of~128 and a dropout rate of 0.1 for all layers. Our implementation is from OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein2017OpenNMT}, except for WDCMT where we use the authors' implementation.\footnote{\noindent\url{http://github.com/DeepLearnXMU/WDCNMT}}\fyDone{batch size}
 
 \subsection{Implementing LDR}\fyTodo{Check acronym.}
 \fyTodo{Motivate the split - discuss experimentally embedding size}
-For the implementation of lexicalized domain representations, we split the embedding vector (of size 512) into four regions: 3 are domain specific and 1 is generic, with respective sizes $[8,8,8,488]$, a choice that will be dicussed in Section~\ref{secc:region_size}. If a sentence originates from domain $i$, the domain specific regions for all domains $j \neq i$ will be zeroed out; while the other regions are activated (cf. Figure~\ref{fig:network}). We then use a dense layer of size~512 to fuse the region for the active domain and the ``generic'' region. Training is formalized in algorithm~\ref{alg:multidomain}.\fyTodo{Notation B for batch size}
+For the implementation of lexicalized domain representations, we split the embedding vector (of size 512) into four regions: 3 are domain specific and 1 is generic, with respective sizes $[8,8,8,488]$, a choice that will be dicussed in Section~\ref{secc:region_size}. If a sentence originates from domain $i$, the domain specific regions for all domains $j \neq i$ will be zeroed out; while the other regions are activated (cf. Figure~\ref{fig:network}). We then use a dense layer of size~512 to fuse the region for the active domain and the ``generic'' region. Training is formalized in algorithm~\ref{alg:multidomain}.
 
 \begin{algorithm}[h]
 \caption{Multi-domain Training}
@@ -260,7 +260,7 @@ $$ \theta_i = \theta_i - \operatorname{Opt} (\frac{\partial L}{\partial \theta_i
 \end{algorithmic}
 \end{algorithm}
 
-In training, we use same optimization algorithm as for the baselines. Note that each iteration of algorithm \ref{alg:multidomain} uses 2~batches: a ``generic'' batch updating only the generic region; and ``domain-specific'' batch updating just the domain-specific parameters. The reason to do that is to minimize simultaneously two losses:
+In training, we use same optimization algorithm as for the baselines. Note that each iteration of algorithm \ref{alg:multidomain} uses 2~batches: a ``generic'' batch updating only the generic region; and ``domain-specific'' batch updating just the domain-specific parameters. This is because we wish to simultaneously minimize two losses:
 \begin{align*}
 \theta^*_{s}=&\displaystyle{\mathop{\argmin}_{\theta_s}}E_{(x,y) \sim D(\displaystyle{\mathop{\cup}_{i \in [1,..,d]}}C_{i})}[-log(p_{\theta_s}(y|x))] \\ 
  \theta^*_{i}=&\displaystyle{\mathop{\argmin}_{\theta_i}}E_{(x,y) \sim D(C_{i})}[-log(p_{\theta_i,\theta^*_s}(y|x,i))]
@@ -288,14 +288,17 @@ The batch selection procedure (step~2 of algorithm~\ref{alg:multidomain}) ensure
 % \item ajouter Sparse 4
 % \end{itemize}
 
-Our main results are summarized respectively in Table~\ref{tab:results-trsf} for the Transformer systems and Table~\ref{tab:results-rnn} for the RNN systems. \fyTodo{Footnote for missing numbers}.
+Our main results are summarized respectively in Table~\ref{tab:results-trsf} for the Transformer systems and Table~\ref{tab:results-rnn} for the RNN systems, where we report BLEU scores \citecomputed after detokenization. \fyTodo{Footnote for missing numbers}.
 
 We first concentrate on the left part of these tables, where we analyze the performance for the three domains of interest. A first series of observations is that Transformer is consistently better than RNN, and that fine-tuning on a domain-specific corpus, when applicable, is almost the best way to optimize the performance on that domain.\footnote{This is not so clear for the EPPS, where fine-tuning does not seem to help.}  Note that fine-tuning will however yield a marked (even sometimes catastrophic, eg.\ for the EMEA-tuned Transformer system) decrease in performance for the other domains. 
 
-For these test sets, our proposal (\texttt{LDR}$_{oracle}$) is consistently better that the mix-domain strategy, with gains than range from very large (for EMEA and ECB) to unsignificant (for EPPS in most conditions). This means that our architecture is somehow able to compensate for the data unbalance and to raise the performance of the multi-domain system close to the best (fine-tuned) system in each domain. We even observe rare cases where the \texttt{LDR}$_{oracle}$ system outperforms fine-tuning (eg.\ Transformer en:ge in the EMEA domain). \texttt{LDR}$_{oracle}$ is also better than Domain Control in three conditions out of four, \texttt{DC} being seemingly a better choice for the RNN than for the Transformer architecture. The comparison with the WDCMT model is less favourable for our RNN systems, which are arguably much simpler.\footnote{The direct comparison with WDCMT is difficult as the implementation differ in many ways: a different framework, different cell types (LSTMs vs. conditional GRUs), etc.} \fyDone{More on this.}
-As expected, ignoring the domain label yields a drop in performance for the two fallback strategies considered in this study. The first, \texttt{LDR}$_{generic}$, only use the generic embeddings. The second, \texttt{LDR}$_{pred}$\fyTodo{Fix this}, resorts to automatically predicted domain labels.\fyTodo{Explain how} Note that this decrease is however quite limited\fyTodo{How much on average ?}, showing that our architecture is quite robust to noisy labels. Even in the worst case scenario where all domain tags are intently wrong (\texttt{LDR}$_{wrong}$), we see that the generic part still ensures a satisfying level of performance.\fyTodo{Comment V2 from Minh}
+For these test sets, our proposal (\texttt{LDR}$_{oracle}$) is consistently better that the mix-domain strategy, with gains than range from very large (for EMEA and ECB) to unsignificant (for EPPS in most conditions). This means that our architecture is somehow able to compensate for the data unbalance and to raise the performance of the multi-domain system close to the best (fine-tuned) system in each domain. We even observe rare cases where the \texttt{LDR}$_{oracle}$ system outperforms fine-tuning (eg.\ Transformer en:ge in the EMEA domain). \texttt{LDR}$_{oracle}$ is also better than Domain Control in three conditions out of four, \texttt{DC} being seemingly a better choice for the RNN than for the Transformer architecture. The comparison with the \texttt{WDCMT} model is less favourable for our RNN systems, which are arguably much simpler.\footnote{The direct comparison with WDCMT is difficult as the implementation differs in many ways from our RNN: a different framework, different cell types (LSTMs vs. conditional GRUs), etc.} \fyDone{More on this.}
+As expected, ignoring the domain label yields a drop in performance for the two fallback strategies considered in this study. The first, \texttt{LDR}$_{generic}$, only uses the generic part of the embeddings. The second, \texttt{LDR}$_{pred}$, resorts to automatically predicted domain labels\footnote{Our domain classifier uses a bi-LSTM RNN encoder, followed by a simple softmax layer. Its precision on a development set are higher than 95\%.}
+\fyTodo{Explain how} Note that this decrease is however quite limited (and hardly significant for \texttt{LDR}$_{pred}$), showing that our architecture is quite robust to noisy labels. Even in the worst case scenario where all domain tags are intently wrong (\texttt{LDR}$_{wrong}$), we see that the generic part still ensures a satisfying level of performance. A last contrast is with \texttt{LDR}$_{oracle}^{0.5}$ where we change the distribution of training sentence to increase the number of ECB samples: as a result, we see a small decrease for EMEA and EPPS, and a large boost for ECB. This shows that our technique can be used in conjunction to other well known strategies for performing domain adaptation. 
 
-The right part of Tables~\ref{tab:results-trsf} and \ref{tab:results-rnn} report performance on test sets for new domains not seen in training. Khresmoi texts, which are extracted from summaries of medical article are assumed to from the same domain as EMEA data; for the other two test sets, we assume no domain and only use the generic embeddings. Here, we see that our best system \texttt{LDR}$_{oracle}$ is slightly lagging behind the \texttt{Mixed} baselines (the difference ranges from unsignificant to one Bleu point), which can be attributed to larger useful (generic) embedding in the \texttt{Mixed} setting. Here again, we see that using the sole generic part makes the system robust with respect to unknown or misleading domain tags. We finally outline that our approach outperforms DC for these test sets (were we have to predict a tag)\fyTodo{Fix this}, and even outperforms WCDMT, which has no built in mechanism to handle data from unknown domains.
+% \fyTodo{Comment V2 from Minh}
+
+The right parts of Tables~\ref{tab:results-trsf} and \ref{tab:results-rnn} report performance on test sets for new domains not seen in training. Khresmoi texts, which are extracted from summaries of medical articles are assumed to be from the same domain as EMEA data; for the other two test sets, we assume no domain and only use the generic part of the embeddings. Here, we see that our best system \texttt{LDR}$_{oracle}$ is slightly lagging behind the \texttt{Mixed} baselines (the difference ranges from unsignificant to one Bleu point), which can be attributed to larger useful (generic) embeddings in the \texttt{Mixed} setting. Here again, we see that using the sole generic part makes the system robust with respect to unknown or misleading domain tags. We finally outline that our approach outperforms DC for these test sets (were we have to commit to a predicted domain tag), and even outperforms WDCMT (for German-English). This might be due to the fact that WDCMT has no built-in mechanism to ignore, as we do in the \texttt{LDR}$_{generic}$ systems, the possibly misleading predicted domain information.
 
 \begin{table*}[!h]
 \begin{center}
@@ -318,8 +321,8 @@ $DC$ & 67.87$_{45.42}$ & 37.31 & 54.14 & 33.63 & 26.52 & 24.81 & avg\\
 $LDR_{oracle}$   & 74.26$_{49.90}$ & 37.67 & 54.07 & 33.85 & 28.11 & 25.70 & avg \\
 $LDR^{v2}_{oracle}$   & 74.95$_{49.38}$ & 37.35 & 55.91 & 33.57 & 27.59 & 25.27 & avg \\
 $LDR_{generic}$ & 73.97$_{49.54}$ & 37.81 & 53.67 & 34.17 & 28.11 & 25.70 & avg \\
-$LDR_{rnn}$ & 74.29 $_{49.84}$ & 37.73 & 54.01 & 33.34 & 28.32 & 26 & avg \\
-$LDR_{wrong}$ & 72.95$_{49.78}$ & 37.62 & 53.35 & khreshmoi & newstest & iwslt & avg\\
+$LDR_{pred}$ & 74.29 $_{49.84}$ & 37.73 & 54.01 & 33.34 & 28.32 & 26 & avg \\
+$LDR_{wrong}$ & 72.95$_{49.78}$ & 37.62 & 53.35 & - & - & - & avg\\
   \hline
 \multicolumn{8}{l}{} \\[-9pt]
 \multicolumn{8}{l}{English $\rightarrow$German} \\
@@ -335,8 +338,8 @@ $DC$ & 63.48$_{42.98}$ & 26.27 & 66.95 & 21.45 & 16.45 & 18.78 & avg \\
 $LDR_{oracle}$ & 70.9$_{46.12}$ & 26.30 & 68.9 & 21.42 & 16.57 & 18.82 & avg \\
 $LDR^{v2}_{oracle}$ & 71.31$_{45.23}$ & 25.98 & 73.74 & 21.6 & 16.37 & 19.2 & avg \\
 $LDR_{generic}$ & 70.86$_{45.60}$ & 26.14 & 68.59 & 21.95 & 16.57 & 18.82 & avg\\
-$LDR_{rnn}$ & 70.89$_{46.12}$ & 26.53 & 68.63 & 21.45 & 16.61 & 19.07 & avg \\
-$LDR_{wrong}$ & 69.51$_{43.50}$ & 26.31 & 66.86 & khreshmoi & newstest & iwslt & avg \\
+$LDR_{pred}$ & 70.89$_{46.12}$ & 26.53 & 68.63 & 21.45 & 16.61 & 19.07 & avg \\
+$LDR_{wrong}$ & 69.51$_{43.50}$ & 26.31 & 66.86 & - & - & - & avg \\
 \hline
 \end{tabular}
 } %scalebox
@@ -366,8 +369,8 @@ $WDCMT$           & 68.76 $_{45.29}$ & 35.71 & 52.75 & 32.03 & 24.63 & 23.28 & a
 \hline
 $LDR_{oracle}$   & 71.73 $_{46.30}$ & 35.21 & 50.91 & 29.62 & 23.00 & 20.96 & avg\\
 $LDR_{generic}$ & 70.59 $_{46.37}$ & 35.22 & 49.68 & 29.51 & 23.00 & 20.96 & avg\\
-$LDR_{rnn}$        & 72.76 $_{46.35}$ & 35.1 & 50.38 & 30.02 & 23.28 & 21.32 & avg\\
-$LDR_{wrong}$   & 62.1 $_{43.29}$ & 34.17 & 48.79 & khreshmoi & newstest & iwslt & avg \\
+$LDR_{pred}$        & 72.76 $_{46.35}$ & 35.1 & 50.38 & 30.02 & 23.28 & 21.32 & avg\\
+$LDR_{wrong}$   & 62.1 $_{43.29}$ & 34.17 & 48.79 &  - & - & - & avg \\
 \hline
 \multicolumn{8}{l}{} \\[-9pt]
 \multicolumn{8}{l}{English$\rightarrow$German} \\
@@ -385,8 +388,8 @@ WDCMT               & 64.05 $_{38.54}$ & 22.82 & 67.00 & 15.94 & 11.45 & 13.66 &
 $LDR_{oracle}$   & 63.43 $_{40.04}$ & 22.66 & 64.40 & 16.99 & 11.45 & 14.26 & avg\\
 $LDR^{v2}_{oracle}$   & 63.27 $_{38.16}$ & 21.83 & 69.55 & 15.7 & 11.32 & 13.98 & avg\\
 $LDR_{generic}$ & 63.27 $_{39.75}$ & 22.62 & 63.70 & 17.26 & 11.45 & 14.26 & avg\\
-$LDR_{rnn}$        & 63.17 $_{39.92}$ & 22.51 & 64 & 15.94 & 11.32 & 14.27 & avg\\
-$LDR_{wrong}$   & 56.84 $_{37.05}$ & 22.06 & 61.66 & khreshmoi & newstest & iwslt & avg \\
+$LDR_{pred}$        & 63.17 $_{39.92}$ & 22.51 & 64 & 15.94 & 11.32 & 14.27 & avg\\
+$LDR_{wrong}$   & 56.84 $_{37.05}$ & 22.06 & 61.66 & - & - & - & avg \\
 \hline
 \end{tabular}
 } %scalebox
@@ -395,21 +398,23 @@ $LDR_{wrong}$   & 56.84 $_{37.05}$ & 22.06 & 61.66 & khreshmoi & newstest & iwsl
 \end{table*}
 % \clearfloat
 
-\section{Discussion\label{sec:Discussion}}
+\section{Complementary experiments\label{sec:Discussion}}
 % \subsection{Sparse's performance}
 % First, we analyze the performance of models on inner test sets which are created by randomly splited from same corpora as training set. The 4 table show remarquable improvement 6 points BLEU in average in EMEA translation which is comparable with finetuned model. In all most the cases, Sparse model has slightly higher score on EPPS test and ECB test than mixed and finetuned models. Sparse model also achieve comparable scores with Domain Control and WDCMT in average. In considering the score of finetuned model on out-of-domain test sets, we observed a fast catastrophic forgetting while the out-of-domain scores drop dramatically compared to mixed model. Taking into account the average score on 3 inner test sets, Sparse achieved far better score than all finetuned models. \\
 % Secondly, we compare performance of models on IWSLT test 2010 and newstest 2014 which are more general than inner test sets. On these test sets, mixed, Sparse has approximately same score in Transformer and are a little better than Domain Control while in Recurrent Net Work architecture, WDCMT is better than mixed, Sparse and Domain Control for English -French pair. We also noted a quick fall of performance in finetuned model.
 
 \subsection{Balancing generic and domain-specific representations\label{secc:region_size}}
 
-An important practical question concerns the balance between the generic and the domain-specific part of the embedding. In the limit where the domain specific part is very small, we should recover the performance of the \texttt{Mixed} system; conversely, we expect to see a less effective sharing of data across domains by increasing the domain-specific regions. Table~\ref{tab:embedding-size} reports the result of  a series of experiments for the Transformer\fyTodo{Check This} architecture with varying domain-specific sizes allocating between 4 and 64 cells for domain-specific information, and the complement to 512 for the generic part. The differences being overall quite small \fyTodo{Comments - is this due to prior ?}, we decided to allocate $8$ cells for the domain specific part. \fyTodo{Easily accomodate more domains}
+An important practical question concerns the balance between the generic and the domain-specific part of the embeddings. In the limit where the domain specific part is very small, we should recover the performance of the \texttt{Mixed} system; conversely, we expect to see a less effective sharing of data across domains by increasing the domain-specific regions. Table~\ref{tab:embedding-size} reports the result of  a series of experiments for the Transformer architecture (English-French) with varying domain-specific sizes allocating between 4 and 64 cells for domain-specific information, and the complement to 512 for the generic part. The differences are overall quite small in our experimental setting, where the training data is relatively limited and does not require to use a large embedding size. We therefore decided to allocate $8$~cells for the domain specific part. This suggests that we could easily accomodate more domains with the same architecture, and even reserve some regions to handle supplementary incoming training data.  
+% \fyTodo{Easily accomodate more domains}
 \fyTodo{Given the ways embeddings are computed, why not add more domains, and test robustness agains data presentation order ?}
+
 \begin{table*}[!h]
 \begin{center}
 \scalebox{1.0}{
 \begin{tabular}{|l|ccc|ccc|}
 \hline
-$LDR$ & EMEA & EPPS & ECB & khreshmoi & newstest2014 & iwslt2010 \\
+$LDR$ & EMEA & EPPS & ECB & Khresmoi & NewsTest2014 & IWSLT2010 \\
 \hline
 \multicolumn{7}{l}{English$\rightarrow$French} \\
 \hline
@@ -422,13 +427,13 @@ $LDR$ & EMEA & EPPS & ECB & khreshmoi & newstest2014 & iwslt2010 \\
 \end{tabular}
 } %scalebox
 \end{center}
-\caption{BPE-detokenized BLEU scores for the Transformer architecture for varying domain-specific embedding sizes}
+\caption{BPE-detokenized BLEU scores for the Transformer architecture for varying domain-specific embedding sizes \label{tab:embedding-size}}
 \end{table*}
 
-\subsection{Word embedding analysis \label{ssec:word_embeddings}}
-One of our main assumption is that the difference between domains can be confined at the lexical level, warranting our decision to specialize lexical representation for each domain, while the remaining part of the network is shared across domains. Linguistically, this assumption relates to the ``one domain, one meaning'' assumption, which express the fact that in many cases, polysemy correspond to variation in use across domain. In its weaker form, it allows us to assume that all occurrences of a given form in a given domain correspond to the same sense and share the same embedding; the same form occuring in different domain is allowed to have one distinct embedding per domain, which may help capture polysemy and lexical ambiguity in translation. 
+\subsection{Analysis of Word Embeddings \label{ssec:word_embeddings}}
+One of our main assumptions is that the difference between domains can be confined at the lexical level, warranting our decision to specialize lexical representations for each domain, while the remaining part of the network is shared across domains. Linguistically, this assumption relates to the ``one domain, one sense'' assumption \fyTodo{Refs}, which expresses the fact that in many cases, polysemy corresponds to variation in use across domain. In its weaker form, it allows us to assume that all occurrences of a given form in a given domain correspond to the same sense and share the same embedding; the same form occuring in different domains is allowed to have one distinct embedding per domain, which may help capture polysemy and lexical ambiguity in translation. 
 
-To check the validity of this hypothesis, we performed the following analysis of embeddings learned with the multi-domain system\fyTodo{Language and system} For each unit\footnote{In this study, we work with BPE units, not words, meaning that in many cases we observe the variation of use of word parts. As we work with a large inventory, many of these units correspond to actual words, and we focus on these in our comments.} in our dictionary, we compute the $k$ nearest neighbours for each domain, \fyTodo{As follows} yielding three lists of nearest neighbours. The size of their intersection should then be a sign of a variation of use across domains; conversely, a stable set of neighbours across domains should reflect the stability of word use.
+To check the validity of this hypothesis, we performed the following analysis of embeddings learned with the multi-domain Transformer system for English:French. For each unit\footnote{In this study, we work with BPE units, not words, meaning that in many cases we observe the variation of use of word parts. As we work with a large inventory, many of these units correspond to actual words, and we focus on these in our comments.} in our dictionary, we compute the $k$ nearest neighbours for each domain, \fyTodo{As follows} yielding $k$ lists of nearest neighbours. The size of their intersection should then be a sign of a variation of use across domains; conversely, an identical set of neighbours across domains should reflect the stability of word use.
 
 - impairment - mostly renal / hepatic impairment - translates as insuffisance in EMEA, quite different in ECB
 - convenience - mostly credit card convenience in ECB (), mostly for convenience (par commodité in EMEA).
