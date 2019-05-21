@@ -420,8 +420,18 @@ $LDR$ & EMEA & EPPS & ECB & khreshmoi & newstest2014 & iwslt2010 \\
 \caption{BPE-detokenized BLEU scores for the Transformer architecture for varying domain-specific embedding sizes}
 \end{table*}
 
-\subsection{Word embedding analysis}
-We analyze neigborhood in word embedding space of polysemies.
+\subsection{Word embedding analysis \label{ssec:word_embeddings}}
+One of our main assumption is that the difference between domains can be confined at the lexical level, warranting our decision to specialize lexical representation for each domain, while the remaining part of the network is shared across domains. Linguistically, this assumption relates to the ``one domain, one meaning'' assumption, which express the fact that in many cases, polysemy correspond to variation in use across domain. In its weaker form, it allows us to assume that all occurrences of a given form in a given domain correspond to the same sense and share the same embedding; the same form occuring in different domain is allowed to have one distinct embedding per domain, which may help capture polysemy and lexical ambiguity in translation. 
+
+To check the validity of this hypothesis, we performed the following analysis of embeddings learned with the multi-domain system\fyTodo{Language and system} For each unit\footnote{In this study, we work with BPE units, not words, meaning that in many cases we observe the variation of use of word parts. As we work with a large inventory, many of these units correspond to actual words, and we focus on these in our comments.} in our dictionary, we compute the $k$ nearest neighbours for each domain, \fyTodo{As follows} yielding three lists of nearest neighbours. The size of their intersection should then be a sign of a variation of use across domains; conversely, a stable set of neighbours across domains should reflect the stability of word use.
+
+- impairment - mostly renal / hepatic impairment - translates as insuffisance in EMEA, quite different in ECB
+- convenience - mostly credit card convenience in ECB (), mostly for convenience (par commodité in EMEA).
+- turnover in ECB= chiffre d'affaire; EMEA - we observe collocations such as ``bone turnover'' (remodelage or renouvellement osseux') and more generally of cell renewall.
+
+Conversely, same sense
+
+This only works for sufficiently frequent words.
 
 \begin{table}
   \centering
