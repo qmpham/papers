@@ -97,17 +97,20 @@
 
 \section{Introduction \label{sec:introduction}}
 % The problem
-Owing to the development of flexible and powerful architectures based on neural networks \cite{Cho14properties,Bahdanau15learning,Ghering17convolutional,Vaswani17attention}, Machine Translation (MT) has made significant progresses over the past years, and constitute to date the standard for most production engines. The development of MT systems, be they neural or statistical, require very large parallel corpora consisting of millions of sentence pairs, a resource that only exist in very few application domains and language pairs. A lot of the recent research effort has thus focused on developping MT systems in restricted data conditions, for instance building multilingual MTs which enable zero-shot translation \cite{Firat16multiway,Ha16towards,Johnson17google}; or even building systems without any parallel data \cite{Artetxe18unsupervised,Lample18unsupervised}.
-Another important scenario for industrial MT is to adapt a neural system trained using parallel data in one domain to the peculiarity of other domains. Domain Adaption (DA) in MT is an old issue \cite{Foster07mixture,Axelrod11domain}, which comes in various guises, and for which a number of solutions have been studied (see the recent survey of \cite{Chu18asurvey} for neural MT). The typical setting is \emph{supervised adaptation}, where a (small) amount of data of the target domain of interest is used to fine-tuned the parameters of a system trained on a large amount of texts in a source domain. We study here a different scenario, \emph{multi-domain adaptation} \cite{Sennrich13multidomain,Farajian17multidomain}, where we would like to use heterogenous data sources to train a unique system that would work well for all domains. This allows us to be both data efficient (all data is used to train all domains) and computationally efficient (we only train one system). In our setting, we assume that the domain of test documents is known.
+Owing to the development of flexible and powerful architectures based on neural networks \cite{Cho14properties,Bahdanau15learning,Ghering17convolutional,Vaswani17attention}, Machine Translation (MT) has made significant progresses over the past years, and constitute to date the standard for most production engines. The development of MT systems, be they neural or statistical, require very large parallel corpora consisting of millions of sentence pairs, a resource that only exist in very few application domains and language pairs. A lot of the recent research effort has thus focused on developping MT systems in restricted data conditions, for instance building multilingual MTs which enable zero-shot translation \cite{Firat16multiway,Ha16towards,Johnson17google}; %or even building systems without any parallel data \cite{Artetxe18unsupervised,Lample18unsupervised}.
+Another important scenario for industrial MT is to adapt a neural system trained using parallel data in one domain to the peculiarity of other domains. Domain Adaption (DA) in MT is an old issue \cite{Foster07mixture,Axelrod11domain}, which comes in various guises, and for which a number of solutions have been studied. See the recent survey of \cite{Chu18asurvey} for neural MT. The typical setting is \emph{supervised adaptation}, where a (small) amount of data of the target domain of interest is used to fine-tune the parameters of a system trained on a large amount of texts in a source domain. We study here a different scenario, \emph{multi-domain adaptation} \cite{Sennrich13multidomain,Farajian17multidomain}, where we would like to use heterogenous data sources to train a unique system that would work well for all domains. This allows us to be both data efficient (all data is used to train all domains) and computationally efficient (we only train one system). %In our setting, we assume that the domain of test documents is known.
 
 Multi-domain adaptation is conceptually close to multilingual MT, or more generally to multi-task learning \cite{Caruana97multitask}, and can be approached in a number of ways. We adapt here ideas of \citet{Daume07frustratingly} to neural MT.
 % in an attempt to confine the differences between domains at the lexical level, while the rest of the parameters is shared between domains.
 Our main hypothesis is that domains mostly differ at the lexical level, due to cross-domain polysemy, which motivates domain specific embeddings. By contrast, the deeper layers, which arguably model more abstract linguistic phenomena, are made shareable across domains. To this end, we design word embeddings containing a generic and several domain-specific regions. We experiment with three domains, two neural architectures and two language pairs and find that our technique yields effective multi-domain NMTs, outperforming several baselines. Our contribution is thus as follows:
-\begin{itemize}
-\item we implement the ideas of \cite{Daume07frustratingly} for two NMT architectures;
-\item we provide experimental evidence that suggest the effectiveness of this technique;
-\item our analysis of embeddings seems to confort our assumption that their variation across domain actually reflects a variation of senses.
-\end{itemize}
+%\begin{itemize}
+%\item 
+we implement the ideas of \cite{Daume07frustratingly} for two NMT architectures;
+%\item 
+we provide experimental evidence that suggest the effectiveness of this technique;
+%\item 
+our analysis of embeddings seems to confort our assumption that their variation across domain actually reflects a variation of senses.
+%\end{itemize}
 \fyDone{can we train in random order ? can we get away with catastrophic forgetting ?}
 \fyDone{how to analyze the embeddings ? how can we test or claim ?}
 
@@ -170,7 +173,7 @@ Our first approach to multi-domain machine translation is to build such trivial 
 This section explains a new design for word embeddings used in a multi-domain model. As mentioned above, we separate parameter set into $D+1$ parameter sets correspond to D domains and one shared paramater set. Our first attempt is to split standard vector word embedding into $D+1$ regions named $\theta_i$ for $i \in [1,..,D]$ and $\theta_s$.\fyTodo{nullified not vanishing}
 \begin{figure}
 \center
-    \includegraphics[width=0.52\textwidth]{embeddings}
+    \includegraphics[width=0.48\textwidth]{embeddings}
     \caption{Lexicalized domain embeddings. When processing a sample from domain $2$, we only activate the corresponding parameter region ($\theta_2$) in the input embeddings; the remaining domain-specific parts are zeroed out, and do not receive any update. The generic part is always active, and is updated irrespective of the input domain.} 
     \label{fig:network}
   \end{figure}
