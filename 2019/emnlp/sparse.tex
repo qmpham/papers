@@ -297,12 +297,12 @@ If a sentence originates from domain $i$, the domain specific regions for all do
 %In training, we use same optimization algorithm as for the baselines. 
 %The same optimisation algorithm is always used.
 Note that each iteration of algorithm \ref{alg:multidomain} uses 2~batches: a ``generic'' batch updating only the generic region; and a ``domain-specific'' batch updating just the domain-specific parameters. 
-Thus, we minimise two losses:
+% Thus, we minimise two losses:
 %This is because we wish to simultaneously minimize two losses:
-\begin{align*}
-\theta^*_{s}=&\displaystyle{\mathop{\argmin}_{\theta_s}}E_{(x,y) \sim D(\displaystyle{\mathop{\cup}_{i \in [1,..,d]}}C_{i})}[-log(p_{\theta_s}(y|x))] \\ 
- \theta^*_{i}=&\displaystyle{\mathop{\argmin}_{\theta_i}}E_{(x,y) \sim D(C_{i})}[-log(p_{\theta_i,\theta^*_s}(y|x,i))]
-\end{align*} 
+% \begin{align*}
+% \theta^*_{s}=&\displaystyle{\mathop{\argmin}_{\theta_s}}E_{(x,y) \sim D(\displaystyle{\mathop{\cup}_{i \in [1,..,d]}}C_{i})}[-log(p_{\theta_s}(y|x))] \\ 
+%  \theta^*_{i}=&\displaystyle{\mathop{\argmin}_{\theta_i}}E_{(x,y) \sim D(C_{i})}[-log(p_{\theta_i,\theta^*_s}(y|x,i))]
+% \end{align*} 
 
 % We also take into account the problem of overfitting that could occur for small corpora. Indeed, real data are not always balanced for every domain. For instance, in our experiments, the size of corpora are very different where EPPS is largest with approximately 2 millions sentences, EMEA contains about 1 million sentences and ECB is the smallest with only 200 000 sentences for English French and 100 000 for English-German. If we train each corpora with same number of batches, ECB will be trained too oftenly, that easily leads to overfitting. Therefore, we select batches from each corpora with frequencies proportional to its size.
 The batch selection procedure (step~2 of algorithm~\ref{alg:multidomain}) ensures that the number of examples seen in training of each domain follows the distribution of examples seen in the training data.
@@ -450,7 +450,7 @@ $LDR_{wrong}$   & 56.84 $_{37.05}$ & 22.06 & 61.66 & - & - & - & avg \\
 
 An important practical question concerns the balance between the generic and the domain-specific part of the embeddings. In the limit where the domain specific part is very small, we should recover the performance of the \texttt{Mixed} system; conversely, we expect to see a less effective sharing of data across domains by increasing the domain-specific regions. Table~\ref{tab:embedding-size} reports the result of  a series of experiments for the Transformer architecture (English-French) with varying domain-specific sizes allocating between 4 and 64 cells for domain-specific information, and the complement to 512 for the generic part. The differences are overall quite small in our experimental setting, where the training data is relatively limited and does not require to use a large embedding size. We therefore decided to allocate $8$~cells for the domain specific part. This suggests that we could easily accomodate more domains with the same architecture, and even reserve some regions to handle supplementary incoming training data.  
 % \fyTodo{Easily accomodate more domains}
-\fyTodo{Given the ways embeddings are computed, why not add more domains, and test robustness agains data presentation order ?}
+\fyToDone{Given the ways embeddings are computed, why not add more domains, and test robustness agains data presentation order ?}
 
 \begin{table*}[!h]
 \begin{center}
@@ -474,7 +474,7 @@ $LDR$ & EMEA & EPPS & ECB & Khresmoi & NewsTest2014 & IWSLT2010 \\
 \end{table*}
 
 \subsection{Analysis of Word Embeddings \label{ssec:word_embeddings}}
-One of our main assumptions is that the difference between domains can be confined at the lexical level, warranting our decision to specialize lexical representations for each domain, while the remaining part of the network is shared across domains. Linguistically, this assumption relates to the classical ``one discourse, one sense'' \cite{Yarowsky95onediscourse}, and corresponds to the fact that in many cases, polysemy corresponds to variation of use across domain. In its weaker form, it allows us to assume that all occurrences of a given form in a given domain correspond to the same sense and share the same representation; the same form occuring in different domains is allowed to have one distinct embedding per domain, which may help capture polysemy and lexical ambiguity in translation. 
+One of our main assumptions is that the difference between domains can be confined at the lexical level, warranting our decision to specialize lexical representations for each domain, while the remaining part of the network is shared across domains. Linguistically, this assumption relates to the classical ``one sense per collocation'' \cite{Yarowsky93onesense} and corresponds to the fact that in many cases, polysemy corresponds to variation of use across domain. In its weaker form, it allows us to assume that all occurrences of a given form in a given domain correspond to the same sense and share the same representation; the same form occuring in different domains is allowed to have one distinct embedding per domain, which may help capture polysemy and lexical ambiguity in translation. 
 
 To check the validity of this hypothesis, we performed the following analysis of embeddings learned with the multi-domain Transformer system for English:French. For each unit\footnote{In this study, we work with BPE units, not words, meaning that in many cases we observe the variation of use of word parts. As we work with a large inventory, many of these units correspond to actual words, and we focus on these in our comments. We also restrict our analysis to words that occur at least 30 times in each domain, to ensure that each domain-specific region is updated during training.} in our English dictionary, we compute the $k$ nearest neighbours for each domain $i \in [1\dots{}d]$, where the distance between unit $u$ and $v$ for domain $i$ is the cosine distance in the corresponding embedding space, ie.\ assuming that the actual embedding of $v$ for domain $d$ is $e(v,i) = M_ge_g(u) + M_de_i(v)$ (cf.\ equation~\eqref{}).\fyTodo{Equation}. This process yields $d$ lists of $k$ nearest neighbours. The size of their intersection should then be a sign of a variation of use across domains; conversely, an identical set of neighbours across domains should reflect the stability of word use. Table~\ref{tab:embeddings} list the 10 units with the smaller (respectively larger) intersection (we use $k=10$ and $d=3$). 
 
