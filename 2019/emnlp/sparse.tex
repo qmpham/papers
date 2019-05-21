@@ -127,86 +127,95 @@ Multi-domain machine translation is formalized as follows: we assume that our ob
 \end{equation}
 The training data for domain $i$ is denoted $C_i$.
 
-A straightforward solution is to process each domain separately, computing the value $\theta_i^*$ that minimizes the empirical loss on the training corpus $C_i$. This strategy is only effective if we have sufficient training data for each domain; when this is not the case, some estimates $\theta_i^*$ may be far from their optimal value. \fyDone{Risk}. 
-The alternative we consider here constraints each parameter $\theta_i$ to be made of two parts: one ($\theta_s \in R^{D_g}$) is shared across all domains, while the second part $\theta_i \in \mathbb{R}^{D_i}$ is only used in domain $i$.
+A straightforward solution is to process each domain separately, computing the value $\theta_i^*$ that minimizes the empirical loss on the training corpus $C_i$. This strategy is only effective if we have sufficient training data for each domain; when this is not the case, some estimates $\theta_i^*$ may be far from their optimal value. \fyDone{Risk}
+The alternative we consider here constraints each parameter $\theta_i$ to be made of two parts: $\theta_i = [\theta_s; \theta'_i]$ ($\theta_s \in R^{D_g}$) is shared across all domains, while the second part $\theta'_i \in \mathbb{R}^{D_i}$ is only used in domain $i$.
 The parameter set is now much more constrained, yet we expect that tying parameters across domains will yield better estimates for $\theta_s$ due to a larger training corpus. In this setting, the optimization program defined by equation~\eqref{eq:loss} can no longer be performed separately for each training corpus.
-
-%%% 
-\fyTodo{Use math for notation, label equations and such}
-\begin{definition}{Domain}
-\label{def:domain}
-A domain is probabilistic distribution of translation $(x,y)$ in a given corpora. Given corpora $C$, we denote $D(C)$ the domain of $C$.
-\end{definition}
-\fyTodo{We need more: the source, the target, etc}
-In machine translation, the loss function for training is:
-\begin{equation}\label{eq:1}
-\begin{split}
-E_{(x,y) \sim p_{rel}}[-log(p_{\theta}(y|x))] &= \\
-= E_{x \sim p_{rel}(x)}[KL(p_{rel}(y|x) & \mid p_{\theta}(y|x))] + \\
-+ E_{x \sim p_{rel}} &[H(p_{rel}(y|x))]
-\end{split}
-\end{equation}.
-
-Where $p_{\theta}(y|x) = p(y|x,\theta)$ \\
-In this equation, the domain is $p_{rel}(x,y)$. In minimizing given objective \ref{eq:1}, one aims to approximate the objective domain $p_{rel}$. In inference, provided the model was trained on certain training data, the more likely test set is generated from domain of training data, the better performance.\\
-In general, a generic model is trained first with a mix of several corpora which belongs to different topics (e.g medical, banking, adminstration) whose the domain $p_{rel}$ is considered as a general domain, noted $p_{gen}$. Being trained with a general mixed corpora, the generic model is not usually good enough for translating by topic. In order to improve topical translation quality, specializing generic model is required. One usually finetunes the generic model by continue the training from initial value $\theta^*$, which was optimized on general domain, using corpora of interested topic. However, there is always a dramatical shift from generic domain $p_{gen}$ to specialization domain $p_{spec}$. Indeed, the translation $(x,y)$ could be very different in different topic. For instance, in financial document, to translate "security" into "titre financier" is more likely than to translate it into "securit\'e" but in IT document. Therefore, the shift from general domain containing these two corpora to one of them is not negligible. This shift usually leads to catastrophic forgetting in neural network using backpropagation \cite{McCloskey1989Catastrophic}. In effect, the finetuned model usually shows lower performance in translating sentences, which are less related to the finetuning topic, than generic model. 
-In order to conduct the model translating topic by topic, we might refer to conditional probability conditioned by topic $p(y|x,d)$. Given a set of training corpora, we assume that there are a limited d engendering topic, i.e, there are d corpora $C_i$ $i \in [1,..,d]$ representing d topical domains $D(C_i)$ respectively. We are then interested in approximating $p(y,x|i)$ for $i \in [1,..,d]$ and use $p(y|x,i)$ for the inference in topic $i$. From now, we formalize the multi-domain problem for machine translation in following equation
-\begin{equation} \label{eq:2}
-\begin{split}
-\theta^* = \argmin_{\theta} \displaystyle{\mathop{\sum}_{i \in [1..d]}} E_{(x,y) \sim D(C_{i})}[-log(p_{\theta}(y|x,i))]
-\end{split}
-\end{equation}
-It is obvious that
-\begin{equation} \label{eq:3}
-\begin{split}
-\argmin_{\theta} \displaystyle{\mathop{\sum}_{i \in [1..d]}} E_{(x,y) \sim D(C_{i})} &[-log(p_{\theta}(y|x,i))] \\
-\geq \displaystyle{\mathop{\sum}_{i \in [1..d]}} \argmin_{\theta} E_{(x,y) \sim D(C_{i})} &[-log(p_{\theta}(y|x,i))]
-\end{split}
-\end{equation}
-A trivial solution for the equation \ref{eq:2} is $\theta^* = (\theta^*_{0},...,\theta^*_{d})$ and $p_{(\theta_{0},...,\theta_d)}(y|x,i)$ is independent of $\theta_{j}$ $\forall j \neq i$, i.e, $\exists f:\Omega_i \times C(D_i) \rightarrow [0,1]: f_{\theta_i}(y,x) = p_{(\theta_{0},...,\theta_d)}(y|x,i)$ where $\Omega_i$ is set of all possible values of $\theta_i$. \\
-The trivial solution is not rather than ensemble of $d$ models specialized for one domain. However, we could reduce the seperation by using shared paramaters denoted $\theta_s$ then reformulate the model as following: \\
-$\theta^* = (\theta^*_{0},...,\theta^*_{d}, \theta_s^*)$ and $p_{(\theta_{0},...,\theta_d, \theta_s)}(y|x,i)$ is independent of $\theta_{j}$ $\forall j \neq i$, i.e, $\exists f:\Omega_i \times \Omega_s \times C(D_i) \rightarrow [0,1]: f_{\theta_i, \theta_s}(y,x) = p_{(\theta_{0},...,\theta_d, \theta_s)}(y|x,i)$ \\ $p_{(\theta_{0},...,\theta_d, \theta_s)}(y|x)$ is independent of $\theta_{j}$ $\forall j$ i.e, $\exists \bar{f}:\Omega_s \times C \rightarrow [0,1]: \bar{f}_{\theta_s}(y,x) = p_{(\theta_{0},...,\theta_d, \theta_s)}(y|x)$
-where $\Omega_i$ is set of all possible values of $\theta_i$ and $\Omega_s$ is set of all possible values of $\theta_s$. The optimization problem will become
-\begin{equation}
-\displaystyle{\mathop{\sum}_{i \in [1..d]}} \argmin_{\theta_{0},...,\theta_{d}, \theta_s} E_{(x,y) \sim D(C_{i})} [-log(p_{\theta_s,\theta_i}(y|x,i))]
-\end{equation}
-However, the couple $\theta_s^*$ and $\theta_i^*$ are hardly optimal $\forall i \in [1..d]$.\\
-Despite the fact that $\theta^* = (\theta^*_{0},...,\theta^*_{d}, \theta_s^*)$ is hardly achieved by backpropagation, we could attempt to optimize $\theta_s$:
-\begin{equation}
-\theta^*_{s} = \displaystyle{\mathop{\argmin}_{\theta_s}}E_{(x,y) \sim D(\displaystyle{\mathop{\cup}_{i \in [1,..,d]}}C_{i})}[-log(p_{\theta_s}(y|x))]
-\end{equation} 
-
-then optimize each $\theta_i$ (as additional factor used for fine-tuning the model to the domain $D(C_{i})$) the perplexity with respect to true distribution of domain
-\begin{equation}
-\theta^*_{i} = \displaystyle{\mathop{\argmin}_{\theta_i}}E_{(x,y) \sim D(C_{i})}[-log(p_{\theta_i,\theta^*_s}(y|x,i))]
-\end{equation} 
-Our first approach to multi-domain machine translation is to build such trivial solution by assigning different regions of word embedding vector to set of domain paramters $\theta_i$ and set of shared parameters $\theta_s$ while keep sharing other parameters between domains.
 
 \subsection{Lexicalized domain embeddings \label{ssec:lde}}
 
-This section explains a new design for word embeddings used in a multi-domain model. As mentioned above, we separate parameter set into $D+1$ parameter sets correspond to D domains and one shared paramater set. Our first attempt is to split standard vector word embedding into $D+1$ regions named $\theta_i$ for $i \in [1,..,D]$ and $\theta_s$.\fyTodo{nullified not vanishing}
+To actually implement this idea for NMT, we need to define the subset of parameters that will be common to all domain. We make the assumption that domain specificities can be confined to the lexical level, and define $\theta_s$ to contain all the network parameters, except for a subpart of the word embeddings. For each word $v$, the embedding vector $e(v)$ is thus decomposed as $e(v) = [e_g(v); e_1(v); \dots; e_d(v)]$, where $e_g(v)$ stores the generic lexical embedding, while $e_i(v)$ stores the subpart that is specific to domain $i$.
+In our NMT architectures, the actual embedding layer composes these vectors linearly to generate the word embedding for domain $k$ according to:
+\begin{align}
+  \tilde{e}_k(v) =& M_g e_g(v) + \sum_{i \in [1,..,d]} M_i * e_i(v) * \delta(i=k) \nonumber \\
+   & = M [e_g(v); e_1'(v,k) \dots; e_d'(v,k)], \label{eq:embedding}
+\end{align}
+where $\delta()$ is the Kronecker function, $M$ is the matrix made of blocks $M_g, M_1 \dots, M_d$, and $e_i'(v,k)$ is the masked embedding: $e_i'(v,k)= e_i(v) * \delta(i=k)$.  Making sure that the actual embedding do not contain any zero is important for the Transformer model, since the lexical representations are then summed to the positional encoding, which would undo the effect of domain masking, and propagate a gradient even to regions that should not be modified. With our design, we make sure that during backprogation, the matrix $M$ receives gradient $0$ at regions corresponding to deactivated regions in the word embedding. Those regions are also masked in forward step, thus do not interfere the training on the domain to which they are not assigned (see Figure~\ref{fig:network}).
+
 \begin{figure}
-\center
-    \includegraphics[width=0.48\textwidth]{embeddings}
-    \caption{Lexicalized domain embeddings. When processing a sample from domain $2$, we only activate the corresponding parameter region ($\theta_2$) in the input embeddings; the remaining domain-specific parts are zeroed out, and do not receive any update. The generic part is always active, and is updated irrespective of the input domain.} 
-    \label{fig:network}
-  \end{figure}
-\fyTodo{Explain vanishing ?}
-Figure~\ref{fig:network} presents our proposed design. During backprogation, the \fyTodo{fix notation}{projection matrix $M$} receives gradient 0 at regions corresponding to deactivated regions in the word embedding. Those regions are also masked in forward step, thus do not interfere the training on the domain to which they are not assigned.
+  \center
+  \includegraphics[width=0.48\textwidth]{embeddings}
+  \caption{Lexicalized domain embeddings. When processing a sample from domain $2$, we only activate the corresponding parameter region ($\theta_2$) in the input embeddings; the remaining domain-specific parts are zeroed out, and do not receive any update. The generic part is always active, and is updated irrespective of the input domain.} 
+  \label{fig:network}
+\end{figure}
 
-Let $\tilde{x}_{t} = M * e_{t} = M_g e_g(t) + \displaystyle{\mathop{\sum}_{i \in [1,..,d]} M_i * e_i(t)}$ be the projection of word embedding where $e_{t}$ is word embedding of token $x_{t}$, M is projection matrix, $M_j \forall j \in [1...d]$ is row block corresponding to domain region $j$ (Transformer \cite{Vaswani17attention}, recurrent \cite{Bahdanau15learning})\\
-Assume the batch belongs to domain $i$, then $e_j(t) = 0$ $\forall j \neq i$,$\forall t$. 
-\begin{equation}
-\begin{split}
-\frac{\partial L(x,y)}{\partial M_j} &= \sum_{t}\frac{\partial L}{\partial \tilde{x}_t}(x_t) * \frac{\partial \tilde{x}_t}{\partial M_j} \\
-								&= \sum_{t} \frac{\partial L}{\partial \tilde{x}_t}(x_t) * e_j(t)\\
-									&=0
-\end{split} 
-\forall j \neq i
-\end{equation}
+Our architecture is thus readily compatible with any NMT architecture, where we simply replace standard embedding layers the computation in equation~\ref{eq:embedding}. In our experiment, we consider both the attentional RNN architectures of \citet{Bahdanau15learning} and for Transformer architectures of \citet{Vaswani17attention}.
 
-The complex structure of State-of-the-art architecture Transformer \cite{Vaswani17attention} and popular recurrent network \cite{Bahdanau15learning} makes the implementation of sparse embedding non-obvious. Indeed, Transformer involve positional embedding and residual connections which are not homogeneous for domain-regions. Therefore, in our first implementation, we used an dense layer to fuse domain-region and generic region before applying positional embedding and residual connection. This implementation limits the finetuning effect at only word level.\\
-Furthermore, because word embeddings are involved in three parts of standard encoder-decoder structure, which are input of encoder, input of decoder and projection before softmax, we have 7 possibilities to apply sparse embedding. However, due to high memory cost, we only want to apply sparse embedding on the source side. \fyTodo{Explain this. Future work ?}
+% Let $\tilde{x}_{t} = M * e_{t} = M_g e_g(t) + \displaystyle{\mathop{\sum}_{i \in [1,..,d]} M_i * e_i(t)}$ be the projection of word embedding where $e_{t}$ is word embedding of token $x_{t}$, M is projection matrix, $M_j \forall j \in [1...d]$ is row block corresponding to domain region $j$ (Transformer \cite{Vaswani17attention}, recurrent \cite{Bahdanau15learning})\\
+% Assume the batch belongs to domain $i$, then $e_j(t) = 0$ $\forall j \neq i$,$\forall t$. 
+% \begin{equation}
+% \begin{split}
+% \frac{\partial L(x,y)}{\partial M_j} &= \sum_{t}\frac{\partial L}{\partial \tilde{x}_t}(x_t) * \frac{\partial \tilde{x}_t}{\partial M_j} \\
+% 								&= \sum_{t} \frac{\partial L}{\partial \tilde{x}_t}(x_t) * e_j(t)\\
+% 									&=0
+% \end{split} 
+% \forall j \neq i
+% \end{equation}
+
+% The complex structure of State-of-the-art architecture Transformer \cite{Vaswani17attention} and popular recurrent network \cite{Bahdanau15learning} makes the implementation of sparse embedding non-obvious. Indeed, Transformer involve positional embedding and residual connections which are not homogeneous for domain-regions. Therefore, in our first implementation, we used an dense layer to fuse domain-region and generic region before applying positional embedding and residual connection. This implementation limits the finetuning effect at only word level.\\
+% Furthermore, because word embeddings are involved in three parts of standard encoder-decoder structure, which are input of encoder, input of decoder and projection before softmax, we have 7 possibilities to apply sparse embedding. However, due to high memory cost, we only want to apply sparse embedding on the source side. \fyTodo{Explain this. Future work ?}
+
+
+% %%% 
+% \fyTodo{Use math for notation, label equations and such}
+% \begin{definition}{Domain}
+% \label{def:domain}
+% A domain is probabilistic distribution of translation $(x,y)$ in a given corpora. Given corpora $C$, we denote $D(C)$ the domain of $C$.
+% \end{definition}
+% \fyTodo{We need more: the source, the target, etc}
+% In machine translation, the loss function for training is:
+% \begin{equation}\label{eq:1}
+% \begin{split}
+% E_{(x,y) \sim p_{rel}}[-log(p_{\theta}(y|x))] &= \\
+% = E_{x \sim p_{rel}(x)}[KL(p_{rel}(y|x) & \mid p_{\theta}(y|x))] + \\
+% + E_{x \sim p_{rel}} &[H(p_{rel}(y|x))]
+% \end{split}
+% \end{equation}.
+
+% Where $p_{\theta}(y|x) = p(y|x,\theta)$ \\
+% In this equation, the domain is $p_{rel}(x,y)$. In minimizing given objective \ref{eq:1}, one aims to approximate the objective domain $p_{rel}$. In inference, provided the model was trained on certain training data, the more likely test set is generated from domain of training data, the better performance.\\
+% In general, a generic model is trained first with a mix of several corpora which belongs to different topics (e.g medical, banking, adminstration) whose the domain $p_{rel}$ is considered as a general domain, noted $p_{gen}$. Being trained with a general mixed corpora, the generic model is not usually good enough for translating by topic. In order to improve topical translation quality, specializing generic model is required. One usually finetunes the generic model by continue the training from initial value $\theta^*$, which was optimized on general domain, using corpora of interested topic. However, there is always a dramatical shift from generic domain $p_{gen}$ to specialization domain $p_{spec}$. Indeed, the translation $(x,y)$ could be very different in different topic. For instance, in financial document, to translate "security" into "titre financier" is more likely than to translate it into "securit\'e" but in IT document. Therefore, the shift from general domain containing these two corpora to one of them is not negligible. This shift usually leads to catastrophic forgetting in neural network using backpropagation \cite{McCloskey1989Catastrophic}. In effect, the finetuned model usually shows lower performance in translating sentences, which are less related to the finetuning topic, than generic model. 
+% In order to conduct the model translating topic by topic, we might refer to conditional probability conditioned by topic $p(y|x,d)$. Given a set of training corpora, we assume that there are a limited d engendering topic, i.e, there are d corpora $C_i$ $i \in [1,..,d]$ representing d topical domains $D(C_i)$ respectively. We are then interested in approximating $p(y,x|i)$ for $i \in [1,..,d]$ and use $p(y|x,i)$ for the inference in topic $i$. From now, we formalize the multi-domain problem for machine translation in following equation
+% \begin{equation} \label{eq:2}
+% \begin{split}
+% \theta^* = \argmin_{\theta} \displaystyle{\mathop{\sum}_{i \in [1..d]}} E_{(x,y) \sim D(C_{i})}[-log(p_{\theta}(y|x,i))]
+% \end{split}
+% \end{equation}
+% It is obvious that
+% \begin{equation} \label{eq:3}
+% \begin{split}
+% \argmin_{\theta} \displaystyle{\mathop{\sum}_{i \in [1..d]}} E_{(x,y) \sim D(C_{i})} &[-log(p_{\theta}(y|x,i))] \\
+% \geq \displaystyle{\mathop{\sum}_{i \in [1..d]}} \argmin_{\theta} E_{(x,y) \sim D(C_{i})} &[-log(p_{\theta}(y|x,i))]
+% \end{split}
+% \end{equation}
+% A trivial solution for the equation \ref{eq:2} is $\theta^* = (\theta^*_{0},...,\theta^*_{d})$ and $p_{(\theta_{0},...,\theta_d)}(y|x,i)$ is independent of $\theta_{j}$ $\forall j \neq i$, i.e, $\exists f:\Omega_i \times C(D_i) \rightarrow [0,1]: f_{\theta_i}(y,x) = p_{(\theta_{0},...,\theta_d)}(y|x,i)$ where $\Omega_i$ is set of all possible values of $\theta_i$. \\
+% The trivial solution is not rather than ensemble of $d$ models specialized for one domain. However, we could reduce the seperation by using shared paramaters denoted $\theta_s$ then reformulate the model as following: \\
+% $\theta^* = (\theta^*_{0},...,\theta^*_{d}, \theta_s^*)$ and $p_{(\theta_{0},...,\theta_d, \theta_s)}(y|x,i)$ is independent of $\theta_{j}$ $\forall j \neq i$, i.e, $\exists f:\Omega_i \times \Omega_s \times C(D_i) \rightarrow [0,1]: f_{\theta_i, \theta_s}(y,x) = p_{(\theta_{0},...,\theta_d, \theta_s)}(y|x,i)$ \\ $p_{(\theta_{0},...,\theta_d, \theta_s)}(y|x)$ is independent of $\theta_{j}$ $\forall j$ i.e, $\exists \bar{f}:\Omega_s \times C \rightarrow [0,1]: \bar{f}_{\theta_s}(y,x) = p_{(\theta_{0},...,\theta_d, \theta_s)}(y|x)$
+% where $\Omega_i$ is set of all possible values of $\theta_i$ and $\Omega_s$ is set of all possible values of $\theta_s$. The optimization problem will become
+% \begin{equation}
+% \displaystyle{\mathop{\sum}_{i \in [1..d]}} \argmin_{\theta_{0},...,\theta_{d}, \theta_s} E_{(x,y) \sim D(C_{i})} [-log(p_{\theta_s,\theta_i}(y|x,i))]
+% \end{equation}
+% However, the couple $\theta_s^*$ and $\theta_i^*$ are hardly optimal $\forall i \in [1..d]$.\\
+% Despite the fact that $\theta^* = (\theta^*_{0},...,\theta^*_{d}, \theta_s^*)$ is hardly achieved by backpropagation, we could attempt to optimize $\theta_s$:
+% \begin{equation}
+% \theta^*_{s} = \displaystyle{\mathop{\argmin}_{\theta_s}}E_{(x,y) \sim D(\displaystyle{\mathop{\cup}_{i \in [1,..,d]}}C_{i})}[-log(p_{\theta_s}(y|x))]
+% \end{equation} 
+
+% then optimize each $\theta_i$ (as additional factor used for fine-tuning the model to the domain $D(C_{i})$) the perplexity with respect to true distribution of domain
+% \begin{equation}
+% \theta^*_{i} = \displaystyle{\mathop{\argmin}_{\theta_i}}E_{(x,y) \sim D(C_{i})}[-log(p_{\theta_i,\theta^*_s}(y|x,i))]
+% \end{equation} 
+% Our first approach to multi-domain machine translation is to build such trivial solution by assigning different regions of word embedding vector to set of domain paramters $\theta_i$ and set of shared parameters $\theta_s$ while keep sharing other parameters between domains.
+
 
 \section{Experiments \label{sec:experiments}}
 
@@ -258,10 +267,10 @@ The \texttt{WDCMT} system has one bidirectional Gated recurrent units (GRU) laye
 To train NMT systems, we use Adam, with parameters $\beta_1=0.9$, $\beta_2 = 0.999$, $\alpha=0.0005$ for RNNs; with parameters $\beta_1=0.9$, $\beta_2= 0.98$, with Noam decay \cite{Vaswani17attention} for Transformer ($warmup\_steps=4000$). In all cases, we use a batch size of~128 and a dropout rate of 0.1 for all layers. 
 All our systems are implemented in OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein2017OpenNMT} except for WDCMT for which we use the authors' implementation.\footnote{\noindent\url{http://github.com/DeepLearnXMU/WDCNMT}}\fyDone{batch size}
 
-\subsection{Implementing LDR}\fyTodo{Check acronym.}
+\subsection{Implementing Lexicalized Domain Representations}\fyDone{Check acronym.}
 
 \fyDone{Motivate the split - discuss experimentally embedding size}
-In order to implement lexicalised domain representations (LDR), we split the embedding vector into four regions: 3 are domain specific and 1 is generic, with sizes $[8,8,8,488]$ respectively. %, a choice that will be discussed in Section~\ref{secc:region_size}. 
+In order to implement lexicalised domain representations (henceforth LDR), we split the embedding vector into four regions: 3 are domain specific and 1 is generic, with sizes $[8,8,8,488]$ respectively. %, a choice that will be discussed in Section~\ref{secc:region_size}. 
 If a sentence originates from domain $i$, the domain specific regions for all domains $j \neq i$ will be zeroed out; while the rest of regions are activated (cf. Figure~\ref{fig:network}). We then use a dense layer of size~512 to fuse the region for the active domain and the ``generic'' region. Training is formalised in algorithm~\ref{alg:multidomain}.
 
 \begin{algorithm}[h]
@@ -319,7 +328,7 @@ In our experiments, this means that sentences from the Europarl domain will be s
 % \item ajouter Sparse 4
 % \end{itemize}
 
-Our main results are summarized respectively in Table~\ref{tab:results-trsf} for the Transformer systems and Table~\ref{tab:results-rnn} for the RNN systems, where we report BLEU scores \cite{Papineni02bleu} computed after detokenization. \fyTodo{Footnote for missing numbers}.
+Our main results are summarized respectively in Table~\ref{tab:results-trsf} for the Transformer systems and Table~\ref{tab:results-rnn} for the RNN systems, where we report BLEU scores \cite{Papineni02bleu} computed after detokenization.\footnote{As explained above, we consistently report two numbers when testing with EMEA, except for the fine-tuning scenarios when tuning on ECB and EPPS.} % \fyTodo{Footnote for missing numbers}.
 
 We first concentrate on the left part of these tables, where we analyze the performance for the three domains of interest. A first series of observations is that Transformer is consistently better than RNN, and that fine-tuning on a domain-specific corpus, when applicable, is almost the best way to optimize the performance on that domain.\footnote{This is not so clear for the EPPS, where fine-tuning does not seem to help.}  Note that fine-tuning will however yield a marked (even sometimes catastrophic, eg.\ for the EMEA-tuned Transformer system) decrease in performance for the other domains. 
 
@@ -465,7 +474,7 @@ $LDR$ & EMEA & EPPS & ECB & Khresmoi & NewsTest2014 & IWSLT2010 \\
 \end{table*}
 
 \subsection{Analysis of Word Embeddings \label{ssec:word_embeddings}}
-One of our main assumptions is that the difference between domains can be confined at the lexical level, warranting our decision to specialize lexical representations for each domain, while the remaining part of the network is shared across domains. Linguistically, this assumption relates to the ``one domain, one sense'' assumption \fyTodo{Refs}, which expresses the fact that in many cases, polysemy corresponds to variation in use across domain. In its weaker form, it allows us to assume that all occurrences of a given form in a given domain correspond to the same sense and share the same embedding; the same form occuring in different domains is allowed to have one distinct embedding per domain, which may help capture polysemy and lexical ambiguity in translation. 
+One of our main assumptions is that the difference between domains can be confined at the lexical level, warranting our decision to specialize lexical representations for each domain, while the remaining part of the network is shared across domains. Linguistically, this assumption relates to the classical ``one discourse, one sense'' \cite{Yarowsky95onediscourse}, and corresponds to the fact that in many cases, polysemy corresponds to variation of use across domain. In its weaker form, it allows us to assume that all occurrences of a given form in a given domain correspond to the same sense and share the same representation; the same form occuring in different domains is allowed to have one distinct embedding per domain, which may help capture polysemy and lexical ambiguity in translation. 
 
 To check the validity of this hypothesis, we performed the following analysis of embeddings learned with the multi-domain Transformer system for English:French. For each unit\footnote{In this study, we work with BPE units, not words, meaning that in many cases we observe the variation of use of word parts. As we work with a large inventory, many of these units correspond to actual words, and we focus on these in our comments. We also restrict our analysis to words that occur at least 30 times in each domain, to ensure that each domain-specific region is updated during training.} in our English dictionary, we compute the $k$ nearest neighbours for each domain $i \in [1\dots{}d]$, where the distance between unit $u$ and $v$ for domain $i$ is the cosine distance in the corresponding embedding space, ie.\ assuming that the actual embedding of $v$ for domain $d$ is $e(v,i) = M_ge_g(u) + M_de_i(v)$ (cf.\ equation~\eqref{}).\fyTodo{Equation}. This process yields $d$ lists of $k$ nearest neighbours. The size of their intersection should then be a sign of a variation of use across domains; conversely, an identical set of neighbours across domains should reflect the stability of word use. Table~\ref{tab:embeddings} list the 10 units with the smaller (respectively larger) intersection (we use $k=10$ and $d=3$). 
 
