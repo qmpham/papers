@@ -288,7 +288,7 @@ The batch selection procedure (step~2 of algorithm~\ref{alg:multidomain}) ensure
 % \item ajouter Sparse 4
 % \end{itemize}
 
-Our main results are summarized respectively in Table~\ref{tab:results-trsf} for the Transformer systems and Table~\ref{tab:results-rnn} for the RNN systems, where we report BLEU scores \citecomputed after detokenization. \fyTodo{Footnote for missing numbers}.
+Our main results are summarized respectively in Table~\ref{tab:results-trsf} for the Transformer systems and Table~\ref{tab:results-rnn} for the RNN systems, where we report BLEU scores \cite{Papineni02bleu} computed after detokenization. \fyTodo{Footnote for missing numbers}.
 
 We first concentrate on the left part of these tables, where we analyze the performance for the three domains of interest. A first series of observations is that Transformer is consistently better than RNN, and that fine-tuning on a domain-specific corpus, when applicable, is almost the best way to optimize the performance on that domain.\footnote{This is not so clear for the EPPS, where fine-tuning does not seem to help.}  Note that fine-tuning will however yield a marked (even sometimes catastrophic, eg.\ for the EMEA-tuned Transformer system) decrease in performance for the other domains. 
 
@@ -433,7 +433,7 @@ $LDR$ & EMEA & EPPS & ECB & Khresmoi & NewsTest2014 & IWSLT2010 \\
 \subsection{Analysis of Word Embeddings \label{ssec:word_embeddings}}
 One of our main assumptions is that the difference between domains can be confined at the lexical level, warranting our decision to specialize lexical representations for each domain, while the remaining part of the network is shared across domains. Linguistically, this assumption relates to the ``one domain, one sense'' assumption \fyTodo{Refs}, which expresses the fact that in many cases, polysemy corresponds to variation in use across domain. In its weaker form, it allows us to assume that all occurrences of a given form in a given domain correspond to the same sense and share the same embedding; the same form occuring in different domains is allowed to have one distinct embedding per domain, which may help capture polysemy and lexical ambiguity in translation. 
 
-To check the validity of this hypothesis, we performed the following analysis of embeddings learned with the multi-domain Transformer system for English:French. For each unit\footnote{In this study, we work with BPE units, not words, meaning that in many cases we observe the variation of use of word parts. As we work with a large inventory, many of these units correspond to actual words, and we focus on these in our comments. We also restrict our analysis to words that occur at least 30 times in each domain, to ensure that each domain-specific region is updated during training.} in our English dictionary, we compute the $k$ nearest neighbours for each domain $i \in [1\dots{}d]$, where the distance between unit $u$ and $v$ for domain $i$ is the cosine distance in the corresponding embedding space, ie.\ assuming that the actual embedding of $v$ for domain $d$ is $e(v,i) = M_ge_g(u) + M_de_i(v)$ (cf.\ equation~\eqref{}).\fyTodo{Equation}. This process yields $d$ lists of $k$ nearest neighbours. The size of their intersection should then be a sign of a variation of use across domains; conversely, an identical set of neighbours across domains should reflect the stability of word use. Table~\ref{tab:embeddings} list the 10 units with the larger intersection, and the 10 units with the smaller intersection. 
+To check the validity of this hypothesis, we performed the following analysis of embeddings learned with the multi-domain Transformer system for English:French. For each unit\footnote{In this study, we work with BPE units, not words, meaning that in many cases we observe the variation of use of word parts. As we work with a large inventory, many of these units correspond to actual words, and we focus on these in our comments. We also restrict our analysis to words that occur at least 30 times in each domain, to ensure that each domain-specific region is updated during training.} in our English dictionary, we compute the $k$ nearest neighbours for each domain $i \in [1\dots{}d]$, where the distance between unit $u$ and $v$ for domain $i$ is the cosine distance in the corresponding embedding space, ie.\ assuming that the actual embedding of $v$ for domain $d$ is $e(v,i) = M_ge_g(u) + M_de_i(v)$ (cf.\ equation~\eqref{}).\fyTodo{Equation}. This process yields $d$ lists of $k$ nearest neighbours. The size of their intersection should then be a sign of a variation of use across domains; conversely, an identical set of neighbours across domains should reflect the stability of word use. Table~\ref{tab:embeddings} list the 10 units with the larger intersection, and the 10 units with the smaller intersection (we use $k=10$ and $d=3$) 
 
 \begin{table}
   \centering
@@ -444,45 +444,41 @@ To check the validity of this hypothesis, we performed the following analysis of
   \label{tab:embeddings}
 \end{table}
 
-- impairment - mostly renal / hepatic impairment - translates as insuffisance in EMEA, quite different in ECB
-- convenience - mostly credit card convenience in ECB (), mostly for convenience (par commodité in EMEA).
-- turnover in ECB= chiffre d'affaire; EMEA - we observe collocations such as ``bone turnover'' (remodelage or renouvellement osseux') and more generally of cell renewall.
+Let us first consider the complete words in the left column of Table~\ref{tab:embeddings}. The case of \emph{impairment} is pretty clear, collocating mostly in EMEA in terms such as ``hepatic impairment'' or ``renal impairment'', and translating into French as \textsl{insuffisance}; in ECB, the collocates of ``impairment'' are quite different, and impairment often occurs in terms such as ``cost subject to impairments'' (French: \emph{coût soumis à des réductions de valeur}). Likewise, ``convenience'' seems to have its general meaning (``for convenience'') in EMEA, but appears in ECB in the specific context of ``convenience credit card'' (French \textsl{carte de crédit à remboursement différé}). We finally see the same phenomena with ``turnover'', which is consistently translated with its economic meaning (French \textsl{chiffre d'affaire}) in ECB and EPPS, but whose collocates in EMEA ("bone turnover", ``hepatic turnover'') are associated with the idea of the cell renewall process, yielding translations such as \textsl{remodelage osseux} in French. Subword units can be analysed in the same ways: ``ums'', for instance, appears in words such as ``gums'', ``serums'', ``vacuums''  in EMEA; in ECB, ``ums'' is mostly the suffix of ``maximums'', ``minimums'', or ``premiums''; EPPS finally contains a more diverse set of ``-ums'' ending words (``stadium'', ``forum'', equilibrium'', etc). 
 
-Conversely, same sense
+Let us now consider the list of putative monosemic words (on the right part of Table~\ref{tab:embeddings}), ie.\ words for which the nearest neighbors are the same in all domains, contains mostly words for which we do not expect much variation in translation: adverbs (`` ``) 
 
-This only works for sufficiently frequent words.
-
-\begin{table}
-  \centering
-  \begin{tabular}{*{4}{|r|}}
-    \hline
-    Domain & Word & Neighbor & Cosinus distance \\ \hline
-    \multirow{5}{*}{EMEA} & \multirow{5}{*}{joint} 
-    & Joint & 0.371 \\  
-    &  & jointly & 0.545 \\
-    &  & artic- & 0.605 \\
-    &  & joints & 0.607 \\
-	&  & collective & 0.609 \\
-	\hline
-	\multirow{5}{*}{EPPS} & \multirow{5}{*}{joint} 
-	& Joint & 0.365 \\
-	& & jointly & 0.497 \\
-	& & join- & 0.606 \\
-	& & common & 0.607 \\
-	& & collective & 0.626 \\
-	& & artic- & 0.633\\
-	\hline
-	\multirow{5}{*}{ECB} & \multirow{5}{*}{joint}
-	& Joint & 0.423 \\
-	& & jointly & 0.467 \\
-	& & common & 0.601 \\
-	& & together & 0.632 \\
-	& & artic- & 0.663 \\
-	& & coordinated & 0.668 \\
-\end{tabular}
-\caption{Corpora}
-\label{tab:Polysemy}
-\end{table}
+% \begin{table}
+%   \centering
+%   \begin{tabular}{*{4}{|r|}}
+%     \hline
+%     Domain & Word & Neighbor & Cosinus distance \\ \hline
+%     \multirow{5}{*}{EMEA} & \multirow{5}{*}{joint} 
+%     & Joint & 0.371 \\  
+%     &  & jointly & 0.545 \\
+%     &  & artic- & 0.605 \\
+%     &  & joints & 0.607 \\
+% 	&  & collective & 0.609 \\
+% 	\hline
+% 	\multirow{5}{*}{EPPS} & \multirow{5}{*}{joint} 
+% 	& Joint & 0.365 \\
+% 	& & jointly & 0.497 \\
+% 	& & join- & 0.606 \\
+% 	& & common & 0.607 \\
+% 	& & collective & 0.626 \\
+% 	& & artic- & 0.633\\
+% 	\hline
+% 	\multirow{5}{*}{ECB} & \multirow{5}{*}{joint}
+% 	& Joint & 0.423 \\
+% 	& & jointly & 0.467 \\
+% 	& & common & 0.601 \\
+% 	& & together & 0.632 \\
+% 	& & artic- & 0.663 \\
+% 	& & coordinated & 0.668 \\
+% \end{tabular}
+% \caption{Corpora}
+% \label{tab:Polysemy}
+% \end{table}
 
 \section{Related Work \label{sec:related_work}}
 \fyDone{Add standard labels to sections}
