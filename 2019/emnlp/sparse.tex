@@ -98,17 +98,17 @@
 \section{Introduction \label{sec:introduction}}
 % The problem
 Owing to the development of flexible and powerful architectures based on neural networks \cite{Cho14properties,Bahdanau15learning,Ghering17convolutional,Vaswani17attention}, Machine Translation (MT) has made significant progresses over the past years, and constitute to date the standard for most production engines. One issue which repeatedly pops up with MT, be it neural or statistical, is the need to perform training with large parallel corpora, typically consisting of millions of parallel sentences deemed to be as close as possible to the application domain. A lot of the recent research effort has thus focused on developping MT systems in restricted data conditions, for instance building multilingual MTs which enable zero-shot translation \cite{Firat16multiway,Ha16towards,Johnson17google}; or even building systems without any parallel data \cite{Artetxe18unsupervised,Lample18unsupervised}.
-Another important scenario for industrial MT systems is to adapt a neural system trained using parallel data in one domain to the peculiarity of other domains. Domain Adaption (DA) in MT is an old issue \cite{Foster07mixture,Axelrod11domain}, which comes in various guises, and for which a number of solutions have been studied (see the recent survey of \cite{Chu18asurvey} for neural MT). The typical setting is \emph{supervised adaptation}, where a (small) amount of data of the target domain of interest is used to fine-tuned the parameters of a system trained on a large amount of texts in a source domain. We study here a different scenario, \emph{multi-domain adaptation} \cite{Sennrich13multidomain,Farajian17multidomain}, where we would like to use heterogenous data sources to train a unique system that would work well for all domains. This allows us to be both data efficient (all data is used to train all domains) and compuationally efficient (we only need to train one domain). In our setting, we assume that the domain of test documents is known.
+Another important scenario for industrial MT systems is to adapt a neural system trained using parallel data in one domain to the peculiarity of other domains. Domain Adaption (DA) in MT is an old issue \cite{Foster07mixture,Axelrod11domain}, which comes in various guises, and for which a number of solutions have been studied (see the recent survey of \cite{Chu18asurvey} for neural MT). The typical setting is \emph{supervised adaptation}, where a (small) amount of data of the target domain of interest is used to fine-tuned the parameters of a system trained on a large amount of texts in a source domain. We study here a different scenario, \emph{multi-domain adaptation} \cite{Sennrich13multidomain,Farajian17multidomain}, where we would like to use heterogenous data sources to train a unique system that would work well for all domains. This allows us to be both data efficient (all data is used to train all domains) and computationally efficient (we only train one system). In our setting, we assume that the domain of test documents is known.
 
 Multi-domain adaptation is conceptually close to multilingual MT, or more generally to multi-task learning \cite{Caruana97multitask}, and can be approached in a number of ways. We adapt here theideas of \cite{Daume07frustratingly} to neural MT, in an attempt to confine the differences between domains at the lexical level, while the rest of the parameters is shared between domains. Our main hypothesis is that most of the differences between domains take place at the lexical level, due to cross-domain polysemy. By contrast, the deeper layers, which arguably model more abstract linguistic phenomena, are made shareable across domains.
-To this end, we make sure to design word embeddings in such that they will contain a generic as well as a domain-specific region. We perform experiments with three domains, two neural architectures and two language pairs and find that our technique can effectively build multi-domain NMT, outperforming several baselines. Our contribution is thus twofold:
+To this end, we make sure to design word embeddings in such that they will contain a generic as well as a domain-specific region. We perform experiments with three domains, two neural architectures and two language pairs and find that our technique can effectively build multi-domain NMT, outperforming several baselines. Our contribution is thus as follows
 \begin{itemize}
-\item methods to adapt the ideas of \cite{Daume07frustratingly} for two NMT architectures;
-\item experimental results that demonstrate the effectiveness of this technique;
-\item analysis of embeddings
+\item we develop methods to adapt the ideas of \cite{Daume07frustratingly} for two NMT architectures;
+\item we provide experimental evidence that suggest the effectiveness of this technique;
+\item our analysis of embeddings seems to confort our assumption that their variation across domain actually reflects a variation of senses.
 \end{itemize}
-\fyTodo{can we train in random order ? can we get away with catastrophic forgetting ?}
-\fyTodo{how to analyze the embeddings ? how can we test or claim ?}
+\fyDone{can we train in random order ? can we get away with catastrophic forgetting ?}
+\fyDone{how to analyze the embeddings ? how can we test or claim ?}
 
 \section{Lexicalize domain representations\label{sec:lexicalized_embeddings}}
 \fyDone{Use meaningful titles throughout}
@@ -202,15 +202,15 @@ We experiment with two language pairs (English-French, English-German) and data 
   \begin{tabular}{ *{4}{|r|}}
     \hline
     Corpus & Train & Dev & Test \\ \hline
-    \multicolumn{4}{|l|}{$En \rightarrow Fr$ }\\
-    \multicolumn{4}{|l|}{Vocab\. En: 30,165, Fr: 30,398}\\
+    \multicolumn{4}{|l|}{En $\rightarrow$ Fr }\\
+    \multicolumn{4}{|l|}{Vocabulary size - En: 30,165, Fr: 30,398}\\
     \hline
-    EMEA  & 1,09M & 1000 & 1000 [300]\\
+    EMEA  & 1,09M & 1000 & 1000$_{300}$\\
     ECB    & 0,19M & 1000 & 1000     \\
     EPPS   & 2,0M  & 1000 & 1000  \\ \hline \hline
-    \multicolumn{4}{|l|}{$En \rightarrow Ge$}\\
-    \multicolumn{4}{|l|}{ Vocab.\ En:30,159, De: 30,698}\\ \hline
-    EMEA  & 1,11M & 1000 & 1000 \\
+    \multicolumn{4}{|l|}{En $\rightarrow$ De}\\
+    \multicolumn{4}{|l|}{Vocabulary size -  En:30,159, De: 30,698}\\ \hline
+    EMEA  & 1,11M & 1000 & 1000$_{300}$ \\
     ECB     &  0,11M & 1000 & 1000  \\
     EPPS   & 1,92M & 1000 & 1000 \\ \hline
 \end{tabular}
@@ -312,9 +312,9 @@ Model & EMEA & EPPS & ECB & Khresmoi & NewsTest2014 & IWSLT2010 & Avg. \\
 \hline
 $Mixed$ & 67.69$_{47.60}$ & 37.50 & 53.49 & 34.86 & 28.56 & 25.70 & avg \\
 \hline
-$FT_{EMEA}$ & 76.77$_{49.43}$ & 17.16 & 11.99 & 29.58 & 11.64 & 11.10 & avg \\
-$FT_{EPPS}$ & 20.86 & 37.04 & 24.53 & 31.86 & 28.33 & 11.10 & avg \\
-$FT_{ECB}$   & 26.93 & 27.09 & 56.52 & 22.04 & 17.51 & 13.99 & avg \\
+$\mathtt{FT} (EMEA)$ & 76.77$_{49.43}$ & 17.16 & 11.99 & 29.58 & 11.64 & 11.10 & avg \\
+$\mathtt{FT} (EPPS)$  & 20.86 & 37.04 & 24.53 & 31.86 & 28.33 & 11.10 & avg \\
+$\mathtt{FT} (ECB)$   & 26.93 & 27.09 & 56.52 & 22.04 & 17.51 & 13.99 & avg \\
 \hline
 $DC$ & 67.87$_{45.42}$ & 37.31 & 54.14 & 33.63 & 26.52 & 24.81 & avg\\
 \hline
@@ -329,9 +329,9 @@ $LDR_{wrong}$ & 72.95$_{49.78}$ & 37.62 & 53.35 & - & - & - & avg\\
 \hline
 $Mixed$ & 64.57$_{42.99}$ & 26.47 & 68.67 & 21.77 & 17.04 & 18.85 & avg \\
 \hline
-$FT_{EMEA}$ & 68.35 & 17.02 & 32.87 & 21.15 & 11.21 & 13.49 & avg\\
-$FT_{EPPS}$ & 36.19 & 26.29 & 40.71 & 19.67 & 16.47 & 19.24 & avg \\
-$FT_{ECB}$   & 24.72 & 18.36 & 74.05 & 11.31  & 10.8 & 11.00 & avg \\
+$\mathtt{FT} (EMEA)$ & 68.35$_{42.97}$ & 17.02 & 32.87 & 21.15 & 11.21 & 13.49 & avg\\
+$\mathtt{FT} (EPPS)$ & 36.19 & 26.29 & 40.71 & 19.67 & 16.47 & 19.24 & avg \\
+$\mathtt{FT} (ECB)$  & 24.72 & 18.36 & 74.05 & 11.31  & 10.8 & 11.00 & avg \\
 \hline
 $DC$ & 63.48$_{42.98}$ & 26.27 & 66.95 & 21.45 & 16.45 & 18.78 & avg \\
 \hline
@@ -359,9 +359,9 @@ Model & EMEA & EPPS & ECB & Khresmoi & NewsTest2014 & IWSLT2010 & Avg. \\
 \hline
 $Mixed$               & 65.42$_{45.11}$ & 34.7 & 51.38 & 29.27 & 22.21 & 21.63 & avg \\
 \hline
-$FT_{EMEA}$     & 72.06 $ $ & 18.62 & 16.78 & 25.88 & 10.94 & 5.73 & avg \\
-$FT_{EPPS}$      & 35.47 $ $ & 34.61 & 39.56 & 27.11 & 21.85 & 20.61 & avg \\
-$FT_{ECB}$        & 21.93 $ $ & 22.6 & 51.53 & 14.74 & 12.10 & 10.47 & avg \\
+$\mathtt{FT} (EMEA)$  & 72.06 $ $ & 18.62 & 16.78 & 25.88 & 10.94 & 5.73 & avg \\
+$\mathtt{FT} (EPPS)$    & 35.47 $ $ & 34.61 & 39.56 & 27.11 & 21.85 & 20.61 & avg \\
+$\mathtt{FT} (ECB)$     & 21.93 $ $ & 22.6 & 51.53 & 14.74 & 12.10 & 10.47 & avg \\
 \hline
 $DC$                   & 68.26 $_{43.76}$ & 35.13 & 50.09 & 27.86 & 20.95 & 21.16 & avg \\
  \hline
@@ -377,9 +377,9 @@ $LDR_{wrong}$   & 62.1 $_{43.29}$ & 34.17 & 48.79 &  - & - & - & avg \\
 \hline
 $Mixed$               & 57.37 $_{37.94}$ & 23.1 & 63.54 & 17.39 & 11.51 & 14.29 & avg\\
 \hline
-$FT_{EMEA}$      & 65.64 $ $ & 12.36 & 15.93 & 15.38 & 6.22 & 7.6  & avg\\
-$FT_{EPPS}$       & 24.90 $ $ & 22.98 & 26.26 & 13.55 & 11.33 & 14.32 & avg \\
-$FT_{ECB}$         & 41.8 $ $ & 15.97 & 71.07 & 10.77 & 7.66 & 8.07 & avg\\
+$\mathtt{FT} (EMEA)$  & 65.64$_{44.71}$ & 12.36 & 15.93 & 15.38 & 6.22 & 7.6  & avg\\
+$\mathtt{FT} (EPPS)$   & 24.90 $ $ & 22.98 & 26.26 & 13.55 & 11.33 & 14.32 & avg \\
+$\mathtt{FT} (ECB)$    & 41.8 $ $ & 15.97 & 71.07 & 10.77 & 7.66 & 8.07 & avg\\
 \hline
 $DC$                    & 62.53 $_{39.25}$ & 23.74 & 65.71 & 16.88 & 11.15 & 14.97 & avg\\
 \hline
