@@ -105,11 +105,11 @@ Multi-domain adaptation is conceptually close to multilingual MT, or more genera
 Our main hypothesis is that domains mostly differ at the lexical level, due to cross-domain polysemy, which motivates domain specific embeddings. By contrast, the deeper layers, which arguably model more abstract linguistic phenomena, are made shareable across domains. To this end, we design word embeddings containing a generic and several domain-specific regions. We experiment with three domains, two neural architectures and two language pairs and find that our technique yields effective multi-domain NMTs, outperforming several baselines. Our contribution is thus as follows:
 %\begin{itemize}
 %\item 
-we implement the ideas of \cite{Daume07frustratingly} for two NMT architectures;
+we adapt the ideas of \cite{Daume07frustratingly} for two NMT architectures;
 %\item 
 we provide experimental evidence that suggest the effectiveness of this technique;
 %\item 
-our analysis of embeddings seems to confort our assumption that their variation across domain actually reflects a variation of senses.
+our analysis of embeddings conforts our assumption that their variation across domain actually reflects a variation of senses.
 %\end{itemize}
 \fyDone{can we train in random order ? can we get away with catastrophic forgetting ?}
 \fyDone{how to analyze the embeddings ? how can we test or claim ?}
@@ -129,7 +129,7 @@ The training data for domain $i$ is denoted $C_i$.
 
 A straightforward solution is to process each domain separately, computing the value $\theta_i^*$ that minimizes the empirical loss on the training corpus $C_i$. This strategy is only effective if we have sufficient training data for each domain; when this is not the case, some estimates $\theta_i^*$ may be far from their optimal value. \fyDone{Risk}
 The alternative we consider here constraints each parameter $\theta_i$ to be made of two parts: $\theta_i = [\theta_s; \theta'_i]$ ($\theta_s \in R^{D_g}$) is shared across all domains, while the second part $\theta'_i \in \mathbb{R}^{D_i}$ is only used in domain $i$.
-The parameter set is now much more constrained, yet we expect that tying parameters across domains will yield better estimates for $\theta_s$ due to a larger training corpus. In this setting, the optimization program defined by equation~\eqref{eq:loss} can no longer be performed separately for each training corpus.
+The parameter set is now much more constrained, yet we expect that partly tying parameters across domains will yield better estimates for $\theta_s$ due to a larger training corpus. In this setting, the optimization program defined by equation~\eqref{eq:loss} can no longer be performed separately for each training corpus.
 
 \subsection{Lexicalized domain embeddings \label{ssec:lde}}
 
@@ -139,7 +139,7 @@ In our NMT architectures, the actual embedding layer composes these vectors line
   \tilde{e}_k(v) =& M_g e_g(v) + \sum_{i \in [1,..,d]} M_i * e_i(v) * \delta(i=k) \nonumber \\
    & = M [e_g(v); e_1'(v,k) \dots; e_d'(v,k)], \label{eq:embedding}
 \end{align}
-where $\delta()$ is the Kronecker function, $M$ is the matrix made of blocks $M_g, M_1 \dots, M_d$, and $e_i'(v,k)$ is the masked embedding: $e_i'(v,k)= e_i(v) * \delta(i=k)$.  Making sure that the actual embedding do not contain any zero is important for the Transformer model, since the lexical representations are then summed to the positional encoding, which would undo the effect of domain masking, and propagate a gradient even to regions that should not be modified. With our design, we make sure that during backprogation, the matrix $M$ receives gradient $0$ at regions corresponding to deactivated regions in the word embedding. Those regions are also masked in forward step, thus do not interfere the training on the domain to which they are not assigned (see Figure~\ref{fig:network}).
+where $\delta()$ is the Kronecker function, $M$ is the matrix made of blocks $M_g, M_1 \dots, M_d$, and $e_i'(v,k)$ is the masked embedding: $e_i'(v,k)= e_i(v) * \delta(i=k)$.  Making sure that the actual embedding do not contain any zero is important for the Transformer model, since the lexical representations are then summed to the positional encoding, which would undo the effect of domain masking, and propagate a gradient even to regions that should not be modified. With our design, we make sure that during backprogation, the matrix $M$ receives gradient $0$ at regions corresponding to deactivated regions in the word embeddings. Those regions are also masked in forward step, thus do not interfere the training on the domain to which they are not assigned (see Figure~\ref{fig:network}).
 
 \begin{figure}
   \center
@@ -148,7 +148,7 @@ where $\delta()$ is the Kronecker function, $M$ is the matrix made of blocks $M_
   \label{fig:network}
 \end{figure}
 
-Our architecture is thus readily compatible with any NMT architecture, where we simply replace standard embedding layers the computation in equation~\ref{eq:embedding}. In our experiment, we consider both the attentional RNN architectures of \citet{Bahdanau15learning} and for Transformer architectures of \citet{Vaswani17attention}.
+Our architecture is then readily compatible with any NMT framework, where we simply replace standard embedding layers the computation in equation~\eqref{eq:embedding}. In our experiments, we consider both the attentional RNN architectures of \citet{Bahdanau15learning} and for Transformer architectures of \citet{Vaswani17attention}.
 
 % Let $\tilde{x}_{t} = M * e_{t} = M_g e_g(t) + \displaystyle{\mathop{\sum}_{i \in [1,..,d]} M_i * e_i(t)}$ be the projection of word embedding where $e_{t}$ is word embedding of token $x_{t}$, M is projection matrix, $M_j \forall j \in [1...d]$ is row block corresponding to domain region $j$ (Transformer \cite{Vaswani17attention}, recurrent \cite{Bahdanau15learning})\\
 % Assume the batch belongs to domain $i$, then $e_j(t) = 0$ $\forall j \neq i$,$\forall t$. 
@@ -281,7 +281,7 @@ If a sentence originates from domain $i$, the domain specific regions for all do
 \REPEAT 
 \STATE{Randomly pick $i \in [1,..,d]$ w.r.t the multinomial distribution $[\frac{|C_i|}{\sum_{i\in [1,..,d]}|C_i|}]$.}
 \STATE{Randomly pick $B$ sentences from $C_i$.}
-\STATE{Activate only generic region to create generic batch, denoted $W_g$.}
+\STATE{Activate only the generic region to create generic batch, denoted $W_g$.}
 % \STATE{Pass the generic embedding batch to a dense layer.}
 \STATE{Compute gradient of $\theta_s$, $\frac{\partial L}{\partial \theta_s}$ using $W_g$.}
 \STATE{Activate domain-specific and generic regions to create domain-specific batch $W_i$}
