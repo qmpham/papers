@@ -1,0 +1,190 @@
+
+2019 Conference on Empirical Methods in Natural Language Processing and 9th International Joint Conference on Natural Language Processing
+EMNLP-IJCNLP 2019
+
+Author Response
+
+Title:
+	
+
+Lexicalized Domain Representations for Neural Machine Translation
+
+Authors:
+	
+
+MinhQuang Pham, Josep Crego, Jean Senellart and François Yvon
+Instructions
+
+The author response period has begun. The reviews for your submission are displayed on this page. If you want to respond to the points raised in the reviews, you may do so in the boxes provided below.
+
+Please note: you are not obligated to respond to the reviews.
+
+Review #1
+What is this paper about, what contributions does it make, and what are the main strengths and weaknesses?
+
+This paper applies the feature expansion technique of (Daum´e III, 2007) to NMT domain adaptation. They assign generic and domain specific dimensions in the word embeddings on an NMT system, aiming to learn generic and domain specific lexical representations. Experiments were conducted on the En->Fr and En->De language pairs and 3 different domains, and both the Transformer and RNN-based NMT. Results show that the proposed model performs worse than fine-tuning and a previous related work.
+
+Strengths:
+
+    A simple model for NMT domain adaptation.
+    Experiments on both the Transformer and RNN-based NMT.
+
+Weaknesses:
+
+    The results are not convincing: 
+        The method is very related to WDCMT (Zeng et al. 2018), aiming to learn domain specific lexical representation, but it performs worse.
+        It also performs worse than fine-tuning.
+    Some baselines are missing:
+        How about the scores trained on the in-domain data only?
+        The performance of the mixed fine-tuning method (Chu et al. 2018) is also interesting to be compared, as different from fine-tuning, it performs good on both in- and out-of-domain data.
+    Comparing LDR_generic to LDR_oracle shows that the domain specific lexical representation is not very helpful.
+
+Reasons to accept
+
+The proposed domain adaptation model is simple and easy to implement.
+Reasons to reject
+
+    The results are not convincing. 
+    The missing of baselines. 
+    The domain specific lexical representation is ineffective.
+
+Questions for the Author(s)
+
+    What a Kronecker function is needs to be explained.
+    What does 300 in 1000_300 mean in Table 3?
+    #322-324: why do not you update them simultaneously? 4: #388-390: why?
+    What are the small numbers of EMEA in Tables 2, 3 and 4?
+
+Typos, Grammar, Style, and Presentation Improvements
+
+    357: better that -> better than
+    Tables 2, 3, and 4 are far away from the text describing it.
+
+ 
+
+Review #2
+What is this paper about, what contributions does it make, and what are the main strengths and weaknesses?
+
+The authors present a way for adapting the "frustratingly easy domain adaptation approach" by Daume 2009 for multi-domain adaptation for neural machine translation. To this end, the embedding layers are modified to include domain-specific parameters in addition to the ones for the general domain. Training is carried out with a special batch schedule and appropriate masking.
+
+Strengths:
+
+    According to the large number of experiments in the evaluation, the approach appears to perform favorably or comparably to the approaches of Kobus et al. 2017 and Zeng et al. 2018. The scores for the proposed method are also not too far from per-domain fine-tuning. The approach is applicable to all NMT systems which make use of embeddings, rendering it quite flexible.
+    The approach is well described and easy to understand.
+
+Weaknesses:
+
+    It's however somewhat surprising that the approach seems to work well even when during training and (actually not clear) testing an incorrect domain is selected. A further analysis and clarification would be helpful.
+    The 'Mixed' baseline is also almost on par with the proposed approach, which I would have assumed to be a relatively weak baseline. I'm also missing a true baseline, i.e. one that has not seen any domain-relevant data at all (for EMEA, EPPS, and ECB).
+    It's not clear what part of the embeddings are used e.g. with LDR_pred when testing on NewsTest2014 and IWSLT2010.
+
+Reasons to accept
+
+It is a straightforward adaptation of "frustratingly easy DA" for NLP models with embeddings.
+Reasons to reject
+
+The evaluation is a bit unclear, and the results are somewhat difficult to assess given there is no "real" baseline.
+Questions for the Author(s)
+
+    Please provide a more explanation what LDR_pred etc. are when there is no known domain.
+    For the sake of comparison it would have been better to re-implement the WDCMT approach, instead of comparing to completely different model.
+    On what data is the domain classifier trained?
+    Where are the results for the batch sampling strategy with sqrt?
+
+Typos, Grammar, Style, and Presentation Improvements
+
+Section 2.1 Multi-domain machine translation:
+
+    C_i is not used in the equations.
+
+Results tables:
+
+    For readability it would be helpful to use bold or other visual means to highlight some of the numbers.
+
+Review #3
+What is this paper about, what contributions does it make, and what are the main strengths and weaknesses?
+
+The paper proposes a lexicalized approach to multi-domain adaptation, where each word embedding is a concatenation of a comparatively large (488) generic word embedding and one short domain-specific vector for each domain, which is trained only on examples that pertain to that particular domain. According to contrastive experiments, this approach is competitive with a fine-tuning (FT) approach while avoiding the massive degradation observed with FT on out-of-domain data.
+
+A weakness that I see in this approach is that it appears to be limited to handling just a handful of domains. How would this scale to hundreds or even thousands of domains? (E.g., with customer-dependent translation preferences in localisation)? With domain control, it's easy accommodate many domains, but with LDR?
+
+Another weakness is in the presentation: I find the empirical section hard to follow, especially Section 3.4 and the tables. Understanding the tables required me to flip back and forth to make sense of the acronyms. A simple list (e.g., in a 'description' environment in LaTex) that explains what the table rows mean in a clear, easy-to follow way would greatly facilitate understanding of the work. Now I have to constantly scan through the text to figure out what is what. I find that very tedious.
+Reasons to accept
+
+Shows improvements over the state of the art.
+Reasons to reject
+
+I have doubts whether this will scale to hundreds or thousands of domains, so this approach may be practical only in specific circumstances.
+Questions for the Author(s)
+
+    How would you scale your system to hundreds or thousands of domains?
+    I'm puzzled that LDR_generic performs so much better that the baselines (Except FT on in-domain data.) Doesn't LDR_generic mean that at inference time, no domain information is used? How come it's still so much better than Mixed and DC?
+
+Typos, Grammar, Style, and Presentation Improvements
+
+The captions of Tables 2 and 3 should explain what FT, DC, and, for completeness, LDR mean. Also, what's the role of the small numbers in the respective second columns in these tables?
+
+The paper refers to Daume (2007) as the underlying technique but simply assumes that the reader is familiar with that work. Sentence or two explaining Daume's technique would be in order here. 
+
+line 381: intently => intentionally
+
+ 
+Submit Response to Reviewers
+
+Use the following boxes to enter your response to the reviews. Please limit the total amount of words in your comments to 600 words (longer responses will not be accepted by the system).
+
+Response to Review #1:
+
+Q1. What a Kronecker function is needs to be explained.
+
+Wikipedia : the Kronecker delta is a function of two variables, usually just non-negative integers. The function is 1 if the variables are equal, and 0 otherwise. We will change to "indicator function".
+
+Q2. What does 300 in 1000_300 mean in Table 3 ?
+This is explained in footnote 1 (line 246) and footnote 4 (l348): we report two numbers on EMEA (one large, one small) corresponding to two experiment condictions.
+
+Q3. #322-324: why do not you update them simultaneously?
+Our experiments showed that this update strategy was better as it ensures that the domain generic part is trained without any knowledge of the domain information. 
+
+Q4: #388-390: why?
+By increasing the number of ECB batches, we observe an improvement of performance for this dataset; this suggests that our method can be used in conjunction to other domain adaption techniques such as under / oversampling, data-weighting, etc.
+
+Q5. What are the small numbers of EMEA in Tables 2, 3 and 4?
+
+See answer above for Q2.
+
+Response to Review #2:
+
+Q1. Please provide a more explanation what LDR_pred etc. are when there is no known domain.
+
+This is explained l375 and following. To reiterate: LDR$_pred$ uses predicted domain labels; LDR$_wrong$ uses intentionally wrong labels/ 
+
+Q2. For the sake of comparison it would have been better to re-implement the WDCMT approach, instead of comparing to completely different model.
+
+We have run new experiments with an architecture that is closer to WDCMT (conditional GRUs, etc). Our conclusion stand that our approach is very close in performance to WDCMT.
+
+Q3. On what data is the domain classifier trained?
+
+On the same training data as the translation model.
+
+Q4. Where are the results for the batch sampling strategy with sqrt?
+This is in line $LDR_oracle^{0.5}$ (explanation is on line 384-386).
+
+Response to Review #3:
+
+Q1. How would you scale your system to hundreds or thousands of domains?
+Our results show that (a) lexicalized domain encodding can be effective and as small as 4-8 cells, which would allow us to scale to dozens to one or two hundreds domains. Strategies for large scale DA are left future work, for instance defining actual domains as linear combination of a fixed basis of  "topics". 
+
+Q2. I'm puzzled that LDR_generic performs so much better that the baselines (Except FT on in-domain data.) Doesn't LDR_generic mean that at inference time, no domain information is used ? How come it's still so much better than Mixed and DC ?
+
+Apart from EMEA (see fn 4 and 7) , we agree that Mixed and Generic are quite similar in performance, and the variation may be explained by the ways batches are defined (domain homogeneously in LDR); the difference with DC is because our architecture separates more clearly the domain embedding and the generic lexical representation in training. 
+
+General Response to Reviewers:
+The thanks the reviewer for their comments. We will improve the presentation of tables in the revised version (see also our answers to reviewer 1). Regarding the alledged lack of baseline, we would like to point out that as far as we know, domain-specific fine-tuning has consistently been reported a very solid baseline.
+
+Response to Chairs
+
+Use this textbox to contact the chairs directly only when there are serious issues regarding the reviews. Such issues can include reviewers who grossly misunderstood the submission, or have made unfair comparisons or requests in their reviews. These comments will not be visible to the reviewers of your submission. Most submissions should not need to use this facility.
+
+ 
+
+ 
