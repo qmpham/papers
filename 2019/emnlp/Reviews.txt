@@ -179,7 +179,7 @@ Q2. I'm puzzled that LDR_generic performs so much better that the baselines (Exc
 Apart from EMEA (see fn 4 and 7) , we agree that Mixed and Generic are quite similar in performance, and the variation may be explained by the ways batches are defined (domain homogeneously in LDR); the difference with DC is because our architecture separates more clearly the domain embedding and the generic lexical representation in training. 
 
 General Response to Reviewers:
-The thanks the reviewer for their comments. We will improve the presentation of tables in the revised version (see also our answers to reviewer 1). Regarding the alledged lack of baseline, we would like to point out that as far as we know, domain-specific fine-tuning has consistently been reported a very solid baseline.
+The thanks the reviewer for their comments. We will improve the presentation of tables in the revised version (see also our answers to reviewer 1). Regarding the alledged lack of baseline, we would like to point out that as far as we know, domain-specific fine-tuning has consistently been reported a very solid baseline, much stonger than only using the in-domain data.
 
 Response to Chairs
 
