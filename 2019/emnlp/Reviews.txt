@@ -138,6 +138,7 @@ Response to Review #1:
 Q1. What a Kronecker function is needs to be explained.
 
 Wikipedia : the Kronecker delta is a function of two variables, usually just non-negative integers. The function is 1 if the variables are equal, and 0 otherwise. We will change to "indicator function".
+The notation we used is not correct (line 172) we must replace \delta(i=k) by \delta(i,k)
 
 Q2. What does 300 in 1000_300 mean in Table 3 ?
 This is explained in footnote 1 (line 246) and footnote 4 (l348): we report two numbers on EMEA (one large, one small) corresponding to two experiment condictions.
@@ -150,7 +151,7 @@ By increasing the number of ECB batches, we observe an improvement of performanc
 
 Q5. What are the small numbers of EMEA in Tables 2, 3 and 4?
 
-See answer above for Q2.
+Same answer than for Q2 
 
 Response to Review #2:
 
@@ -161,6 +162,7 @@ This is explained l375 and following. To reiterate: LDR$_pred$ uses predicted do
 Q2. For the sake of comparison it would have been better to re-implement the WDCMT approach, instead of comparing to completely different model.
 
 We have run new experiments with an architecture that is closer to WDCMT (conditional GRUs, etc). Our conclusion stand that our approach is very close in performance to WDCMT.
+@@@@@@@@@
 
 Q3. On what data is the domain classifier trained?
 
@@ -176,7 +178,7 @@ Our results show that (a) lexicalized domain encodding can be effective and as s
 
 Q2. I'm puzzled that LDR_generic performs so much better that the baselines (Except FT on in-domain data.) Doesn't LDR_generic mean that at inference time, no domain information is used ? How come it's still so much better than Mixed and DC ?
 
-Apart from EMEA (see fn 4 and 7) , we agree that Mixed and Generic are quite similar in performance, and the variation may be explained by the ways batches are defined (domain homogeneously in LDR); the difference with DC is because our architecture separates more clearly the domain embedding and the generic lexical representation in training. 
+Apart from EMEA (see footnote 4 and 7) , we agree that Mixed and Generic are quite similar in performance, and the variation may be explained by the ways batches are defined (domain homogeneously in LDR); the difference with DC is because our architecture separates more clearly the domain embedding and the generic lexical representation in training. 
 
 General Response to Reviewers:
 The thanks the reviewer for their comments. We will improve the presentation of tables in the revised version (see also our answers to reviewer 1). Regarding the alledged lack of baseline, we would like to point out that as far as we know, domain-specific fine-tuning has consistently been reported a very solid baseline, much stonger than only using the in-domain data.
