@@ -77,8 +77,9 @@ Multi-domain adaptation is conceptually close to multilingual MT, or more genera
 Our main hypothesis is that domains mostly differ at the lexical level, due to cross-domain polysemy, which motivates domain specific embeddings. By contrast, the deeper layers, which arguably model more abstract linguistic phenomena, are made shareable across domains. To this end, we design word embeddings containing a generic and several domain-specific regions. We experiment with three domains, two neural architectures and two language pairs and find that our technique yields effective multi-domain NMTs, outperforming several baselines. Our contribution is thus as follows:
 we adapt and implement the ideas of \cite{Daume07frustratingly} for two NMT architectures;
 we provide experimental evidence that show the effectiveness of this technique;
-\jcTodo{focus on that the analysis of embeddings is an original technique.}
+\jcTodo{highlight the analysis of embeddings as an original technique.}
 our analysis of embeddings comforts our assumption that their variation across domains actually reflects a variation of senses.
+\jcTodo{introduce the additional domain scenario experiment.}
 
 \section{Lexicalized domain representations\label{sec:lexicalized_embeddings}}
 
@@ -112,6 +113,8 @@ where $\delta()$ is the indicator function, $M$ is the matrix made of blocks $M_
 Making sure that the actual embedding do not contain any zero is important for the Transformer model, since the lexical representations are then summed to the positional encoding, which would undo the effect of domain masking, and propagate a gradient even to regions that should not be modified. 
 With our design, we make sure that during backprogation, the matrix $M$ receives gradient $0$ at regions corresponding to deactivated regions in the word embedding. 
 Those regions are also masked in forward step, thus do not interfere the training on the domain to which they are not assigned (see Figure~\ref{fig:network}).
+%
+Our architecture is thus readily compatible with any NMT architecture, where we simply replace standard embedding layers the computation in equation~\eqref{eq:embedding}. In our experiments, we consider both the attentional RNN architecture of \cite{Bahdanau15learning} and for Transformer architecture of \cite{Vaswani17attention}.
 
 \begin{figure}[h]
   \center
@@ -119,9 +122,6 @@ Those regions are also masked in forward step, thus do not interfere the trainin
   \caption{Lexicalized domain embeddings. When processing a sample from domain $2$, we only activate the corresponding parameter region ($\theta_2$) in the input embeddings; the remaining domain-specific parts are zeroed out, and do not receive any update. The generic part is always active, and is updated irrespective of the input domain.} 
   \label{fig:network}
 \end{figure}
-
-
-Our architecture is thus readily compatible with any NMT architecture, where we simply replace standard embedding layers the computation in equation~\eqref{eq:embedding}. In our experiments, we consider both the attentional RNN architecture of \cite{Bahdanau15learning} and for Transformer architecture of \cite{Vaswani17attention}.
 
 % Let $\tilde{x}_{t} = M * e_{t} = M_g e_g(t) + \displaystyle{\mathop{\sum}_{i \in [1,..,d]} M_i * e_i(t)}$ be the projection of word embedding where $e_{t}$ is word embedding of token $x_{t}$, M is projection matrix, $M_j \forall j \in [1...d]$ is row block corresponding to domain region $j$ (Transformer \cite{Vaswani17attention}, recurrent \cite{Bahdanau15learning})\\
 % Assume the batch belongs to domain $i$, then $e_j(t) = 0$ $\forall j \neq i$,$\forall t$. 
@@ -371,7 +371,7 @@ $\mathtt{LDR}_{wrong}$ & 69.51$_{43.50}$ & 26.31 & 66.86 & \\
 \end{tabular}
 } %scalebox
 \end{center}
-\caption{BPE-detokenized BLEU scores for  Transformer systems \label{tab:results-trsf}}
+\caption{BLEU scores for  Transformer systems \label{tab:results-trsf}}
 \end{table}
 
 
@@ -426,7 +426,7 @@ $\mathtt{LDR}_{wrong}$     & 56.84 $_{37.05}$ & 22.06 & 61.66 & \\
 \end{tabular}
 } %scalebox
 \end{center}
-\caption{BPE-detokenized BLEU scores for RNN systems\label{tab:results-rnn}}
+\caption{BLEU scores for RNN systems\label{tab:results-rnn}}
 \end{table}
 % \clearfloat
 
@@ -453,7 +453,7 @@ $\mathtt{LDR_{condgru}}_{pred}$   & 71.70 $_{46.21}$ & 35.09 & 51.22 & \\
 \end{tabular}
 } %scalebox
 \end{center}
-\caption{BPE-detokenized BLEU scores for RNN systems\label{tab:results-rnn-wdcmt}}
+\caption{BLEU scores for RNN systems\label{tab:results-rnn-wdcmt}}
 \end{table}
 
 \section{Complementary experiments\label{sec:Discussion}}
@@ -486,19 +486,19 @@ $LDR$ & EMEA & EPPS & ECB & Avg. \\
 \end{tabular}
 } %scalebox
 \end{center}
-\caption{BPE-detokenized BLEU scores for the Transformer architecture for varying domain-specific embedding sizes \label{tab:embedding-size}}
+\caption{BLEU scores for the Transformer architecture for varying domain-specific embedding sizes \label{tab:embedding-size}}
 \end{table}
 
 \subsection{Additional Domain Scenario \label{ssec:additiona_domain}}
 
 We evaluate now the ability of our model to cope with new unseen domains, a very common scenario for industrial MT.
-We simulate the apparition of the IT domain (see Section~\ref{sec:data}) once the $\mathtt{LDR}_{oracle}$ model is built for EMEA, EPPS and ECB domains.
-Note that to accommodate a new domain the network must reserve the new IT region from the beginning (never updated).
+We simulate the apparition of the IT domain (see Section~\ref{ssec:data}) once the $\mathtt{LDR}_{oracle}$ model is built for EMEA, EPPS and ECB domains.
+Note that to accommodate a new domain the network must reserve the new IT region from the beginning.
 Hence, word embeddings contain 32 cells (8 x 4 domain regions) and 480 cells for the generic region.
-Equivalently to our previous $\mathtt{LDR}_{oracle}$ model, 200,000 iterations are performed using EMEA, EPPS and ECB data sets.
-Then, 100,000 additional iterations are performed using  EMEA, EPPS, ECB and IT data sets ($\mathtt{LDR}_{oracle}\ cont$).
+Equivalently to our previous $\mathtt{LDR}_{oracle}$ model, 200,000 iterations are performed using EMEA, EPPS and ECB data sets (the IT region is never updated).
+Then, 100,000 additional iterations are performed using  EMEA, EPPS, ECB and IT data sets ($\mathtt{LDR}_{oracle}^*$).
 Experiments are only reported for the English$\rightarrow$French language pair.
-For comparison purposes we also continue training our $\mathtt{Mixed}$ model applying the same number of iterations using the same four datasets ($\mathtt{Mixed}\ cont$).
+For comparison purposes we also continue training our $\mathtt{Mixed}$ model applying the same number of iterations and using the same four datasets ($\mathtt{Mixed}^*$).
 BLEU results are shown in Table~\ref{tab:add}.
 
 \begin{table}[!h]
@@ -511,21 +511,23 @@ Model & EMEA & EPPS & ECB & IT & Avg.\\
 \multicolumn{5}{l}{English$\rightarrow$French} \\
 \hline
 $\mathtt{Mixed}$                     & 67.69$_{47.60}$ & 37.50 & 53.49 & 13.91 & \\
-$\mathtt{Mixed}\ cont$             & 66.49$_{45.79}$ & 37.59 & 55.07 & 51.78 & \\
+$\mathtt{Mixed}^*$             & 66.49$_{45.79}$ & 37.59 & 55.07 & 51.78 & \\
 \hline
 $\mathtt{LDR}_{oracle}$          & 74.26$_{49.90}$ & 37.67 & 54.07 & 13.40 & \\
-$\mathtt{LDR}_{oracle}\ cont$  & 76.17$_{49.71}$ & 37.48 & 55.12 & 55.24 & \\
+$\mathtt{LDR}_{oracle}^*$  & 76.17$_{49.71}$ & 37.48 & 55.12 & 55.24 & \\
 \hline
 \end{tabular}
 } %scalebox
 \end{center}
-\caption{BPE-detokenized BLEU scores for the Transformer architecture for varying domain-specific embedding sizes \label{tab:add}}
+\caption{BLEU scores for the Transformer architecture for varying domain-specific embedding sizes \label{tab:add}}
 \end{table}
 
-Huge gap in IT test sets thanks to using in-domain data.
-Light difference for EPPS test sets (as before).
-Both $\mathtt{Mixed}$ and $\mathtt{LDR}_{oracle}$ systems show similar gains on ECB when further trained with IT data.
-Only $\mathtt{LDR}_{oracle}$ shows gains on EMEA when further training (only on the large test set).
+As expected, a huge gap is observed over the IT test sets when using in-domain data.
+Note that $\mathtt{LDR}_{oracle}^*$ clearly outperforms $\mathtt{Mixed}^*$ by a large margin.
+As previously, all models show very little differences on the EPPS test set.
+Both models show similar results over the ECB test set when further trained with IT data.
+Only our $\mathtt{LDR}_{oracle}$ model shows gains on the EMEA test set when further trained (only on the large test set).
+Overall better results for our LDR when further trained.
 \jcTodo{rewrite this part}
 
 \subsection{Analysis of Word Embeddings \label{ssec:word_embeddings}}
