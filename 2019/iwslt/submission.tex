@@ -471,17 +471,17 @@ An important practical question concerns the balance between the generic and the
 \begin{table}[!h]
 \begin{center}
 \scalebox{1.0}{
-\begin{tabular}{|l|ccc|}
+\begin{tabular}{|l|ccc|c|}
 \hline
-$LDR$ & EMEA & EPPS & ECB \\
+$LDR$ & EMEA & EPPS & ECB & Avg. \\
 \hline
-\multicolumn{4}{l}{English$\rightarrow$French} \\
+\multicolumn{5}{l}{English$\rightarrow$French} \\
 \hline
- size=4   & 74.65 $_{49.61}$ & 37.42 & 54.49 \\
- size=8   & 74.26 $_{49.90}$ & 37.67 & 54.07 \\
- size=16 & 74.15 $_{49.10}$ & 37.78 & 54.56 \\
- size=32 & 75.10 $_{48.61}$ & 37.64 & 54.29 \\
- size=64 & 74.50 $_{50.17}$ & 37.27 & 54.50 \\
+ size=4   & 74.65 $_{49.61}$ & 37.42 & 54.49 & \\
+ size=8   & 74.26 $_{49.90}$ & 37.67 & 54.07 & \\
+ size=16 & 74.15 $_{49.10}$ & 37.78 & 54.56 & \\
+ size=32 & 75.10 $_{48.61}$ & 37.64 & 54.29 & \\
+ size=64 & 74.50 $_{50.17}$ & 37.27 & 54.50 & \\
 \hline
 \end{tabular}
 } %scalebox
@@ -489,11 +489,47 @@ $LDR$ & EMEA & EPPS & ECB \\
 \caption{BPE-detokenized BLEU scores for the Transformer architecture for varying domain-specific embedding sizes \label{tab:embedding-size}}
 \end{table}
 
-\subsection{Additional domain experiment \label{ssec:additiona_domain}}
+\subsection{Additional Domain Scenario \label{ssec:additiona_domain}}
 
+We evaluate now the ability of our model to cope with new unseen domains, a very common scenario for industrial MT.
+We simulate the apparition of the IT domain (see Section~\ref{sec:data}) once the $\mathtt{LDR}_{oracle}$ model is built for EMEA, EPPS and ECB domains.
+Note that to accommodate a new domain the network must reserve the new IT region from the beginning (never updated).
+Hence, word embeddings contain 32 cells (8 x 4 domain regions) and 480 cells for the generic region.
+Equivalently to our previous $\mathtt{LDR}_{oracle}$ model, 200,000 iterations are performed using EMEA, EPPS and ECB data sets.
+Then, 100,000 additional iterations are performed using  EMEA, EPPS, ECB and IT data sets ($\mathtt{LDR}_{oracle}\ cont$).
+Experiments are only reported for the English$\rightarrow$French language pair.
+For comparison purposes we also continue training our $\mathtt{Mixed}$ model applying the same number of iterations using the same four datasets ($\mathtt{Mixed}\ cont$).
+BLEU results are shown in Table~\ref{tab:add}.
+
+\begin{table}[!h]
+\begin{center}
+\scalebox{0.9}{
+\begin{tabular}{|l|cccc|c|}
+\hline
+Model & EMEA & EPPS & ECB & IT & Avg.\\
+\hline
+\multicolumn{5}{l}{English$\rightarrow$French} \\
+\hline
+$\mathtt{Mixed}$                     & 67.69$_{47.60}$ & 37.50 & 53.49 & 13.91 & \\
+$\mathtt{Mixed}\ cont$             & 66.49$_{45.79}$ & 37.59 & 55.07 & 51.78 & \\
+\hline
+$\mathtt{LDR}_{oracle}$          & 74.26$_{49.90}$ & 37.67 & 54.07 & 13.40 & \\
+$\mathtt{LDR}_{oracle}\ cont$  & 76.17$_{49.71}$ & 37.48 & 55.12 & 55.24 & \\
+\hline
+\end{tabular}
+} %scalebox
+\end{center}
+\caption{BPE-detokenized BLEU scores for the Transformer architecture for varying domain-specific embedding sizes \label{tab:add}}
+\end{table}
+
+Huge gap in IT test sets thanks to using in-domain data.
+Light difference for EPPS test sets (as before).
+Both $\mathtt{Mixed}$ and $\mathtt{LDR}_{oracle}$ systems show similar gains on ECB when further trained with IT data.
+Only $\mathtt{LDR}_{oracle}$ shows gains on EMEA when further training (only on the large test set).
+\jcTodo{rewrite this part}
 
 \subsection{Analysis of Word Embeddings \label{ssec:word_embeddings}}
-One of our main assumptions is that the difference between domains can be confined at the lexical level, warranting our decision to specialize lexical representations for each domain, while the remaining part of the network is shared across domains. Linguistically, this assumption relates to the classical ``one sense per collocation'' \cite{Yarowsky93onesense} and corresponds to the fact that in many cases, polysemy corresponds to variation of use across domain. In its weaker form, it allows us to assume that all occurrences of a given form in a given domain correspond to the same sense and share the same representation; the same form occuring in different domains is allowed to have one distinct embedding per domain, which may help capture polysemy and lexical ambiguity in translation. 
+One of our main assumptions is that the difference between domains can be confined at the lexical level, warranting our decision to specialise lexical representations for each domain, while the remaining part of the network is shared across domains. Linguistically, this assumption relates to the classical ``one sense per collocation'' \cite{Yarowsky93onesense} and corresponds to the fact that in many cases, polysemy corresponds to variation of use across domain. In its weaker form, it allows us to assume that all occurrences of a given form in a given domain correspond to the same sense and share the same representation; the same form occurring in different domains is allowed to have one distinct embedding per domain, which may help capture polysemy and lexical ambiguity in translation. 
 
 To check this hypothesis, we performed the following analysis of embeddings learned with the multi-domain Transformer system for English:French. For each unit\footnote{In this study, we work with BPE units, not words, meaning that in many cases we observe the variation of use of word parts. As we work with a large inventory, many of these units correspond to actual words, and we focus on these in our comments. We also restrict our analysis to words that occur at least 30 times in each domain, to ensure that each domain-specific region is updated during training.} in our English dictionary, we compute the $k$ nearest neighbours for each domain $i \in [1\dots{}d]$, where the distance between unit $u$ and $v$ for domain $i$ is the cosine distance in the corresponding embedding space, ie.\ assuming that the actual embedding of $v$ for domain $i$ is $e(v,i) = M_ge_g(u) + M_de_i(v)$ (cf.\ equation~\eqref{eq:embedding}). This process yields $d$ lists of $k$ nearest neighbours. The size of their intersection should then be a sign of a variation of use across domains; conversely, an identical set of neighbours across domains should reflect the stability of word use. Table~\ref{tab:embeddings} list the 10 units with the smaller (respectively larger) intersection (we use $k=10$ and $d=3$). 
 
@@ -533,15 +569,22 @@ The multi-domain scenario in NMT has been studied in a number of recent works. \
 
 By analogy with the proposal of \cite{Johnson17google} for multilingual NMT, \cite{Kobus17domaincontrol} and \cite{Chu18multilingual} separately propose to extend the representation of the source text with a domain tag. Our model also modifies input representations, but allows each source word to have a domain-specific representation, thereby improving training of the shared parts of the network.\fyDone{Talk about target embeddings somewhere.} 
 
-Similarly to our approach, \cite{Zeng18multidomain} attempts to separate on the encoder side domain-specific representation from generic representations in two different sub-networks, where generic versus domain-specific representations automatically emerge from two adversarial networks. The decoder side can thus attend separately to these two representations to generate its output. In this approach, the shared and domain-specific part kept separated in the deeper layers of the network, whereas we try to localize the differences between domains at the lexical level, based on a much cheaper computational architecture. Another trait of this proposal is the ability to automatically infer domain information for test sentences; as we have shown, our architecture can also effectively accomodate sentences lacking domain information.
+Similarly to our approach, \cite{Zeng18multidomain} attempts to separate on the encoder side domain-specific representation from generic representations in two different sub-networks, where generic versus domain-specific representations automatically emerge from two adversarial networks. 
+The decoder side can thus attend separately to these two representations to generate its output. 
+In this approach, the shared and domain-specific part kept separated in the deeper layers of the network, whereas we try to localise the differences between domains at the lexical level, based on a much cheaper computational architecture. 
+Another trait of this proposal is the ability to automatically infer domain information for test sentences; 
+as we have shown, our architecture can also effectively accommodate sentences lacking domain information.
 
 \section{Conclusions}
-In this paper, we have presented a new technique for multi-domain machine translation, adapting to two common NMT architectures the ``frustratingly easy'' idea of \cite{Daume07frustratingly}. Our experiments have shown that for both architecture and for two language pairs, our multi-domain models improve over several baselines of the literature, and that it is robust to noise in domain labels. In our future work, we intend to develop this work so as to make the architecture more self-configurable and able to adapt the size of the domain-specific regions depending upon the actual variation of use across domains; we also would like to find ways to make the architecture able to integrate new domains in a dynamic fashion, as this is an important requirement in industrial systems.
+In this paper, we have presented a new technique for multi-domain machine translation, adapting to two common NMT architectures the ``frustratingly easy'' idea of \cite{Daume07frustratingly}. 
+Our experiments have shown that for both architecture and for two language pairs, our multi-domain models improve over several baselines of the literature, and that it is robust to noise in domain labels. 
+In our future work, we intend to develop this work so as to make the architecture more self-configurable and able to adapt the size of the domain-specific regions depending upon the actual variation of use across domains; 
+we also would like to find additional ways to make the architecture able to integrate new domains in a dynamic fashion, as this is an important requirement in industrial systems.
 
-\section{Acknowledgements}
-The IWSLT 2015 organizing committee would like to thank the
-organizing committees of INTERSPEECH 2004 for their
-help and for kindly providing the template files.
+%\section{Acknowledgements}
+%The IWSLT 2015 organizing committee would like to thank the
+%organizing committees of INTERSPEECH 2004 for their
+%help and for kindly providing the template files.
 
 %
 \bibliography{iwslt19}
