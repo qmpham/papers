@@ -91,17 +91,17 @@ Our main hypothesis is that domains mostly differ at the lexical level, due to c
 By contrast, the deeper layers, which arguably model more abstract linguistic phenomena, are made shareable across domains. 
 To this end, we design word embeddings containing a generic and several domain-specific regions. 
 We experiment with three domains, two neural architectures and two language pairs and find that our technique yields effective multi-domain NMTs, outperforming several baselines. 
-Our contribution is thus as follows:
+Our contributions are thus as follows:
 we adapt and implement the ideas of \cite{Daume07frustratingly} for two NMT architectures;
 we provide experimental evidence that show the effectiveness of this technique;
-we evaluate the ability of our network to efficiently accommodate new domains;
-and we introduce a novel technique to analyse word polysemy using word embeddings which comforts our assumption that their variation across domains actually reflects a variation of senses.
+we evaluate the ability of our network to dynamically accommodate new domains;
+and we introduce a novel technique to analyse word polysemy using word embeddings, which comforts the assumption that their variation across domains actually reflects a variation of senses.
 
 \section{Lexicalized domain representations\label{sec:lexicalized_embeddings}}
 
 \subsection{Multi-domain machine translation \label{ssec:statement}}
 
-Multi-domain machine translation is formalized as follows: we assume observations that correspond to  domain-tagged sentence pairs $[(x,y),i]$, with $x$ in the source language, $y$ in the target language and $i$ a domain tag in $[1\dots d]$. We further assume a two-stage sampling process: first select a domain $i$ according to $p(i)$, then select a sentence pair according to a domain specific distribution $D_i$. Our objective is to find a tuple of parameters $\{\theta_1 \dots \theta_d \} \in \mathbb{R}^D \times \mathbb{R}^D \dots \times \mathbb{R}^D$ minimizing:
+Multi-domain machine translation is formalized as follows: we assume observations taking the form of  domain-tagged sentence pairs $[(x,y),i]$, with $x$ in the source language, $y$ in the target language and $i$ a domain tag in $[1\dots d]$. We further assume a two-stage sampling process: first select a domain $i$ according to $p(i)$, then select a sentence pair according to a domain specific distribution $D_i$. Our objective is to find a tuple of parameters $\{\theta_1 \dots \theta_d \} \in \mathbb{R}^D \times \mathbb{R}^D \dots \times \mathbb{R}^D$ minimizing:
 \begin{equation} \label{eq:loss}
 \begin{split}
 \sum_{i \in [1..d]} p(i) E_{(x,y) \sim D_{i}} [-log(p_{\theta_i}(y|x,i))]
@@ -115,8 +115,8 @@ The parameter set is now much more constrained, yet we expect that tying paramet
 
 \subsection{Lexicalized domain embeddings \label{ssec:lde}}
 
-To actually implement this idea for NMT, we need to define the subset of parameters that will be common to all domains. 
-We make the assumption that domain specificities can be confined to the lexical level, and define $\theta_s$ to contain all the network parameters, except for a subpart of the word embeddings. 
+To actually implement this idea for NMT, we need to define the subset of parameters that will be shared across domains. 
+Our hypothesis is that domain specificities can be confined to the lexical level and define $\theta_s$ to contain all the network parameters except for a subpart of the word embeddings. 
 For each word $v$, the embedding vector $e(v)$ is thus decomposed as $e(v) = [e_g(v); e_1(v); \dots; e_d(v)]$, where $e_g(v)$ stores the generic lexical embedding, while $e_i(v)$ stores the subpart that is specific to domain $i$.
 In our NMT architectures, the actual embedding layer composes these vectors linearly to generate the word embedding for domain $k$ according to:
 
@@ -129,7 +129,7 @@ where $\delta()$ is the indicator function, $M$ is the matrix made of blocks $M_
 \begin{figure}[h]
   \center
   \includegraphics[width=0.48\textwidth]{embeddings}
-  \caption{Lexicalized domain embeddings. When processing a sample from domain $2$, we only activate the corresponding parameter region ($\theta_2$) in the input embeddings; the remaining domain-specific parts are zeroed out, and do not receive any update. The generic part is always active, and is updated irrespective of the input domain.} 
+  \caption{Lexicalized domain embeddings. When processing a sample from domain $2$, we only activate the corresponding parameter region ($\theta_2$) in the input embeddings; the remaining domain-specific parts are zeroed out, and do not receive any update. The generic part is always active and is updated irrespective of the input domain.} 
   \label{fig:network}
 \end{figure}
 
@@ -256,10 +256,10 @@ We therefore report two numbers: the first is comparable to what has been publis
 To reduce the number of lexical units and make our systems open-vocabulary, we apply Byte-Pair Encoding \cite{Sennrich16BPE} separately for each language with 30,000 merge operations. \fyDone{I need explanations here}
 
 \subsection{Baselines \label{ssec:baselines}}
-To validate our findings, we compared lexicalized domain embedding models with standard models using both attentional Recurrent Neural Networks (RNNs) \cite{Bahdanau15learning} and the recent Transformer architecture of \cite{Vaswani17attention}. Our baselines consist of:
+To validate our findings, we compared lexicalized domain embedding models with standard models using both attentional Recurrent Neural Networks (RNNs) \cite{Bahdanau15learning} and the Transformer architecture of \cite{Vaswani17attention}. Our baselines consist of:
 \begin{itemize}
-\item generic models trained with a simple concatenation of all corpora (\texttt{Mixed}); 
-\item models tuned separately on each domain using respectively (10000, 15000, 5000) iterations over in-domain data (\texttt{ft$_{EMEA}$}, \texttt{ft$_{EPPS}$}, \texttt{ft$_{ECB}$}); 
+\item generic models trained with a simple concatenation of all corpora (\texttt{Mixed});
+\item models tuned separately on each domain for respectively (10000, 15000, 5000) iterations using in-domain data (\texttt{ft$_{EMEA}$}, \texttt{ft$_{EPPS}$}, \texttt{ft$_{ECB}$}); 
 \item models using domain tags as in \cite{Kobus17domaincontrol} (\texttt{DC}); 
 \end{itemize}
 
@@ -312,13 +312,13 @@ In our experiments, this means that sentences from the Europarl domain will be s
 
 \subsection{Results \label{ssec:results}}
 
-Results are summarised respectively in Table~\ref{tab:results-trsf} for the Transformer systems and Table~\ref{tab:results-rnn} for the RNN systems, where we report BLEU~\cite{Papineni02bleu} scores computed after detokenization.\footnote{As explained above, we  report two numbers when testing with EMEA, except for the fine-tuning scenarios when tuning on ECB and EPPS.} % \fyTodo{Footnote for missing numbers}.
+Results are summarized respectively in Table~\ref{tab:results-trsf} for the Transformer systems and Table~\ref{tab:results-rnn} for the RNN systems, where we report BLEU~\cite{Papineni02bleu} scores computed after detokenization.\footnote{As explained above, we  report two numbers when testing with EMEA, except for the fine-tuning scenarios when tuning on ECB and EPPS.} % \fyTodo{Footnote for missing numbers}.
 
 %We first concentrate on the left part of these tables, where we analyze the performance for the three domains of interest. 
-First, we observe that Transformer is consistently better than RNN, and that fine-tuning on a domain-specific corpus, when applicable, is almost the best way to optimise the performance on that domain.\footnote{This is not so clear for EPPS, where fine-tuning does not seem to help.}  
+First, we observe that Transformer is consistently better than RNNs and that fine-tuning on a domain-specific corpus, when applicable, is almost the best way to optimize the performance on that domain.\footnote{This is not so clear for EPPS, where fine-tuning does not seem to help.}  
 Note that fine-tuning will however yield a marked (even sometimes catastrophic, eg.\ for the EMEA-tuned Transformer system) decrease in performance for the other domains. 
 
-The presented model (\texttt{LDR}$_{oracle}$) is consistently better than the \texttt{Mixed} strategy, with gains that range from very large (for EMEA and ECB) to unsignificant (for EPPS in most conditions). 
+Our approach (\texttt{LDR}$_{oracle}$) is consistently better than the \texttt{Mixed} strategy, with gains that range from very large (for EMEA and ECB) to unsignificant (for EPPS in most conditions). 
 This means that our architecture is somehow able to compensate for the data unbalance and to raise the performance of the multi-domain system close to the best (fine-tuned) system in each domain. 
 We even observe rare cases where the \texttt{LDR}$_{oracle}$ system outperforms fine-tuning (eg.\ Transformer en:de in the EMEA domain). 
 \texttt{LDR}$_{oracle}$ is also better than Domain Control in three conditions out of four, \texttt{DC} being seemingly a better choice for the RNN than for the Transformer architecture. 
@@ -449,16 +449,14 @@ $\mathtt{LDR}_{wrong}$     & 56.84$_{37.05}$ & 22.06 & 61.66 & \\
 \end{table}
 % \clearfloat
 
-We also compare our presented network with the multi-domain model of \cite{Zeng18multidomain} (\texttt{WDCMT}) for English$\rightarrow$French translation.
-We use the author's network implementation\footnote{\noindent\url{http://github.com/DeepLearnXMU/WDCNMT}} that is composed of one bidirectional Gated recurrent units (GRU) layer on the encoder side; and one unidirectional conditional GRU layer on the decoder side; the dimension of ``domain'' layers is~300.
+We also compare our architecture with the multi-domain model of \cite{Zeng18multidomain} (\texttt{WDCMT}) for the pair English$\rightarrow$French. We use the author's implementation\footnote{\noindent\url{http://github.com/DeepLearnXMU/WDCNMT}} that is composed of one bidirectional Gated recurrent units (GRU) layer on the encoder side; and one unidirectional conditional GRU layer on the decoder side; the dimension of ``domain'' layers is~300.
 %
-Since the comparison is difficult as both networks differ in many ways: framework, cell types, \textit{etc.} we rearrange the architecture of our model to make it closer to that of the \texttt{WDCMT} network. 
-This is, we build our model with a single GRU layer in the encoder and a single conditional GRU layer in the decoder ($\mathtt{LDR}_{pred}^{condgru}$).
+The direct comparison with our RNN is difficult, as both networks differ in many ways: framework, cell types, \textit{etc.}. The results in Table~\ref{tab:results-rnn-wdcmt} therefore use a variant of our model that makes it more similar to that of the \texttt{WDCMT} network. In particular, this variant also uses a single GRU layer in the encoder and a single conditional GRU layer in the decoder ($\mathtt{LDR}_{pred}^{condgru}$). As can be seen in this table, our model is on average comparable to \texttt{WDCMT}, while using a much simpler design.
 %However, the comparison with \texttt{WDCMT} is difficult as the implementation differs in many ways from our RNN: framework, cell types,  etc.
 %Thus, in order to compare closer architectures we replace our model to use a single GRU layer in the encoder and a decoder with a single conditional GRU layer ($\mathtt{LDR}_{pred}^{condgru}$).
 %
-Results are shown by Table~\ref{tab:results-rnn-wdcmt}.
-The comparison is less favourable for our RNN system, which is arguably much simpler.
+% Results are shown by Table~\ref{tab:results-rnn-wdcmt}.
+% The comparison is less favourable for our RNN system, which is arguably much simpler.
 
 \begin{table}[!h]
 \begin{center}
@@ -472,7 +470,7 @@ Model & EMEA & EPPS & ECB & Avg. \\
 \hline
 $\mathtt{LDR}_{pred}$               & 72.76$_{46.35}$ & 35.10 & 50.38 & \\
 $\mathtt{LDR}_{pred}^{condgru}$  & 71.70$_{46.21}$ & 35.09 & 51.22 & \\
-$\mathtt{WDCMT}$           & 68.76$_{45.29}$ & 35.71 & 52.75 & \\
+$\mathtt{WDCMT}$                  & 68.76$_{45.29}$ & 35.71 & 52.75 & \\
 \hline
 \end{tabular}
 } %scalebox
@@ -521,15 +519,7 @@ $\mathtt{LDR}_{oracle}$ & EMEA & EPPS & ECB & Avg. \\
 
 \subsection{Additional Domain Scenario \label{ssec:additiona_domain}}
 
-We evaluate now the ability of our model to integrate new domains, a very common scenario for industrial MT.
-We simulate the apparition of the IT domain once the $\mathtt{LDR}_{oracle}$ model is built for EMEA, EPPS and ECB domains.
-Note that to accommodate a new domain the network must be designed with a region reserved for the new domain.
-Hence, for this experiment word embeddings contain 480 cells for the generic region and 32 cells for domain specific regions (8 cells x 4 regions).
-Equivalently to our previous $\mathtt{LDR}_{oracle}$ model, 200,000 iterations are performed using EMEA, EPPS and ECB data sets (the IT region is never updated).
-Then, 100,000 additional iterations are performed using  EMEA, EPPS, ECB and IT datasets ($\mathtt{LDR}_{oracle}^*$).
-Experiments are reported for the English$\rightarrow$French language pair.
-For comparison purposes we also continue training our $\mathtt{Mixed}$ model applying the same number of iterations and using the same four datasets ($\mathtt{Mixed}^*$).
-BLEU results are shown in Table~\ref{tab:add}.
+We now evaluate the ability of our model to integrate new domains, a very common scenario for industrial MT. In this setting, we consider that we have a model ($\mathtt{LDR}_{oracle}$) trained as before for EMEA, EPPS and ECB during 200,000 iterations, which needs to accomodate new training data in the IT domain. Assuming that we have reserved extra empty embedding cells\footnote{For this experiment, word embeddings contain 480 cells for the generic region and 32 cells for domain specific regions (8 cells x 4 regions).} for this new domain, we resume training with 4 domains during 100,000 additional iterations, yielding a updated model  $\mathtt{LDR}_{oracle}^*$. Experiments are reported for the English$\rightarrow$French language pair in Table~\ref{tab:add}, where for comparison purposes we also report numbers obtained with continued training with the $\mathtt{Mixed}$ model, training for the same number of iterations and using the same four datasets ($\mathtt{Mixed}^*$).
 
 \begin{table}[!h]
 \begin{center}
@@ -552,16 +542,11 @@ $\mathtt{LDR}_{oracle}^*$  & 76.17$_{49.71}$ & 37.48 & 55.12 & 55.24 & \\
 \caption{BLEU scores for the Transformer architecture when including IT as additional domain \label{tab:add}}
 \end{table}
 
-As expected, a huge gap is observed over the IT test set when learning includes in-domain data.
-Note that on this test set $\mathtt{LDR}_{oracle}^*$ clearly outperforms $\mathtt{Mixed}^*$ by a large margin.
+As expected, a huge improvement in performance is observed for the IT test set when learning includes in-domain data for both models, with$\mathtt{LDR}_{oracle}^*$ outperforming $\mathtt{Mixed}^*$ by a wide margin.
 %
-Considering the other test sets: both models similarly enhance their performance on the ECB test set;
-$\mathtt{LDR}_{oracle}^*$ shows gains over the EMEA test set while a loss of quality is observed on $\mathtt{Mixed}^*$;
-using IT data does not impact the quality of translations of the EPPS test set of any of the models.
-Overall better results are obtained by our $\mathtt{LDR}_{oracle}$ model when trained including the additional domain dataset.
-Thus, confirming the ability of the model to easily integrate new domains. % as supplementary training data becomes available.
+It is interesting to see that this additional data has also a positive impact on other test sets: both models similarly increase their performance for the ECB domain, and $\mathtt{LDR}_{oracle}^*$ additionally improves the results for the EMEA test, which is not the case for $\mathtt{Mixed}^*$;
+finally, using IT data does not impact the quality of translations for the EPPS domain of any of the models. Overall better results are obtained by our $\mathtt{LDR}_{oracle}$ model when trained including the additional domain dataset, demonstrating the ability of the model to seamlessly integrate new domains. % as supplementary training data becomes available.
 %New domains are easily integrated in the model if the corresponding embedding regions are reserved in advance.
-
 
 \subsection{Analysis of Word Embeddings \label{ssec:word_embeddings}}
 One of our main assumptions is that the difference between domains can be confined at the lexical level, warranting our decision to specialise lexical representations for each domain, while the remaining part of the network is shared across domains. Linguistically, this assumption relates to the classical ``one sense per collocation'' \cite{Yarowsky93onesense} and corresponds to the fact that in many cases, polysemy corresponds to variation of use across domain. In its weaker form, it allows us to assume that all occurrences of a given form in a given domain correspond to the same sense and share the same representation; the same form occurring in different domains is allowed to have one distinct embedding per domain, which may help capture polysemy and lexical ambiguity in translation. 
@@ -610,10 +595,11 @@ Another trait of this proposal is the ability to automatically infer domain info
 as we have shown, our architecture can also effectively accommodate sentences lacking domain information.
 
 \section{Conclusions}
-In this paper, we have presented a new technique for multi-domain machine translation, adapting to two common NMT architectures the ``frustratingly easy'' idea of \cite{Daume07frustratingly}. 
-Our experiments have shown that for both architecture and for two language pairs, our multi-domain models improve over several baselines of the literature, and that it is robust to noise in domain labels. 
-In our future work, we intend to develop this work so as to make the architecture more self-configurable and able to adapt the size of the domain-specific regions depending upon the actual variation of use across domains; 
-we also would like to find additional ways to make the architecture able to integrate new domains in a dynamic fashion, as this is an important requirement in industrial systems.
+In this paper, we have presented a new technique for multi-domain machine translation,  adapting the ``frustratingly easy'' idea of \cite{Daume07frustratingly} to two standard NMT architectures. 
+Our experiments have shown that for both architectures and for two language pairs, our multi-domain models improve over several baselines of the literature and that it is robust to noise in domain labels. It is noticeable that these results are obtained without impacting the architecture or training complexity
+, making our approach a simple baseline for further studies in multi-domain translation
+.
+We have also shown that our approach can dynamically handle new domains; and that the domain-specific embeddings often reflect differences of senses. In our future work, we intend to develop these ideas so as to make the architecture more self-configurable and able to adapt the size of the domain-specific regions depending upon the actual variation of use across domains; we also would like to find additional ways to make the architecture able to integrate an arbitrary number of new domains in a dynamic fashion, as this is an important requirement in industrial systems.
 
 %\section{Acknowledgements}
 %The IWSLT 2015 organizing committee would like to thank the
