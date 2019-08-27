@@ -257,7 +257,7 @@ To reduce the number of lexical units and make our systems open-vocabulary, we a
 To validate our findings, we compared lexicalized domain embedding models with standard models using both attentional Recurrent Neural Networks (RNNs) \cite{Bahdanau15learning} and the recent Transformer architecture of \cite{Vaswani17attention}. Our baselines consist of:
 \begin{itemize}
 \item generic models trained with a simple concatenation of all corpora (\texttt{Mixed}); 
-\item models tuned separately on each domain using respectively (10000, 15000, 5000) iterations over in-domain data (\texttt{ft(EMEA)}, \texttt{ft(EPPS)}, \texttt{ft(ECB)}); 
+\item models tuned separately on each domain using respectively (10000, 15000, 5000) iterations over in-domain data (\texttt{ft$_{EMEA}$}, \texttt{ft$_{EPPS}$}, \texttt{ft$_{ECB}$}); 
 \item models using domain tags as in \cite{Kobus17domaincontrol} (\texttt{DC}); 
 \end{itemize}
 
@@ -351,9 +351,9 @@ Model & EMEA & EPPS & ECB & Avg. \\
 \hline
 $\mathtt{Mixed}$          & 67.69$_{47.60}$ & 37.50 & 53.49 & \\
 \hline
-$\mathtt{FT} (EMEA)$ & 76.77$_{49.43}$ & 17.16 & 11.99 &\\
-$\mathtt{FT} (EPPS)$  & 20.86 & 37.04 & 24.53 &  \\
-$\mathtt{FT} (ECB)$    & 26.93 & 27.09 & 56.52 & \\
+$\mathtt{FT}_{EMEA}$ & 76.77$_{49.43}$ & 17.16 & 11.99 &\\
+$\mathtt{FT}_{EPPS}$  & 20.86 & 37.04 & 24.53 &  \\
+$\mathtt{FT}_{ECB}$    & 26.93 & 27.09 & 56.52 & \\
 \hline
 $\mathtt{DC}$              & 67.87$_{45.42}$ & 37.31 & 54.14 & \\
 \hline
@@ -368,9 +368,9 @@ $\mathtt{LDR}_{wrong}$            & 72.95$_{49.78}$ & 37.62 & 53.35 & \\
 \hline
 $\mathtt{Mixed}$         & 64.57$_{42.99}$ & 26.47 & 68.67 & \\
 \hline
-$\mathtt{FT} (EMEA)$ & 68.35$_{42.97}$ & 17.02 & 32.87 & \\
-$\mathtt{FT} (EPPS)$  & 36.19 & 26.29 & 40.71 & \\
-$\mathtt{FT} (ECB)$   & 24.72 & 18.36 & 74.05 & \\
+$\mathtt{FT}_{EMEA}$ & 68.35$_{42.97}$ & 17.02 & 32.87 & \\
+$\mathtt{FT}_{EPPS}$  & 36.19 & 26.29 & 40.71 & \\
+$\mathtt{FT}_{ECB}$   & 24.72 & 18.36 & 74.05 & \\
 \hline
 $\mathtt{DC}$ & 63.48$_{42.98}$ & 26.27 & 66.95 & \\
 \hline
@@ -401,9 +401,9 @@ Model & EMEA & EPPS & ECB & Avg. \\
 \hline
 $Mixed$                         & 65.42$_{45.11}$ & 34.70 & 51.38 & \\
 \hline
-$\mathtt{FT} (EMEA)$   & 72.06$_{47.33}$ & 18.62 & 16.78 & \\
-$\mathtt{FT} (EPPS)$    & 35.47 $ $ & 34.61 & 39.56 & \\
-$\mathtt{FT} (ECB)$      & 21.93 $ $ & 22.60 & 51.53 & \\
+$\mathtt{FT}_{EMEA}$   & 72.06$_{47.33}$ & 18.62 & 16.78 & \\
+$\mathtt{FT}_{EPPS}$    & 35.47 $ $ & 34.61 & 39.56 & \\
+$\mathtt{FT}_{ECB}$      & 21.93 $ $ & 22.60 & 51.53 & \\
 \hline
 $\mathtt{DC}$                            & 68.26 $_{43.76}$ & 35.13 & 50.09 & \\
 % \hline
@@ -421,9 +421,9 @@ $\mathtt{LDR}_{wrong}$            & 62.10 $_{43.29}$ & 34.17 & 48.79 & \\
 \hline
 $Mixed$                        & 57.37 $_{37.94}$ & 23.10 & 63.54 & \\
 \hline
-$\mathtt{FT} (EMEA)$  & 65.64$_{44.71}$ & 12.36 & 15.93 & \\
-$\mathtt{FT} (EPPS)$   & 24.90 $ $ & 22.98 & 26.26 & \\
-$\mathtt{FT} (ECB)$     & 41.80 $ $ & 15.97 & 71.07 & \\
+$\mathtt{FT}_{EMEA}$  & 65.64$_{44.71}$ & 12.36 & 15.93 & \\
+$\mathtt{FT}_{EPPS}$   & 24.90 $ $ & 22.98 & 26.26 & \\
+$\mathtt{FT}_{ECB}$     & 41.80 $ $ & 15.97 & 71.07 & \\
 \hline
 $\mathtt{DC}$                & 62.53 $_{39.25}$ & 23.74 & 65.71 & \\
 %\hline
@@ -474,7 +474,7 @@ $\mathtt{LDR_{condgru}}_{pred}$   & 71.70 $_{46.21}$ & 35.09 & 51.22 & \\
 
 \subsection{Balancing generic and domain-specific representations\label{secc:region_size}}
 
-An important practical question concerns the balance between the generic and the domain-specific part of the embeddings. In the limit where the domain specific part is very small, we should recover the performance of the \texttt{Mixed} system; conversely, we expect to see a less effective sharing of data across domains by increasing the domain-specific regions. Table~\ref{tab:embedding-size} reports the result of  a series of experiments for the Transformer architecture (English-French) with varying domain-specific sizes allocating between 4 and 64 cells for domain-specific information, and the complement to 512 for the generic part. The differences are overall quite small in our experimental setting, where the training data is relatively limited and does not require to use a large embedding size. We therefore decided to allocate $8$~cells for the domain specific part. This suggests that we could easily accomodate more domains with the same architecture, and even reserve some regions to handle supplementary incoming training data.  
+An important practical question concerns the balance between the generic and the domain-specific part of the embeddings. In the limit where the domain specific part is very small, we should recover the performance of the \texttt{Mixed} system; conversely, we expect to see a less effective sharing of data across domains by increasing the domain-specific regions. Table~\ref{tab:embedding-size} reports the result of  a series of experiments for the Transformer architecture (English-French) with varying domain-specific sizes allocating between 4 and 64 cells for domain-specific information, and the complement to 512 for the generic part. The differences are overall quite small in our experimental setting, where the training data is relatively limited and does not require to use a large embedding size. We therefore decided to allocate $8$~cells for the domain specific part. This suggests that we could easily accommodate more domains with the same architecture, and even reserve some regions to handle supplementary incoming training data.  
 % \fyTodo{Easily accomodate more domains}
 \fyDone{Given the ways embeddings are computed, why not add more domains, and test robustness agains data presentation order ?}
 
@@ -539,7 +539,8 @@ Considering the other test sets: both models similarly enhance their performance
 $\mathtt{LDR}_{oracle}^*$ shows gains over the EMEA test set while a loss of quality is observed on $\mathtt{Mixed}^*$;
 using IT data does not impact the quality of translations of the EPPS test set of any of the models.
 Overall better results are obtained by our $\mathtt{LDR}_{oracle}$ model when trained including the additional domain dataset.
-New domains are easily integrated in the model if the corresponding embedding regions are reserved in advance.
+Thus, confirming the ability of the model to easily integrate new domains as supplementary training data becomes available.
+%New domains are easily integrated in the model if the corresponding embedding regions are reserved in advance.
 
 
 \subsection{Analysis of Word Embeddings \label{ssec:word_embeddings}}
