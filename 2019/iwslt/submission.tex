@@ -270,10 +270,9 @@ the inner feedforward layer contains 2048 cells;
 RNN models use 1 layer on both sides: 
 a bidirectional LSTM encoder and a unidirectional LSTM decoder with attention;
 The domain control systems are exactly as their baseline counterparts (RNN and Transformer), with an additional 2 cells encoding the domain on the input layer.
-The \texttt{WDCMT} system has one bidirectional Gated recurrent units (GRU) layer on the encoder side and one unidirectional conditional GRU layer on the decoder side; the dimension of ``domain'' layers is~300.
-%
+ %
 To train NMT systems, we use Adam, with parameters $\beta_1=0.9$, $\beta_2 = 0.999$, $\alpha=0.0005$ for RNNs; with parameters $\beta_1=0.9$, $\beta_2= 0.98$, with Noam decay \cite{Vaswani17attention} for Transformer ($warmup\_steps=4000$). In all cases, we use a batch size of~128 and a dropout rate of 0.1 for all layers. 
-All our systems are implemented in OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt} except for WDCMT for which we use the authors' implementation.\footnote{\noindent\url{http://github.com/DeepLearnXMU/WDCNMT}}\fyDone{batch size}
+All our systems are implemented in OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}
 
 \subsection{Implementing Lexicalized Domain Representations}\fyDone{Check acronym.}
 
@@ -451,8 +450,13 @@ $\mathtt{LDR}_{wrong}$     & 56.84$_{37.05}$ & 22.06 & 61.66 & \\
 % \clearfloat
 
 We also compare our presented network with the multi-domain model of \cite{Zeng18multidomain} (\texttt{WDCMT}) for English$\rightarrow$French translation.
-However, the comparison with \texttt{WDCMT} is difficult as the implementation differs in many ways from our RNN: framework, cell types,  etc.
-Thus, in order to compare closer architectures we replace our model to use a single GRU layer in the encoder and a decoder with a single conditional GRU layer ($\mathtt{LDR}_{pred}^{condgru}$).
+We use the author's network implementation\footnote{\noindent\url{http://github.com/DeepLearnXMU/WDCNMT}} that is composed of one bidirectional Gated recurrent units (GRU) layer on the encoder side; and one unidirectional conditional GRU layer on the decoder side; the dimension of ``domain'' layers is~300.
+%
+Since the comparison is difficult as both networks differ in many ways: framework, cell types, \textit{etc.} we rearrange the architecture of our model to make it closer to that of the \texttt{WDCMT} network. 
+This is, we build our model with a single GRU layer in the encoder and a single conditional GRU layer in the decoder ($\mathtt{LDR}_{pred}^{condgru}$).
+%However, the comparison with \texttt{WDCMT} is difficult as the implementation differs in many ways from our RNN: framework, cell types,  etc.
+%Thus, in order to compare closer architectures we replace our model to use a single GRU layer in the encoder and a decoder with a single conditional GRU layer ($\mathtt{LDR}_{pred}^{condgru}$).
+%
 Results are shown by Table~\ref{tab:results-rnn-wdcmt}.
 The comparison is less favourable for our RNN system, which is arguably much simpler.
 
@@ -466,6 +470,7 @@ Model & EMEA & EPPS & ECB & Avg. \\
 %\multicolumn{8}{l}{} \\[-9pt]
 \multicolumn{5}{l}{English$\rightarrow$French} \\
 \hline
+$\mathtt{LDR}_{pred}$               & 72.76$_{46.35}$ & 35.10 & 50.38 & \\
 $\mathtt{LDR}_{pred}^{condgru}$  & 71.70$_{46.21}$ & 35.09 & 51.22 & \\
 $\mathtt{WDCMT}$           & 68.76$_{45.29}$ & 35.71 & 52.75 & \\
 \hline
@@ -591,11 +596,11 @@ Let us now consider the list of putative monosemic words (on the right part of T
 Domain adaptation (DA) is a vexing problem in NLP, which appears in a wide range of practical situations and data scenarios (eg.\ supervised vs. unsupervised adaptation), and  has been thoroughly  studied from a number of perspectives, ranging from theoretical analysis to more applied work, and for which many solutions have been proposed. The literature of DA for Machine Translation reflects this diversity and typically distinguishes data-based approaches from model-based approaches \cite{Chu2017comparison,Chu18asurvey}.
 
 The most common adaptation scenario uses (mostly) out-of-domain data in training, while testing on a low-resource in-domain set of texts. In this setting, \emph{data-based approaches} aim to bias the distribution of the train (out-of-domain) data towards matching that of the target domain, using data selection techniques \cite{Moore10selection,Axelrod11domain,Duh13selection}, or generating adapted pseudo-parallel data through back-translation  \cite{Utiyama03measure,Wang14neural,Wang16connecting,Sennrich16improving}. \emph{Model-centric approaches} build domain-adapted models by combining (eg.\ with mixture weights) multiple data sources or multiple systems \cite{Foster07mixture,Wang17instance}, or by biasing the training objective towards the desired domain using in-domain adaptation data \cite{Luong15stanford,Freitag16fast,Chen17costweighting}. Another approach worth mentioning integrates domain information (for instance a domain language model) in the decoding algorithm \cite{Gulcehre17onintegrating}.
-
-Our scenario is a bit different as we aim to train a unique system that will work well for several domains. This corresponds to a practical scenario in the industry, where one would like to maintain one single multi-domain engine, trained on all the available (heteregeneous) sources of data. Our primary source of inspiration is the proposal of \cite{Daume07frustratingly} who proposes to use several copies of the same features (one ``generic'' shared across domains, and one for each domain), letting the training adjust their respective weights. This work has been reanalyzed in a Bayesian framework in \cite{Finkel09hierarchical}, and revisited notably in \cite{Chang10necessity}. Following up on \cite{Yang15unified}, the recent proposals of \cite{Peng17multitask} apply the same idea with neural architectures, using domain specific masking to zero out the parameters modeling domains irrelevant to the current input sentence. Compared to our work, these techniques are used in deep layers of the network and applied to sequence labelling tasks.
+%
+Our scenario is a bit different as we aim to train a unique system that will work well for several domains. This corresponds to a practical scenario in the industry, where one would like to maintain one single multi-domain engine, trained on all the available (heteregeneous) sources of data. Our primary source of inspiration is the proposal of \cite{Daume07frustratingly} who proposes to use several copies of the same features (one ``generic'' shared across domains, and one for each domain), letting the training adjust their respective weights. This work has been reanalyzed in a Bayesian framework in \cite{Finkel09hierarchical}, and revisited notably in \cite{Chang10necessity}. Following up on \cite{Yang15unified}, the recent proposals of \cite{Peng17multitask} apply the same idea with neural architectures, using domain specific masking to zero out the parameters modeling domains irrelevant to the current input sentence. Compared to our work, these techniques are used in deep network layers and applied to sequence labelling tasks.
 
 The multi-domain scenario in NMT has been studied in a number of recent works. \cite{Farajian17multidomain} learn a generic system and propose to dynamically adapt the network weights in an unsupervised manner using a small sample of training data that resembles the test data, an idea already explored in \cite{Sennrich13multidomain}. Their main contribution is to propose an a method to relate the amount of adaptation of the network parameters to the similarity between the adaptation sample and the test sentence: the higher the similarity, the more agressive the adaptation.
-
+%
 By analogy with the proposal of \cite{Johnson17google} for multilingual NMT, \cite{Kobus17domaincontrol} and \cite{Chu18multilingual} separately propose to extend the representation of the source text with a domain tag. Our model also modifies input representations, but allows each source word to have a domain-specific representation, thereby improving training of the shared parts of the network.\fyDone{Talk about target embeddings somewhere.} 
 
 Similarly to our approach, \cite{Zeng18multidomain} attempts to separate on the encoder side domain-specific representation from generic representations in two different sub-networks, where generic versus domain-specific representations automatically emerge from two adversarial networks. 
