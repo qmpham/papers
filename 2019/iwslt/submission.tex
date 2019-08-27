@@ -43,6 +43,8 @@
 %% Please make sure to keep technical paper submissions anonymous  !
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \name{Firstname Lastname}
+%\name{MinhQuang Pham$^{\dag\ddag}$, \ Josep Crego$^\dag$, \ Fran\c cois Yvon$^\ddag$, \ Jean Senellart$^\dag$}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% If multiple authors, uncomment and edit the lines shown below.       %%
 %% Note that each line must be emphasized {\em } by itself.             %%
@@ -55,9 +57,9 @@
 %      {\em Firstname4 Lastname4}}
 %%%%%%%%%%%%%%% End of required multiple authors changes %%%%%%%%%%%%%%%%%
 
-\address{ Affiliation / Address line 1 \\
-{\small \tt email@domain}
-}
+\address{ Affiliation / Address line 1 \\ Affiliation / Address line 2 \\ Affiliation / Address line 3 \\ {\small \tt email@domain}}
+%\address{ $^\dag$SYSTRAN / 5 rue Feydeau, 75002 Paris, France \\ \small \tt firstname.lastname@systrangroup.com \\ $^\ddag$LIMSI, CNRS,  Universit\'e Paris-Saclay 91405 Orsay, France \\ {\small \tt firstname.lastname@limsi.fr}}
+
 %
 \begin{document}
 \maketitle
@@ -470,7 +472,7 @@ $\mathtt{WDCMT}$           & 68.76$_{45.29}$ & 35.71 & 52.75 & \\
 \end{tabular}
 } %scalebox
 \end{center}
-\caption{BLEU scores for RNN systems. Comparison between \texttt{WDCMT} and a version of $\texttt{LDR}_{pred}$ using conditional GRUs.\label{tab:results-rnn-wdcmt}}
+\caption{BLEU scores for RNN systems. Comparison between \texttt{WDCMT} and $\texttt{LDR}_{pred}$ built using conditional GRUs.\label{tab:results-rnn-wdcmt}}
 \end{table}
 
 \section{Complementary experiments\label{sec:Discussion}}
@@ -487,7 +489,7 @@ conversely, we expect to see a less effective sharing of data across domains by 
 Table~\ref{tab:embedding-size} reports the result of  a series of experiments for the Transformer architecture (English-French) with varying domain-specific sizes allocating between 4 and 64 cells for domain-specific information, and the complement to 512 for the generic part. 
 The differences are overall quite small in our experimental setting, where the training data is relatively limited and does not require to use a large embedding size. 
 We therefore decided to allocate $8$~cells for the domain specific part. 
-This suggests that we could easily accommodate more domains with the same architecture, and even reserve some regions to handle supplementary incoming training data.  
+This suggests that we could easily accommodate more domains with the same architecture, and even reserve some regions to handle supplementary data. %incoming training data.  
 % \fyTodo{Easily accomodate more domains}
 \fyDone{Given the ways embeddings are computed, why not add more domains, and test robustness agains data presentation order ?}
 
@@ -561,7 +563,7 @@ One of our main assumptions is that the difference between domains can be confin
 
 To check this hypothesis, we performed the following analysis of embeddings learned with the multi-domain Transformer system for English:French. For each unit\footnote{In this study, we work with BPE units, not words, meaning that in many cases we observe the variation of use of word parts. As we work with a large inventory, many of these units correspond to actual words, and we focus on these in our comments. We also restrict our analysis to words that occur at least 30 times in each domain, to ensure that each domain-specific region is updated during training.} in our English dictionary, we compute the $k$ nearest neighbours for each domain $i \in [1\dots{}d]$, where the distance between unit $u$ and $v$ for domain $i$ is the cosine distance in the corresponding embedding space, ie.\ assuming that the actual embedding of $v$ for domain $i$ is $e(v,i) = M_ge_g(u) + M_de_i(v)$ (cf.\ equation~\eqref{eq:embedding}). This process yields $d$ lists of $k$ nearest neighbours. The size of their intersection should then be a sign of a variation of use across domains; conversely, an identical set of neighbours across domains should reflect the stability of word use. Table~\ref{tab:embeddings} list the 10 units with the smaller (respectively larger) intersection (we use $k=10$ and $d=3$). 
 
-\begin{table}
+\begin{table}[h]
   \centering
 %  \begin{tabularx}{1.0\linewidth}{c|c}
   \begin{tabular}{c|c}
@@ -586,7 +588,6 @@ Let us first consider the full words in the left column of Table~\ref{tab:embedd
 Let us now consider the list of putative monosemic words (on the right part of Table~\ref{tab:embeddings}), ie.\ words for which the nearest neighbors are the same in all domains, contains mostly words for which we do not expect much variation in translation: adjective (``previous'', ``better''), adverbs (``virtually``), generic verbs (``handling'', ``coordinated''), etc; and the list of words having a constant set of neighbors also contains prepositions (``at'', ``in''), auxiliary (``been'') etc.  
 
 \section{Related Work \label{sec:related_work}}
-
 Domain adaptation (DA) is a vexing problem in NLP, which appears in a wide range of practical situations and data scenarios (eg.\ supervised vs. unsupervised adaptation), and  has been thoroughly  studied from a number of perspectives, ranging from theoretical analysis to more applied work, and for which many solutions have been proposed. The literature of DA for Machine Translation reflects this diversity and typically distinguishes data-based approaches from model-based approaches \cite{Chu2017comparison,Chu18asurvey}.
 
 The most common adaptation scenario uses (mostly) out-of-domain data in training, while testing on a low-resource in-domain set of texts. In this setting, \emph{data-based approaches} aim to bias the distribution of the train (out-of-domain) data towards matching that of the target domain, using data selection techniques \cite{Moore10selection,Axelrod11domain,Duh13selection}, or generating adapted pseudo-parallel data through back-translation  \cite{Utiyama03measure,Wang14neural,Wang16connecting,Sennrich16improving}. \emph{Model-centric approaches} build domain-adapted models by combining (eg.\ with mixture weights) multiple data sources or multiple systems \cite{Foster07mixture,Wang17instance}, or by biasing the training objective towards the desired domain using in-domain adaptation data \cite{Luong15stanford,Freitag16fast,Chen17costweighting}. Another approach worth mentioning integrates domain information (for instance a domain language model) in the decoding algorithm \cite{Gulcehre17onintegrating}.
