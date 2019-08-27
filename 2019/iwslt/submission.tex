@@ -321,11 +321,17 @@ The presented model (\texttt{LDR}$_{oracle}$) is consistently better than the \t
 This means that our architecture is somehow able to compensate for the data unbalance and to raise the performance of the multi-domain system close to the best (fine-tuned) system in each domain. 
 We even observe rare cases where the \texttt{LDR}$_{oracle}$ system outperforms fine-tuning (eg.\ Transformer en:de in the EMEA domain). 
 \texttt{LDR}$_{oracle}$ is also better than Domain Control in three conditions out of four, \texttt{DC} being seemingly a better choice for the RNN than for the Transformer architecture. 
-As expected, ignoring the domain label yields a drop in performance for the two fallback strategies considered in this study. 
-The first, \texttt{LDR}$_{generic}$, only uses the generic part of the embeddings. 
-The second, \texttt{LDR}$_{pred}$, resorts to automatically predicted domain labels.\footnote{Our domain classifier uses a bi-LSTM RNN encoder, followed by a simple softmax layer. Its precision on a development set exceeds 95\%.}
+As expected, ignoring the true domain label yields a light drop in performance. %for the two fallback strategies considered in this study. 
+%The first, \texttt{LDR}$_{generic}$, only uses the generic part of the embeddings. 
+%The second, 
+\texttt{LDR}$_{pred}$ employs automatically predicted domain labels.\footnote{Our domain classifier uses a bi-LSTM RNN encoder, followed by a simple softmax layer. 
+Its precision on a development set exceeds 95\%.}
 % \fyDone{Explain how}
-Note that this decrease is however quite limited (and hardly significant for \texttt{LDR}$_{pred}$), showing that our architecture is quite robust to noisy labels. Even in the worst case scenario where all domain tags are intentionally wrong (\texttt{LDR}$_{wrong}$), we see that the generic part still ensures a satisfying level of performance. A last contrast is with \texttt{LDR}$_{oracle}^{0.5}$ where we change the distribution of training sentences to decrease the weight of EPPS data and increase the number of ECB samples. As a result, we see a small decrease for EMEA and EPPS, and a large boost for ECB. This shows that our technique can be used in conjunction to other well known strategies for performing domain adaptation. 
+Note that this decrease is however hardly significant, showing that our architecture is quite robust to noisy labels. 
+Even in the worst case scenario where all domain tags are intentionally wrong (\texttt{LDR}$_{wrong}$), we see that the generic part still ensures a satisfying level of performance. 
+A last contrast is with \texttt{LDR}$_{oracle}^{0.5}$ where we change the distribution of training sentences to decrease the weight of EPPS data and increase the number of ECB samples. 
+As a result, we see a small decrease for EMEA and EPPS, and a large boost for ECB. 
+This shows that our technique can be used in conjunction to other well known strategies for performing domain adaptation. 
 
 
 % \fyTodo{Comment V2 from Minh}
@@ -359,12 +365,12 @@ $\mathtt{DC}$              & 67.87$_{45.42}$ & 37.31 & 54.14 & \\
 \hline
 $\mathtt{LDR}_{oracle}$            & 74.26$_{49.90}$ & 37.67 & 54.07 & \\
 $\mathtt{LDR}_{oracle}^{0.5}$   & 74.95$_{49.38}$ & 37.35 & 55.91 & \\
-$\mathtt{LDR}_{generic}$          & 73.97$_{49.54}$ & 37.81 & 53.67 & \\
+%$\mathtt{LDR}_{generic}$          & 73.97$_{49.54}$ & 37.81 & 53.67 & \\
 $\mathtt{LDR}_{pred}$               & 74.29 $_{49.84}$ & 37.73 & 54.01 & \\
 $\mathtt{LDR}_{wrong}$            & 72.95$_{49.78}$ & 37.62 & 53.35 & \\
   \hline
 %\multicolumn{8}{l}{} \\[-9pt]
-\multicolumn{5}{l}{English $\rightarrow$German} \\
+\multicolumn{5}{l}{English$\rightarrow$German} \\
 \hline
 $\mathtt{Mixed}$         & 64.57$_{42.99}$ & 26.47 & 68.67 & \\
 \hline
@@ -376,7 +382,7 @@ $\mathtt{DC}$ & 63.48$_{42.98}$ & 26.27 & 66.95 & \\
 \hline
 $\mathtt{LDR}_{oracle}$ & 70.90$_{46.12}$ & 26.30 & 68.90 & \\
 $\mathtt{LDR}_{oracle}^{0.5}$ & 71.31$_{45.23}$ & 25.98 & 73.74 & \\
-$\mathtt{LDR}_{generic}$ & 70.86$_{45.60}$ & 26.14 & 68.59 & \\
+%$\mathtt{LDR}_{generic}$ & 70.86$_{45.60}$ & 26.14 & 68.59 & \\
 $\mathtt{LDR}_{pred}$ & 70.89$_{46.12}$ & 26.53 & 68.63 & \\
 $\mathtt{LDR}_{wrong}$ & 69.51$_{43.50}$ & 26.31 & 66.86 & \\
 \hline
@@ -412,7 +418,7 @@ $\mathtt{DC}$                            & 68.26 $_{43.76}$ & 35.13 & 50.09 & \\
 $\mathtt{LDR}_{oracle}$            & 71.73 $_{46.30}$ & 35.21 & 50.91 & \\
 %$\mathtt{LDR_{condgru}}_{pred}$   & 71.7 $_{46.21}$ & 35.09 & 51.22 & \\
 $\mathtt{LDR}_{oracle}^{0.5}$   & 71.70$_{46.41}$ & 34.24& 52.37 & \\
-$\mathtt{LDR}_{generic}$          & 70.59 $_{46.37}$ & 35.22 & 49.68 & \\
+%$\mathtt{LDR}_{generic}$          & 70.59 $_{46.37}$ & 35.22 & 49.68 & \\
 $\mathtt{LDR}_{pred}$               & 72.76 $_{46.35}$ & 35.10 & 50.38 & \\
 $\mathtt{LDR}_{wrong}$            & 62.10 $_{43.29}$ & 34.17 & 48.79 & \\
 \hline
@@ -431,7 +437,7 @@ $\mathtt{DC}$                & 62.53 $_{39.25}$ & 23.74 & 65.71 & \\
 \hline
 $\mathtt{LDR}_{oracle}$     & 63.43 $_{40.04}$ & 22.66 & 64.40 & \\
 $\mathtt{LDR}_{oracle}^{0.5}$   & 63.27 $_{38.16}$ & 21.83 & 69.55 & \\
-$\mathtt{LDR}_{generic}$   & 63.27 $_{39.75}$ & 22.62 & 63.70 & \\
+%$\mathtt{LDR}_{generic}$   & 63.27 $_{39.75}$ & 22.62 & 63.70 & \\
 $\mathtt{LDR}_{pred}$        & 63.17 $_{39.92}$ & 22.51 & 64.00 & \\
 $\mathtt{LDR}_{wrong}$     & 56.84 $_{37.05}$ & 22.06 & 61.66 & \\
 \hline
@@ -443,9 +449,10 @@ $\mathtt{LDR}_{wrong}$     & 56.84 $_{37.05}$ & 22.06 & 61.66 & \\
 % \clearfloat
 
 We also compare our presented network with the multi-domain model of \cite{Zeng18multidomain} (\texttt{WDCMT}) for English$\rightarrow$French translation.
-\jcTodo{(explain why conditional GRU are used for the comparison)},
-Results are shown by Table~\ref{tab:results-rnn-wdcmt}. 
-The comparison is less favourable for our RNN systems, which are arguably much simpler.\footnote{The direct comparison with \texttt{WDCMT} is difficult as the implementation differs in many ways from our RNN: framework, cell types,  etc.}
+However, the comparison with \texttt{WDCMT} is difficult as the implementation differs in many ways from our RNN: framework, cell types,  etc.
+Thus, in order to compare closer architectures we replace our model to use a single GRU layer in the encoder and a decoder with a single conditional GRU layer ($\mathtt{LDR}_{pred}^{condgru}$).
+Results are shown by Table~\ref{tab:results-rnn-wdcmt}.
+The comparison is less favourable for our RNN system, which is arguably much simpler.
 
 \begin{table}[!h]
 \begin{center}
@@ -457,13 +464,13 @@ Model & EMEA & EPPS & ECB & Avg. \\
 %\multicolumn{8}{l}{} \\[-9pt]
 \multicolumn{5}{l}{English$\rightarrow$French} \\
 \hline
+$\mathtt{LDR}_{pred}^{condgru}$  & 71.70 $_{46.21}$ & 35.09 & 51.22 & \\
 $\mathtt{WDCMT}$           & 68.76 $_{45.29}$ & 35.71 & 52.75 & \\
-$\mathtt{LDR_{condgru}}_{pred}$   & 71.70 $_{46.21}$ & 35.09 & 51.22 & \\
 \hline
 \end{tabular}
 } %scalebox
 \end{center}
-\caption{BLEU scores when comparing \texttt{LDR} to \texttt{WDCMT}.\label{tab:results-rnn-wdcmt}}
+\caption{BLEU scores for RNN systems. Comparison between a version of $\texttt{LDR}_{pred}$ using conditional GRUs and \texttt{WDCMT}.\label{tab:results-rnn-wdcmt}}
 \end{table}
 
 \section{Complementary experiments\label{sec:Discussion}}
@@ -539,7 +546,7 @@ Considering the other test sets: both models similarly enhance their performance
 $\mathtt{LDR}_{oracle}^*$ shows gains over the EMEA test set while a loss of quality is observed on $\mathtt{Mixed}^*$;
 using IT data does not impact the quality of translations of the EPPS test set of any of the models.
 Overall better results are obtained by our $\mathtt{LDR}_{oracle}$ model when trained including the additional domain dataset.
-Thus, confirming the ability of the model to integrate new domains as supplementary training data becomes available.
+Thus, confirming the ability of the model to easily integrate new domains. % as supplementary training data becomes available.
 %New domains are easily integrated in the model if the corresponding embedding regions are reserved in advance.
 
 
