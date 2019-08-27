@@ -479,9 +479,15 @@ $\mathtt{WDCMT}$           & 68.76$_{45.29}$ & 35.71 & 52.75 & \\
 % First, we analyze the performance of models on inner test sets which are created by randomly splited from same corpora as training set. The 4 table show remarquable improvement 6 points BLEU in average in EMEA translation which is comparable with finetuned model. In all most the cases, Sparse model has slightly higher score on EPPS test and ECB test than mixed and finetuned models. Sparse model also achieve comparable scores with Domain Control and WDCMT in average. In considering the score of finetuned model on out-of-domain test sets, we observed a fast catastrophic forgetting while the out-of-domain scores drop dramatically compared to mixed model. Taking into account the average score on 3 inner test sets, Sparse achieved far better score than all finetuned models. \\
 % Secondly, we compare performance of models on IWSLT test 2010 and newstest 2014 which are more general than inner test sets. On these test sets, mixed, Sparse has approximately same score in Transformer and are a little better than Domain Control while in Recurrent Net Work architecture, WDCMT is better than mixed, Sparse and Domain Control for English -French pair. We also noted a quick fall of performance in finetuned model.
 
-\subsection{Balancing generic and domain-specific representations\label{secc:region_size}}
+\subsection{Balancing generic and domain representations\label{secc:region_size}}
 
-An important practical question concerns the balance between the generic and the domain-specific part of the embeddings. In the limit where the domain specific part is very small, we should recover the performance of the \texttt{Mixed} system; conversely, we expect to see a less effective sharing of data across domains by increasing the domain-specific regions. Table~\ref{tab:embedding-size} reports the result of  a series of experiments for the Transformer architecture (English-French) with varying domain-specific sizes allocating between 4 and 64 cells for domain-specific information, and the complement to 512 for the generic part. The differences are overall quite small in our experimental setting, where the training data is relatively limited and does not require to use a large embedding size. We therefore decided to allocate $8$~cells for the domain specific part. This suggests that we could easily accommodate more domains with the same architecture, and even reserve some regions to handle supplementary incoming training data.  
+An important practical question concerns the balance between the generic and the domain-specific part of the embeddings. 
+In the limit where the domain specific part is very small, we should recover the performance of the \texttt{Mixed} system; 
+conversely, we expect to see a less effective sharing of data across domains by increasing the domain-specific regions. 
+Table~\ref{tab:embedding-size} reports the result of  a series of experiments for the Transformer architecture (English-French) with varying domain-specific sizes allocating between 4 and 64 cells for domain-specific information, and the complement to 512 for the generic part. 
+The differences are overall quite small in our experimental setting, where the training data is relatively limited and does not require to use a large embedding size. 
+We therefore decided to allocate $8$~cells for the domain specific part. 
+This suggests that we could easily accommodate more domains with the same architecture, and even reserve some regions to handle supplementary incoming training data.  
 % \fyTodo{Easily accomodate more domains}
 \fyDone{Given the ways embeddings are computed, why not add more domains, and test robustness agains data presentation order ?}
 
@@ -540,7 +546,7 @@ $\mathtt{LDR}_{oracle}^*$  & 76.17$_{49.71}$ & 37.48 & 55.12 & 55.24 & \\
 \end{table}
 
 As expected, a huge gap is observed over the IT test set when learning includes in-domain data.
-Note that $\mathtt{LDR}_{oracle}^*$ clearly outperforms $\mathtt{Mixed}^*$ by a large margin over the IT test set.
+Note that on this test set $\mathtt{LDR}_{oracle}^*$ clearly outperforms $\mathtt{Mixed}^*$ by a large margin.
 %
 Considering the other test sets: both models similarly enhance their performance on the ECB test set;
 $\mathtt{LDR}_{oracle}^*$ shows gains over the EMEA test set while a loss of quality is observed on $\mathtt{Mixed}^*$;
