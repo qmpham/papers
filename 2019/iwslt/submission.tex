@@ -43,8 +43,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Please make sure to keep technical paper submissions anonymous  !
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\name{Firstname Lastname}
-%\name{MinhQuang Pham$^{\dag\ddag}$, \ Josep Crego$^\dag$, \ Fran\c cois Yvon$^\ddag$, \ Jean Senellart$^\dag$}
+%\name{Firstname Lastname}
+\name{MinhQuang Pham$^{\dag\ddag}$, \ Josep Crego$^\dag$, \ Fran\c cois Yvon$^\ddag$, \ Jean Senellart$^\dag$}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% If multiple authors, uncomment and edit the lines shown below.       %%
@@ -58,8 +58,8 @@
 %      {\em Firstname4 Lastname4}}
 %%%%%%%%%%%%%%% End of required multiple authors changes %%%%%%%%%%%%%%%%%
 
-\address{ Affiliation / Address line 1 \\ Affiliation / Address line 2 \\ Affiliation / Address line 3 \\ {\small \tt email@domain}}
-%\address{ $^\dag$SYSTRAN / 5 rue Feydeau, 75002 Paris, France \\ \small \tt firstname.lastname@systrangroup.com \\ $^\ddag$LIMSI, CNRS,  Universit\'e Paris-Saclay 91405 Orsay, France \\ {\small \tt firstname.lastname@limsi.fr}}
+%\address{ Affiliation / Address line 1 \\ Affiliation / Address line 2 \\ Affiliation / Address line 3 \\ {\small \tt email@domain}}
+\address{ $^\dag$SYSTRAN / 5 rue Feydeau, 75002 Paris, France \\ \small \tt firstname.lastname@systrangroup.com \\ $^\ddag$LIMSI, CNRS,  Universit\'e Paris-Saclay 91405 Orsay, France \\ {\small \tt firstname.lastname@limsi.fr}}
 
 %
 \begin{document}
@@ -122,7 +122,7 @@ For each word $v$, the embedding vector $e(v)$ is thus decomposed as $e(v) = [e_
 In our NMT architectures, the actual embedding layer composes these vectors linearly to generate the word embedding for domain $k$ according to:
 
 \begin{align}
-  \tilde{e}_k(v) =& M_g e_g(v) + \sum_{i \in [1,..,d]} M_i * e_i(v) * \delta(i=k) \nonumber \\
+  \tilde{e}_k(v) =& M_g e_g(v) + \sum_{i \in [1,..,d]} M_i \times e_i(v) \times \delta(i=k) \nonumber \\
    & = M [e_g(v); e_1'(v,k) \dots; e_d'(v,k)], \label{eq:embedding}
 \end{align}
 where $\delta()$ is the indicator function, $M$ is the matrix made of blocks $M_g, M_1 \dots, M_d$, and $e_i'(v,k)$ is the masked embedding: $e_i'(v,k)= e_i(v) * \delta(i=k)$.  
@@ -138,7 +138,9 @@ Making sure that the actual embedding do not contain any zero is important for t
 With our design, we make sure that during backprogation, the matrix $M$ receives gradient $0$ at regions corresponding to deactivated regions in the word embedding. 
 Those regions are also masked in forward step, thus do not interfere the training on the domains to which they are not assigned (see Figure~\ref{fig:network}).
 %
-Our architecture is thus readily compatible with any NMT architecture, where we simply replace standard embedding layers the computation in equation~\eqref{eq:embedding}. In our experiments, we consider both the attentional RNN architecture of \cite{Bahdanau15learning} and the Transformer architecture of \cite{Vaswani17attention}.
+Our architecture is thus readily compatible with any NMT architecture, where we simply replace standard embedding layers 
+by the embeddings defined
+in equation~\eqref{eq:embedding}. In our experiments, we consider both the attentional RNN architecture of \cite{Bahdanau15learning} and the Transformer architecture of \cite{Vaswani17attention}.
 
 % Let $\tilde{x}_{t} = M * e_{t} = M_g e_g(t) + \displaystyle{\mathop{\sum}_{i \in [1,..,d]} M_i * e_i(t)}$ be the projection of word embedding where $e_{t}$ is word embedding of token $x_{t}$, M is projection matrix, $M_j \forall j \in [1...d]$ is row block corresponding to domain region $j$ (Transformer \cite{Vaswani17attention}, recurrent \cite{Bahdanau15learning})\\
 % Assume the batch belongs to domain $i$, then $e_j(t) = 0$ $\forall j \neq i$,$\forall t$. 
@@ -518,7 +520,7 @@ $\mathtt{LDR}_{oracle}$ & EMEA & EPPS & ECB & Avg. \\
 
 \subsection{Additional Domain Scenario \label{ssec:additional_domain}}
 
-We now evaluate the ability of our model to integrate new domains, a very common scenario for industrial MT. In this setting, we consider that we have a model ($\mathtt{LDR}_{oracle}$) trained as before for EMEA, EPPS and ECB during 200,000 iterations, which needs to process new training data from the IT domain. Assuming that we have reserved extra empty embedding cells\footnote{For this experiment, word embeddings contain 480 cells for the generic region and 32 cells for domain specific regions (8 cells x 4 regions).} for this domain, we resume training with 4 domains during 100,000 additional iterations, yielding a updated model  $\mathtt{LDR}_{oracle}^*$. Results for the English$\rightarrow$French language pair are in Table~\ref{tab:add}, where for comparison purposes we also report numbers obtained with continued training with the $\mathtt{Mixed}$ model, training for the same number of iterations and using the same four datasets ($\mathtt{Mixed}^*$).
+We now evaluate the ability of our model to integrate new domains, a very common scenario for industrial MT. In this setting, we consider that we have a model ($\mathtt{LDR}_{oracle}$) trained as before for EMEA, EPPS and ECB during 200,000 iterations, which needs to process new training data from the IT domain. Assuming that we have reserved extra empty embedding cells\footnote{For this experiment, word embeddings contain 480 cells for the generic region and 32 cells for domain specific regions (8 cells x 4 regions).} for this domain, we resume training with 4 domains during 100,000 additional iterations, yielding an updated model  $\mathtt{LDR}_{oracle}^*$. Results for the English$\rightarrow$French language pair are in Table~\ref{tab:add}, where for comparison purposes we also report numbers obtained with continued training with the $\mathtt{Mixed}$ model, training for the same number of iterations and using the same four datasets ($\mathtt{Mixed}^*$).
 
 \begin{table}[!h]
 \begin{center}
@@ -544,13 +546,13 @@ $\mathtt{LDR}_{oracle}^*$  & \bf 76.17$_{49.71}$ & 37.48 & \bf 55.12 & \bf 55.24
 As expected, a huge improvement in performance is observed for the IT test set when learning includes in-domain data for both models, with $\mathtt{LDR}_{oracle}^*$ outperforming $\mathtt{Mixed}^*$ by a wide margin.
 %
 It is interesting to see that this additional data has also a positive impact on other test sets: both models similarly increase their performance for the ECB domain, and $\mathtt{LDR}_{oracle}^*$ additionally improves the results for the EMEA test, which is not the case for $\mathtt{Mixed}^*$;
-finally, using IT data does not impact the quality of translations for the EPPS domain of any of the models. Overall better results are obtained by our $\mathtt{LDR}_{oracle}^*$ model trained with data from an additional source, demonstrating the ability of our architecture to seamlessly integrate new domains. % as supplementary training data becomes available.
+finally, using IT data does not impact the quality of translations for the EPPS domain of any of the models. Overall better results are obtained by our $\mathtt{LDR}_{oracle}^*$ model trained with data from an additional source, demonstrating the ability of our architecture to seamlessly integrate a new domain. % as supplementary training data becomes available.
 %New domains are easily integrated in the model if the corresponding embedding regions are reserved in advance.
 
 \subsection{Analysis of Word Embeddings \label{ssec:word_embeddings}}
 One of our main assumptions is that the difference between domains can be confined at the lexical level, warranting our decision to specialise lexical representations for each domain, while the remaining part of the network is shared across domains. Linguistically, this assumption relates to the classical ``one sense per collocation'' \cite{Yarowsky93onesense} and corresponds to the fact that in many cases, polysemy corresponds to variation of use across domain. In its weaker form, it allows us to assume that all occurrences of a given form in a given domain correspond to the same sense and share the same representation; the same form occurring in different domains is allowed to have one distinct embedding per domain, which may help capture polysemy and lexical ambiguity in translation. 
 
-To check this hypothesis, we performed the following analysis of embeddings learned with the multi-domain Transformer system for English:French. For each unit\footnote{In this study, we work with BPE units meaning that in many cases we observe the variation of use of \emph{word parts}. As we work with a large inventory, many of these units still correspond to actual words and we focus on these in our comments. We also restrict our analysis to words that occur at least 30 times in each domain, to ensure that each domain-specific region is updated during training.} in our English dictionary, we compute the $k$ nearest neighbours for each domain $i \in [1\dots{}d]$, where the distance between unit $u$ and $v$ for domain $i$ is the cosine distance in the corresponding embedding space, ie.\ assuming that the actual embedding of $v$ for domain $i$ is $e(v,i) = M_ge_g(u) + M_de_i(v)$ (cf.\ equation~\eqref{eq:embedding}). This process yields $d$ lists of $k$ nearest neighbours. A small intersection should then be a sign of a variation of use across domains; conversely, an near-identical set of neighbours across domains should reflect the stability of word use. Table~\ref{tab:embeddings} list the 10 units with the smaller (respectively larger) intersection (we use $k=10$ and $d=3$). 
+To check this hypothesis, we performed the following analysis of embeddings learned with the multi-domain Transformer system for English:French. For each unit\footnote{In this study, we work with BPE units meaning that in many cases we observe the variation of use of \emph{word parts}. As we work with a large inventory, many of these units still correspond to actual words and we focus on these in our comments. We also restrict our analysis to words that occur at least 30 times in each domain, to ensure that each domain-specific region is updated during training.} in our English dictionary, we compute the $k$ nearest neighbours for each domain $i \in [1\dots{}d]$, where the distance between unit $u$ and $v$ for domain $i$ is the cosine distance in the corresponding embedding space, ie.\ assuming that the actual embedding of $v$ for domain $i$ is $e(v,i) = M_ge_g(u) + M_ie_i(v)$ (cf.\ equation~\eqref{eq:embedding}). This process yields $d$ lists of $k$ nearest neighbours. A small intersection should then be a sign of a variation of use across domains; conversely, an near-identical set of neighbours across domains should reflect the stability of word use. Table~\ref{tab:embeddings} list the 10 units with the smaller (respectively larger) intersection (we use $k=10$ and $d=3$). 
 
 \begin{table}[h]
   \centering
@@ -583,7 +585,7 @@ The most common adaptation scenario uses (mostly) out-of-domain data in training
 %
 Our scenario is a bit different as we aim to train a unique system that will work well for several domains. This corresponds to a practical scenario in the industry, where one would like to maintain one single multi-domain engine, trained on all the available (heteregeneous) sources of data. Our primary source of inspiration is the proposal of \cite{Daume07frustratingly} who proposes to use several copies of the same features (one ``generic'' shared across domains, and one for each domain), letting the training adjust their respective weights. This work has been reanalyzed in a Bayesian framework in \cite{Finkel09hierarchical}, and revisited notably in \cite{Chang10necessity}. Following up on \cite{Yang15unified}, the recent proposals of \cite{Peng17multitask} apply the same idea with neural architectures, using domain specific masking to zero out the parameters modeling domains irrelevant to the current input sentence. Compared to our work, these techniques are used in deep network layers and applied to sequence labelling tasks.
 
-The multi-domain scenario in NMT has been studied in a number of recent works. \cite{Farajian17multidomain} learn a generic system and propose to dynamically adapt the network weights in an unsupervised manner using a small sample of training data that resembles the test data, an idea already explored in \cite{Sennrich13multidomain}. Their main contribution is to propose an a method to relate the amount of adaptation of the network parameters to the similarity between the adaptation sample and the test sentence: the higher the similarity, the more agressive the adaptation.
+The multi-domain scenario in NMT has been studied in a number of recent works. \cite{Farajian17multidomain} learn a generic system and propose to dynamically adapt the network weights in an unsupervised manner using a small sample of training data that resembles the test data, an idea already explored in \cite{Sennrich13multidomain}. Their main contribution is to propose a method to relate the amount of adaptation of the network parameters to the similarity between the adaptation sample and the test sentence: the higher the similarity, the more agressive the adaptation.
 %
 By analogy with the proposal of \cite{Johnson17google} for multilingual NMT, \cite{Kobus17domaincontrol} and \cite{Chu18multilingual} separately propose to extend the representation of the source text with a domain tag. Our model also modifies input representations, but allows each source word to have a domain-specific representation, thereby improving training of the shared parts of the network.\fyDone{Talk about target embeddings somewhere.} 
 
