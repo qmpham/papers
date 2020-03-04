@@ -1,0 +1,123 @@
+%
+% File coling2020.tex
+%
+% Contact: feiliu@cs.ucf.edu & liang.huang.sh@gmail.com
+%% Based on the style files for COLING-2018, which were, in turn,
+%% Based on the style files for COLING-2016, which were, in turn,
+%% Based on the style files for COLING-2014, which were, in turn,
+%% Based on the style files for ACL-2014, which were, in turn,
+%% Based on the style files for ACL-2013, which were, in turn,
+%% Based on the style files for ACL-2012, which were, in turn,
+%% based on the style files for ACL-2011, which were, in turn, 
+%% based on the style files for ACL-2010, which were, in turn, 
+%% based on the style files for ACL-IJCNLP-2009, which were, in turn,
+%% based on the style files for EACL-2009 and IJCNLP-2008...
+
+%% Based on the style files for EACL 2006 by 
+%%e.agirre@ehu.es or Sergi.Balari@uab.es
+%% and that of ACL 08 by Joakim Nivre and Noah Smith
+
+\documentclass[11pt]{article}
+\usepackage{coling2020}
+\usepackage{times}
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage[draft]{todo}
+%\setlength\titlebox{5cm}
+%\colingfinalcopy % Uncomment this line for the final submission
+
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+\title{Revisiting Multi-Domain Machine Translation}
+
+\author{First Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  {\tt email@domain} \\\And
+  Second Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  {\tt email@domain} \\}
+
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Abstract goes here
+\end{abstract}
+
+\section{Introduction}
+\label{intro}
+
+%
+% The following footnote without marker is needed for the camera-ready
+% version of the paper.
+% Comment out the instructions (first text) and uncomment the 8 lines
+% under "final paper" for your variant of English.
+% 
+\blfootnote{
+    %
+    % for review submission
+    %
+    \hspace{-0.65cm}  % space normally used by the marker
+    Place licence statement here for the camera-ready version. See
+    Section~\ref{licence} of the instructions for preparing a
+    manuscript.
+    %
+    % % final paper: en-uk version 
+    %
+    % \hspace{-0.65cm}  % space normally used by the marker
+    % This work is licensed under a Creative Commons 
+    % Attribution 4.0 International Licence.
+    % Licence details:
+    % \url{http://creativecommons.org/licenses/by/4.0/}.
+    % 
+    % % final paper: en-us version 
+    %
+    % \hspace{-0.65cm}  % space normally used by the marker
+    % This work is licensed under a Creative Commons 
+    % Attribution 4.0 International License.
+    % License details:
+    % \url{http://creativecommons.org/licenses/by/4.0/}.
+}
+
+Statistical Machine Translation, whether probabilistic or neural, rests on well understood machine learning principles. Given a training sample of paired source-target sentences $(\src,trg)$ drawn from an unknown underlying distribution $\mathcal{D}$, a model parameterized (here a translation function $f_{\theta}$) by $\theta$ is trained by minimizing the empirical expectation of a loss function $\ell(f_\theta(\src), \trg)$. This approach ensures that the expectation of the translation loss will remain low when translating new (test) sentences \emph{drawn from the same distribution}.
+
+Owing to the great variability of language data, this ideal situation is rarely met in practice, warranting the study of an alternative scenario, where the test distribution $\mathcal{D'}$ differs from $\mathcal{D}$. In this setting, \emph{domain adaptation} (DA) methods are required. DA has a long history in Machine Learning in general \cite{} and in NLP in particular \cite{Daume,Blitzer}, and various techniques exist to handle both the situation where a (small) training sample drawn from $\mathcal{D'}$ is available, or where only samples of the source (or from the target) domain are given (see \cite{Chu18asurvey} for a recent survey of DA for Neural MT).
+% In a nutshell, DA attempts to compensate for the distribution mismatch either by biasing the training sample to match ${\mathcal{D'}$ (eg.\ using resampling or instance-weighting strategies), or by adapting the 
+
+A related problem is multi-domain (MD) translation \cite{Hassan17neural,Farajian17multidomain,Kobus17domaincontrol} when \emph{a single system} has to be trained  and tested with data from multiple domains. As pointed out eg.\ by \newcite{Dredze08online}, this setting borrows both from DA, but also from multi-task learning \cite{}.  If the intuitions behind MD may seem simple, the requirements of a MDMT system are rarely spelled out, which makes their evaluation difficult. For instance, should a simple average BLEU score be reported, as in \cite{}, or a domain-weighted average? How about domains not seen in training or domain labelling errors? Should they be taken into account?
+
+A related question: Can a MD learning improve over DA ? 
+
+In this paper, we try to answer these questions and to spell out in a more precise fashion the requirements that a MDMT system should meet, and to design adapted metrics aimed to evaluate how well these expectations are met. We then use these metrics to compare several recent proposals from the state-of-the-art in a typical MDMT scenario. 
+
+\section{Requirements of multi-domain MT \label{sec:requirements}}
+
+
+\section{Experimental settings \label{sec:experiments}}
+\subsection{Data}
+\subsection{MD systems}
+
+\section{Results and discussion \label{sec:results}}
+
+\section{Conclusion and outlook \label{sec:conclusion}}
+
+% --------------
+% \section*{Acknowledgements}
+
+% The acknowledgements should go immediately before the references.  Do
+% not number the acknowledgements section. Do not include this section
+% when submitting your paper for review.
+
+% include your own bib file like this:
+\bibliographystyle{coling}
+\bibliography{multidomain}
+
+\end{document}
