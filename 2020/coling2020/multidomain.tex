@@ -87,25 +87,50 @@ Abstract goes here
     % \url{http://creativecommons.org/licenses/by/4.0/}.
 }
 
-Statistical Machine Translation, whether probabilistic or neural, rests on well understood machine learning principles. Given a training sample of paired source-target sentences $(\src,trg)$ drawn from an unknown underlying distribution $\mathcal{D}$, a model parameterized (here a translation function $f_{\theta}$) by $\theta$ is trained by minimizing the empirical expectation of a loss function $\ell(f_\theta(\src), \trg)$. This approach ensures that the expectation of the translation loss will remain low when translating new (test) sentences \emph{drawn from the same distribution}.
+Data-based Machine Translation (MT), whether statistical or neural, rests on well understood machine learning principles. Given a training sample of paired source-target sentences $(\src,trg)$ drawn from an underlying distribution $\mathcal{D}$, a model parameterized by $\theta$ (here a translation function $f_{\theta}$) is trained by minimizing the empirical expectation of a loss function $\ell(f_\theta(\src, \trg))$. This approach ensures that the expectation of the translation loss will remain low when translating new (test) sentences \emph{drawn from the same distribution}.
 
-Owing to the great variability of language data, this ideal situation is rarely met in practice, warranting the study of an alternative scenario, where the test distribution $\mathcal{D'}$ differs from $\mathcal{D}$. In this setting, \emph{domain adaptation} (DA) methods are required. DA has a long history in Machine Learning in general \cite{} and in NLP in particular \cite{Daume,Blitzer}, and various techniques exist to handle both the situation where a (small) training sample drawn from $\mathcal{D'}$ is available, or where only samples of the source (or from the target) domain are given (see \cite{Chu18asurvey} for a recent survey of DA for Neural MT).
+Owing to the great variability of language data, this ideal situation is rarely met in practice, warranting the study of an alternative scenario, where the test distribution $\mathcal{D'}$ differs from $\mathcal{D}$. In this setting, \emph{domain adaptation} (DA) methods are required. DA has a long history in Machine Learning in general \cite{} and in NLP in particular \cite{Daume,Blitzer}, and various techniques exist to handle both the situations where a (small) training sample drawn from $\mathcal{D'}$ is available, or where only samples of source-side (or target-side) sentences are available (see \cite{Chu18asurvey} for a recent survey of DA for Neural MT).
 % In a nutshell, DA attempts to compensate for the distribution mismatch either by biasing the training sample to match ${\mathcal{D'}$ (eg.\ using resampling or instance-weighting strategies), or by adapting the 
 
-A related problem is multi-domain (MD) translation \cite{Hassan17neural,Farajian17multidomain,Kobus17domaincontrol} when \emph{a single system} has to be trained  and tested with data from multiple domains. As pointed out eg.\ by \newcite{Dredze08online}, this setting borrows both from DA, but also from multi-task learning \cite{}.  If the intuitions behind MD may seem simple, the requirements of a MDMT system are rarely spelled out, which makes their evaluation difficult. For instance, should a simple average BLEU score be reported, as in \cite{}, or a domain-weighted average? How about domains not seen in training or domain labelling errors? Should they be taken into account?
+A seemingly related problem is multi-domain (MD) machine translation \cite{Hassan17neural,Farajian17multidomain,Kobus17domaincontrol,Zeng18multi-domain,Pham19generic} when \emph{a single system} has to be trained  and tested with data from multiple domains. As pointed out eg.\ by \newcite{Dredze08online}, this setting borrows both from DA, but also from multi-task learning \cite{}.  If the intuitions behind MD may seem simple, the exact specifications of MDMTs system are rarely spelled out, which makes their evaluation difficult. For instance, should a simple score (eg.\ BLEU) averaged across domain be reported, as in \cite{Farajian17multidomain}, or a domain-weighted average as in \cite{}? How about domains not seen in training or domain labelling errors? How should they be taken into account in the evaluation?
 
 A related question: Can a MD learning improve over DA ? 
-
-In this paper, we try to answer these questions and to spell out in a more precise fashion the requirements that a MDMT system should meet, and to design adapted metrics aimed to evaluate how well these expectations are met. We then use these metrics to compare several recent proposals from the state-of-the-art in a typical MDMT scenario. 
+ 
+In this paper, we try to answer these questions and to spell out in a more precise fashion the requirements that a MDMT system should meet. Our main contribution are (a) ;  (b) adapted metrics aimed to evaluate how well these expectations are met; (c) a thorough reanalysis of recent approaches from the SOTA based on these new metrics. 
+ 
+% From Kobus et al
+% Our goal is toallow a model built from a diverse set of trainingdata  to  produce  in-domain  translations.  This is, to extend the coverage of generic NMT models to specific domains, with their specialized terminology and style, without lowering translation quality on more generic data.
 
 \section{Requirements of multi-domain MT \label{sec:requirements}}
 
+
+\section{Evaluation issues \label{sec:evaluation}}
+
+A general consideration is that evaluation should report our best estimates of the test loss, computed on a sample that is representative of the anticipated test conditions. Three scenarios need be distinguished:
+\begin{enumerate}
+\item test data are mixed in the same proportion as training data; this warrants the design of an unbalanced mix-domain test sets in the same proportions as in training; alternatively, if per domain scores are ever reported, their average should take the mixing proportions into account;
+\item all domains are equally likely and important in testing (the prior over domains is uniform), which warrants the computation of per domain scores, and of unweighted averages; note that in this situation, the optimal training regime is to balance the training set in the same way -- which is hardly ever done in practice, as the baseline scores always consider mixing unevenly all available data;
+\item the test distribution is neither equal to the training set, nor uniform; again if this distribution is known in advance an optimal domain mix should be used in training to compute the baseline scores, rather than using the empirical distribution of all the training data;
+\end{itemize}
 
 \section{Experimental settings \label{sec:experiments}}
 \subsection{Data}
 \subsection{MD systems}
 
 \section{Results and discussion \label{sec:results}}
+
+\section{Related work \label{sec:related}} 
+\cite{Farajian17multidomain} performs on-line adaptation at the sentence-level - processing a test sentence triggers the selection of a dedicated (small) set of fine-tuning instances assumed to be similar to the input text; using these, the generic NMT system is then tuned for some epochs, before delivering its translation. No clear notion of a domain, so it would pass all our tests, presumably.  Also improves upon systems fine tuned individually, sometimes by a wide margin. Test distribution is different from the training distribution (for domains). 
+
+The authors of \cite{Kobus17domaincontrol} propose to add extra information, either in the form of an extra (initial) domain-token, or in the form of additional domain-feature associated to each word. This approach is extended in \cite{Pham19generic} where source word embeddings are likely to vary across domains: this is achieved by spliting the embedding vector into a generic and a domain-specific part (one for each possible domain). 
+
+The motivation of \cite{Zeng18multidomain} are to leverage as much as possible the available information in the training data. The main assumption is that translation examples can be useful not only for test sentences of the same domains, but also for other domains. In this approach, the upper layers the MT aimed to sort out domain specific information on the one hand, and domain-agnostic information on the other hand, using auxiliary tasks, hoping that the domain-agnostic part will be useful across the board. These two sets of representations are then input to a conventional attentional sequence to sequence models; scores are reported separately per domain, suggesting that all domains are equally important at test time.
+
+The motivations of \cite{Tars18multidomain} conjoins both (a) they argue that fine-tuning is brittle, owing to the reduced size of the tuning data, and can impair generalization; (b) they also argue that having one domain-agnostic system is a practical solution in many contexts
+\begin{quote}
+  In-domain fine-tuning has two main shortcomings: it depends on the availability of sufficientamounts of in-domain data in order to avoid over-fitting and it results in degraded performance for all other domains. The latter means that for translating multiple domains one has to run an individual NMT system for each domain.
+\end{quote}
+In their experiments, they consider that all domains are equally important and report individual scores for each known domain; further experiments are performed with automatically induced domain tags, which show that working with automatically induced tags (at the sentence level) is a viable alternative to using corpus labels as domain tags.
 
 \section{Conclusion and outlook \label{sec:conclusion}}
 
