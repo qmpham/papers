@@ -1,4 +1,12 @@
-% Hassan Sajjad, Nadir Durrani, Fahim Dalvi, Yonatan Belinkov, and Stephan Vogel.  2017.  Neural machine trans-lation training in a multi-domain scenario.   InProceedings of the Twelfth International Workshop on SpokenLanguage Translation (IWSLT), Tokyo, Japan.
+@inproceedings{Clark12onesystem,
+  title={One system, many domains: Open-domain statistical machine translation via feature augmentation},
+  author={Clark, Jonathan H. and Lavie, Alon and Dyer, Chris},
+  year={2012},
+  publisher={Carnegie Mellon University}
+  Address = {San Diego, CA},
+  Booktitle = {Proceedings of the Tenth Biennial Conference of the Association for Machine Translation in the Americas},
+  Series = {AMTA 2012}
+}
 
 @inproceedings{Saunders19ucam,
     title = "{UCAM} Biomedical Translation at {WMT}19: Transfer Learning Multi-domain Ensembles",
@@ -14,7 +22,7 @@
     abstract = "The 2019 WMT Biomedical translation task involved translating Medline abstracts. We approached this using transfer learning to obtain a series of strong neural models on distinct domains, and combining them into multi-domain ensembles. We further experimented with an adaptive language-model ensemble weighting scheme. Our submission achieved the best submitted results on both directions of English-Spanish.",
 }
 
-@ARTICLE{Su19exploring,
+@article{Su19exploring,
 author={Jinsong Su and Jiali Zeng and Jun Xie and Huating Wen and Yongjing Yin and Yang Liu},
 journal={IEEE Transactions on Pattern Analysis and Machine Intelligence (PAMI)},
 title={Exploring Discriminative Word-Level Domain Contexts for Multi-domain Neural Machine Translation},
@@ -116,6 +124,15 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
 	url = {https://arxiv.org/pdf/1409.0473.pdf},
 }
 
+@InProceedings{Banerjee10combining,
+  author = 	 {Banerjee, Pratyush and Du, Jinhua and Li, Baoli and Kumar Naskar, Sudip and Way, Andy and van Genabith, Josef},
+  title = 	 {Combining multi-domain statistical machine translation models using automatic classifiers},
+  booktitle = {Proceedings of the  9th Conference of the Association for Machine Translation in the Americas},
+  year = 	 2010,
+  series = 	 {AMTA 2010},
+  address = 	 {Denver, CO, USA}
+}
+
 @article{Biao2017CARENMT,
  author = {Zhang, Biao and Xiong, Deyi and Su, Jinsong and Duan, Hong},
  title = {A Context-Aware Recurrent Encoder for Neural Machine Translation},
@@ -148,9 +165,7 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
 }
 
 @InProceedings{Britz2017mixing,
-  author = 	"Britz, Denny
-		and Le, Quoc
-		and Pryzant, Reid",
+  author = 	"Britz, Denny and Le, Quoc and Pryzant, Reid",
   title = 	"Effective Domain Mixing for Neural Machine Translation",
   booktitle = 	"Proceedings of the Second Conference on Machine Translation",
   year = 	"2017",
@@ -271,11 +286,20 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
 	Year = {2008},
 	Bdsk-Url-1 = {https://www.aclweb.org/anthology/D08-1072}}
 
+@article{Dredze09multidomain,
+Abstract = {State-of-the-art statistical NLP systems for a variety of tasks learn from labeled training data that is often domain specific. However, there may be multiple domains or sources of interest on which the system must perform. For example, a spam filtering system must give high quality predictions for many users, each of whom receives emails from different sources and may make slightly different decisions about what is or is not spam. Rather than learning separate models for each domain, we explore systems that learn across multiple domains. We develop a new multi-domain online learning framework based on parameter combination from multiple classifiers. Our algorithms draw from multi-task learning and domain adaptation to adapt multiple source domain classifiers to a new target domain, learn across multiple similar domains, and learn across a large number of disparate domains. We evaluate our algorithms on two popular NLP domain adaptation tasks: sentiment classification and spam filtering.},
+Author = {Mark Dredze and Alex Kulesza and Koby Crammer},
+File = {http://www.springerlink.com/content/a78049767680386l/},
+Journal = {Machine Learning},
+Number = {1-2},
+Pages = {123-149},
+Title = {Multi-Domain Learning by Confidence-Weighted Parameter Combination},
+Volume = {79},
+Year = {2010}
+}
+
 @InProceedings{Duh13selection,
-  author = 	"Duh, Kevin
-		and Neubig, Graham
-		and Sudoh, Katsuhito
-		and Tsukada, Hajime",
+  author = 	"Duh, Kevin and Neubig, Graham and Sudoh, Katsuhito and Tsukada, Hajime",
   title = 	"Adaptation Data Selection using Neural Language Models: Experiments in Machine Translation",
   booktitle = 	"Proceedings of the 51st Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)",
   year = 	"2013",
@@ -296,7 +320,8 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
 	Url = {https://www.aclweb.org/anthology/W17-4713},
 	Year = {2017},
 	Bdsk-Url-1 = {https://www.aclweb.org/anthology/W17-4713},
-	Bdsk-Url-2 = {https://doi.org/10.18653/v1/W17-4713}} 
+	Bdsk-Url-2 = {https://doi.org/10.18653/v1/W17-4713}}
+	
 @inproceedings{Finkel09hierarchical,
 	Address = {Boulder, Colorado},
 	Author = {Finkel, Jenny Rose and Manning, Christopher D.},
@@ -438,10 +463,8 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
         Year = {2012}
 }
 
-<<<<<<< Updated upstream
 @InProceedings{Kalchbrenner13recurrent,
-  author = 	"Kalchbrenner, Nal
-		and Blunsom, Phil",
+  author = 	"Kalchbrenner, Nal and Blunsom, Phil",
   title = 	"Recurrent Continuous Translation Models",
   booktitle = 	"Proceedings of the 2013 Conference on Empirical Methods in Natural Language Processing",
   year = 	"2013",
@@ -450,13 +473,9 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
   address = 	"Seattle, Washington, USA",
   url = 	"http://aclweb.org/anthology/D13-1176"
 }
-=======
+
 @InProceedings{Khayrallah2017lattice,
-  author = 	"Khayrallah, Huda
-		and Kumar, Gaurav
-		and Duh, Kevin
-		and Post, Matt
-		and Koehn, Philipp",
+  author = 	"Khayrallah, Huda and Kumar, Gaurav and Duh, Kevin and Post, Matt and Koehn, Philipp",
   title = 	"Neural Lattice Search for Domain Adaptation in Machine Translation",
   booktitle = 	"Proceedings of the Eighth International Joint Conference on Natural Language Processing (Volume 2: Short Papers)",
   year = 	"2017",
@@ -465,7 +484,6 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
   address = 	"Taipei, Taiwan",
   url = 	"http://aclweb.org/anthology/I17-2004"
 }
->>>>>>> Stashed changes
 
 @misc{Khresmoi17test,
  title = {Khresmoi Summary Translation Test Data 2.0},
@@ -565,10 +583,7 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
 }
 
 @InProceedings{Miceli17regularize,
-  author = 	"Miceli Barone, Antonio Valerio
-		and Haddow, Barry
-		and Germann, Ulrich
-		and Sennrich, Rico",
+  author = 	"Miceli Barone, Antonio Valerio and Haddow, Barry and Germann, Ulrich and Sennrich, Rico",
   title = 	"Regularization techniques for fine-tuning in neural machine translation",
   booktitle = 	"Proceedings of the 2017 Conference on Empirical Methods in Natural      Language Processing    ",
   year = 	"2017",
@@ -580,8 +595,7 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
 }
 
 @InProceedings{Michel2018extreme,
-  author = 	"Michel, Paul
-		and Neubig, Graham",
+  author = 	"Michel, Paul and Neubig, Graham",
   title = 	"Extreme Adaptation for Personalized Neural Machine Translation",
   booktitle = 	"Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)",
   year = 	"2018",
@@ -592,8 +606,7 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
 }
 
 @InProceedings{Moore10selection,
-  author = 	"Moore, Robert C.
-		and Lewis, William",
+  author = 	"Moore, Robert C. and Lewis, William",
   title = 	"Intelligent Selection of Language Model Training Data",
   booktitle = 	"Proceedings of the ACL 2010 Conference Short Papers",
   year = 	"2010",
@@ -639,10 +652,7 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
 }
 
 @inproceedings{Pei2018MADA,
-  author    = {Zhongyi Pei and
-               Zhangjie Cao and
-               Mingsheng Long and
-               Jianmin Wang},
+  author    = {Zhongyi Pei and Zhangjie Cao and Mingsheng Long and Jianmin Wang},
   title     = {Multi-Adversarial Domain Adaptation},
   booktitle = {Proceedings of the Thirty-Second {AAAI} Conference on Artificial Intelligence,
                (AAAI-18), the 30th innovative Applications of Artificial Intelligence
@@ -658,7 +668,6 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
-<<<<<<< Updated upstream
 @InProceedings{Peng17multitask,
   author = 	 {Nanyun Peng and Mark Dredze},
   title = 	 {Multi-task domain adaptation for sequence tagging},
@@ -669,8 +678,6 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
   series = 	 {REP4NLP@ACL},
   address = 	 {Vancouver, Canada}}
 
-=======
->>>>>>> Stashed changes
 @inproceedings{Platanios18contextual,
 	Address = {Brussels, Belgium},
 	Author = {Platanios, Emmanouil Antonios and Sachan, Mrinmaya and Neubig, Graham and Mitchell, Tom},
@@ -720,9 +727,7 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
 }
 
 @InProceedings{Sennrich16improving,
-  author = 	"Sennrich, Rico
-		and Haddow, Barry
-		and Birch, Alexandra",
+  author = 	"Sennrich, Rico	and Haddow, Barry and Birch, Alexandra",
   title = 	"Improving Neural Machine Translation Models with Monolingual Data",
   booktitle = 	"Proceedings of the 54th Annual Meeting of the Association for      Computational Linguistics (Volume 1: Long Papers)    ",
   year = 	"2016",
@@ -745,11 +750,9 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
 }
 
 @InProceedings{Sennrich16politeness,
-  author = 	"Sennrich, Rico
-		and Haddow, Barry
-		and Birch, Alexandra",
+  author = 	"Sennrich, Rico and Haddow, Barry and Birch, Alexandra",
   title = 	"Controlling Politeness in Neural Machine Translation via Side Constraints",
-  booktitle = 	"Proceedings of the 2016 Conference of the North American Chapter of the      Association for Computational Linguistics: Human Language Technologies    ",
+  booktitle = 	"Proceedings of the 2016 Conference of the North American Chapter of the      Association for Computational Linguistics: Human Language Technologies",
   year = 	"2016",
   publisher = 	"Association for Computational Linguistics",
   pages = 	"35--40",
@@ -840,13 +843,9 @@ url = {http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf}
 	Bdsk-Url-2 = {https://doi.org/10.18653/v1/N18-2080}}
 
 @InProceedings{Wang14neural,
-  author = 	"Wang, Rui
-		and Zhao, Hai
-		and Lu, Bao-Liang
-		and Utiyama, Masao
-		and Sumita, Eiichiro",
+  author = 	"Wang, Rui and Zhao, Hai and Lu, Bao-Liang and Utiyama, Masao and Sumita, Eiichiro",
   title = 	"Neural Network Based Bilingual Language Model Growing for Statistical Machine Translation ",
-  booktitle = 	"Proceedings of the 2014 Conference on Empirical Methods in Natural      Language Processing (EMNLP)    ",
+  booktitle = 	"Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)    ",
   year = 	"2014",
   publisher = 	"Association for Computational Linguistics",
   pages = 	"189--195",
@@ -856,10 +855,7 @@ url = {http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf}
 }
 
 @InProceedings{Wang16connecting,
-  author = 	"Wang, Rui
-		and Zhao, Hai
-		and Lu, Bao-Liang
-		and Utiyama, Masao
+  author = 	"Wang, Rui and Zhao, Hai and Lu, Bao-Liang and Utiyama, Masao
 		and Sumita, Eiichiro",
   title = 	"Connecting Phrase based Statistical Machine Translation Adaptation",
   booktitle = 	"Proceedings of COLING 2016, the 26th International Conference on Computational Linguistics: Technical Papers",
@@ -938,10 +934,7 @@ url = {http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf}
 
 
 @InProceedings{Zhang16topicinformed,
-  author = 	"Zhang, Jian
-		and Li, Liangyou
-		and Way, Andy
-		and Liu, Qun",
+  author = 	"Zhang, Jian and Li, Liangyou and Way, Andy and Liu, Qun",
   title = 	"Topic-Informed Neural Machine Translation",
   booktitle = 	"Proceedings of the 26th International Conference on Computational Linguistics: Technical Papers",
   series =      "COLING 2016",
