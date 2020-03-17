@@ -1,8 +1,42 @@
+
+
+@article{Daume06domain,
+  title={Domain adaptation for statistical classifiers},
+  author={Daum\'e {III}, Hal and Marcu, Daniel},
+  journal={Journal of Artificial Intelligence Research (JAIR)},
+  volume={26},
+  pages={101--126},
+  year={2006}
+}
+
+@phdthesis{Blitzer07domain,
+  title={Domain adaptation of natural language processing systems},
+  author={Blitzer, John},
+  journal={University of Pennsylvania},
+  pages={1--106},
+  year={2007}
+}
+
+@misc{Arivazhagan19massively,
+  author    = {Naveen Arivazhagan and Ankur Bapna and
+               Orhan Firat and Dmitry Lepikhin and
+               Melvin Johnson and Maxim Krikun and
+               Mia Xu Chen and Yuan Cao and
+               George Foster and Colin Cherry and
+               Wolfgang Macherey and Zhifeng Chen and Yonghui Wu},
+  title     = {Massively Multilingual Neural Machine Translation in the Wild: Findings and Challenges},
+  archivePrefix   = {arXiv},
+  eprint    = {1907.05019},
+  year      = {2019},
+  primaryClass = {cs.CL},
+  url       = {http://arxiv.org/abs/1907.05019}
+}
+
 @inproceedings{Clark12onesystem,
   title={One system, many domains: Open-domain statistical machine translation via feature augmentation},
   author={Clark, Jonathan H. and Lavie, Alon and Dyer, Chris},
   year={2012},
-  publisher={Carnegie Mellon University}
+  publisher={Carnegie Mellon University},
   Address = {San Diego, CA},
   Booktitle = {Proceedings of the Tenth Biennial Conference of the Association for Machine Translation in the Americas},
   Series = {AMTA 2012}
@@ -17,7 +51,6 @@
     address = "Florence, Italy",
     publisher = "Association for Computational Linguistics",
     url = "https://www.aclweb.org/anthology/W19-5421",
-    doi = "10.18653/v1/W19-5421",
     pages = "169--174",
     abstract = "The 2019 WMT Biomedical translation task involved translating Medline abstracts. We approached this using transfer learning to obtain a series of strong neural models on distinct domains, and combining them into multi-domain ensembles. We further experimented with an adaptive language-model ensemble weighting scheme. Our submission achieved the best submitted results on both directions of English-Spanish.",
 }
@@ -59,13 +92,14 @@ month={},}
 	Url = {https://zenodo.org/record/3524959/files/IWSLT2019_paper_10.pdf},
 	Year = {2019}}
 
-@misc{Jiang2019multidomain,
+@misc{Jiang19multidomain,
     title={Multi-Domain Neural Machine Translation with Word-Level Adaptive Layer-wise Domain Mixing},
     author={Haoming Jiang and Chen Liang and Chong Wang and Tuo Zhao},
     year={2019},
     eprint={1911.02692},
     archivePrefix={arXiv},
-    primaryClass={cs.CL}
+    primaryClass={cs.CL},
+    url= {http://arxiv.org/abs/1911.02692},
 }
 
 @inproceedings{Jiang07instance,
@@ -224,14 +258,14 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
 @inproceedings{Cho14properties,
 	Address = {Doha, Qatar},
 	Author = {Cho, Kyunghyun and van Merrienboer, Bart and Bahdanau, Dzmitry and Bengio, Yoshua},
-	Booktitle = {Proceedings of SSST-8, Eighth Workshop on Syntax, Semantics and Structure in Statistical Translation},
+	Booktitle = {Proceedings of the Eighth Workshop on Syntax, Semantics and Structure in Statistical Translation},
+	Series = {SSST-8},
 	Month = {October},
 	Pages = {103--111},
 	Title = {On the Properties of Neural Machine Translation: Encoder--Decoder Approaches},
 	Url = {http://www.aclweb.org/anthology/W14-4012},
 	Year = {2014},
-	Bdsk-Url-1 = {http://www.aclweb.org/anthology/W14-4012}}
-
+}
 @InProceedings{Chu18asurvey,
   author = 	"Chu, Chenhui and Wang, Rui",
   title = 	"A Survey of Domain Adaptation for Neural Machine Translation",
@@ -245,29 +279,27 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
 @InProceedings{Chu18multilingual,
   author = 	 {Chenhui Chu and Raj Dabre},
   title = 	 {Multilingual and multi-domain adaptation for neural machine translation},
-  booktitle = {Proceedings of the 24st Annual Meeting of the Association for Natural Language Processing (NLP 2018)},
+  booktitle = {Proceedings of the 24st Annual Meeting of the Association for Natural Language Processing},
+  series = {NLP 2018},
   year = 	 2018,
   pages = 	 {909-–912},
-  address = 	 {Okayama, Japan}}
-
+  address = 	 {Okayama, Japan}
+}
 @InProceedings{Chu2017comparison,
   author = 	"Chu, Chenhui and Dabre, Raj and Kurohashi, Sadao",
   title = 	"An Empirical Comparison of Domain Adaptation Methods for Neural Machine Translation    ",
   booktitle = 	"Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)    ",
   year = 	"2017",
-  publisher = 	"Association for Computational Linguistics",
+  series = 	"ACL 2017",
   pages = 	"385--391",
   address = 	"Vancouver, Canada",
-  doi = 	"10.18653/v1/P17-2061",
   url = 	"http://aclweb.org/anthology/P17-2061"
 }
-
 @inproceedings{Daume07frustratingly,
 	Address = {Prague, Czech Republic},
 	Author = {Daum\'e III, Hal},
 	Booktitle = {Proceedings of the 45th Annual Meeting of the Association of Computational Linguistics},
-	Date-Added = {2019-04-28 19:22:53 +0200},
-	Date-Modified = {2019-04-28 19:22:53 +0200},
+	Series = {ACL 2007},
 	Pages = {256--263},
 	Title = {Frustratingly Easy Domain Adaptation},
 	Url = {http://aclweb.org/anthology/P07-1033},
@@ -414,12 +446,9 @@ Year = {2010}
 	Address = {Vancouver, Canada},
 	Author = {Ha, Thanh-He and Niehues, Jan and Waibel, Alex},
 	Booktitle = {Proceedings of the 13th International Workshop on Spoken Language Translation},
-	Date-Added = {2019-05-19 16:26:43 +0200},
-	Date-Modified = {2019-05-19 16:28:13 +0200},
 	Series = {IWSLT 2016},
 	Title = {Toward Multilingual Neural Machine Translation with Universal Encoder and Decoder},
 	Year = {2016}}
-
 
 @inproceedings{Hassan17neural,
   title={Neural Machine Translation Training in a Multi-Domain Scenario},
@@ -625,7 +654,6 @@ Year = {2010}
   address   = {Santa Fe, New Mexico, USA},
   year      = {2018},
   editor    = {Emily M. Bender and Leon Derczynski and Pierre Isabelle},
-  crossref  = {DBLP:conf/coling/2018},
   url       = {https://aclanthology.info/papers/C18-1086/c18-1086},
 }
 
