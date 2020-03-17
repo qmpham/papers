@@ -145,6 +145,9 @@ In theory, evaluation procedures should report realistic estimates of the test l
 \item all domains are equally likely and important in testing (the prior over test domains is uniform), which warrants the computation of per domain scores and of unweighted averages; note that in this situation, the optimal training regime is to balance the training set in the same way -- which is hardly ever done in practice, as the baseline scores always consider mixing unevenly all available data;
 \item the test distribution is neither equal to the training set, nor uniform; again if this distribution is known in advance an optimal domain mix should be used in training to compute the baseline scores, rather than using the empirical distribution of all the training data;
 \end{enumerate}
+The papers in the literature are seldom very explicit regarding their assumption regarding the test distribution. In most cases, per-domain performances are reported, and even sometimes averaged, suggesting that the scenario~2 is the most common situation. 
+
+Another aspect of the evaluation that is hardly, if ever, discussed, is the computational cost of training one single vs multiple systems.
 
 \section{Challenging multi-domain translation systems}
 In this section, we discuss the operational requirements that can be expected from a true multi-domain system, as well as ways to evaluate how much these requirements are met in practice.
@@ -225,46 +228,46 @@ To reduce the number of lexical units and make our systems open-vocabulary, we a
 
 \subsection{Baselines \label{ssec:baselines}}
 
-Our baselines correspond to standard practices for mix-domain systems. Using the ransformer architecture of \shortcite{Vaswani17attention} implemented in OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}, we build the following systems:
+Our baselines correspond to standard practices for mix-domain systems.\footnote{We however omit domain-specific systems trained with a subset of the data, which are often inferior to the mix-domain strategy eg.\ \cite{Britz2017mixing}.} Using the Transformer architecture of \shortcite{Vaswani17attention} implemented in OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}, we build the following systems:
 
 \begin{itemize}
 \item a generic model trained on a concatenation of all corpora (\texttt{Mixed}). We develop two versions of this system, one with domains are unbalanced, and one where all domains are equally represented in training (cf.\ section~\ref{sec:evaluation});
-\item models tuned separately on each domain for respectively (10000, 15000, 5000)\fyTodo{fix this} iterations using in-domain data (\texttt{ft$_{EMEA}$}, \texttt{ft$_{EPPS}$}, \texttt{ft$_{ECB}$});
+\item models fine-tuned \cite{Freitag16fast} separately on each domain for respectively (10000, 15000, 5000)\fyTodo{fix this} iterations using in-domain data (\texttt{ft$_{EMEA}$}, \texttt{ft$_{EPPS}$}, \texttt{ft$_{ECB}$}). In our setting, fine-tuning may update all the parameters of the initial generic model.\fyTodo{Check This}.
 \end{itemize}
 
-For all models, we set the embeddings size and the size of hidden layers to~512. Our Transformers use multi-head attention with 8 heads in each of the 6 layers; the inner feedforward layer contains 2048 cells.  
+For all models, we set the embeddings size and the size of hidden layers to~512. Transformers use multi-head attention with 8 heads in each of the 6 layers; the inner feedforward layer contains 2048 cells.
 
 % The domain control systems are exactly as their baseline counterparts (RNN and Transformer), with an additional 2 cells encoding the domain on the input layer.
  %
-Training is performed using Adam, with parameters $\beta_1=0.9$, $\beta_2= 0.98$ and Noam decay ($warmup\_steps=4000$). In all cases, we use a batch size of~128 and a dropout rate of 0.1 for all layers. 
-All our systems are implemented in OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}.
+Training is performed using Adam, with parameters $\beta_1=0.9$, $\beta_2= 0.98$ and Noam decay ($warmup\_steps=4000$). In all cases, we use a batch size of~128 and a dropout rate of 0.1 for all layers.  All our systems are implemented in OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}.
 
 \subsection{Multi-domain systems \label{ssec:systems}}
-Our comparison of multidomain systems includes the following reimplementations of multiple proposals from the recent literature:
+Our comparison of multidomain systems includes the following reimplementations of recent proposals from the literature:
 \begin{itemize}
 \item a system using domain control as in \cite{Kobus17domaincontrol}: domain information is introduced as an additional feature for each word \fyTodo{Check this} (\texttt{DC});
 \item a system using lexicalized domain representations \cite{Pham19generic}: word embeddings are composed of a generic and a domain specific part;
 \item the multi-domain model of \cite{Zeng18multidomain} (\texttt{WDCMT}), using the transformer-based version of \cite{Su19exploring}: in this approach two representations, a domain-agnostic and a domain-specialized representation of the input are simultaneously processed; supervised classification models and adversarial training are used to compute these representations.
-\item The layer adaptive layer of \cite{Jiang19multidomain} ...
+\item The layer adaptive approach of \cite{Jiang19multidomain} ...
 \end{itemize}
 
-Note that we did not consider including the system of \cite{Farajian17multidomain} for the following reasons. This system has no problem with scaling to a large number of domains.\fyTodo{TBC}
+Note that we did not include here the system of \cite{Farajian17multidomain} which performs on-the-fly tuning for each test sentence, and slightly diverges from our notion of MDMT, which should be able to handle domain information in training and testing. This system has shown to meet many of our requirements, and would also have no problem scaling to an large number of domains.\fyTodo{TBC}
 
 \section{Results and discussion \label{sec:results}}
 
 \section{Related work \label{sec:related}}
 
-\cite{Farajian17multidomain} performs on-line adaptation at the sentence-level - processing a test sentence triggers the selection of a dedicated (small) set of fine-tuning instances assumed to be similar to the input text; using these, the generic NMT system is then tuned for some epochs, before delivering its translation. No clear notion of a domain, so it would pass all our tests, presumably.  Also improves upon systems fine tuned individually, sometimes by a wide margin. Test distribution is different from the training distribution (for domains). 
 
-The authors of \cite{Kobus17domaincontrol} propose to inject additional domain feature in the model, either in the form of an extra (initial) domain-token, or in the form of additional domain-feature associated to each word. This approach is extended in \cite{Pham19generic} where source word embeddings are likely to vary across domains: this is achieved by spliting the embedding vector into a generic and a domain-specific part (one for each possible domain). Such approach strongly relies on earlier proposals from the era of statistical MT \cite{Daume07frustratingly,Clark12onesystem}. 
+The authors of \cite{Kobus17domaincontrol} propose to inject additional domain feature in the model, either in the form of an extra (initial) domain-token, or in the form of additional domain-feature associated to each word. This approach is extended in \cite{Pham19generic} where source word embeddings are likely to vary across domains: this is achieved by spliting the embedding vector into a generic and a domain-specific part (one for each possible domain). Such feature-based approaches strongly relies on earlier proposals from the era of statistical MT \cite{Daume07frustratingly,Clark12onesystem}.
 
-The motivation of \cite{Zeng18multidomain,Su19exploring} are to leverage as much as possible the available information in the training data. The main assumption is that translation examples can be useful not only for test sentences of the same domains, but also for other domains. In this approach, the upper layers the MT aimed to sort out domain specific information on the one hand, and domain-agnostic information on the other hand, using auxiliary tasks, hoping that the domain-agnostic part will be useful across the board. These two sets of representations are then input to a conventional attentional sequence to sequence models; scores are reported separately per domain, suggesting that all domains are equally important at test time.
+In \cite{Britz17mixing}, alternative methods are considered which aim to ensure that domain information is actually used in a mix-domain system. Three alternatives are considered, using either domain classification (or domain normalization, via adversarial training) on source or target representations. There is no clear winner in either of their three language pairs considered, which only distinguish a limited number of domains. The same kinds of techniques are simultaneously at play in \cite{Zeng18multidomain,Su19exploring}: in this approach, the upper layers of the MT aimed to sort out domain specific information on the one hand, and domain-agnostic information on the other hand, using auxiliary tasks, hoping that the domain-agnostic part will be useful across the board. These two sets of representations are then input to a conventional attentional sequence-to -sequence models in \cite{Zeng18multidomain}, and with Transformers in \cite{Su19exploring}; scores are reported separately per domain, suggesting that all domains are equally important at test time.
 
 The motivations of \cite{Tars18multidomain} conjoins both (a) they argue that fine-tuning is brittle, owing to the reduced size of the tuning data, and can impair generalization; (b) they also argue that having one domain-agnostic system is a practical solution in many contexts
 \begin{quote}
   In-domain fine-tuning has two main shortcomings: it depends on the availability of sufficientamounts of in-domain data in order to avoid over-fitting and it results in degraded performance for all other domains. The latter means that for translating multiple domains one has to run an individual NMT system for each domain.
 \end{quote}
 In their experiments, they consider that all domains are equally important and report individual scores for each known domain; further experiments are performed with automatically induced domain tags, which show that working with automatically induced tags (at the sentence level) is a viable alternative to using corpus labels as domain tags.
+
+\cite{Farajian17multidomain} performs on-line adaptation at the sentence-level - processing a test sentence triggers the selection of a dedicated (small) set of fine-tuning instances assumed to be similar to the input text; using these, the generic NMT system is then tuned for some epochs, before delivering its translation. No clear notion of a domain, so it would pass all our tests, presumably.  Also improves upon systems fine-tuned individually, sometimes by a wide margin. Test distribution is different from the training distribution (for domains). 
 
 \section{Conclusion and outlook \label{sec:conclusion}}
 
