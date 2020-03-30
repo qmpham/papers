@@ -1,24 +1,57 @@
 % -*- mode:bibtex -*-
 % encoding:utf-8
 
-@article{Caruana97multitask,
-	Abstract = {Multitask Learning is an approach to inductive transfer that improves generalization by using the domain information contained in the training signals of related tasks as an inductive bias. It does this by learning tasks in parallel while using a shared representation; what is learned for each task can help other tasks be learned better. This paper reviews prior work on MTL, presents new evidence that MTL in backprop nets discovers task relatedness without the need of supervisory signals, and presents new results for MTL with k-nearest neighbor and kernel regression. In this paper we demonstrate multitask learning in three domains. We explain how multitask learning works, and show that there are many opportunities for multitask learning in real domains. We present an algorithm and results for multitask learning with case-based methods like k-nearest neighbor and kernel regression, and sketch an algorithm for multitask learning in decision trees. Because multitask learning works, can be applied to many different kinds of domains, and can be used with different learning algorithms, we conjecture there will be many opportunities for its use on real-world problems.},
-	Author = {Caruana, Rich},
-	Da = {1997/07/01},
-	Date-Added = {2020-03-25 13:06:42 +0100},
-	Date-Modified = {2020-03-25 13:06:42 +0100},
-	Doi = {10.1023/A:1007379606734},
-	Id = {Caruana1997},
-	Isbn = {1573-0565},
+@article{Irvine13measuring,
+author = {Irvine, Ann and Morgan, John and Carpuat, Marine and Daumé, Hal and Munteanu, Dragos},
+title = {Measuring Machine Translation Errors in New Domains},
+journal = {Transactions of the Association for Computational Linguistics},
+volume = {1},
+number = {},
+pages = {429-440},
+year = {2013},
+doi = {10.1162/tacl\_a\_00239},
+URL = {https://doi.org/10.1162/tacl_a_00239},
+abstract = { We develop two techniques for analyzing the effect of porting a machine translation system to a new domain. One is a macro-level analysis that measures how domain shift affects corpus-level evaluation; the second is a micro-level analysis for word-level errors. We apply these methods to understand what happens when a Parliament-trained phrase-based machine translation system is applied in four very different domains: news, medical texts, scientific articles and movie subtitles. We present quantitative and qualitative experiments that highlight opportunities for future research in domain adaptation for machine translation. }
+}
+
+@article{Shimodaira00improving,
+title = "Improving predictive inference under covariate shift by weighting the log-likelihood function",
+journal = "Journal of Statistical Planning and Inference",
+volume = "90",
+number = "2",
+pages = "227 - 244",
+year = "2000",
+issn = "0378-3758",
+author = "Hidetoshi Shimodaira",
+}
+
+@article{Ben-David09atheory,
+	Author = {Shai Ben-David and John Blitzer and Koby Crammer and Alex Kulesza and Fernando Pereira and Jenn Wortman},
+	Issue = {Special Issue on Learning from Multiple Sources},
+	Volume = {79},
+	pages = {151-175},
 	Journal = {Machine Learning},
+	Title = {A Theory of Learning from Different Domains},
 	Number = {1},
-	Pages = {41--75},
-	Title = {Multitask Learning},
-	Ty = {JOUR},
-	Url = {https://doi.org/10.1023/A:1007379606734},
-	Volume = {28},
-	Year = {1997},
-	Bdsk-Url-1 = {https://doi.org/10.1023/A:1007379606734}}
+        url = {https://doi.org/10.1007/s10994-009-5152-4},
+	Year = {2010}}
+
+
+@InProceedings{dredze07,
+  author =	 {Dredze, Mark and Blitzer, John and Pratim Talukdar,
+                  Partha and Ganchev, Kuzman and Graca, Jo\~ao and
+                  Pereira, Fernando},
+  title =	 {Frustratingly Hard Domain Adaptation for Dependency
+                  Parsing},
+  booktitle =	 {Proceedings of the CoNLL Shared Task Session of
+                  EMNLP-CoNLL 2007},
+  month =	 {June},
+  year =	 {2007},
+  address =	 {Prague, Czech Republic},
+  publisher =	 {Association for Computational Linguistics},
+  pages =	 {1051--1055},
+  url =		 {http://www.aclweb.org/anthology/D/D07/D07-1112}
+}
 
 @inproceedings{Farajian17neural,
     title = "Neural vs. Phrase-Based Machine Translation in a Multi-Domain Scenario",
@@ -160,16 +193,6 @@ month={},}
 	Title = {{Generic and Specialized Word Embeddings for Multi-Domain Machine Translation}},
 	Url = {https://zenodo.org/record/3524959/files/IWSLT2019_paper_10.pdf},
 	Year = {2019}}
-
-@misc{Jiang19multidomain,
-    title={Multi-Domain Neural Machine Translation with Word-Level Adaptive Layer-wise Domain Mixing},
-    author={Haoming Jiang and Chen Liang and Chong Wang and Tuo Zhao},
-    year={2019},
-    eprint={1911.02692},
-    archivePrefix={arXiv},
-    primaryClass={cs.CL},
-    url= {http://arxiv.org/abs/1911.02692},
-}
 
 @inproceedings{Jiang07instance,
     title = "Instance Weighting for Domain Adaptation in {NLP}",
@@ -460,7 +483,19 @@ Year = {2010}
   author={Markus Freitag and Yaser Al-Onaizan},
   journal={CoRR},
   year={2016},
+  url= {http://arxiv.org/abs/1612.06897},
   volume={abs/1612.06897}
+}
+
+@article{Jiang19multidomain,
+    title={Multi-Domain Neural Machine Translation with Word-Level Adaptive Layer-wise Domain Mixing},
+    author={Haoming Jiang and Chen Liang and Chong Wang and Tuo Zhao},
+    year={2019},
+    journal={CoRR},
+    volume = {abs/1911.02692},
+    archivePrefix={arXiv},
+    primaryClass={cs.CL},
+    url= {http://arxiv.org/abs/1911.02692},
 }
 
 
