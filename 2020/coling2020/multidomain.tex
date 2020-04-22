@@ -17,8 +17,9 @@
 %%e.agirre@ehu.es or Sergi.Balari@uab.es
 %% and that of ACL 08 by Joakim Nivre and Noah Smith
 
-\documentclass[11pt]{article}
-\usepackage{coling2020}
+\documentclass[11pt,a4paper]{article}
+% \usepackage{coling2020}
+\usepackage{tacl2018v2}
 \usepackage{times}
 \usepackage{url}
 \usepackage{latexsym}
@@ -83,7 +84,7 @@ When building machine translation systems, it is often the case that one need to
 % Comment out the instructions (first text) and uncomment the 8 lines
 % under "final paper" for your variant of English.
 % 
-\blfootnote{
+\footnote{
     %
     % for review submission
     %
@@ -120,10 +121,10 @@ If the intuitions behind MDMT are quite simple, the exact specifications of MDMT
 
 A related question concerns the relationship between domain adaptation and multi-domain translation. The latter setting seems more challenging and one would expect that adapting a system to a known target domain $A$ will be easier than training a MDMT system, where only part of the data belongs to domain $A$. Are there situations where MD systems can surpass DA, as is sometimes expected?
  
-In this paper, we try to spell out in a more precise fashion the requirements that an effective MDMT system should meet (section~\ref{sec:requirements}). Our first contribution is thus of methodological nature and consists of lists of expected properties of MDMT system and associated measurements to evaluate them (section~\ref{sec:challenging}). In doing so, we also shed lights on new problems that arise in this context, regarding for instance the accomodation of new domains in the course of training, or the computation of automating domain tags.\fyDone{New problems - continuous learning, automatic domains} Our second main contribution is experimental and consists in a thorough reanalysis of eight recent multi-domain approaches from the literature, including a variant of a model initially introduced for DA. We show in section~\ref{sec:experiments}  existing approaches still fall short to match many of these requirements, notably with respect to handling a large amount of heterogeneous domains and to dynamically integrating new domains in training.\fyDone{Spell out conclusions}
+In this paper, we spell out in a more precise fashion the requirements that an effective MDMT system should meet (section~\ref{sec:requirements}). Our first contribution is thus of methodological nature and consists of lists of expected properties of MDMT system and associated measurements to evaluate them (section~\ref{sec:challenging}). In doing so, we also shed lights on new problems that arise in this context, regarding for instance the accomodation of new domains in the course of training, or the computation of automating domain tags.\fyDone{New problems - continuous learning, automatic domains} Our second main contribution is experimental and consists in a thorough reanalysis of eight recent multi-domain approaches from the literature, including a variant of a model initially introduced for DA. We show in section~\ref{sec:experiments}  existing approaches still fall short to match many of these requirements, notably with respect to handling a large amount of heterogeneous domains and to dynamically integrating new domains in training.\fyDone{Spell out conclusions}
  
 \section{Requirements of multi-domain MT \label{sec:requirements}}
-In this section, we try to recap the main reasons for considering a multi-domain scenario and discuss their implications in terms of performance evaluation.
+In this section, we recap the main reasons for considering a multi-domain scenario and discuss their implications in terms of performance evaluation.
 \fyDone{Relation to theory, discussion of worst case scenario}
 \fyDone{Insist on the work of Dredze}
 
@@ -133,7 +134,7 @@ We conventionally define a domain $d$ as a distribution $\mathcal{D}_d(x)$ over 
 
 A typical learning scenario in MT is to have access to a samples from $n_d$ domains, which means that the training distribution $\mathcal{D}^s$ is a mixture $\mathcal{D}^s(x) = \sum_d \lambda^{s}_{d} \mathcal{D}_d(x)$. Multi-domain learning, as defined in \cite{Dredze08online} further assumes that domain tags are also available in testing; the implication being that the test distribution is also as a mixture $\mathcal{D}^t(x) = \sum_d \lambda^{t}_{d} \mathcal{D}_d(x)$ of several domains, making the problem distinct from mere domain adaption.  A multi-domain learner is then expected to use these tags effectively \cite{Joshi12multidomain} when computing the combined translation function $h(x,d)$, and to perform well in all domains \cite{Finkel09hierarchical}. Note that this setting is closely related to the multi-source adaptation problem formalized in \cite{Mansour09domainadaptation,Mansour09multiple,Hoffman18algorithms}.
 
-This definition seems to be the most accepted view of a multi-domain MT\footnote{One important exception is \cite{Farajian17multidomain}, where test translations rely on a similarity scores between test and train sentences, rather than on domain labels.} and one that we also adopt here. Note that in the absence of further specification, the naive answer to the MD setting should be to estimate one translation function $\hat{h}_d(x)$ separately for each domain, then to translate using $\hat{h}(x,d) = \sum_{d'} h_{d'}(x) \indic{d' = d}$, where $\indic{x}$ is the indicator function. We now discuss the arguments that are usually put forward to proceed differently.
+This definition seems to be the most accepted view of a multi-domain MT\footnote{One important exception is \cite{Farajian17multidomain}, where test translations rely on a similarity scores between test and train sentences, rather than on domain labels.} and one that we also adopt here. Note that in the absence of further specification, the naive answer to the MD setting should be to estimate one translation function $\hat{h}_d(x)$ separately for each domain, then to translate using $\hat{h}(x,d) = \sum_{d'} h_{d'}(x) \indic{d' = d}$, where $\indic{x}$ is the indicator function. We now discuss the arguments that are put forward to proceed differently.
 % --
 
 % This is also the view that we adopt here, where we assume training inputs in $(\mathcal{X}\times{}\{1\dots{}D\})$, sampled from a mixture $\sum \lambda_{s,d}\mathcal{D}_{d} \times \{d\}$, and also consider various test scenarios, depending whether $\mathcal{D}_t$ is a fixed mixture of known domains, include new domain(s), in the supervised and unsupervised, and zero-shot settings.\fyTodo{explain zero shot}.
@@ -440,7 +441,8 @@ Two other main conclusions can be drawed from this study: first, it seems that m
 % when submitting your paper for review.
 
 % include your own bib file like this:
-\bibliographystyle{coling}
+% \bibliographystyle{coling}
+\bibliographystyle{acl_natbib}
 \bibliography{multidomain}
 
 \appendix{}
