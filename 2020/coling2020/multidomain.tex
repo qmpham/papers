@@ -73,8 +73,8 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-  When building machine translation systems, it is often the case that one need to make the best out of the heterogeneous set of parallel data in training, and to robustly handle inputs from unexpected domains in testing. This multi-domain scenario has attracted a lot of recent work, that fall under the general umbrella of transfert learning.
-In this study, we revisit multi-domain machine translation, with the aim to formulate the motivations for developing such systems and the associated expectations with respect to performance. Our experiments with a large sample of multi-domain systems show that most of these expectations are hardly met and suggest that further work is needed to better analyze the current behoviour of multi-domain systems and to make them fully hold their promises.
+  When building machine translation systems, it is often the case that one need to make the best out of the heterogeneous set of parallel data in training, and to robustly handle inputs from unexpected domains in testing. This multi-domain scenario has attracted a lot of recent work, that fall under the general umbrella of transfer learning.
+In this study, we revisit multi-domain machine translation, with the aim to formulate the motivations for developing such systems and the associated expectations with respect to performance. Our experiments with a large sample of multi-domain systems show that most of these expectations are hardly met and suggest that further work is needed to better analyze the current behaviour of multi-domain systems and to make them fully hold their promises.
   \fyDone{Write abstract}
 \end{abstract}
 
@@ -292,7 +292,7 @@ In this study, all systems fail to outperform fine-tuning, sometimes by a wide m
  %   Full-finetuned on extended in-domain corpora (news) & && 33.96&&& & &\\nn
     \system{DC-Tag}       & 38.1 & 55.3 & 49.9   & 33.2 & 43.5 & \SB{80.5} &41.7 & 50.1    \\%    & 21.8 \\
     \system{DC-Feat}      & 37.7  & 54.9 & 49.5   & 32.9 & 43.6 & \SB{79.9} &41.4 & 49.9   \\% & \SW{21.7} \\
-    \system{LDC-Tag}     & 37.0   & 54.7 & 49.9 & 33.9 & 43.6 & \SB{79.9} & & 49.8          \\% & 22.1 \\ 
+    \system{LDC-Tag}     & 37.0   & 54.7 & 49.9 & 33.9 & 43.6 & \SB{79.9} & 40.9 & 49.8          \\% & 22.1 \\ 
     \system{TTM}            & 37.3 & 54.9 & 49.5 & 32.9 & 43.6 & \SB{79.9} &41.1 & 49.7     \\% &  23.4 \\
     \system{DM}             & \SW{35.6} & \SW{49.5}  & \SW{45.6}& \SW{29.9} & \SW{37.1} & \SW{62.4} & 39.7 & 43.8 \\ % & 22.6\\
     \system{ADM}           & 36.4 & \SW{53.5}  & \SW{48.3} & \SW{32.0} & \SW{41.5} & \SW{73.4} & 40.7 & 47.5 \\% & 23.3 \\
@@ -320,7 +320,7 @@ In the \textsl{merge} experiment, we do the reverse and merge two corpora in tra
     \hfill Set-up & \multicolumn{2}{c|}{Split} &  \multicolumn{2}{c|}{Split} & \multicolumn{2}{c|}{Split} & \multicolumn{2}{c|}{Merge} & \multicolumn{2}{c|}{Wrong} \\ % \hline
      Model \hfill & \multicolumn{2}{c|}{\domain{med} \footnotesize{(0.5 / 0.5)}} &  \multicolumn{2}{c|}{\domain{med} {\footnotesize (0.25 / 0.75)}} & \multicolumn{2}{c|}{\domain{law} {\footnotesize (0.5 / 0.5)}} & \multicolumn{2}{c|}{\domain{bank}+\domain{law}} &  \multicolumn{1}{c|}{old} &  \multicolumn{1}{c|}{new}\\ \hline
     & \domain{med}$_1$ & \domain{med}$_2$ & \domain{med}$_1$ & \domain{med}$_1$ &  \domain{bank}$_1$ & \domain{bank}$_2$ & \domain{bank} & \domain{law}   & \domain{all} & \domain{News} \\
-    \system{FT-Full}      & -0.1 & -0.6 & -1.5& -0.2& -2.3 & -5.1 &\SW{-1.6} & \SW{-1.4}& &\\
+    \system{FT-Full}      & -0.1 & -0.6 & \SW{-1.5}& -0.2& \SW{-2.3} & \SW{-5.1} &\SW{-1.6} & \SW{-1.4}& &\\
     \system{DC-Tag}     & -0.2 & -0.3& +\SB{0.1}$^+$& +0.2& -2.2 & -2.9 & -0.5 & -0.4 & &-1.7\\
     \system{DC-Feat}    & -0.5 & 0.0 & +\SB{0.3} $^+$ & +0.3 & +0.3 & +0.3 & 0.3 & +0.1 & &\SW{-1.8}\\
     \system{LDC-Tag}   & +0.1 & +0.1 & +0.4 & +0.4 & 0.0 &  0.0 &  0.0 & +0.1& &-1.4\\ 
