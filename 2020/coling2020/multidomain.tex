@@ -40,7 +40,7 @@
 % in the camera-ready version and ask you to change it back.
 \newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
 \newcommand{\fyTodostar}[1]{\Todo*[FY:]{\textcolor{orange}{#1}}
-}\newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
 \newcommand{\fyFuture}[1]{\done[FY]\Todo[FY:]{\textcolor{red}{#1}}}
 \newcommand{\fyDonestar}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
 \newcommand{\jcTodo}[1]{\Todo[JC:]{\textcolor{blue}{#1}}}
@@ -132,7 +132,7 @@ In this section, we recap the main reasons for considering a multi-domain scenar
 
 \subsection{Formalizing multi-domain translation \label{ssec:formalization}}
 
-We conventionally define a domain $d$ as a distribution $\mathcal{D}_d(x)$ over some feature space $\mathcal{X}$ that is shared across domains \cite{Pan10asurvey}: in machine translation, $\mathcal{X}$ is the representation space for source sentences; each domain corresponds to a specific source of data, and differs from the other data sources in terms of textual genre, thematic content \cite{Chen16guided,Zhang16topicinformed}, register \cite{Sennrich16politeness}, style \cite{Niu18multitask}, etc. Translation in domain $d$ is formalized by a translation function $h_d(y|x)$ pairing sentences in a source language with sentences in a target language $y \in \mathcal{Y}$. $h_d$ is usually assumed to be deterministic (hence $y = h_d(x)$, but can differ from one domain to the other.
+We conventionally define a domain $d$ as a distribution $\mathcal{D}_d(x)$ over some feature space $\mathcal{X}$ that is shared across domains \cite{Pan10asurvey}: in machine translation, $\mathcal{X}$ is the representation space for source sentences; each domain corresponds to a specific source of data, and differs from the other data sources in terms of textual genre, thematic content \cite{Chen16guided,Zhang16topicinformed}, register \cite{Sennrich16politeness}, style \cite{Niu18multitask}, etc. Translation in domain $d$ is formalized by a translation function $h_d(y|x)$ pairing sentences in a source language with sentences in a target language $y \in \mathcal{Y}$. $h_d$ is usually assumed to be deterministic (hence $y = h_d(x)$), but can differ from one domain to the other.
 
 A typical learning scenario in MT is to have access to a samples from $n_d$ domains, which means that the training distribution $\mathcal{D}^s$ is a mixture $\mathcal{D}^s(x) = \sum_d \lambda^{s}_{d} \mathcal{D}_d(x)$. Multi-domain learning, as defined in \cite{Dredze08online} further assumes that domain tags are also available in testing; the implication being that the test distribution is also as a mixture $\mathcal{D}^t(x) = \sum_d \lambda^{t}_{d} \mathcal{D}_d(x)$ of several domains, making the problem distinct from mere domain adaption.  A multi-domain learner is then expected to use these tags effectively \cite{Joshi12multidomain} when computing the combined translation function $h(x,d)$, and to perform well in all domains \cite{Finkel09hierarchical}. Note that this setting is closely related to the multi-source adaptation problem formalized in \cite{Mansour09domainadaptation,Mansour09multiple,Hoffman18algorithms}.
 
@@ -411,7 +411,7 @@ In this section, we experiment with automatic domains, obtained by clustering se
 \begin{table*}
   \centering
   \fyDone{Fix column size}
-  \begin{tabular}{|p{3cm}|*{8}{r|}|} \hline
+  \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} & \multicolumn{1}{c||}{w\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
   %    \system{Mixed-Nat}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  & 41.1  & 49.4 \\% & 23.5\\
@@ -432,7 +432,7 @@ In this section, we experiment with automatic domains, obtained by clustering se
   \fyDone{Fill the table with correct results,}
 \end{table*}
 
-Table~\ref{tab:subdomains} reports the effect of using automatic domain tags on the 6 domain-specific test sets: each sentence was first assigned to an automatic class, translated with the corresponding multi-domain system; aggregate numbers were then computed, as well as comparisons with the 6-domain scenarios. The results are very clear and confirm previous observations: even though some clusters are very close, the net effect is a decrease in performance for almost all systems and conditions. In this setting, the best MDMT of our pool (MDL-Res) is no longer able to surpass the \system{Mix-Nat} baseline.\fyTodo{Note about scaling?}\fyTodo{More comparison?}
+Table~\ref{tab:subdomains} reports the effect of using automatic domain tags on the 6 domain-specific test sets: each sentence was first assigned to an automatic class, translated with the corresponding multi-domain system; aggregate numbers were then computed, as well as comparisons with the 6-domain scenarios. The results are very clear and confirm previous observations: even though some clusters are very close, the net effect is a decrease in performance for almost all systems and conditions. In this setting, the best MDMT in our pool (MDL-Res) is no longer able to surpass the \system{Mix-Nat} baseline.\fyTodo{Note about scaling?}\fyTodo{More comparison?}
 
 \section{Related work \label{sec:related}}
 
