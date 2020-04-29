@@ -330,7 +330,7 @@ In the \textsl{merge} experiment, we do the reverse and merge two corpora in tra
 %    \system{MDL Gated} & & & & & & & & &  \\
     \system{DM} (!)           & -0.3   & -0.3  & +0.4 & +0.4 & +0.3 & +0.3 & +0.9 & +0.1 & &-0.9\\
     \system{ADM} (!)        & +0.6   & +0.6 & +0.4 & +0.4 & +0.4 & +0.4 &  +0.1 & -0.4 & &-0.2\\
-    \system{WDCMT} (!)     &-0.9    & -0.9  & -1.1 & -1.1  & -2.2 & -2.2  & -0.45 & -0.85 & *** & 0.19 \\
+    \system{WDCMT} (!)     & -0.03    & -0.03  & +0.2 & +0.2  & +0.83 & +0.83  & -0.45 & -0.85 & *** & 0.19 \\
     \system{MDL Res}   & -0.2   & -0.07 & +\SB{0.18}$^+$ &+0.0 & -0.89 & -0.89 & +\SB{0.7} & -0.35 & 31.78 & \SW{-1.3}\\
     \hline
   \end{tabular}
@@ -358,33 +358,33 @@ We expect that a proper MDMT system should not be significantly affected by the 
     \system{Mixed-Nat}  & 37.3  & 54.6   & 50.1   & 33.5  & 43.2  & 77.5  & 23.5 & 41.1 & 49.4 \\
     \system{FT-Full}       & 37.7  & 59.2   & 54.5   & 34.0  & 46.8  & 90.8  & **** & 42.8 & 53.8 \\ \hline\hline
     
-     \system{DC-Feat}     & 37.4 & 54.9   & 50.0    & 34.7  &  43.9  & 79.6 & 28.9  & & 50.1\\[-2pt]
+     \system{DC-Feat}     & 37.4 & 54.9   & 50.0    & 34.7  &  43.9  & 79.6 & 28.9  & 41.2 & 50.1\\[-2pt]
 %                   & 37.2 & 54.7   & 49.9    & 34.2  &  43.0  & 79.9 & \SW{28.1}  & &\\
                    & -0.2 & -0.1  & -0.1 & -0.6 & -0.9 & +0.3 & \SW{-0.8} & -0.2 & -0.3\\
 
-    \system{DC-Tag}      &  37.7 & 54.5   & 49.9    &  34.8 &  43.9  & 78.8 & 29.5  & & 49.9\\[-2pt]
+    \system{DC-Tag}      &  37.7 & 54.5   & 49.9    &  34.8 &  43.9  & 78.8 & 29.5  & 41.4 & 49.9\\[-2pt]
 %                                   & 38.0  & 54.4   & 49.2    & \SW{33.6}  &  \SW{42.7}  &\SW{75.3}  & \SW{28.1}  & & 48.9\\
                    & +0.3  & -0.1   & -0.6    & \SW{-1.1}  &  \SW{-1.3}  &\SW{-3.5}  & \SW{-1.4}  & -0.1 & -1.2\\
     
-    \system{LDC-Tag}    & 37.0   & 54.6  & 49.6    & 34.3  &  43.0  &77.0  & 28.7 & & 46.3 \\[-2pt]
-                    & -0.65 &	0.46 &	-0.44 &	-0.58 &	0.49 &	3.8 &	-0.88 &	0.3 &	-0.4 \\
+    \system{LDC-Tag}    & 37.0   & 54.6  & 49.6    & 34.3  &  43.0  &77.0  & 28.7 & 40.8 & 49.2 \\[-2pt]
+                    & -0.65 &	+0.46 &	-0.44 &	-0.58 &	+0.49 &	+\SB{3.8} &	-0.88 &	+0.5 &	-0.4 \\
 
-    \system{TTM}           &  37.3 & 54.4   & 49.6    & 33.8  &  42.9  &78.2  & 29.1 & & 49.4\\[-2pt]
+    \system{TTM}           &  37.3 & 54.4   & 49.6    & 33.8  &  42.9  &78.2  & 29.1 & 41 & 49.4\\[-2pt]
 %                   & 37.1  & 54.2   & 49.1    & \SW{32.8}  &  42.0  &\SW{74.2}  & \SW{27.7}& 48.2\\
-                    & -0.3  & -0.3  & -0.5    & \SW{-1.1}  &  -1.0  & \SW{-4.0}  & \SW{-1.4}& -0.5 &-1.2\\
+                    & -0.3  & -0.3  & -0.5    & \SW{-1.1}  &  \SW{-1.0}  & \SW{-4.0}  & \SW{-1.4}& -0.5 & -1.2\\
     
-    \system{DM}            &36.0 &51.3&46.8&31.8&39.8&65.7&27.0 & & 45.2\\[-2pt]
+    \system{DM}            &36.0 &51.3&46.8&31.8&39.8&65.7&27.0 & 38.9 & 45.2\\[-2pt]
 %                   &36.5&51.7&47.4&31.7&40.3&65.7&\SW{25.8}& & \\
                    &+0.6&+0.4&+0.6&-0.1&0.5&0.0&\SW{-1.2}& +0.5 & +0.3\\    
     
-    \system{ADM}          &36.6&54.2&49.1&32.9&42.1&75.7&28.7 & &4.4 \\[-2pt]
+    \system{ADM}          &36.6&54.2&49.1&32.9&42.1&75.7&28.7 & 40.2 & 48.4 \\[-2pt]
 %                   &  36.9 &53.5&48.3&32.7&41.7&\SW{70.7}&\SW{26.8}& \\
                    & +0.3 & -0.8 & -0.8 & -0.2 & -0.4 & \SW{-5.0} & \SW{-1.9} & -0.2 & -1.1\\
     
-    \system{WDCMT}     &34.8  &51.8&47.8&30.7&37.3&49.3&25.9 & &\\[-2pt]
-                    &&&&&&&& \\
+    \system{WDCMT}     &&&&&&& & &\\[-2pt]
+                    &&&&&&&&& \\
 
-    \system{MDL-Res}    &37.7   & 55.6   & 51.1   & 34.4  & 44.5  & 87.5  & 29.1 & & 51.8 \\[-2pt]
+    \system{MDL-Res}    &37.7   & 55.6   & 51.1   & 34.4  & 44.5  & 87.5  & 29.1 & 41.9 & 51.8 \\[-2pt]
 %                      & 37.5 & 56.1 & 51.1 & 34.0  &  44.3 & 87.3 & \SW{28.4} & & 51.7 & \\
                         & -0.2 & +0.5 & 0.0 & -0.4  &  -0.2 & -0.2 & \SW{-0.8} & -0.2 & -0.1 \\
      \hline
@@ -413,7 +413,7 @@ In this section, we experiment with automatic domains, obtained by clustering se
   \fyDone{Fix column size}
   \begin{tabular}{|p{3cm}|*{8}{r|}|} \hline
 %     &&&&&& \\
-    Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{w\domain{avg}} & \multicolumn{1}{c||}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
+    Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} & \multicolumn{1}{c||}{w\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
   %    \system{Mixed-Nat}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  & 41.1  & 49.4 \\% & 23.5\\
   %     \system{FT-Full}       & 37.7 & \SB{59.2} & \SB{54.5} & 34.0 & \SB{46.8} & \SB{90.8}   & 42.8 & 53.8\\
   %   Full-finetuned on extended in-domain corpora (news) & && 33.96&&& & &\\nn
