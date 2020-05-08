@@ -325,7 +325,7 @@ In the \textsl{merge} experiment, we merge two corpora in training, in order to 
      Model \hfill & \multicolumn{2}{c|}{\domain{med} \footnotesize{(0.5 / 0.5)}} &  \multicolumn{2}{c|}{\domain{med} {\footnotesize (0.25 / 0.75)}} & \multicolumn{2}{c|}{\domain{law} {\footnotesize (0.5 / 0.5)}} & \multicolumn{2}{c|}{\domain{bank}+\domain{law}} &  \multicolumn{1}{c|}{old} &  \multicolumn{1}{c|}{new}\\ \hline
     & \domain{med}$_1$ & \domain{med}$_2$ & \domain{med}$_1$ & \domain{med}$_1$ &  \domain{bank}$_1$ & \domain{bank}$_2$ & \domain{bank} & \domain{law}   & \domain{all} & \domain{News} \\
     \system{FT-Full}      & -0.1 & -0.6 & \SW{-1.5} & -0.2& \SW{-2.3} & \SW{-5.1} &\SW{-1.6} & \SW{-1.4}& \SW{-21.8} & \SW{-3.3}\\% [32.5]
-    \system{DC-Tag}     & -0.2 & -0.3& +\SB{0.1}  & +0.2& -2.2 & -2.9 & -0.5 & -0.4 & \SW{-14.2} & \SW{-1.7}\\% [35.9]
+    \system{DC-Tag}     & -0.2 & -0.3& +\SB{0.1}  & +0.2& -0.4 & -0.4 & -0.5 & -0.4 & \SW{-14.2} & \SW{-1.7}\\% [35.9]
     \system{DC-Feat}    & -0.5 & 0.0 & +\SB{0.3}   & +0.3 & +0.3 & +0.3 & 0.3 & +0.1 & \SW{-15.0} &\SW{-1.8}\\ % [34.9] 
     \system{LDC-Tag}   & +0.1 & +0.1 & +0.4 & +0.4 & 0.0 &  0.0 &  0.0 & +0.1& \SW{-12.8} & \SW{-1.4}\\ % [37.0]
     \system{TTM} (*)        & -0.2 &  -0.2 & -0.2 & -0.2 & -0.3 &-0.3 &  0.0 & -0.3 & 0.0 & -0.1\\
@@ -431,7 +431,7 @@ Table~\ref{tab:subdomains} reports the effect of using automatic domain tags for
     \system{TTM}            & 37.4 & \SW{53.7} & 48.9 & 32.8 & 41.3 & \SW{75.8} & 40.7 & 48.3   \\% &  23.4 \\
     \system{DM}             & 35.4 & 49.3  & 45.2 & 29.7 & 37.1 & \SW{60.0} & 37.8 & 42.8 \\ % & 22.6\\
     \system{ADM}           & 36.1 & 53.5  & 48.0 & 32.0 & 41.1 & 72.1 & 39.5 & 47.1\\% & 23.3 \\
-    \system{WDCMT}       & 36.0 & 53.8 & 48.5 & 31.0 & 39.0 & 63.5 & 39.1 & 45.3\\ % & 20.4 \\
+    \system{WDCMT}       & 35.57 & 53.08 & 48.43 & 30.55 & \SW{37.73} & \SW{56.02} & 38.47 & 40.37 \\ % & 20.4 \\ 
     \system{MDL Res}     & 37.3 & 55.5  & \SW{50.2}   & \SW{32.2}   &  \SW{42.1}  & \SW{86.7} & 41.2 & 50.7\\%  & \SW{21.2} \\
      \hline
   \end{tabular}
