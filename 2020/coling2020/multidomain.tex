@@ -469,7 +469,7 @@ The same basic techniques (parameter sharing, automatic domain identification / 
 
 Another parameter-sharing scheme is \cite{Jiang19multidomain}, which augments a Transformer model with domain-specific heads, whose contributions are regulated at the word/position level: some words have ``generic'' use and rely on mixed-domain heads, while for some other words it is preferable to use domain specific heads, thereby reintroducing the idea of ensembling that the core of \cite{Huck15mixeddomain,Saunders19ucam}. The results for three language pairs outperform several standard baselines for a two-domain systems (in fr:en and ge:en) and a 4-domain system (zh:en).% \footnote{The reported results for WDC+WL are very bad, worst than anything \fyTodo{This is a mystery to me}.}   
 
-\newcite{Farajian17multidomain} does not use domain tags in training. The processing of each test sentence triggers the selection of a small set of related instances; using these, a generic NMT is tuned for some epochs, before delivering its output. This approach entirely dispenses with the notion of domain and relies on data selection techniques to handle data heterogeneity. 
+\newcite{Farajian17multidomain} does not use domain tags in training. The processing of each test sentence triggers the selection of a small set of related instances; using these, a generic NMT is tuned for some epochs, before delivering its output. This approach entirely dispenses with the notion of domain and relies on data selection techniques to handle data heterogeneity. \jcTodo{cite Xu et al 2019, Lexical Micro-adaptation for Neural Machine Translation}
 
 \section{Conclusion and outlook \label{sec:conclusion}}
 \fyDone{Write conclusions}\fyTodo{no mixture of experts}
