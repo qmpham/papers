@@ -291,8 +291,8 @@ All systems fail to outperform fine-tuning, sometimes by a wide margin, especial
     \system{Mixed-Nat}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  & 41.1  & 49.4 \\% & 23.5\\
     \system{Mixed-Nat-RNN}  & 36.8 & 53.8 & 47.2 & 30.0 & 35.7 & 60.2  & 39.2  & 44.0 \\
     \system{Mixed-Bal}   &  35.3 & 54.1 & 52.5 & 31.9 & 44.9 & 89.5 & 40.3  & 51.4 \\ %& \\
-    \system{FT-Full}       & 37.7 & \SB{59.2} & \SB{54.5} & 34.0 & \SB{46.8} & \SB{90.8}   & 42.7 & 53.8\\
-   \system{FT-Block}     & 37.3 & \SB{57.9} & 53.9 & 33.8 & \SB{46.7} & \SB{90.2}  & 42.3 & 53.3 \\ \hline % & 20.5\\ \hline
+    \system{FT-Full}       & 37.7 & \SB{59.2} & \SB{54.5} & 34.0 & \SB{46.8} & \SB{90.8}   & \SB{42.7} & \SB{53.8} \\
+   \system{FT-Block}     & 37.3 & \SB{57.9} & 53.9 & 33.8 & \SB{46.7} & \SB{90.2}  & \SB{42.3} & \SB{53.3} \\ \hline % & 20.5\\ \hline
  %   Full-finetuned on extended in-domain corpora (news) & && 33.96&&& & &\\nn
     \system{DC-Tag}       & 38.1 & 55.3 & 49.9   & 33.2 & 43.5 & \SB{80.5} &41.6 & 50.1    \\%    & 21.8 \\
     \system{DC-Feat}      & 37.7  & 54.9 & 49.5   & 32.9 & 43.6 & \SB{79.9} &41.4 & 49.9   \\% & \SW{21.7} \\
@@ -301,7 +301,7 @@ All systems fail to outperform fine-tuning, sometimes by a wide margin, especial
     \system{DM}             & \SW{35.6} & \SW{49.5}  & \SW{45.6}& \SW{29.9} & \SW{37.1} & \SW{62.4} & 38.1 & 43.4 \\ % & 22.6\\
     \system{ADM}           & 36.4 & \SW{53.5}  & \SW{48.3} & \SW{32.0} & \SW{41.5} & \SW{73.4} & 38.9 & 47.5 \\% & 23.3 \\
     \system{WDCMT}       & 36.0 & 53.3 & \SB{48.8} & 31.1 & \SB{38.8} & \SW{58.5} & 39.0 & 44.4 \\ % & 20.4 \\
-    \system{MDL Res}     & 37.9 & \SB{56.0}  & \SB{51.2}   & 33.5   &  44.4  & \SB{88.3} & 42.0 & 51.9 \\%  & \SW{21.2} \\
+    \system{MDL Res}     & 37.9 & \SB{56.0}  & \SB{51.2}   & 33.5   &  44.4  & \SB{88.3} & 42.0 & \SB{51.9} \\%  & \SW{21.2} \\
     \hfill MDL Res (gen)    & 37.7 & 51.0 & 34.0 & 30.4 & 34.2 & 15.2 & 36.4 & 33.7\\
 %    \system{MDL Gated} & 37.7 & 56.5 & 53.2 & 34.1 & 44.6 & 90.7 & 42.3 & 53.3&\\
      \hline
@@ -371,14 +371,14 @@ We expect that a MDMT system should not be significantly impacted by the additio
 
     \system{DC-Tag}      &  37.7 & 54.5   & 49.9    &  34.8 &  43.9  & 78.8 & 29.5  & 41.4 & 49.9\\[-2pt]
 %                                   & 38.0  & 54.4   & 49.2    & \SW{33.6}  &  \SW{42.7}  &\SW{75.3}  & \SW{28.1}  & & 48.9\\
-                   & \scriptsize +0.3  & \scriptsize -0.1   & \scriptsize -0.6    & \scriptsize \SW{-1.1}  &  \scriptsize \SW{-1.3}  & \scriptsize \SW{-3.5}  & \scriptsize \SW{-1.4}  & \scriptsize -0.1 & \scriptsize -1.2\\
+                   & \scriptsize +0.3  & \scriptsize -0.1   & \scriptsize -0.6    & \scriptsize \SW{-1.1}  &  \scriptsize \SW{-1.3}  & \scriptsize \SW{-3.5}  & \scriptsize \SW{-1.4}  & \scriptsize -0.1 & \scriptsize \SW{-1.2}\\
     
     \system{LDC-Tag}    & 37.0   & 54.6  & 49.6    & 34.3  &  43.0  &77.0  & 28.7 & 40.8 & 49.2 \\[-2pt]
-                    & \scriptsize -0.6 &	\scriptsize +0.5 & \scriptsize -0.4 & \scriptsize -0.6 &	\scriptsize +0.5 & \scriptsize +\SB{3.8} & \scriptsize -0.9 & \scriptsize +0.5 & \scriptsize -0.4 \\
+                    & \scriptsize -0.6 &	\scriptsize +0.5 & \scriptsize -0.4 & \scriptsize -0.6 &	\scriptsize +0.5 & \scriptsize +\SB{3.8} & \scriptsize \SW{-0.9} & \scriptsize +0.5 & \scriptsize -0.4 \\
 
     \system{TTM}           &  37.3 & 54.4   & 49.6    & 33.8  &  42.9  &78.2  & 29.1 & 41 & 49.4\\[-2pt]
 %                   & 37.1  & 54.2   & 49.1    & \SW{32.8}  &  42.0  &\SW{74.2}  & \SW{27.7}& 48.2\\
-                    & \scriptsize -0.3  & \scriptsize -0.3  & \scriptsize -0.5    & \scriptsize \SW{-1.1}  &  \scriptsize \SW{-1.0}  & \scriptsize \SW{-4.0}  & \scriptsize \SW{-1.4}& \scriptsize -0.5 & \scriptsize -1.2\\
+                    & \scriptsize -0.3  & \scriptsize -0.3  & \scriptsize -0.5    & \scriptsize \SW{-1.1}  &  \scriptsize \SW{-1.0}  & \scriptsize \SW{-4.0}  & \scriptsize \SW{-1.4}& \scriptsize -0.5 & \scriptsize \SW{-1.2}\\
     
     \system{DM}            &36.0 &51.3&46.8&31.8&39.8&65.7&27.0 & 38.9 & 45.2\\[-2pt]
 %                   &36.5&51.7&47.4&31.7&40.3&65.7&\SW{25.8}& & \\
@@ -386,7 +386,7 @@ We expect that a MDMT system should not be significantly impacted by the additio
     
     \system{ADM}          &36.6&54.2&49.1&32.9&42.1&75.7&28.7 & 40.2 & 48.4 \\[-2pt]
 %                   &  36.9 &53.5&48.3&32.7&41.7&\SW{70.7}&\SW{26.8}& \\
-                   & \scriptsize +0.3 & \scriptsize -0.8 & \scriptsize -0.8 & \scriptsize -0.2 & \scriptsize -0.4 & \scriptsize \SW{-5.0} & \scriptsize \SW{-1.9} & \scriptsize -0.2 & \scriptsize -1.1\\
+                   & \scriptsize +0.3 & \scriptsize -0.8 & \scriptsize -0.8 & \scriptsize -0.2 & \scriptsize -0.4 & \scriptsize \SW{-5.0} & \scriptsize \SW{-1.9} & \scriptsize -0.2 & \scriptsize \SW{-1.1}\\
     
     \system{WDCMT}     &&&&&&& & &\\[-2pt]
                     &&&&&&&&& \\
@@ -430,13 +430,13 @@ Table~\ref{tab:subdomains} reports the effect of using automatic domain tags for
   %     \system{FT-Full}       & 37.7 & \SB{59.2} & \SB{54.5} & 34.0 & \SB{46.8} & \SB{90.8}   & 42.8 & 53.8\\
   %   Full-finetuned on extended in-domain corpora (news) & && 33.96&&& & &\\nn
     \system{DC-Tag}       & 38.5 & \SW{54.0} & 49.0   & 33.6 & \SW{42.2} & \SW{76.7} & 41.6 & 49.0 \\%    & 21.8 \\
-    \system{DC-Feat}      & 37.3  & 54.2 & 49.3   & 33.6 & \SW{41.9} & \SW{75.8} & 40.7 & 48.3  \\% & \SW{21.7} \\
-    \system{LDC-Tag}     & 37.4   & 54.1 & \SW{48.7} & \SW{32.5} & \SW{41.4} & \SW{75.9} & 39.1 & 48.3         \\% & 22.1 \\ 
-    \system{TTM}            & 37.4 & \SW{53.7} & 48.9 & 32.8 & 41.3 & \SW{75.8} & 40.7 & 48.3   \\% &  23.4 \\
+    \system{DC-Feat}      & 37.3  & 54.2 & 49.3   & 33.6 & \SW{41.9} & \SW{75.8} & 40.8 & \SW{48.7}  \\% & \SW{21.7} \\
+    \system{LDC-Tag}     & 37.4   & 54.1 & \SW{48.7} & \SW{32.5} & \SW{41.4} & \SW{75.9} & 39.1 & \SW{48.3}         \\% & 22.1 \\ 
+    \system{TTM}            & 37.4 & \SW{53.7} & 48.9 & 32.8 & 41.3 & \SW{75.8} & 40.7 & \SW{48.3}   \\% &  23.4 \\
     \system{DM}             & 35.4 & 49.3  & 45.2 & 29.7 & 37.1 & \SW{60.0} & 37.8 & 42.8 \\ % & 22.6\\
     \system{ADM}           & 36.1 & 53.5  & 48.0 & 32.0 & 41.1 & 72.1 & 39.5 & 47.1\\% & 23.3 \\
-    \system{WDCMT}       & 35.57 & 53.08 & 48.43 & 30.55 & \SW{37.73} & \SW{56.02} & 38.47 & 40.37 \\ % & 20.4 \\ 
-    \system{MDL Res}     & 37.3 & 55.5  & \SW{50.2}   & \SW{32.2}   &  \SW{42.1}  & \SW{86.7} & 41.2 & 50.7\\%  & \SW{21.2} \\
+    \system{WDCMT}       & 35.57 & 53.08 & 48.43 & 30.55 & \SW{37.73} & \SW{56.02} & 38.5 & 43.6 \\ % & 20.4 \\ 
+    \system{MDL Res}     & 37.3 & 55.5  & \SW{50.2}   & \SW{32.2}   &  \SW{42.1}  & \SW{86.7} & 41.2 & \SB{50.7}\\%  & \SW{21.2} \\
      \hline
   \end{tabular}
   \caption{Translation performance with automatic domains, computed with the original test sets.}
