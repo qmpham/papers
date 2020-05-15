@@ -59,7 +59,7 @@
 \renewcommand\floatpagefraction{.95}
 
 \title{Revisiting Multi-Domain Machine Translation}
-
+\fyFuture{A plea for more thoroughness in evaluation}
 \author{First Author \\
   Affiliation / Address line 1 \\
   Affiliation / Address line 2 \\
@@ -76,7 +76,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-  When building machine translation systems, it is often the case that one need to make the best out of the heterogeneous set of parallel data in training, and to robustly handle inputs from unexpected domains in testing. This multi-domain scenario has attracted a lot of recent work, that fall under the general umbrella of transfer learning.
+  When building machine translation systems, one often needs to make the best out of heterogeneous sets of parallel data in training, and to robustly handle inputs from unexpected domains in testing. This multi-domain scenario has attracted a lot of recent work, that fall under the general umbrella of transfer learning.
 In this study, we revisit multi-domain machine translation, with the aim to formulate the motivations for developing such systems and the associated expectations with respect to performance. Our experiments with a large sample of multi-domain systems show that most of these expectations are hardly met and suggest that further work is needed to better analyze the current behaviour of multi-domain systems and to make them fully hold their promises.
   \fyDone{Write abstract}
 \end{abstract}
@@ -261,7 +261,7 @@ Our comparison of multi-domain systems includes the following reimplementations 
 \item a system using domain control as in \cite{Kobus17domaincontrol}: domain information is introduced either as an additional token for each source sentence (\system{DC-Tag}), or introduced in the form of a supplementary feature for each word (\system{DC-Feat}).
 \item a system using lexicalized domain representations \cite{Pham19generic}: word embeddings are composed of a generic and a domain specific part (\system{LDC-Feat});\fyDone{why not LDR as in Minh's paper?}
 \item the three proposals of \newcite{Britz17mixing}. \system{TTM} is a feature-based approach where the domain tag is introduced as an extra word \textsl{on the target side}. Training uses reference tags and inference is performed with predicted tags, just like for regular target words. \system{DM} is a multi-task learner where a domain classifier is trained on top the MT encoder, so as to make it aware of domain differences; \system{ADM} is the adversarial version of \system{DM}, pushing the encoder towards learning domain-independent source representations. These methods thus only use domain tags in training.
-\item the multi-domain model of \newcite{Zeng18multidomain} (\system{WDCMT}), where a domain-agnostic and a domain-specialized representation of the input are simultaneously processed; supervised classification and adversarial training are used to compute these representations.\footnote{For this system, we use the available RNN-based system from the authors (\url{https://github.com/DeepLearnXMU/WDCNMT}\fyDone{URLs}) which does not directly compare to the other, Transformer-based, systems; the improved version of \cite{Su19exploring} seems to produce comparable, albeit slightly, improved results.}\fyDone{Check this}
+\item the multi-domain model of \newcite{Zeng18multidomain} (\system{WDCMT}), where a domain-agnostic and a domain-specialized representation of the input are simultaneously processed; supervised classification and adversarial training are used to compute these representations.\footnote{For this system, we use the available RNN-based system from the authors (\url{https://github.com/DeepLearnXMU/WDCNMT}\fyDone{URLs}) which does not directly compare to the other, Transformer-based, systems; the improved version of \cite{Su19exploring} seems to produce comparable, albeit slightly improved, results.}\fyDone{Check this}
 \item an original, multi-domain, version of the approach of \newcite{Bapna19simple}, denoted \system{MDL Res}, where a domain-specific adaptation module is included in all the Transformer layers; within each layer, residual connexions make it possible to by-pass this module.
   % In a variant (\system{MDL Gated}), we use a gating mechanism to merge computations using the the adapter modules and with those that don not.
 Contrarily to \cite{Bapna19simple}, we do not start with a trained generic system, but learn the multi-domain from scratch.\fyDone{Check this.}
@@ -346,7 +346,7 @@ Our findings can be summarized as follows. For the split experiments, we see sma
 
 \subsubsection{Handling wrong or unknown domains \label{sssec:unknowns}}
 
-\fyTodo{Numbers for the rand domain analysis}In the last two columns of Table~\ref{tab:redomains}, we report the drop in performance when the domain information is not correct. In the first (\domain{rnd}), we use test data from the domains seen in training, presented with a random domain tag\fyDone{all configs use the same tag or is randomization is run for each config}. In this situation, the loss with respect to using the correct domain is generally large (more than 10 BLEU points), showing an overall failure to meet requirement [P4-ERR], except for systems which disregard domain tags in testing. \fyDone{Comments?}
+\fyDone{Numbers for the rand domain analysis}In the last two columns of Table~\ref{tab:redomains}, we report the drop in performance when the domain information is not correct. In the first (\domain{rnd}), we use test data from the domains seen in training, presented with a random domain tag\fyDone{all configs use the same tag or is randomization is run for each config}. In this situation, the loss with respect to using the correct domain is generally large (more than 10 BLEU points), showing an overall failure to meet requirement [P4-ERR], except for systems which disregard domain tags in testing. \fyDone{Comments?}
 
 In the second (\domain{new}), we assess [P5-UNK] by translating sentences from a domain unseen in training (\domain{news}).\fyDone{i would use RND / UNK rather than OLD / NEW} For each sentence, we automatically predict the most likely domain tag and use it for decoding.
 % Results are in the rightmost column of Table~\ref{tab:redomains}.
@@ -394,7 +394,7 @@ We expect that MDMT systems should not to be significantly impacted by the addit
                         & \scriptsize -0.2 & \scriptsize +0.5 & \scriptsize 0.0 & \scriptsize -0.4  &  \scriptsize -0.2 & \scriptsize -0.2 & \scriptsize \SW{-0.8} & \scriptsize -0.2 & \scriptsize -0.1 \\
      \hline
   \end{tabular}
-  \caption{Ability to handle a new domain: BLEU scores for the ``resume training'' mode compared to a complete training session. Averages only take into account the six initial domains (\domain{News} excluded). Underline denotes a significant loss between warmstart and coldstart, bold for a significant gain.}
+  \caption{Ability to handle a new domain: BLEU scores for the ``resume training'' mode compared to a complete training session. Averages only take into account the six initial domains (\domain{News} excluded). Underline denotes a significant loss between warmstart and coldstart, bold a significant gain.}
   \label{tab:warmrestart}
   \fyDone{Fill the table, significancy testing against initial learning condition, for each domain, and averages ? }
   \fyDone{Need correct number / differences for Mixed-Nat}
@@ -433,11 +433,11 @@ Table~\ref{tab:subdomains} reports the effect of using automatic domain tags for
     \system{TTM}            & 37.4 & \SW{53.7} & 48.9 & 32.8 & 41.3 & \SW{75.8} & 40.7 & \SW{48.3}   \\% &  23.4 \\
     \system{DM}             & 35.4 & 49.3  & 45.2 & 29.7 & 37.1 & \SW{60.0} & 37.8 & 42.8 \\ % & 22.6\\
     \system{ADM}           & 36.1 & 53.5  & 48.0 & 32.0 & 41.1 & 72.1 & 39.5 & 47.1\\% & 23.3 \\
-    \system{WDCMT}       & 35.57 & 53.08 & 48.43 & 30.55 & \SW{37.73} & \SW{56.02} & 38.5 & 43.6 \\ % & 20.4 \\ 
+    \system{WDCMT}       & 35.6 & 53.1 & 48.4 & 30.5 & \SW{37.7} & \SW{56.0} & 38.5 & 43.6 \\ % & 20.4 \\ 
     \system{MDL Res}     & 37.3 & 55.5  & \SW{50.2}   & \SW{32.2}   &  \SW{42.1}  & \SW{86.7} & 41.2 & \SB{50.7}\\%  & \SW{21.2} \\
      \hline
   \end{tabular}
-  \caption{Translation performance with automatic domains, computed with the original test sets.}
+  \caption{Translation performance with automatic domains, computed with the original test sets. Significancy tests are for comparisons with the 6-domain scenario.}
   \label{tab:subdomains}
   \fyDone{Fill the table with correct results,}\fyDone{Change wavg and avg}
 \end{table*}
@@ -466,15 +466,14 @@ The same basic techniques (parameter sharing, automatic domain identification / 
 
 Another parameter-sharing scheme is \cite{Jiang19multidomain}, which augments a Transformer model with domain-specific heads, whose contributions are regulated at the word/position level: some words have ``generic'' use and rely on mixed-domain heads, while for some other words it is preferable to use domain specific heads, thereby reintroducing the idea of ensembling that the core of \cite{Huck15mixeddomain,Saunders19ucam}. The results for three language pairs outperform several standard baselines for a two-domain systems (in fr:en and ge:en) and a 4-domain system (zh:en).% \footnote{The reported results for WDC+WL are very bad, worst than anything \fyTodo{This is a mystery to me}.}   
 
-Finally, \newcite{Farajian17multidomain}, \newcite{li-etal-2018-one} and \newcite{xu2019} follow a different strategy. The processing of each test sentence triggers the selection of a small set of related instances; using these, a generic NMT is tuned for some iterations, before delivering its output. This approach entirely dispenses with the notion of domain and relies on data selection techniques to handle data heterogeneity.
+Finally, \newcite{Farajian17multidomain}, \newcite{li-etal-2018-one} and \newcite{xu2019} follow a different strategy. Each test sentence triggers the selection of a small set of related instances; using these, a generic NMT is tuned for some iterations, before delivering its output. This approach entirely dispenses with the notion of domain and relies on data selection techniques to handle data heterogeneity.
 
 \section{Conclusion and outlook \label{sec:conclusion}}
-\fyDone{Write conclusions}\fyTodo{no mixture of experts}
-In this study, we have carefully reconsidered the idea of multi-domain machine translation, which seems to be taken for granted in many recent studies. We have spelled out the various motivations for building such systems, and associated expectations in terms of system performance. We have then designed a series of requirements that MDMT systems should meet, and designed associated testing procedures. In our experiments with multiple MDMTs, we have found that most requirements were not met for our experimental conditions. If MDMT systems are able to outperform the mixed-domain baseline, at least for some domains, they all fall short to match the performance of fine-tuning on each individual domain, which remains the best choice in multi-source single domain adaptation. In this comparison, architecture-based strategies seem to show the best promises. \fyTodo{Mitigate this}
-As expected however, MDMT are less brittle than fine-tuning when domain frontiers are uncertain, and can, to a certain extend,
-dynamically accommodate additional domains:this is especially easy for feature-based methodologies. Our experiments finally suggest that all methods show decreasing performance when the number of domain increases (for a fixed data size). 
+\fyDone{Write conclusions}\fyFuture{no mixture of experts}
+In this study, we have carefully reconsidered the idea of multi-domain machine translation, which seems to be taken for granted in many recent studies. We have spelled out the various motivations for building such systems and the associated expectations in terms of system performance. We have then designed a series of requirements that MDMT systems should meet, and proposed a series of test procedures. In our experiments with a representative sample of MDMTs, we have found that most requirements were hardly met for our experimental conditions. If MDMT systems are able to outperform the mixed-domain baseline, at least for some domains, they all fall short to match the performance of fine-tuning on each individual domain, which remains the best choice in multi-source single domain adaptation. In this scenario, architecture-based strategies aimed at parameter sharing and/or representation normalization obtain the best results. \fyDone{Mitigate this}
+As expected however, MDMTs are less brittle than fine-tuning when domain frontiers are uncertain, and can, to a certain extend, dynamically accommodate additional domains:this is especially easy for feature-based methodologies. Our experiments finally suggest that all methods show decreasing performance when the number of domain increases (for a fixed data size).
 
-Two other main conclusions can be drawed from this study: first, it seems that more work is needed to make MDMT systems make the best out of the variety of the available data, both to effectively share what needs to be shared while at the same time separating what needs to be separated. We notably see two areas worthy of further explorations: the development of parameter sharing strategies when the number of domains is large; the design of training strategies that can effectively handle a change of the training mixture, including an increase in the number of domains. Both problems are of practical relevance in industrial settings. Second, and may be more importantly, there is a general need to adopt better evaluation methodologies for evaluating MDMT systems, require systems developers to clearly spell out the testing conditions and the associated expected distribution of testing instances, and to report more than mere comparisons with simple baselines on a fixed and known pair of domains.
+Two other main conclusions can be drawed from this study: first, it seems that more work is needed to make MDMT systems make the best out of the variety of the available data, both to effectively share what needs to be shared while at the same time separating what needs to be kept separated. We notably see two areas worthy of further explorations: the development of parameter sharing strategies when the number of domains is large; the design of training strategies that can effectively handle a change of the training mixture, including an increase in the number of domains. Both problems are of practical relevance in industrial settings. Second, and may be more importantly, there is a general need to adopt better evaluation methodologies for evaluating MDMT systems, which require systems developers to clearly spell out the testing conditions and the associated expected distribution of testing instances, and to report more than mere comparisons with simple baselines on a fixed and known handful of domains.
 
 % --------------
 % \section*{Acknowledgements}
@@ -488,9 +487,9 @@ Two other main conclusions can be drawed from this study: first, it seems that m
 \bibliographystyle{acl_natbib}
 \bibliography{multidomain}
 
-\todos{}
-
 \end{document}
+
+\todos{}
 
 \appendix{}
 
