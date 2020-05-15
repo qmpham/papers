@@ -248,10 +248,10 @@ Our baselines are standard for multi-domain systems.\footnote{We however omit do
 \item fine-tuned models \cite{Luong15stanford,Freitag16fast}\jcDone{i would use Luong and Manning 2015}, based on the \system{Mixed-Nat} system, further trained on each domain for at most 20~000 iterations, with early stopping when the dev BLEU stops increasing. We again contrast two versions: full fine-tuning (\system{FT-Full}), which may update all the parameters of the initial generic model; and the variant of \cite{Bapna19simple}, where fine-tuning only updates a simple adaptation module that is added (with residual connexions) on top of every Transformer layer (\system{FT-Block}).
 \end{itemize}
 
-For all models, we set the embeddings size and the hidden layers size to~512. Transformers use multi-head attention with 8 heads in each of the 6 layers; the inner feedforward layer contains 2048 cells. The multi-domain residual system (see description below) additionally uses an adaptation block in each transformer layer, composed of 2-layer perceptron, with an inner RELU activation function operating on normalized entries of dimension 1024.
+For all models, we set the embeddings size and the hidden layers size to~512. Transformers use multi-head attention with 8 heads in each of the 6 layers; the inner feedforward layer contains 2048 cells. The multi-domain residual system (see description below) additionally uses an adaptation block in each transformer layer, composed of 2-layer perceptron, with an inner RELU activation function operating on normalized entries of dimension 1024. 
 % The gated variant is made of a dense layer, followed by a layer normalization and a sigmoid activation.
 % The domain control systems are exactly as their baseline counterparts (RNN and Transformer), with an additional 2 cells encoding the domain on the input layer.
-Training use a batch size of~128; optimization uses Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$ and Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ for all layers.\fyDone{Describe the block adaptation layer - voir slides} 
+Training use a batch size of~12288 tokens; optimization uses Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$ and Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ for all layers.\fyDone{Describe the block adaptation layer - voir slides} 
  % All our systems are implemented in OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}.
 \subsection{Multi-domain systems \label{ssec:systems}}
 \fyDone{Remove Gated residual}
