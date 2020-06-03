@@ -1,0 +1,123 @@
+%
+% File emnlp2020.tex
+%
+%% Based on the style files for ACL 2020, which were
+%% Based on the style files for ACL 2018, NAACL 2018/19, which were
+%% Based on the style files for ACL-2015, with some improvements
+%%  taken from the NAACL-2016 style
+%% Based on the style files for ACL-2014, which were, in turn,
+%% based on ACL-2013, ACL-2012, ACL-2011, ACL-2010, ACL-IJCNLP-2009,
+%% EACL-2009, IJCNLP-2008...
+%% Based on the style files for EACL 2006 by 
+%%e.agirre@ehu.es or Sergi.Balari@uab.es
+%% and that of ACL 08 by Joakim Nivre and Noah Smith
+
+\documentclass[11pt,a4paper]{article}
+\usepackage[hyperref]{emnlp2020}
+\usepackage{times}
+\usepackage{latexsym}
+\renewcommand{\UrlFont}{\ttfamily\small}
+
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage[draft]{todo}
+\usepackage{xspace}
+\usepackage{amsmath,amsfonts,amssymb}
+
+% This is not strictly necessary, and may be commented out,
+% but it will improve the layout of the manuscript,
+% and will typically save some space.
+\usepackage{microtype}
+
+%\aclfinalcopy % Uncomment this line for the final submission
+%\def\aclpaperid{***} %  Enter the acl Paper ID here
+
+%\setlength\titlebox{5cm}
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+\newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyTodostar}[1]{\Todo*[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyFuture}[1]{\done[FY]\Todo[FY:]{\textcolor{red}{#1}}}
+\newcommand{\fyDonestar}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\jcTodo}[1]{\Todo[JC:]{\textcolor{red}{#1}}}
+\newcommand{\jcDone}[1]{\done[JC]\Todo[JC:]{\textcolor{red}{#1}}}
+
+\newcommand{\mpTodo}[1]{\Todo[MP:]{\textcolor{green}{#1}}}
+\newcommand{\mpDone}[1]{\done[MP]\Todo[MP:]{\textcolor{green}{#1}}}
+
+\newcommand{\src}{\ensuremath{\mathbf{f}}} % source sentence
+\newcommand{\trg}{\ensuremath{\mathbf{e}}} % target sentence
+\newcommand{\domain}[1]{\texttt{\textsc{#1}}}
+\newcommand{\system}[1]{\texttt{\textbf{#1}}}
+\newcommand{\vlambda}{\ensuremath{\boldsymbol\lambda}\xspace} % parameters vector for a distribution
+\newcommand{\indic}[1]{\ensuremath{\mathbb{I}(#1)}}
+% \newcommand{\SB}[1]{\textcolor{green}{#1}}
+% \newcommand{\SW}[1]{\textcolor{red}{#1}}
+\newcommand{\SB}[1]{\textbf{#1}}
+\newcommand{\SW}[1]{\underline{#1}}
+\renewcommand\textfraction{.1}
+\renewcommand\floatpagefraction{.95}
+
+\newcommand\BibTeX{B\textsc{ib}\TeX}
+
+\title{Less catastrophic forgetting domain adaptation}
+
+\author{First Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\\And
+  Second Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\}
+
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+\mpTodo{write abstract}
+\end{abstract}
+\section{Introduction } \label{sec:intro}
+\mpTodo{write introduction}
+\citet{Bapna19simple}
+\section{Word-Level Adaptive Domain Adaptation \label{sec:wada}}
+\mpTodo{Formalizing problem, network design, training algorithm}
+
+\section{Experimental settings \label{sec:exp}}
+
+\subsection{Data and metrics \label{ssec:corpora}}
+\mpTodo{English - French, English - German}
+\subsection{Baselines \label{ssec:baseline}}
+\mpTodo{\system{FT-block}; \system{FT-full}, \system{FT-full Brian Thompson}, \system{DC}, \system{Domain Mixing}}
+
+\subsection{Proposed systems \label{ssec:wada}}
+
+
+\section{Related Work \label{sec:related}}
+
+
+\section{Discussion \label{sec:discussion}}
+
+
+\section*{Acknowledgments}
+
+\bibliographystyle{acl_natbib}
+\bibliography{emnlp2020}
+\appendix
+\section{Appendices}
+\label{sec:appendix}
+jkk
+\section{Supplemental Material}
+\label{sec:supplemental}
+
+\end{document}
