@@ -111,7 +111,7 @@ The first problem was first studied under the concept of Domain Adaptation where
 Methods in this category improve the low resource model by collecting domain-related examples from out-of-domain resources. For the statistical model, \cite{mansour12simple} investigated the use of the Moore-Lewis score to re-estimate the phrase table.\cite{Duh13selection,Axelrod11domain,silva2018extracting} proposed several methods to select examples for training NMT model by scoring based on the cosine similarity of distributed sentence embedding or based on the probability calculated by in-domain Neural Language Model and the cosine similarity of $tf\_idf$ embedding adjusted by Feature decay algorithm. Another way to get more training is to create pseudo parallel data, \cite{Junjie19domain} proposed an unsupervised method to create pseudo in-domain training data using word by word translation.
 
 \subsubsection*{Model-based adaptation methods}
-These approaches take interest in the model architecture and model training process. We can further categorize them into 3 classes: feature-augmentation, module-augmentation, surrogate losses, and finetuning. In the class of feature-augmentation, \cite{Kobus17domain}, \cite{kenji17multi}, \cite{Pham19generic} proposed to add domain-tags and learn-able domain-embeddings to existing word feature of NMT model. These methods are cheap and efficient in terms of gain over model-size.
+These approaches take interest in the model architecture and model training process. We can further categorize them into 3 classes: feature-augmentation, module-augmentation, surrogate losses, and finetuning. In the class of feature-augmentation, \cite{Kobus17domain}, \cite{kenji17multi}, \cite{Pham19generic} proposed to add domain-tags and learn-able domain-embeddings to existing word feature of NMT model. These methods achieve a good trade-off between performance gain and the number of additional parameters.
 
 
 Module-augmentation is more expensive then feature-augmentation because one adds one or several complementary layers into standard NMT architecture; \cite{bapna19simple},\cite{Michel18extreme},\cite{Zheng18multi},\cite{Vilar18learning}, \cite{Britz2017mixing} are included in this category. Residual module in \cite{bapna19simple} and Hidden units in \cite{Vilar18learning} (\ref{fig:overview}) are used as a plug-in which is used to fine-tune the model without
@@ -131,7 +131,7 @@ a normalization term to cross-entropy loss in order to retain the generalization
 \label{fig:overview}
 \end{figure}
 
-\subsection*{Realized work}
+\subsection*{Past contribution}
 The work of \cite{Kobus17domain} and \cite{Daume07frustratingly} showed promising results for learning in a multi-domain context. Inspired by the simplicity of the methods, we extend their works to a new version of domain embedding. In this method, each word has its domain embedding which amounts to a small share of the word embedding. 
 
 
