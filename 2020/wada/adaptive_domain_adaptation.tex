@@ -121,7 +121,7 @@ We define some important constants:
 \begin{itemize}
 	\item Domain inseparability $\mathbb{\varepsilon}_{insep} = \displaystyle{\mathop{\sum}_{k' \neq k} \mathbb{E}_{x,y}[\mathbf{1}_{d=k'}*p_k(h)]}$. where $h=M(x,y)$
 	\item Risk of generic model $\mathbb{R} = \mathbb{E}_{x,y}[l(h,y)]$
-	\item $\mathbf{\Omega_{k,p_{0}}} = \lbrace h | z_k = p_k(h)<0.8\rbrace$.
+	\item $\mathbf{\Omega_{k,p_{0}}} = \lbrace h | z_k = p_k(h)<p_0\rbrace$.
 	\item Risk of adapted model in in-domain test set $R_k = \displaystyle{\mathbb{E}_{x,y \sim p(.|d=k)}[l(h * (1-f(z_k)) + a_k(h) * f(z_k), y)]}$
 \end{itemize}
 We also have 2 assumptions on the regularization of activation function:
