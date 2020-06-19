@@ -105,7 +105,7 @@ h' = h + a_k(h)
 
 where h is output of sharing layer, i.e $h=M(x,y)$, $M: \mathbb{X} \times \mathbb{Y} \rightarrow \mathbf{\Omega}\subset \mathbb{R}^{d_{model}}$, $a_k$ is the residual adapter which is a function $\mathbb{R}^{d_{model}} \rightarrow \mathbb{R}^{d_{model}}$. \\
 
-The problem of catastrophic forgetting happens when the value of $a_k(h)$ has large magnitude for value of h which is output of an out-of-domain example $(x^{adv}, y^{adv})$ (adv means adversarial). Indeed, finetuning such adapter with only in-domain data, $a_k$ never encounters adversarial examples, thus does not guarantee the risk of prediction on out-of-domain examples. However, if we control the weight of $a_k(h)$ is the combination, we might reduce the wrong belief of $a_k$ on adversarial examples. We then investigate a form more flexible of the latter combination.
+The bad performance of fine-tuned model happens as the value of $a_k(h)$ of the out-of-domain example $(x^{adv}, y^{adv})$ is adversarial to the model. Indeed, by fine-tuning such adapter with only in-domain data, $a_k$ never encounters adversarial examples, thus does not guarantee the risk of prediction on out-of-domain examples. However, if we control the weight of $a_k(h)$ is the combination, we might reduce the wrong belief of $a_k$ on adversarial examples. To execute the idea, we  investigate the version of convex combination.
 
 \begin{equation}
 h' = h * (1-f(z_k)) + a_k(h) * f(z_k)
