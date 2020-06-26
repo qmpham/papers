@@ -82,18 +82,22 @@
 \setlength{\parskip}{0.1cm}
 \setlength{\parindent}{1em}
 \section*{Word Level Adaptive Domain Adaptation}
-Let $h$ is the output of the encoder which is pretrained, the adapted representation will be $h' = h + a_k(h)$. In gating version, $h' = h * (1-z_k) + a_k(h) * z_k$ where $z_k$ is also a function of $h$ taking value in $[0,1]$. More precisely, $h$ and $h'$ is a sequence of context vectors , and the combination is element wise, i.e, $h'(w) = h(w) * z_k(h(w)) + a_k(h(w)) * z_k(h(w))$. \\
-In Word Level Adaptive Domain Adaptation version, $z_k(h(w))$ is designed so that the less probably the word $w$ is in domain $k$ the less $z_k(h(w))$ is. The Word Level Adaptive Domain Adaptation aims to reduce the variation caused by $a_k$ of adapted context vector $h'$ compared to $h$ on words that do not surely belong to domain k. For a domain, there are 2 type of "mistrusted" words: out-of-domain words that rarely or never appear in the in-domain data; or popular words that appear frequently in many domains. By reusing learned representation of the "mistrusted" words, we can at least guarantee the risk of bad prediction in case of out-of-domain words by the risk of the learned generic model.
+Let $h$ is the output of the encoder which is pretrained, the representation adapted to the domain k using the residual adapter will be $$h' = h + a_k(h)$$ In gating version, $$h' = h * (1-z_k) + a_k(h) * z_k$$ where $z_k$ is also a function of $h$ taking value in $[0,1]$. More precisely, in MT task, $h$ and $h'$ is a sequence of context vectors , and the combination is element wise, i.e, $h'(w) = h(w) * z_k(h(w)) + a_k(h(w)) * z_k(h(w))$ where $w$ is a token in the sequence.
+\\
+
+In Word Level Adaptive Domain Adaptation version, $z_k(h(w))$ is designed so that the less probably the word $w$ is in the domain $k$ the smaller $z_k(h(w))$ is. The Word Level Adaptive Domain Adaptation aims to reduce the variation caused by $a_k$ of the adapted context vector $h'$ compared to $h$ of a word that does not surely belong to domain k. \\
+
+For a domain, there are 2 type of "less specific" words: out-of-domain words that rarely or never appear in the domain but is popular in the other domains; or popular words that appear frequently in many domains. By reusing learned representation of the "less specific" words, we can at least guarantee the risk of the bad prediction of out-of-domain words by the risk of the learned generic model.
 \section*{Training process}
-There 3 steps:
+There are 3 steps:
 \begin{itemize}
 	\item Pretraining a generic model with mixed corpora.
-	\item Training a domain classifier on top of the encoder and decoder; freezing the parameters of the generic model.
-	\item Training parameters of adapters with in-domain data separately while freezing the parameters of the generic model and of the domain classifiers.
+	\item Training 2 domain classifiers on top of the encoder and on top of the decoder while freezing the parameters of the generic model.
+	\item Training parameters of the adapters with in-domain data separately while freezing the parameters of the generic model and of the domain classifiers.
 \end{itemize}
 
 \section*{Weakness of the method}
-The new method depends essentially to the quality of the classifier. Moreover, the classifier can fail to detect in-domain words in the case of polysemous words. For example, the word "joint" in joint stereo, joint sprain and joint project has 2 different translations as "joint" and "articulaire" in french. In the unbalanced dataset as the mixed corpora (6 in-domain corpora),  "joint stereo"
+The new method depends essentially to the quality of the classifier. Moreover, the classifier can fail to detect in-domain words in the case of polysemous words. For example, the word "joint" in joint stereo, joint sprain and joint project has 2 different translations as "joint" and "articulaire" in french. In the unbalanced dataset as the mixed corpora (6 in-domain corpora), the classifier somehow fails to predict IT as the most probable domain of "joint stereo".
 
 \section*{Analysis on the risk of new method}
 
@@ -115,7 +119,7 @@ h' = h * (1-f(z_k)) + a_k(h) * f(z_k)
 where 
 \begin{itemize}
 	\item $z_k = P(d=k | h=M(x,y)) = p(h)$ where $p: \mathbf{\Omega} \rightarrow \mathbf{\Delta}^{K}$
-	\item f is an activation function $f: [0,1] \rightarrow [0,1]$ 
+	\item f is an activation function $f: [0,1] \rightarrow [0,1]$ which is monotonically increasing.
 \end{itemize}
 We define some important constants:
 \begin{itemize}
@@ -129,7 +133,7 @@ We also have 2 assumptions on the regularization of activation function:
 	\item $a_k$ is bounded in sense of $\normL{a_k(h)} < M$
 	\item loss function is bounded in sense of $l(h * (1-f(z_k)) + a_k(h) * f(z_k),y) < A$ $\forall x,y$
 \end{itemize}
-We then access the risk of of the model adapted to domain k with the residual $a_k$ to arbitrary examples of K domains.
+We then access the risk of of the model adapted to domain k with the residual $a_k$ in the prediction of arbitrary examples of K domains.
 \begin{equation}
 \begin{split}
 R(M,a_k) &= \mathbb{E}_{x,y}[l(h * (1-f(z_k)) + a_k(h) * f(z_k),y)] \\
