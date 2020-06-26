@@ -82,12 +82,17 @@
 \setlength{\parskip}{0.1cm}
 \setlength{\parindent}{1em}
 \section*{Word Level Adaptive Domain Adaptation}
-Let $h$ the output of the pretrained encoder, the adapted representation for domain $k$ will be $h' = h + a_k(h)$, meaning that all words in all sentences for domain $k$ will use the adapter module $a_k$.  A ``gated'' version uses $h' = h * (1-z_k) + a_k(h) * z_k$\footnote{More precisely, $a_k(h) = \sum_{l} a_{kl}(h)$, where the summation runs over layers, see Figure XXX...}\fyTodo{$a_k(h)=$ somme tous les composants résiduels} where $z_k$ is also a function of $h$ taking values in $[0,1]$. More precisely, $h$ and $h'$ are sequences of context vectors and the combination is performed element-wise, yielding:
+Let $h$ the output of the pretrained encoder, the adapted representation for domain $k$ will be $h' = h + a_k(h)$, meaning that all words in all sentences for domain $k$ will use the adapter module $a_k$.  A ``gated'' version uses $h' = h * (1-z_k) + a_k(h) * z_k$\footnote{More precisely, $a_k(h) = \sum_{l} a_{kl}(h)$, where the summation runs over layers, see Figure \ref{fig:1}} \fyTodo{$a_k(h)=$ somme tous les composants résiduels} where $z_k$ is also a function of $h$ taking values in $[0,1]$. More precisely, $h$ and $h'$ are sequences of context vectors and the combination is performed element-wise, yielding:
 \begin{equation}
   h'(w) = h(w) * (1 - z_k(h(w))) + a_k(h(w)) * z_k(h(w)). \label{eq:gated-residual}
 \end{equation}
 
 In Word Level Adaptive Domain Adaptation, $z_k(h(w))$ is designed to reflect the ``topicality'' of  word $w$ is in domain $k$: the more likely $w$ is in domain $k$, the larger $z_k(h(w))$ is. The word-level adaptive domain adaptation aims to reduce the variation caused by $a_k$ to the adapted context vector $h'$ (compared to $h$) for words that are not typical of domain $k$. For a domain, there are 2 type of non-topical words: out-of-domain words that rarely or never appear in the in-domain texts; or frequent words that appear equally frequently in many domains. \fyTodo{This is like a poor Tf-idf - can be because tf is small or because idf is small} By reusing a learned generic representation for the non-topical words, we can at least bound the risk of poor predictions in case of out-of-domain words by the risk of the learned generic model (see below).
+\begin{figure}[h!]
+\includegraphics[scale=0.5]{highway_residual}
+\caption{Highway residual layer}
+\label{fig:1}
+\end{figure}
 
 \section*{Training process}
 The training process comprises thre main steps:
@@ -99,11 +104,8 @@ The training process comprises thre main steps:
 During the inference, $z_k$ is used to regulate the strength of the adapter module as suggested in equation~\ref{eq:gated-residual}.
 
 \section*{Weakness of the method}
-<<<<<<< HEAD
-The new method depends essentially to the quality of the classifier. Moreover, the classifier can fail to detect in-domain words in the case of polysemous words. For example, the word "joint" in joint stereo, joint sprain and joint project has 2 different translations as "joint" and "articulaire" in french. In the unbalanced dataset as the mixed corpora (6 in-domain corpora), the classifier somehow fails to predict IT as the most probable domain of "joint stereo".
-=======
+
 This method depends crucially to the quality of the classifier $p(k|h(w))$. Moreover, the classifier can fail to detect in-domain words in the case of polysemous words. For example, the word "joint" in ``joint stereo'', ``joint sprain'' and ``joint project'' correspond to multiple translations such as "joint" and "articulaire" in French. In the unbalanced dataset as the mixed corpora (6 in-domain corpora),  "joint stereo" \fyTodo{unfinished sentence}
->>>>>>> 5d2d2fe949df5f0f8a8e2b205347af1bc0ebb767
 
 \section*{Analysis on the risk of new method}
 
