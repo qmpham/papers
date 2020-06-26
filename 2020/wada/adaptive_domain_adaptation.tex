@@ -82,96 +82,107 @@
 \setlength{\parskip}{0.1cm}
 \setlength{\parindent}{1em}
 \section*{Word Level Adaptive Domain Adaptation}
-Let $h$ is the output of the encoder which is pretrained, the representation adapted to the domain k using the residual adapter will be $$h' = h + a_k(h)$$ In gating version, $$h' = h * (1-z_k) + a_k(h) * z_k$$ where $z_k$ is also a function of $h$ taking value in $[0,1]$. More precisely, in MT task, $h$ and $h'$ is a sequence of context vectors , and the combination is element wise, i.e, $h'(w) = h(w) * z_k(h(w)) + a_k(h(w)) * z_k(h(w))$ where $w$ is a token in the sequence.
-\\
+Let $h$ the output of the pretrained encoder, the adapted representation for domain $k$ will be $h' = h + a_k(h)$, meaning that all words in all sentences for domain $k$ will use the adapter module $a_k$.  A ``gated'' version uses $h' = h * (1-z_k) + a_k(h) * z_k$\footnote{More precisely, $a_k(h) = \sum_{l} a_{kl}(h)$, where the summation runs over layers, see Figure XXX...}\fyTodo{$a_k(h)=$ somme tous les composants résiduels} where $z_k$ is also a function of $h$ taking values in $[0,1]$. More precisely, $h$ and $h'$ are sequences of context vectors and the combination is performed element-wise, yielding:
+\begin{equation}
+  h'(w) = h(w) * (1 - z_k(h(w))) + a_k(h(w)) * z_k(h(w)). \label{eq:gated-residual}
+\end{equation}
 
-In Word Level Adaptive Domain Adaptation version, $z_k(h(w))$ is designed so that the less probably the word $w$ is in the domain $k$ the smaller $z_k(h(w))$ is. The Word Level Adaptive Domain Adaptation aims to reduce the variation caused by $a_k$ of the adapted context vector $h'$ compared to $h$ of a word that does not surely belong to domain k. \\
+In Word Level Adaptive Domain Adaptation, $z_k(h(w))$ is designed to reflect the ``topicality'' of  word $w$ is in domain $k$: the more likely $w$ is in domain $k$, the larger $z_k(h(w))$ is. The word-level adaptive domain adaptation aims to reduce the variation caused by $a_k$ to the adapted context vector $h'$ (compared to $h$) for words that are not typical of domain $k$. For a domain, there are 2 type of non-topical words: out-of-domain words that rarely or never appear in the in-domain texts; or frequent words that appear equally frequently in many domains. \fyTodo{This is like a poor Tf-idf - can be because tf is small or because idf is small} By reusing a learned generic representation for the non-topical words, we can at least bound the risk of poor predictions in case of out-of-domain words by the risk of the learned generic model (see below).
 
-For a domain, there are 2 type of "less specific" words: out-of-domain words that rarely or never appear in the domain but is popular in the other domains; or popular words that appear frequently in many domains. By reusing learned representation of the "less specific" words, we can at least guarantee the risk of the bad prediction of out-of-domain words by the risk of the learned generic model.
 \section*{Training process}
-There are 3 steps:
+The training process comprises thre main steps:
 \begin{itemize}
-	\item Pretraining a generic model with mixed corpora.
-	\item Training 2 domain classifiers on top of the encoder and on top of the decoder while freezing the parameters of the generic model.
-	\item Training parameters of the adapters with in-domain data separately while freezing the parameters of the generic model and of the domain classifiers.
+\item Pretraining a generic model with a mixed corpora.
+\item Training a domain classifier on top of the encoder and decoder; during this step, the parameters of the generic model are frozen. This model computes the posterior domain probability $p(k|h(w))$ for each word $w$ based on the representation computed by the last layer. \fyTodo{Which layer, which classifier ?}
+\item Training parameters of adapters with in-domain data separately while freezing the parameters of the generic model and of the domain classifiers.
 \end{itemize}
+During the inference, $z_k$ is used to regulate the strength of the adapter module as suggested in equation~\ref{eq:gated-residual}.
 
 \section*{Weakness of the method}
+<<<<<<< HEAD
 The new method depends essentially to the quality of the classifier. Moreover, the classifier can fail to detect in-domain words in the case of polysemous words. For example, the word "joint" in joint stereo, joint sprain and joint project has 2 different translations as "joint" and "articulaire" in french. In the unbalanced dataset as the mixed corpora (6 in-domain corpora), the classifier somehow fails to predict IT as the most probable domain of "joint stereo".
+=======
+This method depends crucially to the quality of the classifier $p(k|h(w))$. Moreover, the classifier can fail to detect in-domain words in the case of polysemous words. For example, the word "joint" in ``joint stereo'', ``joint sprain'' and ``joint project'' correspond to multiple translations such as "joint" and "articulaire" in French. In the unbalanced dataset as the mixed corpora (6 in-domain corpora),  "joint stereo" \fyTodo{unfinished sentence}
+>>>>>>> 5d2d2fe949df5f0f8a8e2b205347af1bc0ebb767
 
 \section*{Analysis on the risk of new method}
 
-The combination of generic representation and the residual adapter in the adapted model is as following
+The combination of a generic representation and a residual adapter is defined as follows:
 \begin{equation}
-h' = h + a_k(h)
-\label{eq:1}
+  h' = h + a_k(h) \label{eq:residual-adapter}
 \end{equation}
 
-where h is output of sharing layer, i.e $h=M(x,y)$, $M: \mathbb{X} \times \mathbb{Y} \rightarrow \mathbf{\Omega}\subset \mathbb{R}^{d_{model}}$, $a_k$ is the residual adapter which is a function $\mathbb{R}^{d_{model}} \rightarrow \mathbb{R}^{d_{model}}$. \\
+where $h$ is the output of shared ``generic'' layers, i.e $h=M(x,y)$, $M: \mathbb{X} \times \mathbb{Y} \rightarrow \mathbf{\Omega}\subset \mathbb{R}^{d_{model}}$, $a_k$ is the residual adapter defined as a function $a_k: \mathbb{R}^{d_{model}} \rightarrow \mathbb{R}^{d_{model}}$.
 
-The bad performance of fine-tuned model happens as the value of $a_k(h)$ of the out-of-domain example $(x^{adv}, y^{adv})$ is adversarial to the model. Indeed, by fine-tuning such adapter with only in-domain data, $a_k$ never encounters adversarial examples, thus does not guarantee the risk of prediction on out-of-domain examples. However, if we control the weight of $a_k(h)$ is the combination, we might reduce the wrong belief of $a_k$ on adversarial examples. To execute the idea, we  investigate the version of convex combination.
+The poor performance of fine-tuned models with a residual layer happens as the value of $a_k(h)$ of an out-of-domain example $(x^{adv}, y^{adv})$ is adversarial to the model. Indeed, by fine-tuning the adapter with only in-domain data, $a_k$ never encounters adversarial examples, which makes it error-prone in the face of out-of-domain examples. The intuition of wada is that we control the weight of $a_k(h)$ in the combination, we can hope to reduce the wrong belief of $a_k$ on adversarial examples. To implement this idea, we  investigate a convex combination of the generic and the residual layers, and define the adapted representation to be:
 
 \begin{equation}
-h' = h * (1-f(z_k)) + a_k(h) * f(z_k)
+h' = h * (1-f(z_k)) + a_k(h) * f(z_k), 
 \label{eq:2}
 \end{equation}
 
-where 
+\noindent{}where
 \begin{itemize}
-	\item $z_k = P(d=k | h=M(x,y)) = p(h)$ where $p: \mathbf{\Omega} \rightarrow \mathbf{\Delta}^{K}$
-	\item f is an activation function $f: [0,1] \rightarrow [0,1]$ which is monotonically increasing.
+\item $z_k = p(d=k | h=M(x,y)) = p_k(h)$ with $p: \mathbf{\Omega} \rightarrow \mathbf{\Delta}^{K}$\fyTodo{Attention à $x$ et $y$}
+\item f is an activation function $f: [0,1] \rightarrow [0,1]$ 
 \end{itemize}
+
 We define some important constants:
 \begin{itemize}
-	\item Domain inseparability $\mathbb{\varepsilon}_{insep} = \displaystyle{\mathop{\sum}_{k' \neq k} \mathbb{E}_{x,y}[\mathbf{1}_{d=k'}*p_k(h)]}$. where $h=M(x,y)$
-	\item Risk of generic model $\mathbb{R} = \mathbb{E}_{x,y}[l(h,y)]$
-	\item $\mathbf{\Omega_{k,p_{0}}} = \lbrace h | z_k = p_k(h)<p_0\rbrace$.
-	\item Risk of adapted model in in-domain test set $R_k = \displaystyle{\mathbb{E}_{x,y \sim p(.|d=k)}[l(h * (1-f(z_k)) + a_k(h) * f(z_k), y)]}$
+\item Domain inseparability:  \fyTodo{Esperance de classification error - is it }
+  $$
+  \mathbb{\varepsilon}_{insep}(\theta, p) = \sum_{k' \neq k} \mathbb{E}_{x,y \sim \mathcal{D}_{k'}}(p(k|h),
+  $$
+\item Risk of the generic model: $\mathbb{R} = \mathbb{E}_{(x,y) \sim \mathcal{D}}(l(M(x,y_{<t}), y_t))$ \fyDone{wrt to which distribution ?}
+\item $\mathbf{\Omega_{k,p_{0}}} = \lbrace h | z_k = p_\theta(k|h) < p_0\rbrace$.
+\item Risk of the adapted model for the in-domain test set:
+  $$R_k = \mathbb{E}_{x,y \sim \mathcal{D}_k} [l(h * (1 - f(z_k)) + a_k(h) * f(z_k), y)]$$
 \end{itemize}
-We also have 2 assumptions on the regularization of activation function:
+
+We also have two assumptions on the regularity of the activation and the loss functions:
 \begin{itemize}
-	\item $a_k$ is bounded in sense of $\normL{a_k(h)} < M$
-	\item loss function is bounded in sense of $l(h * (1-f(z_k)) + a_k(h) * f(z_k),y) < A$ $\forall x,y$
+\item $a_k$ is bounded in sense of $\normL{a_k(h)} < M$
+\item the loss function is bounded in sense of $l(h * (1-f(z_k)) + a_k(h) * f(z_k), y) < A$ \fyTodo{why not $l(h,y) < A$ ?}
+  $\forall x,y$
 \end{itemize}
-We then access the risk of of the model adapted to domain k with the residual $a_k$ in the prediction of arbitrary examples of K domains.
+We then evaluate the risk of the model adapted to domain $k$ with residuals $a_k$ for arbitrary examples from $K$ domains:
 \begin{equation}
 \begin{split}
-R(M,a_k) &= \mathbb{E}_{x,y}[l(h * (1-f(z_k)) + a_k(h) * f(z_k),y)] \\
-		&= \mathbb{E}_{x,y}[l(h * (1-f(z_k)) + a_k(h) * f(z_k),y)\mathbf{1}_{\mathbf{\Omega_{k,p_{0}}}}(h)] + \\
-		&+ \mathbb{E}_{x,y}[l(h * (1-f(z_k)) + a_k(h) * f(z_k),y) \mathbf{1}_{\mathbf{\Omega_{k,p_{0}}}^{c}}(h)]
+  R(M,a_k) &= \mathbb{E}_{x,y}[l(h * (1-f(z_k)) + a_k(h) * f(z_k),y)] \\
+  &= \mathbb{E}_{x,y}[l(h * (1-f(z_k)) + a_k(h) * f(z_k),y)\mathbf{1}_{\mathbf{\Omega_{k,p_{0}}}}(h)] + \\
+  &+ \mathbb{E}_{x,y}[l(h * (1-f(z_k)) + a_k(h) * f(z_k),y) \mathbf{1}_{\mathbf{\Omega_{k,p_{0}}^{c}}}(h)]
 \end{split}
 \end{equation}
 
-By designing a suitable activation function, we can map $f: [0,p_{0}] \rightarrow [0,\delta]$. Then with $\delta$ is small enough we can have below approximation of the first term:
+By designing a suitable activation function, we can map $f: [0,p_{0}] \rightarrow [0,\delta]$. Then with $\delta$ is small enough we can have an approximation of the first term:
 \begin{equation}
-\mathbb{E}_{x,y}[l(h * (1-f(z_k)) + a_k(h) * f(z_k),y)\mathbf{1}_{\mathbf{\Omega_{k,p_{0}}}}(h)] \sim \mathbb{E}_{x,y}[l(h,y)\mathbf{1}_\mathbf{\Omega_{k,p_{0}}}(h)] \leq \mathbb{E}_{x,y}[l(h,y)] = R
+\mathbb{E}_{x,y}[l(h * (1-f(z_k)) + a_k(h) * f(z_k),y)\mathbf{1}_{\mathbf{\Omega_{k,p_{0}}}}(h)] \approx{} \mathbb{E}_{x,y}[l(h,y)\mathbf{1}_\mathbf{\Omega_{k,p_{0}}}(h)] \leq \mathbb{E}_{x,y}[l(h,y)] = R
 \label{eq:4}
 \end{equation}
-The second term:
-\begin{equation}
+The second term: $ L = \mathbb{E}_{x,y}[l(h * (1-f(z_k)) + a_k(h) * f(z_k),y) \mathbf{1}_{\mathbf{\Omega_{k,p_{0}}^{c}}}(h)]$ can be bounded as follows:
+\begin{equation*}
 \begin{split}
-\mathbb{E}_{x,y}[l(h * (1-f(z_k)) + a_k(h) * f(z_k),y) \mathbf{1}_{\mathbf{\Omega_{k,p_{0}}}^{c}}(h)] &= \displaystyle{\mathop{\sum}_{k'}\mathbb{E}_{x,y \sim p(.|d=k')}[l(h * (1-f(z_k))} \\
-	& + a_k(h) * f(z_k),y) *\mathbf{1}_{\mathbf{\Omega_{k,p_{0}}}^{c}}(h)]P(d=k') \\
-	& \leq \displaystyle{\mathop{\sum}_{k' \neq k}} A * \mathbb{E}_{x,y \sim p(.|d=k')} [\mathbf{1}_{\mathbf{\Omega_{k,p_{0}}}^{c}}(h)]P(d=k') \\
-	&+ \mathbb{E}_{x,y \sim p(.|d=k)}[l(h * (1-f(z_k)) + \\
-	&+ a_k(h) * f(z_k),y) * \mathbf{1}_{\mathbf{\Omega_{k,p_{0}}}^{c}}(h)]P(d=k) \\
+L &= \displaystyle{\mathop{\sum}_{k'}\mathbb{E}_{x,y \sim p(.|d=k')}[l(h * (1-f(z_k))} + a_k(h) * f(z_k),y) * \mathbf{1}_{\mathbf{\Omega_{k,p_{0}}^{c}}}(h)]p(d=k') \\
+	& \leq \displaystyle{\mathop{\sum}_{k' \neq k}} A * \mathbb{E}_{x,y \sim p(.|d=k')} [\mathbf{1}_{\mathbf{\Omega_{k,p_{0}}^{c}}}(h)]P(d=k') \\
+	& \quad + \mathbb{E}_{x,y \sim p(.|d=k)}[l(h * (1-f(z_k)) + a_k(h) * f(z_k),y) * \mathbf{1}_{\mathbf{\Omega_{k,p_{0}}^{c}}}(h)]P(d=k) \\
 	&\leq A * \frac{\mathbb{\varepsilon}_{insep}}{p_{0}} + R_k * P(d=k)
 \end{split}
 \label{eq:5}
-\end{equation}
+\end{equation*}
 
-The last inequality is verified by the below inequality:
+The last inequality is verified since:
 \begin{equation}
 \begin{split}
-\displaystyle{\mathop{\sum}_{k' \neq k}} A * \mathbb{E}_{x,y \sim p(.|d=k')} [\mathbf{1}_{\mathbf{\Omega_{k,p_{0}}}^{c}}(h)]P(d=k') &\leq A * \displaystyle{\mathop{\sum}_{k' \neq k}} \mathbb{E}_{x,y \sim p(.|d=k') } [\frac{p_k(h)}{p_0}]P(d=k') \\
+\displaystyle{\mathop{\sum}_{k' \neq k}} A * \mathbb{E}_{x,y \sim p(.|d=k')} [\mathbf{1}_{\mathbf{\Omega_{k,p_{0}}^{c}}} (h)]P(d=k') &\leq A * \displaystyle{\mathop{\sum}_{k' \neq k}} \mathbb{E}_{x,y \sim p(.|d=k') } [\frac{p_k(h)}{p_0}]P(d=k') \\
 		& = \frac{A}{p_0} \mathbb{E}[\mathbf{1}_{d\neq k}p_k(h)] \\
 		& \leq \frac{A}{p_0} \mathbb{\varepsilon}_{insep}
 \end{split}
 \end{equation}
 because
-$$ \mathbf{1}_{\mathbf{\Omega_{k,p_{0}}}^{c}}(h) \leq \frac{p_k(h)}{p_0} $$
+$$ \mathbf{1}_{\mathbf{\Omega_{k,p_{0}}^{c}}}(h) \leq \frac{p_k(h)}{p_0} $$
 Combining the inequality \ref{eq:4} and the inequality \ref{eq:5} we obtain the risk in general case of the adapted model $(M,a_k)$ $$R(M,a_k) \leq R + \frac{A * \mathbb{\varepsilon}_{insep}}{p_0} + P(d=k)R_k$$
 
+\fyTodo{I sort of buy the equations but then so what ? We should may be compare with non-adaptive ?}
 
 \end{document}
 
