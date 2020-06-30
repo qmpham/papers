@@ -211,7 +211,7 @@ Combining the inequality \ref{eq:4} and the inequality \ref{eq:5} we obtain the 
 
 If we the original version of the residual adapter, with the same assumption in the regularization of the adapter, the bound of the risk of translating out-of-domain is only A (the bound of loss function). By using adaptive version, we reduce A by factor $\frac{p_0}{\epsilon^k_{insep}+\gamma}$ which is high if we choose $p_0$ is high enough, the domains are distant and the classifier is good enough. 
 
-Furthermore $ \varepsilon^k_{insep} < \varepsilon_{insep} $ which is the minimum of the error expectation over the hypothesis space of the classifier. With a trivial prediction $[\frac{1}{K},..,\frac{1}{K}]$ we have an error expectation equal to 0.5. Therefore, $\varepsilon_{insep} \leq 0.5$, i.e, $\varepsilon^k_{insep} < 0.5$. In the worst case where domains in the mixture are very close, we are still able to reduce the risk of predicting out-of-domain examples by a factor of 2.
+
 \fyTodo{I sort of buy the equations but then so what ? We should may be compare with non-adaptive ?}
 
 \end{document}
