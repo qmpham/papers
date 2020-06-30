@@ -146,13 +146,13 @@ We assume that the hidden distribution of a multi-domain problem limited to an u
 
 We define some important constants:
 \begin{itemize}
-\item Inseparability of domains over a given fixed representation space $\Omega$
+\item Inseparability of domains over a fixed representation space $\Omega$
 \begin{equation}
   \begin{split}
   \mathbb{\varepsilon}_{insep} = \min_{p} \sum_{k\in[1..K]} \mathbb{E}_{x,y \sim \sum_{i\in [1..K]} \mathcal{D}_{i}*p(d=i)}(\mathbf{1}_{d\neq k} p(k|h))
   \end{split}
   \end{equation}
-\item Inseparability of domain k from other domains over a given fixed representation space $\Omega$
+\item Inseparability of domain k from other domains over a fixed representation space $\Omega$
   \begin{equation}
   \begin{split}
   \mathbb{\varepsilon}_{insep}^k = \min_{p} \mathbb{E}_{x,y \sim \sum_{i\in [1..K]} \mathcal{D}_{i}*p(d=i)}(\mathbf{1}_{d\neq k} p(k|h))
