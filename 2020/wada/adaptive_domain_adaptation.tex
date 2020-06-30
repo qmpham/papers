@@ -116,7 +116,7 @@ During the inference, $z_k$ is used to regulate the strength of the adapter modu
 
 \section*{Weakness of the method}
 
-This method depends crucially to the quality of the classifier $p(k|h(w))$. Moreover, the classifier can fail to detect in-domain words in the case of polysemous words. For example, the word "joint" in ``joint stereo'', ``joint sprain'' and ``joint project'' correspond to multiple translations such as "joint" and "articulaire" in French. In the unbalanced dataset as the mixed corpora (6 in-domain corpora),  "joint stereo" is hardly to be detected as in IT domain, therefore "joint stereo" does not profit the finetuning's effect.
+This method depends crucially to the quality of the classifier $p(k|h(w))$. Moreover, the classifier can fail to detect in-domain words in the case of polysemous words. For example, the word "joint" in ``joint stereo'', ``joint sprain'' and ``joint project'' correspond to multiple translations such as "joint" and "articulaire" in French. In the unbalanced dataset as the mixed corpora (6 in-domain corpora),  "joint stereo" is hardly to be detected as in IT domain, therefore "joint stereo" does not profit the finetuning's effect even being translated with the adapters of IT domain.
 
 \section*{Analysis on the risk of new method}
 
