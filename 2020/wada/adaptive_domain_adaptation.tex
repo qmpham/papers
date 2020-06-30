@@ -82,7 +82,9 @@
 \setlength{\parskip}{0.1cm}
 \setlength{\parindent}{1em}
 \section*{Word Level Adaptive Domain Adaptation}
-Let $h$ the output of the pretrained encoder, the adapted representation for domain $k$ will be $h' = h + a_k(h)$, meaning that all words in all sentences for domain $k$ will use the adapter module $a_k$.  A ``gated'' version uses $h' = h + a_k(h) * z_k$\footnote{More precisely, $a_k(h) = \sum_{l} a_{kl}(h)$, where the summation runs over layers, see Figure \ref{fig:1}} \fyTodo{$a_k(h)=$ somme tous les composants résiduels} where $z_k$ is also a function of $h$ taking values in $[0,1]$. More precisely, $h$ and $h'$ are sequences of context vectors and the combination is performed element-wise, yielding:
+Let $h$ the output of the pretrained encoder, the adapted representation for domain $k$ will be $h' = h + a_k(h)$, meaning that all words in all sentences for domain $k$ will use the adapter module $a_k$. In highway version, $a_k(h) = \sum_{l} a_{kl}(h^l)$ where $h^l$ is distributed representation of the sequence at l-th layer
+
+ A ``gated'' version uses $h' = h + a_k(h) * z_k$\footnote{More precisely, $a_k(h) = \sum_{l} a_{kl}(h)$, where the summation runs over layers, see Figure \ref{fig:1}} \fyTodo{$a_k(h)=$ somme tous les composants résiduels} where $z_k$ is also a function of $h$ taking values in $[0,1]$. More precisely, $h$ and $h'$ are sequences of context vectors and the combination is performed element-wise, yielding:
 \begin{equation}
   h'(w) = h(w) + a_k(h(w)) * z_k(h(w)). \label{eq:gated-residual}
 \end{equation}
