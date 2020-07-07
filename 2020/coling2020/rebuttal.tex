@@ -121,18 +121,20 @@ Question to authors:
 \\
 - can you describe in more detail the differences between FT-Block and MDL Res, apart from the fact that the former is fine-tuned from a generic model, the latter trained from scratch?
 \\
-\textcolor{red}{The two methods use the same architecture composing of one standard Transformer model and several domain adapters that is the same as the model presented in the paper of \cite{Bapna19simple}. The only difference between FT-block and MDL Res is their training process.
+\textcolor{red}{The two methods use the same architecture composing of one standard Transformer model and domain adapters presented in the paper of \cite{Bapna19simple}. The only difference between FT-block and MDL Res is their training process.
 \\
 To train FT-block, we plug residual adapters to the output of each self-attention layer of the model Mixed-NAT, then resume the training with the learning rate captured in the end of the training of the model Mixed-NAT while freezing all of the parameters of the model Mixed-NAT. We use only the in-domain data as the training data of the finetuning procedure. 
 \\
-To train MDL res, we optimize the parameters of the Transformer model and the parameters of the residual adapters from scratch. Precisely, to create of training batch, we randomly pick a domain with a frequency proportional to the size of its data, then we sample a batch from its corpora. Given a batch from domain i, we optimize the parameters of Transformer model and the parameters of the residual adapters corresponding to the domain i by plugging the residual adapters of domain i to the Transformer model and calculating gradients of the activated parameters.}
+To train MDL res, we optimize the parameters of the Transformer model and the parameters of the residual adapters from scratch. Precisely, to create a training batch, we randomly pick a domain with a probability equal to the proportion of the domain in training data, then we sample a batch from its corpora. Given a batch from domain i, we optimize the parameters of Transformer model and the parameters of the residual adapters corresponding to the domain i by plugging the residual adapters of domain i to the Transformer model and calculating gradients of the activated parameters.}
 \\
 minor issues:
 \\
-- I disagree that generalisation to unseen domains is similar to zero-shot multilingual MT. In zero-shot multilingual MT, both the source and target distribution have been observed at training time, just paired with other languages. In the generalisation to unseen domains, there may be characteristics in the data that were never seen in the training data, including new vocabulary (in the source text, target text, or both).
+- I disagree that generalization to unseen domains is similar to zero-shot multilingual MT. In zero-shot multilingual MT, both the source and target distribution have been observed at training time, just paired with other languages. In the generalization to unseen domains, there may be characteristics in the data that were never seen in the training data, including new vocabulary (in the source text, target text, or both).
 \\
 - 567-568: "having the domain tag on the source is better than on the
 target". I assume this refers to the comparison of "DC-Tag" and "TTM". However, TTM actually uses the predicted domain label on the target side, and could perform better with forced decoding of the gold domain label. More precisely, the statement should be that "having the gold tag is better than a predicted tag", but this is hardly surprising.
+\\
+\textcolor{red}{We agree that the conclusion is not really fair for "TTM" because "TTM" intend to predict domain label rather than to use gold domain label and TTM could definitively translate with gold domain label as prefix of each hypothesis. We will report the performance of "TTM" when translating using gold domain label as prefix in target side.}
 \section*{Reviewer B}
 The paper presents a thorough review of Multi-Domain Machine Translation (MDMT) approaches, and the authors provide comprehensive experiments to study different aspects of MDMT. The innovation of this work can be seen in two main categories:
 \begin{itemize}
@@ -146,7 +148,20 @@ I have a few comments:
 * You provide some useful experimental results on various MDMT approaches. To benefit from your results, we need access to the same segmentation of train/dev/test sets that I hope you will provide to the community.
 \fyTodo{to share data}
 \\
-* On your discussion on the number of parameters (L. 591), could you share the number of parameters per each MDMT approach? It will be helpful to see  the impact of the number of parameters on the MT results. 
+* On your discussion on the number of parameters (L. 591), could you share the number of parameters per each MDMT approach? It will be helpful to see  the impact of the number of parameters on the MT 
+results.
+\\ 
+\textcolor{red}{The description of model in each MDMT approach is as follows:
+\begin{enumerate}
+	\item FT-full, Mixed-NAT, TTM, DC-Tag use medium Transformer model.
+	\item FT-block and MDL res use medium Transformer model, and residual layers with the bottleneck dimension of size 1024. \cite{Bapna19simple} showed that if the bottleneck dimension is large enough, the gap between FT-block and FT-full will be small.
+	\item ADM, DM use medium Tranformer model and a domain classifier composing of 3 dense layers of size $512 \times 2048$, $2048 \times 2048$ and $2048 \times domain\_num$. The two first layers of the classifier use relu as activation function, the last layer uses tanh as activation function.
+	\item DC-Feat uses medium Transformer model, and domain embeddings of size 4. Given a sentence of domain i in training batch, the embedding of domain i is concatenated to the embedding of each token in the sentence.
+	\item LDR uses medium Transformer model and for each token we introduce a LDR feature of size $4 \times domain\_num$. Given a sentence of domain i $i\in[1,..,K]$ in training batch, for each token of the sentence, the LDR units of the indexes outside of the range $[4(i-1),..,4i-1]$ are masked to 0, the masked LDR feature will be concatenated to the embedding of the token.
+	\item WDCNMT uses one layer GRU bidirectional as encoder and one layer GRU-conditional as decoder. The size of each hidden layer is 1024, the size of word embedding is 512.
+	\item Mixed-NAT-RNN uses one layer LSTM bidirectional as encoder and one layer LSTM as decoder. The size of each hidden layer is 1024, the size of word embedding is 512. 
+\end{enumerate}
+}
 \fyTodo{system's description}
 \\
 * Thinking about your seven operational requirements, I wonder if you could also define a domain or the minimum number of samples to specify a domain. I like your selections of domains that you include multiple domains with varying sizes, but what we expect in extreme cases. Having your Split experiments on REL (Table 4), or providing further details on your last analysis in Section 5.3, if you have tiny clusters could help.
@@ -223,7 +238,7 @@ finetuning can originate from one single domain for each finetuned model. The wa
 - To some extent, I dislike Table 5. When not reading carefully, the
 difference values could be interpreted as differences wrt. scores in Table 3. (Except that the numbers would be wrong...) Differences wrt. to Table 3 are important and it took me a while to obtain an overview for myself. Furthermore, it should be immediately obvious which number is "resumed training" and which is training from scratch. (It isn't from the table caption alone.)
 \\
-\textcolor{red}{In the table 5, we report the difference of the model 's performance in 2 situations including resuming training and training from beginning with 7 domains. We would like to report the difference wrt to table 3 in the later version of the paper. We agree that the comparison to table 3 is also important, because it could assess the impact of new domain to the previously learned domains.}
+\textcolor{red}{In the table 5, we report the difference of the model's performance in 2 situations including resuming training and training from beginning with 7 domains. We would like to report the difference wrt to table 3 in the later version of the paper. We agree that the comparison to table 3 is also important, because it could assess the impact of new domain to the previously learned domains.}
 \\
 - How is "Mixed-Bal" achieved? By means of upsampling of the corpora from the less highly represented domains?
 \\
@@ -231,20 +246,24 @@ difference values could be interpreted as differences wrt. scores in Table 3. (E
 \\
 - For "DC-Feat", is the feature added for each word or for each subword token? Is it attached to the word (increasing the vocabulary size a lot) or does it remain a separate token (increasing the input length a lot)?
 \\
-\textcolor{red}{DC-Feat is a small embedding representing the domain. It is concatenated to every word embedding whenever its corresponding domain is detected. The use of DC-Feat increase the size of actual embedding, but does not increase the vocabulary size nor the input length.}
+\textcolor{red}{DC-Feat is a small embedding representing the domain. It is concatenated to every word embedding whenever its corresponding domain is detected. The use of DC-Feat increase the size of the input embedding, but does not increase the vocabulary size nor the input length.}
 \\
 - How is the domain-weighted average (WAVG) calculated? Is the weight determined by proportion of the respective domain in the training data?
 \\
-\textcolor{red}{The domain-weighted average is calculated by weighting the performance of the model in each domain test with the proportion of the respective domain in the training data}
+\textcolor{red}{The domain-weighted average is calculated by weighting the performance of the model in each domain test with the proportion of the respective domain in the training data.}
 \\
 - Wasn't it possible to use standard test sets? The "REL" Bleu scores are suspiciously high and there might be considerable redundancy in the data, or rather: training data contaminated with test data. (Since duplicates are possible, have you verified that the test sentences don't still appear in the remaining training data?)
 \\
-\textcolor{red}{There are standard test sets for the domains including medical, IT, news and talk, but we could not find any standard test sets for the other domains including religion, law and bank. We carefully eliminated every duplicate in all of the experimental corpora. In our opinion, the reason the model achieved extremely high score in the domain religion is because the text in this domain is much less variable}
+\textcolor{red}{There are standard test sets for the domains including medical, IT, news and talk, but we could not find any standard test sets for the other domains including religion, law and bank. We carefully eliminated every duplicate in all of the experimental corpora. In our opinion, the reason why the models achieve extremely high scores in the domain religion is because the text in this domain is much less variable.}
 \\
 Other (minor) remarks:
 - From the UFAL medical corpus, please say that you're using the indomain sections only (which is mostly PatTR Medical).
 \\
+\textcolor{red}{From the UFAL medical corpus of the language pair En-Fr, we select only sentences in categories including EMEA, ParTR, CESTA, ECDC.}
+\\
 - The "DC-Feat" and "DC-Tag" lines in Table 5 should be swapped in order to be in line with Tables 3 and 4.
+\\
+\textcolor{red}{We agree to change the order of "DC-Feat" and "DC-Tag" to be consistent with tables 3 and 4.}
 \\
 - l. 503: "LDC-Feat" $\rightarrow$ "LDR"
 \\
