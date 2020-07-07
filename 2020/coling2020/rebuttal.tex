@@ -190,7 +190,7 @@ results.
 \\
 * L. 687: Please describe how you predict the domain tag, and please share the tag prediction error rate on each domain test set. It is helpful to see the amount and the impact of the error on MDMT results.
 \\
-\fyTodo{to report in details the tag prediction.}
+\textcolor{red}{We train a language model in source language for each domain using respective source training corpus. To predict domain tag of a sentence, we compute probability of the sentence according to each pretrained language model and choose the domain corresponding to the highest probability as domain tag of sentence.} \fyTodo{to compute error rate of domain prediction over each test set}
 \\
 I spotted a few typos in the text:
 \\
@@ -233,6 +233,7 @@ finetuning can originate from one single domain for each finetuned model. The wa
 \textcolor{red}{For each domain, we create train/dev/test sets by randomly splitting the respective corpora. We maintain the size of validation sets and of test sets equal to 1000 lines for every domain. In the table 3 and 4, to train MDMT models except FT-full and FT-block we use a validation set which is a concatenation of 6 validation sets of 6 domains. In the table 5, to train MDMT models except FT-full and FT-block we concatenate the validation set of NEWS to the mixture of 6 validation sets. To train FT-full model and FT-block model we only use the in-domain validation set. We stop training if either the training iteration reach the maximal number of iterations or the score on the validation set does not increase in 3 consecutive evaluations. We average 5 checkpoints up to the best checkpoint to get the final model.}
 \\
 - Report the learning rate. Is it decreased for finetuning?
+\\
 \textcolor{red}{The learning rate is determined by this formula $lr = d_{model}^{-0.5}*\min(step\_num^{-0.5},step\_num * warmup\_steps^{-1.5})$ where $d_{model}=512$,$warmup\_steps=4000$. In the finetuning procedure, we continue the training using the same learning rate schedule and the same $step\_num$}
 \\
 - To some extent, I dislike Table 5. When not reading carefully, the
