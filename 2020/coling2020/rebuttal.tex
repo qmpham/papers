@@ -86,17 +86,12 @@
   \IfBooleanTF{#1}{\norm*{#3}}{\norm[#2]{#3}}_{L_1}%
 }
 
-\title{Combination of generic and specific layers in multidomain learning}
+\title{Rebuttal: Revisiting Multi-Domain Machine Translation}
 \author{}
 \date{}
 
 \begin{document}
-
 \maketitle
-\begin{center}
-{\LARGE \bf}Rebuttal session
-\end{center}
-
 \section*{General comments}
 As TACL action editor for submission 2327, "Revisiting Multi-Domain Machine Translation", I am happy to tell you that I am accepting your paper subject (conditional) to your making specific revisions within two months.
 
@@ -126,7 +121,11 @@ Question to authors:
 \\
 - can you describe in more detail the differences between FT-Block and MDL Res, apart from the fact that the former is fine-tuned from a generic model, the latter trained from scratch?
 \\
-\fyTodo{system's description}
+\textcolor{red}{The two methods use the same architecture composing of one standard Transformer model and several domain adapters that is the same as the model presented in the paper of \cite{Bapna19simple}. The only difference between FT-block and MDL Res is their training process.
+\\
+To train FT-block, we plug residual adapters to the output of each self-attention layer of the model Mixed-NAT, then resume the training with the learning rate captured in the end of the training of the model Mixed-NAT while freezing all of the parameters of the model Mixed-NAT. We use only the in-domain data as the training data of the finetuning procedure. 
+\\
+To train MDL res, we optimize the parameters of the Transformer model and the parameters of the residual adapters from scratch. Precisely, to create of training batch, we randomly pick a domain with a frequency proportional to the size of its data, then we sample a batch from its corpora. Given a batch from domain i, we optimize the parameters of Transformer model and the parameters of the residual adapters corresponding to the domain i by plugging the residual adapters of domain i to the Transformer model and calculating gradients of the activated parameters.}
 \\
 minor issues:
 \\
@@ -145,24 +144,38 @@ In general, the paper has written well, and it is a good read for those who are 
 I have a few comments:
 \\
 * You provide some useful experimental results on various MDMT approaches. To benefit from your results, we need access to the same segmentation of train/dev/test sets that I hope you will provide to the community.
+\fyTodo{to share data}
 \\
 * On your discussion on the number of parameters (L. 591), could you share the number of parameters per each MDMT approach? It will be helpful to see  the impact of the number of parameters on the MT results. 
+\fyTodo{system's description}
 \\
 * Thinking about your seven operational requirements, I wonder if you could also define a domain or the minimum number of samples to specify a domain. I like your selections of domains that you include multiple domains with varying sizes, but what we expect in extreme cases. Having your Split experiments on REL (Table 4), or providing further details on your last analysis in Section 5.3, if you have tiny clusters could help.
 \\
 * Please define Lambda coefficients in lines 142 and 146.
 \\
+\textcolor{red}{We formalize the data distribution as a mixture of several in-domain distribution. $\lambda$ is the prior distribution on the set of domains. We hypothesize that training distribution is different from testing distribution, so we have 2 different mixtures.}
+\\
 * On dynamically changing the number of training and test domains, there is a new related work published recently that might worth citing it: Sharaf A, Hassan H, Daumé III H. Meta-Learning for Few-Shot NMT Adaptation.
+\\
+\textcolor{red}{This is a very interesting work that we would like to cite in our final version of the paper.}
 \\
 * I’d prefer to see the number of running words in Table 1, especially when the batch size is given as the number of tokens (L. 485).
 \\
+\fyTodo{to report number of tokens of the datasets}
+\\
 * L. 503: It seems you refer to this method as LDR in the rest of the paper. Please make them consistent.
 \\
+\textcolor{red}{We have noted this remark. We agree to change the notation correctly.}
+\\
 * L. 576: Although you describe in footnote 11, it is better to mention that you compare WDCMT results with Mixed-NAT-RNN explicitly.
+\\
+\fyTodo{to explicitly compare WDCNMT with Mixed-NAT-RNN}
 \\
 * L. 681-683: I don’t see it as a failure, and I think it is a property (requirement) as you describe in the definition of [P4-ERR], we expect deterioration in the presence of tag error. Am I right?
 \\
 * L. 687: Please describe how you predict the domain tag, and please share the tag prediction error rate on each domain test set. It is helpful to see the amount and the impact of the error on MDMT results.
+\\
+\fyTodo{to report in details the tag prediction.}
 \\
 I spotted a few typos in the text:
 \\
@@ -197,21 +210,36 @@ Let me nevertheless formulate a few questions or points of criticism:
 - I'd like to see some analysis of vocabulary coverages (such as
 cross-domain OOV rates), and of "seen errors" and "new sense errors" as defined by Irvine et al. in "Measuring machine translation errors in new domains" (TACL 2013).
 \\
+\fyTodo{extra experiments to do.}
+\\
 - Maybe the (possible) effect of early stopping (and the choice of the validation set) should be discussed? E.g., the validation set for
 finetuning can originate from one single domain for each finetuned model. The way you're doing early stopping may even have had an impact on the results in Table 5. Is your validation set always a concatenation of 1000 lines from the six domains, without NEWS? Are you actually always training until the early stopping criterion is reached, and are you then using the model from the best checkpoint? (There are contradictory statements in the paper about "50,000  additional iterations" (?) for the experiments in Table 5.)
 \\
+\textcolor{red}{For each domain, we create train/dev/test sets by randomly splitting the respective corpora. We maintain the size of validation sets and of test sets equal to 1000 lines for every domain. In the table 3 and 4, to train MDMT models except FT-full and FT-block we use a validation set which is a concatenation of 6 validation sets of 6 domains. In the table 5, to train MDMT models except FT-full and FT-block we concatenate the validation set of NEWS to the mixture of 6 validation sets. To train FT-full model and FT-block model we only use the in-domain validation set. We stop training if either the training iteration reach the maximal number of iterations or the score on the validation set does not increase in 3 consecutive evaluations. We average 5 checkpoints up to the best checkpoint to get the final model.}
+\\
 - Report the learning rate. Is it decreased for finetuning?
+\textcolor{red}{The learning rate is determined by this formula $lr = d_{model}^{-0.5}*\min(step\_num^{-0.5},step\_num * warmup\_steps^{-1.5})$ where $d_{model}=512$,$warmup\_steps=4000$. In the finetuning procedure, we continue the training using the same learning rate schedule and the same $step\_num$}
 \\
 - To some extent, I dislike Table 5. When not reading carefully, the
 difference values could be interpreted as differences wrt. scores in Table 3. (Except that the numbers would be wrong...) Differences wrt. to Table 3 are important and it took me a while to obtain an overview for myself. Furthermore, it should be immediately obvious which number is "resumed training" and which is training from scratch. (It isn't from the table caption alone.)
 \\
+\textcolor{red}{In the table 5, we report the difference of the model 's performance in 2 situations including resuming training and training from beginning with 7 domains. We would like to report the difference wrt to table 3 in the later version of the paper. We agree that the comparison to table 3 is also important, because it could assess the impact of new domain to the previously learned domains.}
+\\
 - How is "Mixed-Bal" achieved? By means of upsampling of the corpora from the less highly represented domains?
+\\
+\textcolor{red}{In all of our experiments, to get a training batch, we first sample a domain from a set of available domains in training procedure with a fixed probability, the we sample a from the corpora corresponding to the previously picked domain. Therefore, between our notations, "Mixed-NAT" uses a domain probability equal to proportion of domain in training data, and "Mixed-Bal" uses a domain probability equal to uniform probability.}
 \\
 - For "DC-Feat", is the feature added for each word or for each subword token? Is it attached to the word (increasing the vocabulary size a lot) or does it remain a separate token (increasing the input length a lot)?
 \\
+\textcolor{red}{DC-Feat is a small embedding representing the domain. It is concatenated to every word embedding whenever its corresponding domain is detected. The use of DC-Feat increase the size of actual embedding, but does not increase the vocabulary size nor the input length.}
+\\
 - How is the domain-weighted average (WAVG) calculated? Is the weight determined by proportion of the respective domain in the training data?
 \\
+\textcolor{red}{The domain-weighted average is calculated by weighting the performance of the model in each domain test with the proportion of the respective domain in the training data}
+\\
 - Wasn't it possible to use standard test sets? The "REL" Bleu scores are suspiciously high and there might be considerable redundancy in the data, or rather: training data contaminated with test data. (Since duplicates are possible, have you verified that the test sentences don't still appear in the remaining training data?)
+\\
+\textcolor{red}{There are standard test sets for the domains including medical, IT, news and talk, but we could not find any standard test sets for the other domains including religion, law and bank. We carefully eliminated every duplicate in all of the experimental corpora. In our opinion, the reason the model achieved extremely high score in the domain religion is because the text in this domain is much less variable}
 \\
 Other (minor) remarks:
 - From the UFAL medical corpus, please say that you're using the indomain sections only (which is mostly PatTR Medical).
@@ -242,6 +270,9 @@ Table 1."
 - l. 979: "drawed" $\rightarrow$ "drawn"
 \\
 - l. 991: "may be" $\rightarrow$ "maybe"
+
+\bibliographystyle{acl_natbib}
+\bibliography{multidomain}
 \end{document}
 
 
