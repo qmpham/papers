@@ -22,6 +22,52 @@
     pages = "328--337",
 }
 
+@inproceedings{duh13adaptation,
+    title = "Adaptation Data Selection using Neural Language Models: Experiments in Machine Translation",
+    author = "Duh, Kevin  and
+      Neubig, Graham  and
+      Sudoh, Katsuhito  and
+      Tsukada, Hajime",
+    booktitle = "Proceedings of the 51st Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)",
+    month = aug,
+    year = "2013",
+    address = "Sofia, Bulgaria",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/P13-2119",
+    pages = "678--683",
+}
+
+@inproceedings{zoph16transfer,
+    title = "Transfer Learning for Low-Resource Neural Machine Translation",
+    author = "Zoph, Barret  and
+      Yuret, Deniz  and
+      May, Jonathan  and
+      Knight, Kevin",
+    booktitle = "Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2016",
+    address = "Austin, Texas",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/D16-1163",
+    doi = "10.18653/v1/D16-1163",
+    pages = "1568--1575",
+}
+
+@inproceedings{koehn17six,
+    title = "Six Challenges for Neural Machine Translation",
+    author = "Koehn, Philipp  and
+      Knowles, Rebecca",
+    booktitle = "Proceedings of the First Workshop on Neural Machine Translation",
+    month = aug,
+    year = "2017",
+    address = "Vancouver",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/W17-3204",
+    doi = "10.18653/v1/W17-3204",
+    pages = "28--39",
+    abstract = "We explore six challenges for neural machine translation: domain mismatch, amount of training data, rare words, long sentences, word alignment, and beam search. We show both deficiencies and improvements over the quality of phrase-based statistical machine translation.",
+}
+
 @inproceedings{Eidelman12topic,
     title = "Topic Models for Dynamic Translation Model Adaptation",
     author = "Eidelman, Vladimir and Boyd-Graber, Jordan and Resnik, Philip",
@@ -87,7 +133,7 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
   address = 	 {Denver, CO, USA}
 }
 
-@inproceedings{Bapna19simple,
+@inproceedings{bapna19simple,
     title = "Simple, Scalable Adaptation for Neural Machine Translation",
     author = "Bapna, Ankur and Firat, Orhan",
     booktitle = "Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing",
@@ -1108,6 +1154,21 @@ month={},}
 	Year = {2018},
 	Bdsk-Url-1 = {http://aclweb.org/anthology/W18-6313}}
 
+@inproceedings{neubig18rapid,
+    title = "Rapid Adaptation of Neural Machine Translation to New Languages",
+    author = "Neubig, Graham  and
+      Hu, Junjie",
+    booktitle = "Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing",
+    month = oct # "-" # nov,
+    year = "2018",
+    address = "Brussels, Belgium",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/D18-1103",
+    doi = "10.18653/v1/D18-1103",
+    pages = "875--880",
+    abstract = "This paper examines the problem of adapting neural machine translation systems to new, low-resourced languages (LRLs) as effectively and rapidly as possible. We propose methods based on starting with massively multilingual {``}seed models{''}, which can be trained ahead-of-time, and then continuing training on data related to the LRL. We contrast a number of strategies, leading to a novel, simple, yet effective method of {``}similar-language regularization{''}, where we jointly train on both a LRL of interest and a similar high-resourced language to prevent over-fitting to small LRL data. Experiments demonstrate that massively multilingual models, even without any explicit adaptation, are surprisingly effective, achieving BLEU scores of up to 15.5 with no data from the LRL, and that the proposed similar-language regularization method improves over other adaptation methods by 1.7 BLEU points average over 4 LRL settings.",
+}
+
 @InCollection{Tiedemann09news,
   author =	  {J\"org Tiedemann},
   title =	  {News from {OPUS} - {A} Collection of Multilingual
@@ -1357,4 +1418,35 @@ url = {http://papers.nips.cc/paper/8075-adversarial-multiple-source-domain-adapt
     address = "Miyazaki, Japan",
     publisher = "European Language Resource Association",
     url = "https://www.aclweb.org/anthology/L18-1146",
+}
+
+@inproceedings{artetxe20cross,
+    title = "On the Cross-lingual Transferability of Monolingual Representations",
+    author = "Artetxe, Mikel  and
+      Ruder, Sebastian  and
+      Yogatama, Dani",
+    booktitle = "Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/2020.acl-main.421",
+    pages = "4623--4637",
+    abstract = "State-of-the-art unsupervised multilingual models (e.g., multilingual BERT) have been shown to generalize in a zero-shot cross-lingual setting. This generalization ability has been attributed to the use of a shared subword vocabulary and joint training across multiple languages giving rise to deep multilingual abstractions. We evaluate this hypothesis by designing an alternative approach that transfers a monolingual model to new languages at the lexical level. More concretely, we first train a transformer-based masked language model on one language, and transfer it to a new language by learning a new embedding matrix with the same masked language modeling objective, freezing parameters of all other layers. This approach does not rely on a shared vocabulary or joint training. However, we show that it is competitive with multilingual BERT on standard cross-lingual classification benchmarks and on a new Cross-lingual Question Answering Dataset (XQuAD). Our results contradict common beliefs of the basis of the generalization ability of multilingual models and suggest that deep monolingual models learn some abstractions that generalize across languages. We also release XQuAD as a more comprehensive cross-lingual benchmark, which comprises 240 paragraphs and 1190 question-answer pairs from SQuAD v1.1 translated into ten languages by professional translators.",
+}
+
+@inproceedings{aji20neural,
+    title = "In Neural Machine Translation, What Does Transfer Learning Transfer?",
+    author = "Aji, Alham Fikri  and
+      Bogoychev, Nikolay  and
+      Heafield, Kenneth  and
+      Sennrich, Rico",
+    booktitle = "Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/2020.acl-main.688",
+    pages = "7701--7710",
+    abstract = "Transfer learning improves quality for low-resource machine translation, but it is unclear what exactly it transfers. We perform several ablation studies that limit information transfer, then measure the quality impact across three language pairs to gain a black-box understanding of transfer learning. Word embeddings play an important role in transfer learning, particularly if they are properly aligned. Although transfer learning can be performed without embeddings, results are sub-optimal. In contrast, transferring only the embeddings but nothing else yields catastrophic results. We then investigate diagonal alignments with auto-encoders over real languages and randomly generated sequences, finding even randomly generated sequences as parents yield noticeable but smaller gains. Finally, transfer learning can eliminate the need for a warm-up phase when training transformer models in high resource language pairs.",
 }
