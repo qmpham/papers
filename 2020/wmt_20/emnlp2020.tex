@@ -104,9 +104,9 @@ Domain adaptation is an old and vexing problem for machine translation systems. 
 
 \section{Introduction } \label{sec:intro}
 \mpTodo{write introduction} \fyTodo{Citations in chronological order}\fyTodo{Split long sentences}
-Owing to multiple architectural improvements, Neural Machine Translation(NMT) \cite{Kalchbrenner13recurrent,Sutskever14sequence Bahdanau15learning,Vaswani17attention} nowadays delivers useful outputs for many language pairs. However, as many deep learning model, NMT models need to be trained with sufficiently large amounts of data to reach their best performance. Therefore the quality of translation of NMT model is still limited in low-resource language and low-resourced domain conditions \cite{duh13adaptation, zoph16transfer,koehn17six}. While many approaches have been proposed to improve the quality of NMT models in low-resource domains (see the recent survey of \citet{Chu18asurvey}), full fine-tuning of a generic baseline model remains the dominant supervised approach when adapting NMT models to specific domains \cite{Luong15stanford,neubig18rapid}.
+Owing to multiple architectural improvements, Neural Machine Translation(NMT) \cite{Kalchbrenner13recurrent,Sutskever14sequence,Bahdanau15learning,Vaswani17attention} nowadays delivers useful outputs for many language pairs. However, as many deep learning model, NMT models need to be trained with sufficiently large amounts of data to reach their best performance. Therefore the quality of translation of NMT model is still limited in low-resource language and low-resourced domain conditions \cite{duh13adaptation, zoph16transfer,koehn17six}. While many approaches have been proposed to improve the quality of NMT models in low-resource domains (see the recent survey of \citet{Chu18asurvey}), full fine-tuning of a generic baseline model remains the dominant supervised approach when adapting NMT models to specific domains \cite{Luong15stanford,neubig18rapid}.
 
-Under this view, building adapted systems is a two-step process: (a) one first trains NMT with the largest possible parallel corpora, possibility aggregating texts from multiple, heterogeneous sources; (b) assuming that in-domain parallel documents are available for the domain of interest, one then adapts the pretrained model by resuming training with the sole in-domain corpus. It is a conjecture that pretrained model constitute a better initialization a the random initialization, especially when the adaptation data is scarce. Indeed, studies in transfer learning for NMT such as \cite{artetxe20cross,aji20neural} have confirmed this claim by extensive experiments. Fine-tuning by training all the parameters (\system{FT-full}) of the baseline model usally improves significantly the quality of the NMT for the chosen domain. However, it also implies losses in translation quality for other domains, a phenomenon referred to as Catastrophic Forgetting in the neural networks literature \cite{McCloskey89catastrophic}. Therefore, a full fine-tuned model is only useful to one target domain. As the number of domains to handle grows, training and maintaining such models can consume a lot of resource.\fyTodo{Fix this sentence}
+Under this view, building adapted systems is a two-step process: (a) one first trains NMT with the largest possible parallel corpora, possibility aggregating texts from multiple, heterogeneous sources; (b) assuming that in-domain parallel documents are available for the domain of interest, one then adapts the pretrained model by resuming training with the sole in-domain corpus. It is a conjecture that pretrained model constitute a better initialization a the random initialization, especially when the adaptation data is scarce. Indeed, studies in transfer learning for NMT such as \cite{artetxe20cross,aji20neural} have confirmed this claim by extensive experiments. Fine-tuning by training all the parameters (\system{FT-full}) of the baseline model usally improves significantly the quality of the NMT for the chosen domain. However, it also implies losses in translation quality for other domains, a phenomenon referred to as ``catastrophic forgetting'' in the neural network literature \cite{McCloskey89catastrophic}. Therefore, a full fine-tuned model is only useful to one target domain. As the number of domains to handle grows, training and maintaining such models can consume a lot of resource.\fyTodo{Fix this sentence}
 
 \cite{Vilar18learning,bapna19simple} have recently proposed a simple and lightweight method to preserve the value of pretrained models by plugging small adapters to hidden layers. These adapters are trained only with the in-domain data, keeping the pretrained model frozen. Because these additional adapters are very small compared to the size of the baseline model, their use significantly reduces the cost of training and maintaining fine-tuned models, while still delivering performance that are on par with full fine-tuning.
 
@@ -123,44 +123,50 @@ Our contribution is an thorough experimental study on the use of residual adapte
 \section{Residual adapters \label{sec:res}}
 
 \subsection{Architecture \label{ssec:architecture}}
-Residual adapters modifies context vectors of each layer by applying several transformations as follow:
-$$ h^{i}_1 = \mathbf{W}_{d_{model}}^{d_{bottleneck}}h^{i} + b_{1}$$
-$$ h^{i}_2 = \mathbf{RELU}(h_1)$$
-$$ h^{i}_3 = \mathbf{W}_{d_{bottleneck}}^{d_{model}}h_2 + b_{2}$$
-$$ \bar{h}^{i} = h^i_3 + h $$
-For the sake of brevity, we denote $ADAP^{(i)}(h_i) = h^i_3$.
+\fyTodo{More contexts and notations from the transformer}
 
-The "adapted" context vector $\bar{h}^i$ goes to the $i-th$ self-attention layer. There are 12 residual adapters corresponding to total 12 attention layers of the encoder and the decoder (in the decoder, the stack of self-attention layer and cross encoder-decoder attention only counts as one attention layer and serves only one residual adapter).
+Residual adapters modify context vectors in each layer by applying several transformations as follows:\fyTodo{Use align env}
+\begin{align*}
+  h^{i}_1 &= \mathbf{W}_{d_{model}}^{d_{bottleneck}}h^{i} + b_{1} \\
+  h^{i}_2 &= \mathbf{RELU}(h_1) \\
+  h^{i}_3 &= \mathbf{W}_{d_{bottleneck}}^{d_{model}}h_2 + b_{2} \\
+  \bar{h}^{i} &= h^i_3 + h
+\end{align*}
+For the sake of brevity, we denote $h^i_3 = \operatorname{ADAP}^{(i)}(h^i)$.\fyTodo{or is it $h_i$ ?}
+
+The "adapted" context vector $\bar{h}^i$ goes to\fyTodo{Is the output of ?} the $i^{\text{th}}$ self-attention\fyTodo{Self attention ?} layer. In our architecture, there are 12 residual adapters, one for each of the six attention layers of the encoder and similarly for the decoder\footnote{In the decoder, the stack of self-attention layers and cross encoder-decoder attention only counts as one attention layer and serves only one residual adapter}.
+
 \subsection{Ablation study on position and number of residual adapters \label{ssec:ablatation}}
-In this section, we would like to analyze the impact of position and number of residual adapter involved in the adapted model. The importance of hidden layers varies with respect to their position in NMT model. It is conjectured that the higher layer represents more global pattern such as syntax while the lower layer represents more local pattern such as semantic. The domain shift in local patterns and global patterns has not yet studied. In this paper, we do not intend to study this aspect of domain adaptation problem. We would like to give an extensive comparison between domain adaptation in different levels in NMT model. Because the set of possible configurations is large, we only perform experiments on layers at position: 2, 4, 6 which covers a wide range in the hierarchy of attention layers. 
+In this section, we would like to analyze the impact of position and number of residual adapters involved in the adapted model. In fact, the importance of hidden layers varies with respect to their position in the model. It is conjectured that the higher layer represents more global pattern such as syntax while the lower layer represents more local pattern such as semantic\fyTodo{Missing reference here}. The domain shift in local patterns and global patterns has not yet studied. In this paper, we do not intend to study this aspect of domain adaptation problem. We would like to give an extensive comparison between domain adaptation in different levels in NMT model.\fyTodo{Fix style here} Because the set of possible configurations is large, we only perform experiments on layers at position: 2, 4, 6 which covers a wide range in the hierarchy of attention layers. 
 
 Secondly, we would like to observe how much the number of residual adapters can affect the performance of the adapted model. By the limit of computation resource, we limit our study to the case of 3 adapters at positions: 2,4,6. By doing this, we could cover 3 situations: 1 adapter (mentioned in the previous paragraph), 3 adapters and 6 adapters (in the normal setting).
 
 \subsection{Regularization of residual adapters \label{ssec:reg}}
-Finetuning on small corpora can still lead to overfitted model even when the finetuning is applied to a few residual adapters. To avoid this situation, we have several options including: reduce size of the adapter, apply weight decay to the adapter during the finetuning, and apply layer regularization to the adapter during the finetuning. The first option is not compatible if we consider the probable growth of in-domain data. The second and third choices are preferable to regularize a large adapter which will scale if the in-domain corpora extends.
+Fine-tuning on small corpora can still lead to overfitted model even when the fine-tuning is applied to a few residual adapters. To avoid this situation, we have several options including: reduce the size of the adapter module, apply weight decay to the adapter during adaptation, or apply layer regularization to the adapter modules. The first option is not compatible\fyTodo{compatible ???} if we consider the probable growth of in-domain data. The second and third choices are preferable to regularize a large adapter which will scale if the in-domain corpora extends.\fyTodo{Style}
 
 Weight decay applies a penalization on weights of the adapters.
 \begin{equation}
-\begin{split}
-\bar{L} & = \mathop{\sum}_{x,y} (log(P(y|x)) \\
-		  & + \lambda * \sum_{i \in \{1,..,6\} \otimes \{enc, dec\}} \normL{\theta_{ADAP^{(i)}}})
-\end{split}
+  \begin{split}
+    \bar{L} & = \mathop{\sum}_{x,y} (log(P(y|x)) \\
+    & + \lambda * \sum_{i \in \{1,..,6\} \otimes \{enc, dec\}} \normL{\theta_{\operatorname{ADAP}^{(i)}}})
+  \end{split}
 \end{equation}
+
 Layer regularization applies a penalization on the output of the adapters.
 \begin{equation}
-\begin{split}
-\bar{L} & = \mathop{\sum}_{x,y} (log(P(y|x)) \\
-		  & + \lambda * \sum_{i \in \{1,..,6\} \otimes \{enc, dec\}} \normL{ADAP^{(i)}(h_i(x,y))})
-\end{split}
+  \begin{split}
+    \bar{L} & = \mathop{\sum}_{x,y} (log(P(y|x)) \\
+    & + \lambda * \sum_{i \in \{1,..,6\} \otimes \{enc, dec\}} \normL{\operatorname{ADAP}^{(i)}(h_i(x,y))})
+  \end{split}
 \end{equation}
 
 \subsection{Multi-task training\label{ssec:multitask}}
-In the experiments of \cite{Caruana97multitask}, the authors proposed multi-task network in which a ground layer is shared between tasks and is followed by task-related layer in the next level. The network is then trained from scratch by fueling task-related example in a batch and updating all parameters including shared network's parameters and task-related network's parameters at the same time. The multi-domain context is similar to multi-task context if we consider a domain as a task. Therefore, we can also use multi-task training to optimize the parameters of NMT model and the parameters of the residual adapters at once from beginning. To assess the efficacy of multi-task training in multi-domain context, we would like to compare the finetuning approach with multi-task training approach.
+In the experiments of \cite{Caruana97multitask}, the authors proposed an architecture suitable for multi-task learning. The corresponding network comprises a ground layer, which is shared between tasks and is followed by task-related layers in the next level. The network is then trained from scratch by fueling task-related examples in a batch and updating all parameters (shared and task-specific) at the same time. The multi-domain context is similar to multi-task context if we consider a domain as a task\cite{Dredze08}. Therefore, we can also use multi-task training to optimize the parameters of NMT model and the parameters of the residual adapters at once from beginning. To assess the efficacy of multi-task training in multi-domain context, we would like to compare the finetuning approach with multi-task training approach. \fyTodo{Change the training regime}
 
 \subsection{Word-Level Adaptive Domain Adaptation \label{ssec:wada}}
 \mpTodo{Formalizing problem, network design, training algorithm}
-Residual adapters allow us to adapt NMT model to a domain without changing pretrained parameters. However, we still have to decide in which domain a sentence is translated to chose a suitable adapter. Therefore, we face to another problem which is the error of domain prediction. Choosing wrong adapter to translate a sentence can be dramatically bad because a specialized model usually has bad performance in out-of-domain examples according to well-known Catastrophic forgetting \cite{McCloskey89catastrophic}. However, we still have another option that is to use pretrained generic model. Therefore, we could aim to achieve a performance at least as good as the generic model. We would like to present an adaptive version of residual adapter below.
-\\
+Residual adapters allow us to adapt NMT model to a new domain without altering the pretrained parameters. However, we still have to decide in which domain a sentence is translated to chose a suitable adapter.\fyTodo{Lack of context - domain errors} Therefore, we face to another problem which is the error of domain prediction. Choosing wrong adapter to translate a sentence can be dramatically bad because a specialized model usually has bad performance for out-of-domain instances \cite{McCloskey89catastrophic}. However, we still have another option that is to use the pretrained generic model without adaptation. Therefore, we could aim to achieve a performance at least as good as the generic model. We would like to present an adaptive version of residual adapter below.
+
 We consider a generic encoder-decoder architecture for a multi-domain sequence to sequence learning. Let $h \in \R^d$ the output of the encoder, \cite{bapna19simple} proposes to use an adapted representation for domain $k$ defined as $h' = h + a_k(h)$. This means that all words in all sentences in domain $k$ will use the adapter module represented by $a_k$. In a multilayer version with highway connections (see Figure~\ref{fig:hrl-architecture}), $a_k(h) = \sum_{l} a_{kl}(h^l)$ where $h^l$ is the distributed representation of the sequence at the $l^{th}$ layer.
 \begin{figure}[h!]
   \centering
@@ -222,7 +228,6 @@ We randomly select in each corpus a development and a test set of 1,000 lines an
 In table \ref{tab:Corpora-en-fr} and \ref{tab:performance-en-de} we report the performace of NMT model in 6 domains: \domain{med},\domain{law},\domain{bank},\domain{talk},\domain{it} and \domain{rel} in language pair En-Fr; \domain{gouv}, \domain{eco}, \domain{tourism}, \domain{bank}, \domain{med} and \domain{news} in language pair En-De. In most cases, the performance increase with respect to the number of residual adapters used in architecture. Setting \system{FT-block} using residual adapter for all levels outperforms setting \system{FT-Block$_{(2,4,6)}$} using residual adapter at 3 levels that outperforms \system{FT-Block$_{(2)}$}, \system{FT-Block$_{(4)}$} , \system{FT-Block$_{(6)}$} using residual adapter at only on level. However, the difference in performance between positions is not significant except the case of domain \domain{rel} (En-Fr) in which the lower position shows the lower performance.   
 \begin{table*}
   \centering
-  \fyDone{Fix column size}
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
@@ -231,7 +236,7 @@ In table \ref{tab:Corpora-en-fr} and \ref{tab:performance-en-de} we report the p
    \system{FT-Block}     & 37.3 & \SB{57.9} & 53.9 & 33.8 & \SB{46.7} & \SB{90.2} & \SB{53.3} \\ 
    \system{FT-HW-Block}   & 37.5 & 57.2 & 53.4 & 33.1 & 46.3 & 91 & 53.1 \\ 
    \system{FT-Block$_{(6)}$}     & 37.7 & 55.8 & 51.5 & 33.9 & 43.6 & 89.2 & 51.9 \\
-   \system{FT-Block$_{(4)}$}     & 37.9 & 55.6 & 51.7 & 33.7 & 44.39 & 88.73 & 52 \\
+   \system{FT-Block$_{(4)}$}     & 37.9 & 55.6 & 51.7 & 33.7 & 44.4 & 88.7 & 52 \\
    \system{FT-Block$_{(2)}$}     & 37.8 & 55.5 & 51.4 & 34 & 43.8 & 86.7 & 51.5 \\
    \system{FT-Block$_{(2,4,6)}$}     & 37.7 & 57 & 53 & 33.3 & 45 & 90 & 52.7 \\
      \hline
