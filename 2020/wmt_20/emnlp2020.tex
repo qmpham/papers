@@ -110,14 +110,15 @@ Under this view, building adapted systems is a two-step process: (a) one first t
 
 \cite{Vilar18learning,bapna19simple} have recently proposed a simple and lightweight method to preserve the value of pretrained models by plugging small adapters to hidden layers. These adapters are trained only with the in-domain data, keeping the pretrained model frozen. Because these additional adapters are very small compared to the size of the baseline model, their use significantly reduces the cost of training and maintaining fine-tuned models, while still delivering performance that are on par with full fine-tuning.
 
-In this paper, we would like to extend this architecture to improve NMT in several specific situations. In translation task, there are several factors that challenge NMT model, including: noise, topical text. Residual adapters allow to adapt NMT model to any specific domain in a computationally economical way. Could we adapt NMT model to noisy text and topical text at once? While residual adapters are so good to adapt to a specific domain, it still loses dramatically performance in the previously training domains as we show in our experiments. Therefore, we have to decide whether to use residual adapters manually, i.e, we have to know to which domain the text belongs a priori. Therefore, we would like to fuse a domain classifier to the architecture in order to weight the contribution of the adapters with respect to the topic-relatedness of the text.
+In this paper, we would like to extend this architecture to improve NMT in several specific situations that still challenge automatic translation, such as translating noisy inputs or translating topical texts\fyTodo{??}. Residual adapters allow us to adapt NMT model to any specific domain in a computationally economical way. Could we adapt NMT model to noisy text and topical text at once? While residual adapters are good at adapting to one specific domain, their performance still dramatically decrease for the other domains seen in training, as we show in our experiments. Therefore, we have to decide whether to use residual adapters manually, i.e, we have to know to which domain the text belongs a priori. Therefore, we would like to fuse a domain classifier to the architecture in order to weight the contribution of the adapters with respect to the topic-relatedness of the text.\fyTodo{Say differently: various implementations}
 
-Our contribution is an ablation study on the use of residual adapter in NMT domain adaptation by answering 3 following question:
+Our contribution is an thorough experimental study on the use of residual adapters in multidomain adapation. We notably try to answer the following three questions:
 \begin{itemize}
 \item How the number and position of adapters affect the performance.
 \item How to train the residual adapter.
 \item How to be robust to out-of-domain examples.
 \end{itemize}
+\fyTodo{One bit of a conclusion here}
 
 \section{Residual adapters \label{sec:res}}
 
