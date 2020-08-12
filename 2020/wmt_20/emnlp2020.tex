@@ -235,7 +235,7 @@ In table \ref{tab:performance-en-fr} and \ref{tab:performance-en-de} we report t
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
-    \system{Mixed-Nat}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  & 49.4 \\
+    \system{Mixed}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  & 49.4 \\
     \system{FT-Full}       & 37.7 & 59.2 & 54.5 & 34.0 & 46.8 & 90.8 & 53.8 \\
    \system{FT-Block}     & 37.3 & 57.9 & 53.9 & 33.8 & 46.7 & 90.2 & 53.3 \\ 
    \system{FT-HW-Block}   & 37.5 & 57.2 & 53.4 & 33.1 & 46.3 & 91 & 53.1 \\ 
@@ -255,7 +255,7 @@ In table \ref{tab:performance-en-fr} and \ref{tab:performance-en-de} we report t
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{gouv}} & \multicolumn{1}{c|}{\domain{eco}} & \multicolumn{1}{c|}{\domain{tourism}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{ med }} & \multicolumn{1}{c|}{\domain{ news}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
-    \system{Mixed-Nat}  & 29.31 & 30.48 & 17.64 & 38.11 & 47.94 & 20.95  & 30.59 \\
+    \system{Mixed}  & 29.31 & 30.48 & 17.64 & 38.11 & 47.94 & 20.95  & 30.59 \\
     \system{FT-Full}       & 29.8 & 30.97 & 19.81 & 53.43 & 49.98 & 20.84 & 34.14 \\
    \system{FT-Block}     & 29.65 &  & 19.21 & 48.99 & 47.22 & 20.63 & 33.14 \\ 
    \system{FT-HW-Block}   & 29.54 & 30.42 & 18.59 & 50.78 & 47.13 & 20.51 & 32.83 \\ 
@@ -276,8 +276,8 @@ In the translation task En-De, we find that domain \domain{tourism}, \domain{ecb
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
-    \system{Mixed-Nat}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  & 49.4 \\
-   \system{FT-Block}     & 37.3	& 57.93 &	53.91 &	33.79 &	46.69 &	90.17 & 42.5 \\ 
+    \system{Mixed}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  & 49.4 \\
+   \system{FT-Block}     & 37.3	& 57.93 &	53.91 &	33.79 &	46.69 &	90.17 & 53.3 \\ 
    \system{FT-Block-WD}     & 37.18 & 55.99 & 52.93 & 33.36 & 46.03 & 90.65 & 52.7 \\
    \system{FT-Block-LR}     & 37.45 & 56.09 & 51.84 & 33.29 & 45.02 & 89.7 & 52.2 \\
      \hline
@@ -291,7 +291,7 @@ In the translation task En-De, we find that domain \domain{tourism}, \domain{ecb
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{gouv}} & \multicolumn{1}{c|}{\domain{eco}} & \multicolumn{1}{c|}{\domain{tourism}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{ med }} & \multicolumn{1}{c|}{\domain{ news}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
-    \system{Mixed-Nat}  & 29.31 & 30.48 & 17.64 & 38.11 & 47.94 & 20.95  & 30.59 \\
+    \system{Mixed}  & 29.31 & 30.48 & 17.64 & 38.11 & 47.94 & 20.95  & 30.59 \\
    \system{FT-Block}      \\
    \system{FT-Block-WD}     & 29.68 & 30.77 & 20.42 & 50.19 & 47.68 & 20.64 & 33.23 \\
    \system{FT-Block-LR}     & 29.65 & 30.45 & 19.21 & 48.99 & 47.22 & 20.63 & 33.14 \\ 
@@ -315,7 +315,7 @@ To assess the efficacy of multi-task learning in training both NMT model and res
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
-    \system{Mixed-Nat}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  &  49.4 \\% & 23.5\\
+    \system{Mixed}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  &  49.4 \\% & 23.5\\
     \system{FT-Full}       & 37.7 & \SB{59.2} & \SB{54.5} & 34.0 & \SB{46.8} & \SB{90.8} &  \SB{53.8} \\
    \system{FT-Block}     & 37.3 & \SB{57.9} & 53.9 & 33.8 & \SB{46.7} & \SB{90.2}  &  \SB{53.3} \\ \hline 
     \system{DC-Tag}       & 38.1 & 55.3 & 49.9   & 33.2 & 43.5 & \SB{80.5}  & 50.1    \\
@@ -325,18 +325,41 @@ To assess the efficacy of multi-task learning in training both NMT model and res
     \system{DM}             & \SW{35.6} & \SW{49.5}  & \SW{45.6}& \SW{29.9} & \SW{37.1} & \SW{62.4} & 43.4 \\ 
     \system{ADM}           & 36.4 & \SW{53.5}  & \SW{48.3} & \SW{32.0} & \SW{41.5} & \SW{73.4} & 47.5 \\
     \system{MDL Res}     & 37.9 & \SB{56.0}  & \SB{51.2}   & 33.5   &  44.4  & \SB{88.3} & \SB{51.9} \\
+    \system{MDL-HW-res}   & 37.38&	56.43&	52.13&	33.7&	44.81&	89.77&	52.4 \\ 
     \hfill MDL Res (gen)    & 37.7 & 51.0 & 34.0 & 30.4 & 34.2 & 15.2 & 33.7\\
      \hline
   \end{tabular}
-  \caption{Translation performance of various MDMT systems. We report BLEU scores for each domain, as well as domain-weighted (w\domain{avg})}
+  \caption{Translation performance of various MDMT systems.}
   \label{tab:performance-multi}
 \end{table*}
 
 \subsection{Word-Level Adaptive Domain Adaptation \label{sec:wada}}
 \mpTodo{wada}
+To measure the robustness against out-of-domain examples, we perform translation with wrong domain information to trick the systems that need to know domain a priori. In the table \ref{tab:performance-random}, the column \domain{RND} stores the score of multi-domain model, that use domain information to translate, in the situation in which we assign random domain tag to each test sentence. The phenomenon Catastrophic Forgetting manifest clearly in this situation where the performance of all multi-domain systems drops dramatically by approximately 10 points BLEU compared to generic model \system{Mixed}. Our proposed model \system{wada} maintains equivalent performance to generic model in \system{RND} thanks to application of adaptive weight on the output of residual adapter. \system{wada} avoid relying in the residual adapters when predicting examples that come from domain far from the domain of the adapters.
+
+\begin{table*}[htbp]
+  \centering
+  \fyDone{Fix column size}
+  \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
+%     &&&&&& \\
+    Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} & \multicolumn{1}{c|}{\domain{RND}} \\ \hline  
+    \system{Mixed-Nat}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  &  49.4 & 49.4 \\
+    \system{FT-Full}       & 37.7 & \SB{59.2} & \SB{54.5} & 34.0 & \SB{46.8} & \SB{90.8} &  \SB{53.8} & 32.55 \\
+   \system{FT-Block}     & 37.3 & \SB{57.9} & 53.9 & 33.8 & \SB{46.7} & \SB{90.2}  &  \SB{53.3} & 38.38 \\ \hline 
+   \system{FT-HW-Block}   & 37.5 & 57.2 & 53.4 & 33.1 & 46.3 & 91 & 53.1 & 27.13\\ 
+    \system{DC-Tag}       & 38.1 & 55.3 & 49.9   & 33.2 & 43.5 & \SB{80.5}  & 50.1 & 35.92   \\
+    \system{DC-Feat}      & 37.7  & 54.9 & 49.5   & 32.9 & 43.6 & \SB{79.9} & 49.9 & 34.91 \\
+    \system{LDR}            & 37.0   & 54.7 & 49.9 & 33.9 & 43.6 & \SB{79.9} & 49.8          & 37.01 \\
+    \system{MDL Res}     & 37.9 & \SB{56.0}  & \SB{51.2}   & 33.5   &  44.4  & \SB{88.3} & \SB{51.9} & 31.78 \\
+    \system{wada}    & 37.98 &	57.46&	53.05&	33.55&	46.01&	90.07&	53.0&	48.96 \\
+     \hline
+  \end{tabular}
+  \caption{Translation performance of various MDMT systems}
+  \label{tab:performance-random}
+\end{table*}
+
 \section{Related Work \label{sec:related}}
 \mpTodo{related work}
-dsdsd
 \section{Discussion \label{sec:discussion}}
 \mpTodo{discussion}
 \section*{Acknowledgments}
