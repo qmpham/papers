@@ -134,6 +134,8 @@ In this section, we would like to analyze the impact of position and number of r
 
 Secondly, we would like to observe how much the number of residual adapters can affect the performance of the adapted model. By the limit of computation resource, we limit our study to the case of 3 adapters at positions: 2,4,6. By doing this, we could cover 3 situations: 1 adapter (mentioned in the previous paragraph), 3 adapters and 6 adapters (in the normal setting).
 
+Finally, we would like to assess the performance of a variant of residual adapters in which the adapters go directly to the end of the stack of attention layers. We graphically demonstrate this version in the figure \ref{fig:hrl-architecture}. The benefit of this variant is that we can manipulate all values of the adapters at once. An disadvantage of th
+
 \subsection{Regularization of residual adapters \label{ssec:reg}}
 Finetuning on small corpora can still lead to overfitted model even when the finetuning is applied to a few residual adapters. To avoid this situation, we have several options including: reduce size of the adapter, apply weight decay to the adapter during the finetuning, and apply layer regularization to the adapter during the finetuning. The first option is not compatible if we consider the probable growth of in-domain data. The second and third choices are preferable to regularize a large adapter which will scale if the in-domain corpora extends.
 
@@ -292,7 +294,7 @@ In the translation task En-De, we find that domain \domain{tourism}, \domain{ecb
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{gouv}} & \multicolumn{1}{c|}{\domain{eco}} & \multicolumn{1}{c|}{\domain{tourism}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{ med }} & \multicolumn{1}{c|}{\domain{ news}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
     \system{Mixed}  & 29.31 & 30.48 & 17.64 & 38.11 & 47.94 & 20.95  & 30.59 \\
-   \system{FT-Block}      \\
+   \system{FT-Block} & 29.69 &	30.49 &	19.2 &	49.61 &	49.33 &	20.53 &	33.14     \\
    \system{FT-Block-WD}     & 29.68 & 30.77 & 20.42 & 50.19 & 47.68 & 20.64 & 33.23 \\
    \system{FT-Block-LR}     & 29.65 & 30.45 & 19.21 & 48.99 & 47.22 & 20.63 & 33.14 \\ 
      \hline
