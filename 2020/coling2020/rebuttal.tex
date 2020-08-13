@@ -190,7 +190,7 @@ results.
 \\
 * L. 687: Please describe how you predict the domain tag, and please share the tag prediction error rate on each domain test set. It is helpful to see the amount and the impact of the error on MDMT results.
 \\
-\textcolor{red}{We train a language model in source language for each domain using respective source training corpus. To predict domain tag of a sentence, we compute probability of the sentence according to each pretrained language model and choose the domain corresponding to the highest probability as domain tag of sentence.} \fyTodo{to compute error rate of domain prediction over each test set}
+\textcolor{red}{We train a language model in source language for each domain using respective source training corpus. We use statistical n-gram language model implemented in the toolkit SRILM. To predict domain tag of a sentence, we compute probability of the sentence according to each pretrained language model and choose the domain corresponding to the highest probability as domain tag of sentence.} \fyTodo{to compute error rate of domain prediction over each test set}
 \\
 I spotted a few typos in the text:
 \\
