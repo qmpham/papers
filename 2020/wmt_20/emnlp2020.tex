@@ -288,7 +288,7 @@ Tables \ref{tab:Corpora-en-fr} and \ref{tab:performance-en-de} display the perfo
 \fyTodo{Why HW worse than standard version ?} \fyTodo{Why is regularization not helping ? It helps for small domain - domain specific regularization ??}
 
 \subsection{Regularization of fine-tuning}
-In the translation task En-De, we find that domain \domain{tourism}, \domain{ecb} are extremely small with population percentage only 0.039\% and 0.022\% respectively. Finetuning on these domain can lead to overfitting problem. We assess two regularization techniques, that help avoiding overfitting, including: weight decay and layer regularization. In table \ref{tab:performance-en-de-reg}, weight decay results in system \system{FT-Block-WD} outperforms \system{FT-Block}. \fyTodo{How is weight decay ?}
+In the translation from English into German, we find that domains \domain{tourism}, \domain{ecb} are extremely small and account for a very small percentage of the training data, with respective proportions of 0.039\% and 0.022\%. Fine-tuning on these domains can lead to serious overfitting. We assess two well-known regularization techniques for adapter modules, that could help avoid the overfitting issues: weight decay and layer regularization. Results in Table~\ref{tab:performance-en-de-reg} show that weight decay (\system{FT-Block-WD}) outperforms the more basic \system{FT-Block}. \fyTodo{How is the weight decay parameter set ?}
 
 \begin{table*}[htbp]
   \centering
@@ -319,8 +319,10 @@ In the translation task En-De, we find that domain \domain{tourism}, \domain{ecb
   \caption{Translation performance of various finetuned systems. We report BLEU scores for each domain, as well as averages.}
   \label{tab:performance-en-de-reg}
 \end{table*}
+
 \subsection{Multi-task learning}
-To assess the efficacy of multi-task learning in training both NMT model and residual adapters at once from beginning, we use several contrast methods in multi-domain learning including:
+To assess the effectiveness of multi-task learning in training both the NMT model and the residual adapters at once from scratch, we contrast our approach with several proposal from the literature on multi-domain MT including:
+
 \begin{itemize}
 \item a system using domain control as in \cite{Kobus17domaincontrol}: domain information is introduced either as an additional token for each source sentence (\system{DC-Tag}), or introduced in the form of a supplementary feature for each word (\system{DC-Feat}).
 \item a system using lexicalized domain representations \cite{Pham19generic}: word embeddings are composed of a generic and a domain specific part (\system{LDR});
@@ -379,8 +381,32 @@ To measure the robustness against out-of-domain examples, we perform translation
 
 \section{Related Work \label{sec:related}}
 \mpTodo{related work}
+
+Training with data from multiple, heterogeneous sources is a common scenario in natural language processing \cite{Dredze08online,Finkel09hierarchical}. It is thus no wonder that the design of multi-domain systems has been proposed for many tasks. In this short survey, we exclusively focus on machine translation; it is likely that similar methods (parameter sharing, instance selection / weighting, adversarial training, etc) have also been proposed for other tasks.
+
+%; scores are reported separately per domain, suggesting that all domains are equally important at test time.
+% Adversarial adpatation is used in many domains
+% for QA @misc{lee2019domainagnostic,
+%    title={Domain-agnostic Question-Answering with Adversarial Training},
+%    author={Seanie Lee and Donggyu Kim and Jangwon Park},
+%    year={2019},
+%    eprint={1910.09342},
+%    archivePrefix={arXiv},
+%    primaryClass={cs.CL}
+%}, NLU and many others
+
+Early approaches to the multi-domain scenario were proposed for statistical MT, either considering multiple datansources (eg.\ \cite{Banerjee10combining,Clark12onesystem,Sennrich13multidomain,Huck15mixeddomain}), or domains containing of several topics \cite{Eidelman12topic,Hasler14dynamic-topic}. Two main strategies are considered: feature-based methods, where domain/topic labels are integratetd through supplementary feature and instance-based methods, involving a measure of similarities between train and test domains. 
+
+The former approach has also been adapted to NMT: \newcite{Kobus17domaincontrol,Tars18multidomain} use an additional domain feature in an RNN model, either in the form of an extra (initial) domain-token or in the form of additional domain-feature associated to each word. \citet{Chen16guided} apply domain control on the \emph{target} side, using a topic vector to describe the whole document context. Similar ideas are developed in \cite{Chu18multilingual,Pham19generic}, where domain differences and commonalties are enforced through parameter sharing schemes.
+Parameter-sharing is also used by \citet{Jiang19multidomain}, who consider a Transformer model containing both domain-specific heads and domain-agnostic heads.
+
+\citet{Britz17mixing} studies three general techniques to take domain information into account in training: the rely on either domain classification (or domain normalization) on the source or target side. One contribution of this study is the use of adversarial training to normalize representations and make the combination of multiple data sources more effective. Similar techniques (parameter sharing, automatic domain classification / normalization) are at play in \cite{Zeng18multidomain}: in this work, the lower layers of the MT use auxiliary classification tasks to disentangle domain specific from domain-agnostic representations. These two representations are then processed separately, then merged to compute the final translation.
+
+\citet{Farajian17multidomain,li-etal-2018-one} are two recent representatives of the instance-based approach: for each test sentence, a small adaptation corpus is collected based on similarity measures, and used to fine-tune a mix domain model.
+
 \section{Discussion \label{sec:discussion}}
 \mpTodo{discussion}
+
 \section*{Acknowledgments}
 
 \bibliographystyle{acl_natbib}
