@@ -107,9 +107,9 @@ Owing to multiple architectural improvements, Neural Machine Translation(NMT) \c
 
 Under this view, building adapted systems is a two-step process: (a) one first trains NMT with the largest possible parallel corpora, possibility aggregating texts from multiple, heterogeneous sources; (b) assuming that in-domain parallel documents are available for the domain of interest, one then adapts the pretrained model by resuming training with the sole in-domain corpus. It is a conjecture that pretrained model constitute a better initialization a the random initialization, especially when the adaptation data is scarce. Indeed, studies in transfer learning for NMT such as \cite{artetxe20cross,aji20neural} have confirmed this claim by extensive experiments. Full fine-tuning, that is adapting all the parameters of a baseline model usally significantly improves the quality of the NMT for the chosen domain. However, it also implies large losses in translation quality for other domains, a phenomenon referred to as ``catastrophic forgetting'' in the neural network literature \cite{McCloskey89catastrophic}. Therefore, a fully fine-tuned model is only useful to one target domain. As the number of domains to handle grows, training and maintaining such models can consume a lot of resource.\fyTodo{Fix this sentence}
 
-\cite{Vilar18learning,bapna19simple} have recently proposed a simple and lightweight method to preserve the value of pretrained models by plugging small adapters to hidden layers. These adapters are trained only with the in-domain data, keeping the pretrained model frozen. Because these additional adapters are very small compared to the size of the baseline model, their use significantly reduces the cost of training and maintaining fine-tuned models, while still delivering a performance that is on par with full fine-tuning.
+\cite{Vilar18learning,Bapna19simple} have recently proposed a simple and lightweight method to preserve the value of pretrained models by plugging small adapters to hidden layers. These adapters are trained only with the in-domain data, keeping the pretrained model frozen. Because these additional adapters are very small compared to the size of the baseline model, their use significantly reduces the cost of training and maintaining fine-tuned models, while still delivering a performance that is on par with full fine-tuning.
 
-In this paper, we would like to extend this architecture to improve NMT in several specific situations that still challenge automatic translation, such as translating noisy inputs or translating topical texts\fyTodo{??}. Residual adapters allow us to adapt NMT model to any specific domain in a computationally economical way. Could we adapt NMT model to noisy text and topical text at once? While residual adapters are good at adapting to one specific domain, their performance still dramatically decrease for the other domains seen in training, as we show in our experiments. Therefore, we have to decide whether to use residual adapters manually, i.e, we have to know to which domain the text belongs a priori. Therefore, we would like to fuse a domain classifier to the architecture in order to weight the contribution of the adapters with respect to the topic-relatedness of the text.\fyTodo{Say differently: various implementations}
+In this paper, we would like to extend this architecture to improve NMT in several specific situations that still challenge automatic translation, such as translating noisy inputs or translating topical texts\fyTodo{multidomain, multitopic, unbalance data}. Residual adapters allow us to adapt NMT model to any specific domain in a computationally economical way. Could we adapt NMT model to noisy text and topical text at once? While residual adapters are good at adapting to one specific domain, their performance still dramatically decrease for the other domains seen in training, as we show in our experiments. Therefore, we have to decide whether to use residual adapters manually, i.e, we have to know to which domain the text belongs a priori. Therefore, we would like to fuse a domain classifier to the architecture in order to weight the contribution of the adapters with respect to the topic-relatedness of the text.\fyTodo{Say differently: various implementations}
 
 Our contribution is an thorough experimental study on the use of residual adapters in multidomain adapation. We notably try to answer the following three questions:
 \begin{itemize}
@@ -127,20 +127,22 @@ Our contribution is an thorough experimental study on the use of residual adapte
 Residual adapters modify context vectors in each layer by applying several transformations as follows:\fyTodo{Use align env}
 \begin{align*}
   h^{i}_1 &= \mathbf{W}_{d_{model}}^{d_{bottleneck}}h^{i} + b_{1} \\
-  h^{i}_2 &= \mathbf{RELU}(h_1) \\
-  h^{i}_3 &= \mathbf{W}_{d_{bottleneck}}^{d_{model}}h_2 + b_{2} \\
-  \bar{h}^{i} &= h^i_3 + h^i
+  h^{i}_2 &= \mathbf{RELU}(h_1^{i}) \\
+  h^{i}_3 &= \mathbf{W}_{d_{bottleneck}}^{d_{model}}h_2^{i} + b_{2} \\
+  \bar{h}^{i} &= h^{i}_3 + h^i
 \end{align*}
-For the sake of brevity, we denote $h^i_3 = \operatorname{ADAP}^{(i)}(h^i)$.\fyDone{or is it $h_i$ ?}
+For the sake of brevity, we denote $h^i_3 = \operatorname{ADAP}^{(i)}(h^i)$.\fyDone{or is it $h_i$ ?}\fyTodo{attention aux matrices $W_i$}
 
-The "adapted" context vector $\bar{h}^i$ goes to\fyTodo{Is the output of ?} the $(i+1)^{\text{th}}$ attention\fyDone{Self attention ?} layer. In our architecture, there are 12 residual adapters, one for each of the six attention layers of the encoder and similarly for the decoder\footnote{In the decoder, the stack of self-attention layers and cross encoder-decoder attention only counts as one attention layer and serves only one residual adapter}.
+The "adapted" context vector $\bar{h}^i$ is the input of the $(i+1)^{\text{th}}$ attention\fyDone{Self attention ?} layer. In our architecture, there are 12 residual adapters, one for each of the six attention layers of the encoder and similarly for the decoder\footnote{In the decoder, the stack of self-attention layers and cross encoder-decoder attention only counts as one attention layer and serves only one residual adapter}.
 
 \subsection{Ablation study on position and number of residual adapters \label{ssec:ablatation}}
-In this section, we would like to analyze the impact of position and number of residual adapters involved in the adapted model. In fact, the importance of hidden layers varies with respect to their position in the model. It is conjectured that the higher layer represents more global pattern such as syntax while the lower layer represents more local pattern such as semantic\fyTodo{Missing reference here}. The domain shift in local patterns and global patterns has not yet studied. In this paper, we do not intend to study this aspect of domain adaptation problem. We would like to give an extensive comparison between domain adaptation in different levels in NMT model.\fyTodo{Fix style here} Because the set of possible configurations is large, we only perform experiments on layers at position: 2, 4, 6 which covers a wide range in the hierarchy of attention layers. 
+\fyTodo{Move this}
+In this section, we would like to analyze the impact of position and number of residual adapters involved in the adapted model. In fact, the importance of hidden layers varies with respect to their position in the model. It is conjectured that the higher layers represent more global patterns such as semantic while the lower layers represent more local patterns such as syntactic\fyTodo{Missing reference here}. The domain shift in local patterns and global patterns has not yet studied. In this paper, we do not intend to study this aspect of domain adaptation problem. We would like to give an extensive comparison between domain adaptation in different levels in NMT model.\fyTodo{Fix style here} Because the set of possible configurations is large, we only perform experiments on layers at position: 2, 4, 6 which covers a wide range in the hierarchy of attention layers. 
 
 Second, we would like to observe how much the number of residual adapters affects the performance of the adapted model. By the limit of computation resource, we limit our study to the case of 3 adapters at positions: 2,4,6. By doing this, we could cover 3 situations: 1 adapter (mentioned in the previous paragraph), 3 adapters and 6 adapters (in the normal setting) in the encoder or the decoder.\fyTodo{We have 12 layers, have we not ?}
 
-Finally, we would like to assess the performance of a variant of residual adapters in which the adapters go directly to the end of the stack of attention layers. We graphically demonstrate this version in the figure \ref{fig:hrl-architecture}. The benefit of this variant is that we can manipulate all values of the adapters at once. An disadvantage of this variant is a lower complexity than original version because the change of context vector only occurs in the end of the stack of layers.
+\subsection{Multi-task training\label{ssec:multitask}}
+In the experiments of \cite{Caruana97multitask}, the authors proposed an architecture suitable for multi-task learning. The corresponding network comprises a ground layer, which is shared between tasks and is followed by task-related layers in the next level. The network is then trained from scratch by fueling task-related examples in a batch and updating all parameters (shared and task-specific) at the same time. The multi-domain context is similar to multi-task context if we consider a domain as a task\cite{Dredze08}. Therefore, we can also use multi-task training to optimize the parameters of NMT model and the parameters of the residual adapters at once from beginning. To assess the efficacy of multi-task training in multi-domain context, we would like to compare the finetuning approach with multi-task training approach. \fyTodo{Change the training regime}
 
 \subsection{Regularization of residual adapters \label{ssec:reg}}
 Fine-tuning on small corpora can still lead to overfitted model even when the fine-tuning is applied to a few residual adapters. To avoid this situation, we have several options including: reduce the size of the adapter module, apply weight decay to the adapter during adaptation, or apply layer regularization to the adapter modules. The first option is not flexible \fyTodo{compatible ???} if we consider the probable growth of in-domain data. The second and third choices are preferable to regularize a large adapter which will scale if the in-domain corpora extends.\fyTodo{Style}
@@ -161,13 +163,13 @@ Layer regularization applies a penalization on the output of the adapters.
   \end{split}
 \end{equation}
 
-\subsection{Multi-task training\label{ssec:multitask}}
-In the experiments of \cite{Caruana97multitask}, the authors proposed an architecture suitable for multi-task learning. The corresponding network comprises a ground layer, which is shared between tasks and is followed by task-related layers in the next level. The network is then trained from scratch by fueling task-related examples in a batch and updating all parameters (shared and task-specific) at the same time. The multi-domain context is similar to multi-task context if we consider a domain as a task\cite{Dredze08}. Therefore, we can also use multi-task training to optimize the parameters of NMT model and the parameters of the residual adapters at once from beginning. To assess the efficacy of multi-task training in multi-domain context, we would like to compare the finetuning approach with multi-task training approach. \fyTodo{Change the training regime}
+\subsection{Highway ...}
+Finally, we would like to assess the performance of a variant of residual adapters in which the adapters go directly to the end of the stack of attention layers. We graphically demonstrate this version in Figure~\ref{fig:hrl-architecture}. The benefit of this variant is that we can manipulate all values of the adapters at once. An disadvantage of this variant is a lower complexity\fyTodo{Capicity ?? justify this ?} than original version because the change of context vector only occurs in the end of the stack of layers.
 
 \subsection{Word-Level Adaptive Domain Adaptation \label{ssec:wada}}
 \mpTodo{Formalizing problem, network design, training algorithm}
 Residual adapters allow us to adapt NMT models to a new domain without altering the pretrained parameters. However, we still have to decide in which domain a sentence is translated to chose a suitable adapter.\fyTodo{Lack of context - domain errors} Therefore, we face to another problem which is the error of domain prediction. Choosing wrong adapter to translate a sentence can be dramatically bad because a specialized model usually has bad performance for out-of-domain instances \cite{McCloskey89catastrophic}. However, we still have another option that is to use the pretrained generic model without adaptation. Therefore, we could aim to achieve a performance at least as good as the generic model. We would like to present an adaptive version of residual adapter below.
-
+\fyTodo{Consistency of notations wrt section 2.1}
 We consider a generic encoder-decoder architecture for a multi-domain sequence to sequence learning. Let $h \in \R^d$ the output of the encoder, \cite{bapna19simple} proposes to use an adapted representation for domain $k$ defined as $h' = h + a_k(h)$. This means that all words in all sentences in domain $k$ will use the adapter module represented by $a_k$. In a multilayer version with highway connections (see Figure~\ref{fig:hrl-architecture}), $a_k(h) = \sum_{l} a_{kl}(h^l)$ where $h^l$ is the distributed representation of the sequence at the $l^{th}$ layer.
 \begin{figure}[htbp]
   \centering
@@ -249,7 +251,7 @@ Tables \ref{tab:Corpora-en-fr} and \ref{tab:performance-en-de} display the perfo
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
-    \system{Mixed-Nat}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  & 49.4 \\
+    \system{Mixed}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  & 49.4 \\
     \system{FT-Full}       & 37.7 & \SB{59.2} & \SB{54.5} & 34.0 & \SB{46.8} & \SB{90.8} & \SB{53.8} \\
     \system{FT-Block}     & 37.3 & \SB{57.9} & 53.9 & 33.8 & \SB{46.7} & \SB{90.2} & \SB{53.3} \\ 
     \system{FT-HW-Block}   & 37.5 & 57.2 & 53.4 & 33.1 & 46.3 & 91 & 53.1 \\ 
@@ -259,7 +261,7 @@ Tables \ref{tab:Corpora-en-fr} and \ref{tab:performance-en-de} display the perfo
    \system{FT-Block$_{(2)}$}     & 37.8 & 55.5 & 51.4 & 34 & 43.8 & 86.7 & 51.5 \\
      \hline
   \end{tabular}
-  \caption{Translation performance of various finetuned systems (En:Fr). We report BLEU scores for each domain, as well as averages.}
+  \caption{Translation performance of various finetuned systems (En:Fr). We report BLEU scores for each domain, as well as averages.}\fyTodo{Boldface ?}
   \label{tab:performance-en-fr}
 \end{table*}
 
@@ -283,9 +285,10 @@ Tables \ref{tab:Corpora-en-fr} and \ref{tab:performance-en-de} display the perfo
   \label{tab:performance-en-de}
 \end{table*}
 
-\fyTodo{Why HW worse than standard version ?} \fyTodo{Why is regularization not helping ?}
+\fyTodo{Why HW worse than standard version ?} \fyTodo{Why is regularization not helping ? It helps for small domain - domain specific regularization ??}
+
 \subsection{Regularization of fine-tuning}
-In the translation task En-De, we find that domain \domain{tourism}, \domain{ecb} are extremely small with population percentage only 0.039\% and 0.022\% respectively. Finetuning on these domain can lead to overfitting problem. We assess two regularization techniques, that help avoiding overfitting, including: weight-decay and layer regularization. In table \ref{tab:performance-en-de-reg}, weight-decay results in system \system{FT-Block-WD} outperforms \system{FT-Block}. 
+In the translation task En-De, we find that domain \domain{tourism}, \domain{ecb} are extremely small with population percentage only 0.039\% and 0.022\% respectively. Finetuning on these domain can lead to overfitting problem. We assess two regularization techniques, that help avoiding overfitting, including: weight decay and layer regularization. In table \ref{tab:performance-en-de-reg}, weight decay results in system \system{FT-Block-WD} outperforms \system{FT-Block}. \fyTodo{How is weight decay ?}
 
 \begin{table*}[htbp]
   \centering
