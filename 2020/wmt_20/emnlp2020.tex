@@ -57,7 +57,7 @@
 \DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
 \DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 \NewDocumentCommand{\normL}{ s O{} m }{%
-  \IfBooleanTF{#1}{\norm*{#3}}{\norm[#2]{#3}}_{L_2}%
+  \IfBooleanTF{#1}{\norm*{#3}}{\norm[#2]{#3}}_{2}%
 }
 \newcommand{\src}{\ensuremath{\mathbf{f}}} % source sentence
 \newcommand{\trg}{\ensuremath{\mathbf{e}}} % target sentence
@@ -74,7 +74,8 @@
 
 \newcommand\BibTeX{B\textsc{ib}\TeX}
 
-\title{Ablation study on the residual adapter in Neural Machine Translation}
+% -- \title{Ablation study on the residual adapter in Neural Machine Translation}
+\title{A Study of Residual Adapters for Neural Machine Translation}
 
 \author{First Author \\
   Affiliation / Address line 1 \\
@@ -143,7 +144,7 @@ In the experiments of \cite{Caruana97multitask}, the authors proposed an archite
 \subsection{Regularization of residual adapters \label{ssec:reg}}
 Fine-tuning on small corpora can still lead to overfitted model even when the fine-tuning is applied to a few residual adapters. To avoid this situation, we have several options including: reduce the size of the adapter module, apply weight decay to the adapter during adaptation, or apply layer regularization to the adapter modules. The first option is not flexible \fyTodo{compatible ???} if we consider the probable growth of in-domain data. The second and third choices are preferable to regularize a large adapter which will scale if the in-domain corpora extends.\fyTodo{Style}
 
-Weight decay applies a penalization on weights of the adapters.
+Weight decay applies a penalization on the weights of the adapters.\fyTodo{The second summation also runs over $x,y$ ? I think not}
 \begin{equation}
   \begin{split}
     \bar{L} & = \mathop{\sum}_{x,y} (log(P(y|x)) \\
