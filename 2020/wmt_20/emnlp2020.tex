@@ -136,9 +136,9 @@ The "adapted" context vector $\bar{h}^i_{ 1\leq i \leq n-1}$, where n is the num
 
 \subsection{Ablation study on position and number of residual adapters \label{ssec:ablatation}}
 \fyTodo{Move this}
-In this section, we would like to analyze the impact of position and number of residual adapters involved in the adapted model. In fact, the importance of hidden layers varies with respect to their position in the model. It is conjectured that the higher layers represent more global patterns such as semantic while the lower layers represent more local patterns such as syntactic\fyTodo{Missing reference here}. The domain shift in local patterns and global patterns has not yet studied. In this paper, we do not intend to study this aspect of domain adaptation problem. We would like to give an extensive comparison between domain adaptation in different levels in NMT model.\fyTodo{Fix style here} Because the set of possible configurations is large, we only perform experiments on layers at position: 2, 4, 6 which covers a wide range in the hierarchy of attention layers. 
+In this section, we would like to analyze the impact of position and number of residual adapters involved in the adapted model. In fact, the importance of hidden layers varies with respect to their position in the model. It is conjectured that the higher layers represent more global patterns such as semantic while the lower layers represent more local patterns such as syntactic \cite{raganato18analysis}\fyTodo{Missing reference here}. The domain shift in local patterns and global patterns has not yet studied. In this paper, we do not intend to study this aspect of domain adaptation problem. We would like to give an extensive comparison between domain adaptation in different levels in NMT model.\fyTodo{Fix style here} Because the set of possible configurations is large, we only perform experiments on layers at position: 2, 4, 6 in each side of NMT model (encoder and decoder) which covers a wide range in the hierarchy of attention layers. 
 
-Second, we would like to observe how much the number of residual adapters affects the performance of the adapted model. By the limit of computation resource, we limit our study to the case of 3 adapters at positions: 2,4,6. By doing this, we could cover 3 situations: 1 adapter (mentioned in the previous paragraph), 3 adapters and 6 adapters (in the normal setting) in the encoder or the decoder.\fyTodo{We have 12 layers, have we not ?}
+Second, we would like to observe how much the number of residual adapters affects the performance of the adapted model. By the limit of computation resource, we limit our study to the case of 3 adapters at positions: 2,4,6 in each side of the NMT model. By doing this, we could cover 3 situations: 1 adapter (mentioned in the previous paragraph), 3 adapters and 6 adapters (in the normal setting) in each side (encoder and decoder).\fyTodo{We have 12 layers, have we not ?}
 
 \subsection{Multi-task training\label{ssec:multitask}}
 In the experiments of \cite{Caruana97multitask}, the authors proposed an architecture suitable for multi-task learning. The corresponding network comprises a ground layer, which is shared between tasks and is followed by task-related layers in the next level. The network is then trained from scratch by fueling task-related examples in a batch and updating all parameters (shared and task-specific) at the same time. The multi-domain context is similar to multi-task context if we consider a domain as a task\cite{Dredze08}. Therefore, we can also use multi-task training to optimize the parameters of NMT model and the parameters of the residual adapters at once from beginning. To assess the efficacy of multi-task training in multi-domain context, we would like to compare the finetuning approach with multi-task training approach. \fyTodo{Change the training regime}
@@ -162,8 +162,15 @@ Layer regularization applies a penalization on the output of the adapters.
   \end{split}
 \end{equation}
 
-\subsection{Highway ...}
-Finally, we would like to assess the performance of a variant of residual adapters in which the adapters go directly to the end of the stack of attention layers. We graphically demonstrate this version in Figure~\ref{fig:hrl-architecture}. The benefit of this variant is that we can manipulate all values of the adapters at once.
+\subsection{Highway connection}
+Finally, we would like to assess the performance of a variant of residual adapters in which the adapters go directly to the end of the stack of layers. We graphically demonstrate this version in Figure~\ref{fig:hrl-architecture}. In this version, only the last layers of the encoder and the decoder are modified.
+
+\begin{equation}
+\bar{h}^n = h^n + \displaystyle{\mathop{\sum}_{1\leq i\leq n}} ADAP^i(h^i)
+\end{equation}
+
+
+The benefit of this variant is that we can manipulate all values of the adapters at once.
 
 \subsection{Word-Level Adaptive Domain Adaptation \label{ssec:wada}}
 \mpTodo{Formalizing problem, network design, training algorithm}
