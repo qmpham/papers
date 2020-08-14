@@ -75,7 +75,7 @@
 \newcommand\BibTeX{B\textsc{ib}\TeX}
 
 % -- \title{Ablation study on the residual adapter in Neural Machine Translation}
-\title{A Study of Residual Adapters for Neural Machine Translation}
+\title{A Study of Residual Adapters for Multi-Domain Neural Machine Translation}
 
 \author{First Author \\
   Affiliation / Address line 1 \\
@@ -93,12 +93,10 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Among the approaches for adapting a pretrained NMT model to a specific domain, finetuning is the dominant method. Finetuning proposes 2 approaches: simply continuing training all the parameters \cite{Luong15stanford}; training addition adapters while freezing the pretrained model\cite{Bapna19simple,Vilar18learning}. The second approach has several advantages including preserving the pretrained model and the legerity of the adapters. However, the behavior of these adapters has not been further studied. The objective of this paper is to give an ablation study on the use of residual adapter in the domain adaptation problem.
-\mpTodo{correcting abstract}
-
-**** 
-
-\fyTodo{Citation-free abstract}
+% Among the approaches for adapting a pretrained NMT model to a specific domain, finetuning is the dominant method. Finetuning proposes 2 approaches: simply continuing training all the parameters \cite{Luong15stanford}; training addition adapters while freezing the pretrained model\cite{Bapna19simple,Vilar18learning}. The second approach has several advantages including preserving the pretrained model and the legerity of the adapters. However, the behavior of these adapters has not been further studied. The objective of this paper is to give an ablation study on the use of residual adapter in the domain adaptation problem.
+% \mpTodo{correcting abstract}
+% **** 
+\fyDone{Citation-free abstract}
 Domain adaptation is an old and vexing problem for machine translation systems. The most common approach and successful to supervised adaptation is to fine-tune a baseline system with in-domain parallel data. Standard fine-tuning however modifies all the network parameters, which makes this approach computationally costly and prone to overfitting. A recent, lightweigth approach, instead augments a baseline model with supplementary (small) adapter layers, keeping the rest of the mode unchanged. This has the additional merit to leave the baseline model intact, and adaptable to multiple domains. In this paper, we conduct a thorough analysis of the adapter model in the context of a multidomain machine translation task. We contrast multiple implementations of this idea on two language pairs. Our main conclusions is ..\fyTodo{abstract to be continued}
 
 \end{abstract}
@@ -115,22 +113,23 @@ In this paper, we would like to extend this architecture to improve NMT in sever
 \fyDone{Say differently: various implementations}
 
 In this context, our main contribution is a thorough experimental study of the use of residual adapters in a multi-domain translation adaptation. We notably explore ways to adjust and/or regularize adapter modules to handle situations where the adaptation data is very small. We also propose and contrast two new variants of the residual architecture: in the first one (highway residual adapters), adaptation still affects each layer of the architecture, but its effect is delayed till the last layer, thus making the architecture more modular and adaptive; in the second one (gated residual adapters), we explore ways to improve the performance in the face of train-test data mismatch. We experiment with two langage pair and report results that demonstrate the flexibility and effectiveness of these architectures. 
-\fyDone{One bit of a conclusion here}\fyFuture{Build a proper training scenario for these two conditions}.
+\fyDone{One bit of a conclusion here}\fyFuture{Build a proper training scenario for these two conditions}
 
 \section{Residual adapters \label{sec:res}}
 
 \subsection{Architecture \label{ssec:architecture}}
-\fyTodo{More contexts and notations from the transformer}
-For $i^{\text{th}}$layer of the encoder or the decoder, let $h^i$ be the output of the layer, of dimension d. The $i^{\text{th}}$ residual adapter modifies $h^i$ by applying several transformations as follows:\fyTodo{Use align env}
+\fyTodo{More contexts and notations from the transformer}\fyTodo{Encoder / decoder layers}
+For $i^{\text{th}}$layer of the encoder or the decoder, let $h^i$ be the output of the layer, of dimension $d$. The $i^{\text{th}}$ residual adapter modifies $h^i$ by applying several transformations as follows:\fyDone{Use align env}
 \begin{align*}
   h^{i}_1 &= \mathbf{W}_{db}^{i}h^{i} + b^i_{1} \\
   h^{i}_2 &= \mathbf{RELU}(h_1^{i}) \\
   h^{i}_3 &= \mathbf{W}_{bd}^{i}h_2^{i} + b^i_{2} \\
-  \bar{h}^{i} &= h^{i}_3 + h^i
+  \bar{h}^{i} &= h^{i}_3 + h^i.
 \end{align*}
-Where matrices $\displaystyle{\mathbf{W}_{db}^{i}\in\mathbb{R}^{d\times b}}$,$\displaystyle{\mathbf{W}_{bd}^{i}\in\mathbb{R}^{b\times d}}$, bias vectors $\displaystyle{b^i_{1} \in \mathbb{R}^{b}}$, $\displaystyle{b^i_{2} \in \mathbb{R}^{d}}$, b is a bottleneck dimension. For the sake of brevity, we denote $h^i_3 = \operatorname{ADAP}^{(i)}(h^i)$.\fyDone{or is it $h_i$ ?}\fyTodo{attention aux matrices $W_i$}
+Matrices $\displaystyle{\mathbf{W}_{db}^{i}\in\mathbb{R}^{d\times b}}$,$\displaystyle{\mathbf{W}_{bd}^{i}\in\mathbb{R}^{b\times d}}$, bias vectors $\displaystyle{b^i_{1} \in \mathbb{R}^{b}}$, $\displaystyle{b^i_{2} \in \mathbb{R}^{d}}$, b is a bottleneck dimension. For the sake of brevity, we denote $h^i_3 = \operatorname{ADAP}^{(i)}(h^i)$, and $\theta_{\operatorname{ADAP}^{(i)}}$ the set of parameters for the $i^{th}$ adapters.\fyDone{or is it $h_i$ ?}\fyDone{attention aux matrices $W_i$}
 
-The "adapted" context vector $\bar{h}^i_{ 1\leq i \leq n-1}$, where n is the number of layers, is the input of the $(i+1)^{\text{th}}$ \fyDone{Self attention ?} layer, $\bar{h}^n$ is passed to the decoder if it belongs to the encoder side, or the input of output layer if it belongs to the decoder side. In our architecture, there are 12 residual adapters, one for each of the six attention layers of the encoder and similarly for the decoder \footnote{In the decoder, the stack of self-attention layers and cross encoder-decoder attention only counts as one attention layer and serves only one residual adapter}.
+The "adapted" context vector $\bar{h}^i_{ 1\leq i \leq n-1}$, where n is the number of layers, is the input of the $(i+1)^{\text{th}}$ \fyDone{Self attention ?} layer, $\bar{h}^n$ is passed to the decoder if it belongs to the encoder side, or the input of output layer if it belongs to the decoder side. In our architecture, there are 12 residual adapters, one for each of the six attention layers of the encoder and similarly for the decoder.\footnote{In the decoder, the stack of self-attention layers and cross encoder-decoder attention only counts as one attention layer and serves only one residual adapter} 
+\fyTodo{Many question opens: how to train ? how many adapters ? which size ? etc}
 
 \subsection{Ablation study on position and number of residual adapters \label{ssec:ablatation}}
 \fyTodo{Move this}
@@ -144,10 +143,10 @@ In the experiments of \cite{Caruana97multitask}, the authors proposed an archite
 \subsection{Regularization of residual adapters \label{ssec:reg}}
 Fine-tuning on small corpora can still lead to overfitted model even when the fine-tuning is applied to a few residual adapters. To avoid this situation, we have several options including: reduce the size of the adapter module, apply weight decay to the adapter during adaptation, or apply layer regularization to the adapter modules. The first option is not flexible \fyTodo{compatible ???} if we consider the probable growth of in-domain data. The second and third choices are preferable to regularize a large adapter which will scale if the in-domain corpora extends.\fyTodo{Style}
 
-Weight decay applies a penalization on the weights of the adapters.\fyTodo{The second summation also runs over $x,y$ ? I think not}
+Weight decay applies a penalization on the weights of the adapters.\fyDone{The second summation also runs over $x,y$ ? I think not}
 \begin{equation}
   \begin{split}
-    \bar{L} & = \mathop{\sum}_{x,y} (log(P(y|x)) \\
+    \bar{L} & = \mathop{\sum}_{x,y} - \log P(y|x) \\
     & + \lambda * \sum_{i \in \{1,..,6\} \otimes \{enc, dec\}} \normL{\theta_{\operatorname{ADAP}^{(i)}}})
   \end{split}
 \end{equation}
@@ -155,15 +154,16 @@ Weight decay applies a penalization on the weights of the adapters.\fyTodo{The s
 Layer regularization applies a penalization on the output of the adapters.
 \begin{equation}
   \begin{split}
-    \bar{L} & = \mathop{\sum}_{x,y} (log(P(y|x)) \\
+    \bar{L} & = \mathop{\sum}_{x,y} (-\log(P(y|x)) \\
     & + \lambda * \sum_{i \in \{1,..,6\} \otimes \{enc, dec\}} \normL{\operatorname{ADAP}^{(i)}(h_i(x,y))})
   \end{split}
 \end{equation}
 
-\subsection{Highway ...}
+\subsection{Highway Residual Adapters \label{ssec:highway}}
+\fyTodo{Mettre mieux en valeur} \fyTodo{Meilleur entrainement du fait des connections highway ?}
 Finally, we would like to assess the performance of a variant of residual adapters in which the adapters go directly to the end of the stack of attention layers. We graphically demonstrate this version in Figure~\ref{fig:hrl-architecture}. The benefit of this variant is that we can manipulate all values of the adapters at once.
 
-\subsection{Word-Level Adaptive Domain Adaptation \label{ssec:wada}}
+\subsection{Gated Residual Adaptaters \label{ssec:wada}}
 \mpTodo{Formalizing problem, network design, training algorithm}
 Residual adapters allow us to adapt NMT models to a new domain without altering the pretrained parameters. However, we still have to decide in which domain a sentence is translated to chose a suitable adapter.\fyTodo{Lack of context - domain errors} Therefore, we face to another problem which is the error of domain prediction. Choosing wrong adapter to translate a sentence can be dramatically bad because a specialized model usually has bad performance for out-of-domain instances \cite{McCloskey89catastrophic}. However, we still have another option that is to use the pretrained generic model without adaptation. Therefore, we could aim to achieve a performance at least as good as the generic model. We would like to present an adaptive version of residual adapter below.
 \fyTodo{Consistency of notations wrt section 2.1}
@@ -252,7 +252,7 @@ Tables \ref{tab:Corpora-en-fr} and \ref{tab:performance-en-de} display the perfo
    \system{Residual Adapter} & 1 \\
      \hline
   \end{tabular}
-  \caption{Number of parameters($\times 10^3$)}
+  \caption{Number of parameters ($\times 10^3$)}
   \label{tab:params}
 \end{table*}
 
@@ -291,7 +291,7 @@ Tables \ref{tab:Corpora-en-fr} and \ref{tab:performance-en-de} display the perfo
    \system{FT-Block$_{(2,4,6)}$}  & 29.68  & 30.55 & 18.85 & 49.57 & 47.09 & 20.63 &  32.73  \\
      \hline
   \end{tabular}
-  \caption{Translation performance of various fine-tuned systems (En:De). We report BLEU scores for each domain, as well as averages accross domains.}
+  \caption{Translation performance of various fine-tuned systems (En:De). We report BLEU scores for each domain, as well as averages across domains.}
   \label{tab:performance-en-de}
 \end{table*}
 
@@ -391,7 +391,7 @@ To measure the robustness against out-of-domain examples, we perform translation
 \end{table*}
 
 \section{Related Work \label{sec:related}}
-\mpTodo{related work}
+\mpDone{related work}
 
 Training with data from multiple, heterogeneous sources is a common scenario in natural language processing \cite{Dredze08online,Finkel09hierarchical}. It is thus no wonder that the design of multi-domain systems has been proposed for many tasks. In this short survey, we exclusively focus on machine translation; it is likely that similar methods (parameter sharing, instance selection / weighting, adversarial training, etc) have also been proposed for other tasks.
 
