@@ -384,25 +384,13 @@ To measure the robustness against out-of-domain examples, we perform translation
 
 Training with data from multiple, heterogeneous sources is a common scenario in natural language processing \cite{Dredze08online,Finkel09hierarchical}. It is thus no wonder that the design of multi-domain systems has been proposed for many tasks. In this short survey, we exclusively focus on machine translation; it is likely that similar methods (parameter sharing, instance selection / weighting, adversarial training, etc) have also been proposed for other tasks.
 
-%; scores are reported separately per domain, suggesting that all domains are equally important at test time.
-% Adversarial adpatation is used in many domains
-% for QA @misc{lee2019domainagnostic,
-%    title={Domain-agnostic Question-Answering with Adversarial Training},
-%    author={Seanie Lee and Donggyu Kim and Jangwon Park},
-%    year={2019},
-%    eprint={1910.09342},
-%    archivePrefix={arXiv},
-%    primaryClass={cs.CL}
-%}, NLU and many others
+Early approaches to the multi-domain setting were proposed for statistical MT, either considering multiple data sources (eg.\ \cite{Banerjee10combining,Clark12onesystem,Sennrich13multidomain,Huck15mixeddomain}) or domains containing several topics \cite{Eidelman12topic,Hasler14dynamic-topic}. Two main strategies are considered: feature-based methods, where domain/topic labels are integratetd through supplementary feature and instance-based methods, involving a measure of similarity between train and test domains. 
 
-Early approaches to the multi-domain scenario were proposed for statistical MT, either considering multiple datansources (eg.\ \cite{Banerjee10combining,Clark12onesystem,Sennrich13multidomain,Huck15mixeddomain}), or domains containing of several topics \cite{Eidelman12topic,Hasler14dynamic-topic}. Two main strategies are considered: feature-based methods, where domain/topic labels are integratetd through supplementary feature and instance-based methods, involving a measure of similarities between train and test domains. 
+The former approach has also been adapted to NMT: \newcite{Kobus17domaincontrol,Tars18multidomain} use an additional domain feature in an RNN model, in the form of an extra domain-token or of additional domain-features associated with each word. \citet{Chen16guided} apply domain control on the \emph{target} side, using a topic vector to describe the whole document context. Similar ideas are developed in \cite{Chu18multilingual,Pham19generic}, where domain differences and similarities are enforced through parameter sharing schemes. Parameter-sharing also lies at the core of the work by \citet{Jiang19multidomain}, who consider a Transformer model containing both domain-specific heads and domain-agnostic heads.
 
-The former approach has also been adapted to NMT: \newcite{Kobus17domaincontrol,Tars18multidomain} use an additional domain feature in an RNN model, either in the form of an extra (initial) domain-token or in the form of additional domain-feature associated to each word. \citet{Chen16guided} apply domain control on the \emph{target} side, using a topic vector to describe the whole document context. Similar ideas are developed in \cite{Chu18multilingual,Pham19generic}, where domain differences and commonalties are enforced through parameter sharing schemes.
-Parameter-sharing is also used by \citet{Jiang19multidomain}, who consider a Transformer model containing both domain-specific heads and domain-agnostic heads.
+\citet{Britz17mixing} studies three general techniques to take domain information into account in training: they rely on either domain classification or domain normalization on the source or target side. One contribution of this study is the proposal of an adversarial training scheme to normalize representations across domains and make the combination of multiple data sources more effective. Similar techniques (parameter sharing, automatic domain classification / normalization) are at play in \cite{Zeng18multidomain}: in this work, the lower layers of the MT use auxiliary classification tasks to disentangle domain specific from domain-agnostic representations. These two representations are then processed separately, then merged to compute the final translation.
 
-\citet{Britz17mixing} studies three general techniques to take domain information into account in training: the rely on either domain classification (or domain normalization) on the source or target side. One contribution of this study is the use of adversarial training to normalize representations and make the combination of multiple data sources more effective. Similar techniques (parameter sharing, automatic domain classification / normalization) are at play in \cite{Zeng18multidomain}: in this work, the lower layers of the MT use auxiliary classification tasks to disentangle domain specific from domain-agnostic representations. These two representations are then processed separately, then merged to compute the final translation.
-
-\citet{Farajian17multidomain,li-etal-2018-one} are two recent representatives of the instance-based approach: for each test sentence, a small adaptation corpus is collected based on similarity measures, and used to fine-tune a mix domain model.
+\citet{Farajian17multidomain,li-etal-2018-one} are two recent representatives of the instance-based approach: for each test sentence, a small adaptation corpus is collected based on similarity measures, and used to fine-tune a mix-domain model.
 
 \section{Discussion \label{sec:discussion}}
 \mpTodo{discussion}
