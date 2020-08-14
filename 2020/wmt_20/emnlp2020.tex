@@ -120,17 +120,16 @@ In this context, our main contribution is a thorough experimental study of the u
 
 \subsection{Architecture \label{ssec:architecture}}
 \fyTodo{More contexts and notations from the transformer}
-
-Residual adapters modify context vectors in each layer by applying several transformations as follows:\fyTodo{Use align env}
+For $i^{\text{th}}$layer of the encoder or the decoder, let $h^i$ be the output of the layer, of dimension d. The $i^{\text{th}}$ residual adapter modifies $h^i$ by applying several transformations as follows:\fyTodo{Use align env}
 \begin{align*}
-  h^{i}_1 &= \mathbf{W}_{d_{model}}^{d_{bottleneck}}h^{i} + b_{1} \\
+  h^{i}_1 &= \mathbf{W}_{db}^{i}h^{i} + b^i_{1} \\
   h^{i}_2 &= \mathbf{RELU}(h_1^{i}) \\
-  h^{i}_3 &= \mathbf{W}_{d_{bottleneck}}^{d_{model}}h_2^{i} + b_{2} \\
+  h^{i}_3 &= \mathbf{W}_{bd}^{i}h_2^{i} + b^i_{2} \\
   \bar{h}^{i} &= h^{i}_3 + h^i
 \end{align*}
-For the sake of brevity, we denote $h^i_3 = \operatorname{ADAP}^{(i)}(h^i)$.\fyDone{or is it $h_i$ ?}\fyTodo{attention aux matrices $W_i$}
+Where matrices $\displaystyle{\mathbf{W}_{db}^{i}\in\mathbb{R}^{d\times b}}$,$\displaystyle{\mathbf{W}_{bd}^{i}\in\mathbb{R}^{b\times d}}$, bias vectors $\displaystyle{b^i_{1} \in \mathbb{R}^{b}}$, $\displaystyle{b^i_{2} \in \mathbb{R}^{d}}$, b is a bottleneck dimension. For the sake of brevity, we denote $h^i_3 = \operatorname{ADAP}^{(i)}(h^i)$.\fyDone{or is it $h_i$ ?}\fyTodo{attention aux matrices $W_i$}
 
-The "adapted" context vector $\bar{h}^i$ is the input of the $(i+1)^{\text{th}}$ attention\fyDone{Self attention ?} layer. In our architecture, there are 12 residual adapters, one for each of the six attention layers of the encoder and similarly for the decoder\footnote{In the decoder, the stack of self-attention layers and cross encoder-decoder attention only counts as one attention layer and serves only one residual adapter}.
+The "adapted" context vector $\bar{h}^i_{ 1\leq i \leq n-1}$, where n is the number of layers, is the input of the $(i+1)^{\text{th}}$ \fyDone{Self attention ?} layer, $\bar{h}^n$ is passed to the decoder if it belongs to the encoder side, or the input of output layer if it belongs to the decoder side. In our architecture, there are 12 residual adapters, one for each of the six attention layers of the encoder and similarly for the decoder \footnote{In the decoder, the stack of self-attention layers and cross encoder-decoder attention only counts as one attention layer and serves only one residual adapter}.
 
 \subsection{Ablation study on position and number of residual adapters \label{ssec:ablatation}}
 \fyTodo{Move this}
@@ -161,7 +160,7 @@ Layer regularization applies a penalization on the output of the adapters.
 \end{equation}
 
 \subsection{Highway ...}
-Finally, we would like to assess the performance of a variant of residual adapters in which the adapters go directly to the end of the stack of attention layers. We graphically demonstrate this version in Figure~\ref{fig:hrl-architecture}. The benefit of this variant is that we can manipulate all values of the adapters at once. An disadvantage of this variant is a lower complexity\fyTodo{Capicity ?? justify this ?} than original version because the change of context vector only occurs in the end of the stack of layers.
+Finally, we would like to assess the performance of a variant of residual adapters in which the adapters go directly to the end of the stack of attention layers. We graphically demonstrate this version in Figure~\ref{fig:hrl-architecture}. The benefit of this variant is that we can manipulate all values of the adapters at once.
 
 \subsection{Word-Level Adaptive Domain Adaptation \label{ssec:wada}}
 \mpTodo{Formalizing problem, network design, training algorithm}
@@ -243,6 +242,19 @@ Training use a batch size of~12288 tokens; optimization uses Adam with parameter
 \subsection{Varying the positions and number of residual adapters}
 
 Tables \ref{tab:Corpora-en-fr} and \ref{tab:performance-en-de} display the performace of NMT model in 6 domains: \domain{med},\domain{law},\domain{bank},\domain{talk},\domain{it} and \domain{rel} for the language pair En-Fr; \domain{gouv}, \domain{eco}, \domain{tourism}, \domain{bank}, \domain{med} and \domain{news} for En-De. In most cases, the performance increases with respect to the number of residual adapters used in architecture. The setting \system{FT-block} using residual adapters at all levels outperforms setting \system{FT-Block$_{(2,4,6)}$} using residual adapter at 3 levels, which outperforms \system{FT-Block$_{(2)}$}, \system{FT-Block$_{(4)}$} , \system{FT-Block$_{(6)}$} using residual adapter at only one level. However, the difference in performance between positions is not significant except the case of domain \domain{rel} (En-Fr) in which the lower position shows the lower performance.\fyTodo{What does bold mean ?}\fyTodo{Number of parameters ?} 
+
+\begin{table*}[htbp]
+  \centering
+  \begin{tabular}{|l|l|} \hline
+    Model & params \\ \hline 
+    \system{Transformer}  & 65 \\
+   \system{Residual Adapter} & 1 \\
+     \hline
+  \end{tabular}
+  \caption{Number of parameters($\times 10^3$)}
+  \label{tab:params}
+\end{table*}
+
 \begin{table*}
   \centering
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
@@ -344,7 +356,7 @@ To assess the effectiveness of multi-task learning in training both the NMT mode
     \system{ADM}           & 36.4 & \SW{53.5}  & \SW{48.3} & \SW{32.0} & \SW{41.5} & \SW{73.4} & 47.5 \\
     \system{MDL Res}     & 37.9 & \SB{56.0}  & \SB{51.2}   & 33.5   &  44.4  & \SB{88.3} & \SB{51.9} \\
     \system{MDL-HW-res}   & 37.38&	56.43&	52.13&	33.7&	44.81&	89.77&	52.4 \\ 
-    \hfill MDL Res (gen)    & 37.7 & 51.0 & 34.0 & 30.4 & 34.2 & 15.2 & 33.7\\
+    \hfill MDL Res (gen)    & 37.7 & 51.0 & 34.0 & 30.4 & 34.2 & 15.2 & 33.7 \\
      \hline
   \end{tabular}
   \caption{Translation performance of various MDMT systems.}
@@ -370,6 +382,7 @@ To measure the robustness against out-of-domain examples, we perform translation
     \system{LDR}            & 37.0   & 54.7 & 49.9 & 33.9 & 43.6 & \SB{79.9} & 49.8          & 37.01 \\
     \system{MDL Res}     & 37.9 & \SB{56.0}  & \SB{51.2}   & 33.5   &  44.4  & \SB{88.3} & \SB{51.9} & 31.78 \\
     \system{wada}    & 37.98 &	57.46&	53.05&	33.55&	46.01&	90.07&	53.0&	48.96 \\
+    \system{FT-full-UEW} &	37.94 &	55.97 &	52.1 &	33.71 &	44.91 &	89.08 &	52.3 &	46.48 \\
      \hline
   \end{tabular}
   \caption{Translation performance of various MDMT systems}
@@ -396,11 +409,11 @@ The former approach has also been adapted to NMT: \newcite{Kobus17domaincontrol,
 
 \bibliographystyle{acl_natbib}
 \bibliography{emnlp2020}
-\appendix
-\section{Appendices}
-\label{sec:appendix}
-\mpTodo{appendix}
-\section{Supplemental Material}
-\label{sec:supplemental}
+%\appendix
+%\section{Appendices}
+%\label{sec:appendix}
+%\mpTodo{appendix}
+%\section{Supplemental Material}
+%\label{sec:supplemental}
 
 \end{document}
