@@ -318,7 +318,7 @@ By varying the number and positions of residual adapters as aforementioned in se
 \subsection{Regularization of fine-tuning}
 In the translation from English into German, we find that domains \domain{tourism}, \domain{ecb} are extremely small and account for a very small percentage of the training data, with respective proportions of 0.039\% and 0.022\%. Fine-tuning on these domains can lead to serious overfitting. We assess two well-known regularization techniques for adapter modules, that could help avoid the overfitting issues: weight decay and layer regularization. 
 
-We choose optimal hyper-parameter $\lambda$ by grid search with a small set of values $\{ 10^{-3}, 10^{-4}, 10^{-5}$.
+We choose optimal hyper-parameter $\lambda$ by grid search with a small set of values $\{ 10^{-3}, 10^{-4}, 10^{-5} \}$.
 
 Results in Table~\ref{tab:performance-en-de-reg} show that weight decay (\system{FT-Block-WD}) outperforms the more basic \system{FT-Block}. \fyTodo{How is the weight decay parameter set ?}
 
@@ -374,18 +374,18 @@ The table \ref{tab:performance-multi} shows that \system{FT-Block} outperforms \
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
-    \system{Mixed}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  &  49.4 \\% & 23.5\\
-    \system{FT-Full}       & 37.7 & \SB{59.2} & \SB{54.5} & 34.0 & \SB{46.8} & \SB{90.8} &  \SB{53.8} \\
-   \system{FT-Block}     & 37.3 & \SB{57.9} & 53.9 & 33.8 & \SB{46.7} & \SB{90.2}  &  \SB{53.3} \\ 
+    \system{Mixed}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  &  49.4 \\
+    \system{FT-Full}       & 37.7 & 59.2 & 54.5 & 34.0 & 46.8 & 90.8 & 53.8 \\
+   \system{FT-Block}     & 37.3 & 57.9 & 53.9 & 33.8 & 46.7 & 90.2 & 53.3 \\ 
    \system{FT-HW-Block}   & 37.5 & 57.2 & 53.4 & 33.1 & 46.3 & 91 & 53.1 \\
    \hline 
-    \system{DC-Tag}       & 38.1 & 55.3 & 49.9   & 33.2 & 43.5 & \SB{80.5}  & 50.1    \\
-    \system{DC-Feat}      & 37.7  & 54.9 & 49.5   & 32.9 & 43.6 & \SB{79.9} & 49.9   \\
-    \system{LDR}            & 37.0   & 54.7 & 49.9 & 33.9 & 43.6 & \SB{79.9} & 49.8          \\
-    \system{TTM}            & 37.3 & 54.9 & 49.5 & 32.9 & 43.6 & \SB{79.9} & 49.7   \\
-    \system{DM}             & \SW{35.6} & \SW{49.5}  & \SW{45.6}& \SW{29.9} & \SW{37.1} & \SW{62.4} & 43.4 \\ 
-    \system{ADM}           & 36.4 & \SW{53.5}  & \SW{48.3} & \SW{32.0} & \SW{41.5} & \SW{73.4} & 47.5 \\
-    \system{MDL-Res}     & 37.9 & \SB{56.0}  & \SB{51.2}   & 33.5   &  44.4  & \SB{88.3} & \SB{51.9} \\
+    \system{DC-Tag}       & 38.1 & 55.3 & 49.9   & 33.2 & 43.5 & 80.5  & 50.1    \\
+    \system{DC-Feat}      & 37.7  & 54.9 & 49.5   & 32.9 & 43.6 & 79.9 & 49.9   \\
+    \system{LDR}            & 37.0   & 54.7 & 49.9 & 33.9 & 43.6 & 79.9 & 49.8          \\
+    \system{TTM}            & 37.3 & 54.9 & 49.5 & 32.9 & 43.6 & 79.9 & 49.7   \\
+    \system{DM}             & 35.6 & 49.5  & 45.6 & 29.9 & 37.1 & 62.4 & 43.4 \\ 
+    \system{ADM}           & 36.4 & 53.5  & 48.3 & 32.0 & 41.5 & 73.4 & 47.5 \\
+    \system{MDL-Res}     & 37.9 & 56.0 & 51.2  & 33.5 & 44.4 & 88.3 & 51.9 \\
     \system{MDL-HW-Res}   & 37.38&	56.43&	52.13&	33.7&	44.81&	89.77&	52.4 \\ 
     \hfill MDL-Res (gen)    & 37.7 & 51.0 & 34.0 & 30.4 & 34.2 & 15.2 & 33.7 \\
      \hline
@@ -428,7 +428,7 @@ The phenomenon of Catastrophic Forgetting manifests clearly in this situation wh
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} & \multicolumn{1}{c|}{\domain{RND}} \\ \hline  
     \system{Mixed-Nat}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  &  49.4 & 49.4 \\
-    \system{FT-Full}       & 37.7 & \SB{59.2} & \SB{54.5} & 34.0 & \SB{46.8} & \SB{90.8} &  \SB{53.8} & 32.55 \\
+    \system{FT-Full}       & 37.7 & 59.2 & 54.5 & 34.0 & 46.8 & 90.8 &  53.8 & 32.55 \\
    \system{FT-Block}     & 37.3 & \SB{57.9} & 53.9 & 33.8 & \SB{46.7} & \SB{90.2}  &  \SB{53.3} & 38.38 \\ \hline 
    \system{FT-HW-Block}   & 37.5 & 57.2 & 53.4 & 33.1 & 46.3 & 91 & 53.1 & 27.13\\ 
     \system{DC-Tag}       & 38.1 & 55.3 & 49.9   & 33.2 & 43.5 & \SB{80.5}  & 50.1 & 35.92   \\
