@@ -251,12 +251,12 @@ Using Transformers \cite{Vaswani17attention} implemented in OpenNMT-tf\footnote{
 \item fine-tuned models \cite{Luong15stanford,Freitag16fast}, based on the \system{Mixed} system, further trained on each domain with early stopping when the dev BLEU stops increasing during 3 consecutive epochs. We again contrast two versions: full fine-tuning (\system{FT-Full}), which update all the parameters of the initial generic model \system{Mixed}; and the variants of \cite{Bapna19simple} (\system{FT-Block}).
 \end{itemize}
 
-For all En$\rightarrow$Fr models, we set the embeddings size and the hidden layers size to~512. Transformers use multi-head attention with 8 heads in each of the 6 layers; the inner feedforward layer contains 2,048 cells. Residual adapters additionally uses an adaptation block in each layer, composed of a 2-layer perceptron, with an inner ReLU activation function operating on normalized entries of dimension $b=1024$.
+For all En$\rightarrow$Fr models, we set the embeddings size and the hidden layers size to~512. Transformers use multi-head attention with 8 heads in each of the 6 layers; the inner feedforward layer contains 2,048 cells. Residual adapters additionally use an adaptation block in each layer, composed of a 2-layer perceptron, with an inner ReLU activation function operating on normalized entries of dimension $b=1024$.
 % The gated variant is made of a dense layer, followed by a layer normalization and a sigmoid activation.
 % The domain control systems are exactly as their baseline counterparts (RNN and Transformer), with an additional 2 cells encoding the domain on the input layer.
 Training use a batch size of~12,288 tokens; optimization uses Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$ and Noam decay ($warmup\_steps=4,000$), and a dropout rate of $0.1$ for all layers.\fyDone{Describe the block adaptation layer - voir slides}
 
-Models for En$\rightarrow$De are larger and rely on embeddings size as well as hidden layers size of~1024; each Transformers layer contains 16~attention heads; the inner feedforward layer contains 4,096 cells. Adapter modules have the same architecture as for the other language pair, except for their size, that is doubled ($b=2,048$). 
+Models for En$\rightarrow$De are larger and rely on embeddings size as well as hidden layers size of~1024; each Transformers layer contains 16~attention heads; the inner feedforward layer contains 4,096 cells. Adapter modules have the same architecture as for the other language pair, except for their size, which is doubled ($b=2,048$). 
 %The number of parameters in each model is reported in Table~\ref{tab:params}.
 
 \iffalse{
@@ -285,7 +285,7 @@ we compare several proposals from the literature on multi-domain MT to finetunin
 \item an original, multi-domain, version of the approach of \newcite{Bapna19simple}, denoted \system{MDL Res}, where a domain-specific adaptation module is included in all the Transformer layers; within each layer, residual connections make it possible to by-pass this module. Contrarily to \cite{Bapna19simple}, we do not start with a trained generic system, but learn the multi-domain from scratch.\fyDone{Check this.}
 \end{itemize}
 
-Because the limit of our computational resource, we limit our experiments in this section to one language pair En-Fr. 
+Because of the limit of our computational resources, we limit our experiments in this section to one language pair En-Fr. 
 
 The table \ref{tab:performance-multi} shows that the full-finetuning outperforms all other systems in the in-domain tests. \system{FT-Block} is able to reduce the margin in several domains, showing the efficacy of residual adapters. Multi-task training system \system{MDL-Res} gains important improvement compared to baseline \system{Mixed}. However, \system{MDL-Res} is outperformed by \system{FT-Block}. It means that individually finetuning generic model is better than multi-task training. However, \system{MDL-Res} is better than other methods in multi-domain learning including:  \system{DC-Tag},  \system{DC-Feat}, \system{LDR}, \system{TTM}, \system{DM}, \system{ADM}.
 
@@ -370,11 +370,11 @@ Results in Table~\ref{tab:performance-en-de-pos-reg} show that weight decay (\sy
 
 \subsection{Highway and Gated Residual Adaptaters \label{ssec:gate-exp}}
 
-We assess the efficacy of proposed variants: Highway residual adapters \system{FT-HW-Block} and Gated residual adapter \system{FT-Gate-Block} by the same experiments in previous section except that we only perform them in language pair En-Fr.
+We assess the efficacy of proposed variants: Highway residual adapters \system{FT-HW-Block} and Gated residual adapter \system{FT-Gate-Block} by the same experiments in the previous section except that we only perform them in language pair En-Fr.
 
-To measure the robustness against out-of-domain examples, we perform translations with wrong domain information to trick the systems that need to know domain a priori. In the table \ref{tab:performance-random}, the column \domain{RND} stores the score of multi-domain models, that use domain information to translate, in the situation in which we assign random domain tag to each test sentence. Beside the \system{RND} test, we use a new domain \domain{news} to assess the performance of systems in out-of-domain examples. Given a sentence of \domain{news}, we predict the closest domain to it by choosing the lowest perplexity of the sentence among those computed by in-domain language models and use the corresponding adapters to translate the sentence.
+To measure the robustness against out-of-domain examples, we perform translations with wrong domain information to trick the systems that need to know domain a priori. In the table \ref{tab:performance-random}, the column \domain{RND} stores the score of multi-domain models, that use domain information to translate, in the situation in which we assign random domain tag to each test sentence. Besides the \system{RND} test, we use a new domain \domain{news} to assess the performance of systems in out-of-domain examples. Given a sentence of \domain{news}, we predict the closest domain to it by choosing the lowest perplexity of the sentence among those computed by in-domain language models and use the corresponding adapters to translate the sentence.
 
-We also report model \system{FT-Full-UEW} which is obtained by full-finetuning generic model using uniform elastic weight to avoid catatrophic forgetting.
+We also report model \system{FT-Full-UEW} which is obtained by full-finetuning the generic model using uniform elastic weight to avoid catastrophic forgetting.
 
 Table \ref{tab:performance-random} shows that variants \system{FT-HW-Block} and \system{FT-Gate-Block} achieve equivalent performances to the original version \system{FT-Block} of \cite{Bapna19simple}.
 
@@ -382,7 +382,7 @@ The phenomenon of Catastrophic Forgetting manifests clearly in this situation wh
 
 In the new domain test \domain{news}, generic model outperforms other systems. Finetuning systems including \system{FT-Full}, \system{FT-Block} and \system{FT-HW-Block} underperforms generic model by large margin. More regularized variants including \system{FT-Full-UEW}, and \system{FT-Gate-Block} are able to reduce the gap of performance compared to generic.
 
-The column \domain{PROC} shows that highway residual adapter \system{FT-HW-Block} process examples faster than original version \system{FT-Block}.
+The column \domain{PROC} shows that highway residual adapter \system{FT-HW-Block} process examples faster than the original version \system{FT-Block}.
 
 \begin{table*}[htbp]
   \centering
@@ -392,7 +392,7 @@ The column \domain{PROC} shows that highway residual adapter \system{FT-HW-Block
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} & \multicolumn{1}{c|}{\domain{RND}} & \multicolumn{1}{c|}{\domain{news}} & \multicolumn{1}{c|}{\domain{PROC}} \\ \hline  
     \system{Mixed-Nat}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  &  49.4 & 49.4 & 23.47 & 34s \\
    \system{FT-Full}       & 37.7 & 59.2 & 54.5 & 34.0 & 46.8 & 90.8 & 53.8 & 32.55 & 20.19 & 34s \\
-   \system{FT-Block}     & 37.3 & \SB{57.9} & 53.9 & 33.8 & \SB{46.7} & \SB{90.2}  &  \SB{53.3} & 38.38 & 20.51 & 22s\\ 
+   \system{FT-Block}     & 37.3 & 57.9 & 53.9 & 33.8 & 46.7 & 90.2  & 53.3 & 38.38 & 20.51 & 22s\\ 
    \system{FT-HW-Block}   & 37.5 & 57.2 & 53.4 & 33.1 & 46.3 & 91 & 53.1 & 36.62 & 20.22 & 19s \\
    \hline 
     \system{FT-Gate-Block}    & 37.98 &	57.46&	53.05&	33.55&	46.01&	90.07&	53.0&	48.96 & 22.51 & 21s \\
@@ -418,7 +418,7 @@ The former approach has also been adapted to NMT: \newcite{Kobus17domaincontrol,
 
 \section{Discussion \label{sec:discussion}}
 \mpDone{discussion}
-Residual Adapters allows us to quickly adapt a model to a domain without creating lots of domain-specific parameters even though full finetuning still outperforms this method by an important gap in in-domain test sets. For extremely small domains, we are able to reduce the number of adapter incorporated to NMT model without losing performance, also using Weight-Decay in finetuning over small domains demonstrates significant improvement. The proposed highway variant shows an equivalent performance to the original version of \cite{Bapna19simple} which allows us to process hidden layer of NMT model only once. The extended version of highway residual adapter to gated residual adapter shows the benefit in the robustness against wrong domain prediction and out-of-domain examples. 
+Residual Adapters allows us to quickly adapt a model to a domain without creating lots of domain-specific parameters even though full finetuning still outperforms this method by an important gap in in-domain test sets. For extremely small domains, we are able to reduce the number of adapters incorporated to the NMT model without losing performance, also using Weight-Decay in finetuning over small domains demonstrates significant improvement. The proposed highway variant shows an equivalent performance to the original version of \cite{Bapna19simple} which allows us to process the hidden layer of the NMT model only once. The extended version of the highway residual adapter to gated residual adapter shows the benefit in the robustness against wrong domain prediction and out-of-domain examples. 
 
 %\section{Acknowledgments}
 
