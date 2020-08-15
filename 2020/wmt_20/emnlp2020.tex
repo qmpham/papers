@@ -139,7 +139,7 @@ The residual adapter architecture extends this model by adding one new computati
   h^{i}_3 &= \mathbf{W}_{bd}^{i}h_2^{i} + b^i_{2} \\
   \bar{h}^{i} &= h^{i}_3 + h^i.
 \end{align*}
-Overall, the  $i^{\text{th}}$ adapter is thus parameterized by matrices $\displaystyle{\mathbf{W}_{db}^{i}\in\mathbb{R}^{d\times b}}$,$\displaystyle{\mathbf{W}_{bd}^{i}\in\mathbb{R}^{b\times d}}$, bias vectors $\displaystyle{b^i_{1} \in \mathbb{R}^{b}}$, $\displaystyle{b^i_{2} \in \mathbb{R}^{d}}$, with $b$ the dimension of the adapter (with $d \gg b$)\fyTodo{Check this}. For the sake of brevity, we will simply denote $h^{i}_3 = \operatorname{ADAP}^{(i)}(h^i)$, and $\theta_{\operatorname{ADAP}^{(i)}}$ the corresponding set of parameters.\fyDone{or is it $h_i$ ?}\fyDone{attention aux matrices $W_i$}
+Overall, the  $i^{\text{th}}$ adapter is thus parameterized by matrices $\displaystyle{\mathbf{W}_{db}^{i}\in\mathbb{R}^{d\times b}}$,$\displaystyle{\mathbf{W}_{bd}^{i}\in\mathbb{R}^{b\times d}}$, bias vectors $\displaystyle{b^i_{1} \in \mathbb{R}^{b}}$, $\displaystyle{b^i_{2} \in \mathbb{R}^{d}}$, with $b$ the dimension of the adapter (with $d \gg b$)\fyDone{Check this}. For the sake of brevity, we will simply denote $h^{i}_3 = \operatorname{ADAP}^{(i)}(h^i)$, and $\theta_{\operatorname{ADAP}^{(i)}}$ the corresponding set of parameters.\fyDone{or is it $h_i$ ?}\fyDone{attention aux matrices $W_i$}
 
 The "adapted" hidden vectors $\bar{h}^i_{ 1\leq i \leq L-1}$, where $L$ is the number of layers, will then be the input of the $(i+1)^{\text{th}}$\fyDone{Self attention ?} layer; $\bar{h}^L$ is passed to the decoder if it belongs to the encoder side, or is the input of output layer if it belongs to the decoder side. Note that zeroing out all adapters enables us to recover the basic Transformer, with $\bar{h}^{i} = h^i$ for all $i$.
 
@@ -240,10 +240,12 @@ En$\rightarrow$De is a much larger task, for which we use corpora distributed fo
 \label{tab:Corpora-en-de}
 \end{table*}
 
-We randomly select in each corpus a development and a test set of 1,000 lines each and keep the rest for training. Development sets help choose the best model according to the average BLEU score \cite{Papineni02bleu}.\footnote{We use truecasing and the \texttt{multibleu} script.}\fyDone{A word about meta-parameter settings} Significance testing is performed using bootstrap resampling \cite{Koehn04statistical}, implemented in compare-mt\footnote{\url{https://github.com/neulab/compare-mt}} \cite{Neubig19compare-mt}. We report significant differences at the level of $p=0.05$.\fyTodo{Is this part on significance testing still accurate ?}
+We randomly select in each corpus a development and a test set of 1,000 lines each and keep the rest for training. Development sets help choose the best model according to the average BLEU score \cite{Papineni02bleu}.\footnote{We use truecasing and the \texttt{multibleu} script.}\fyDone{A word about meta-parameter settings}
+   %    Significance testing is performed using bootstrap resampling \cite{Koehn04statistical}, implemented in compare-mt\footnote{\url{https://github.com/neulab/compare-mt}} \cite{Neubig19compare-mt}. We report significant differences at the level of $p=0.05$.
+\fyFuture{Is this part on significance testing still accurate ?}
 
 \subsection{Baseline architectures \label{ssec:baseline}}
-\fyTodo{Write this - settings and parameters for Mixed and Full-FT}.
+\fyDone{Write this - settings and parameters for Mixed and Full-FT}.
 % Our baselines are standard for multi-domain systems.
 % \footnote{We however omit domain-specific systems trained only with the corresponding subset of the data, which are always inferior to the mix-domain strategy \cite{Britz17mixing}.}
 Using Transformers \cite{Vaswani17attention} implemented in OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}, we train the following baselines:
