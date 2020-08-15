@@ -223,18 +223,18 @@ We perform our experiments with two translation pairs involving multiple domains
 \label{tab:Corpora-en-fr}
 \end{table*}
 
-En$\rightarrow$De is a much larger task, for which we use corpora distributed for the News task of WMT20\footnote{\url{http://www.statmt.org/wmt20/news.html}} including: European Central Bank corpus (\domain{bank}),  European Economic and Social Committee corpus (\domain{eco}), European Medicines Agency corpus (\domain{med})\footnote{\url{https://tilde-model.s3-eu-west-1.amazonaws.com/Tilde_MODEL_Corpus.html}}, Press Release Database of European Commission corpus, News Commentary v15 corpus, Common Crawl corpus (\domain{news}), Europarl v10 (\domain{gov}), Tilde MODEL - czechtourism (\domain{tourism})\footnote{\url{https://tilde-model.s3-eu-west-1.amazonaws.com/Tilde_MODEL_Corpus.html}}, Paracrawl and Wikipedia Matrix (\domain{web}). Statistics are in Table~\ref{tab:Corpora-en-de}.
+En$\rightarrow$De is a much larger task, for which we use corpora distributed for the News task of WMT20\footnote{\url{http://www.statmt.org/wmt20/news.html}} including: European Central Bank corpus (\domain{bank}),  European Economic and Social Committee corpus (\domain{eco}), European Medicines Agency corpus (\domain{med})\footnote{\url{https://tilde-model.s3-eu-west-1.amazonaws.com/Tilde_MODEL_Corpus.html}}, Press Release Database of European Commission corpus, News Commentary v15 corpus, Common Crawl corpus (\domain{news}), Europarl v10 (\domain{gov}), Tilde MODEL - czechtourism (\domain{tour})\footnote{\url{https://tilde-model.s3-eu-west-1.amazonaws.com/Tilde_MODEL_Corpus.html}}, Paracrawl and Wikipedia Matrix (\domain{web}). Statistics are in Table~\ref{tab:Corpora-en-de}.
 \begin{table*}[htbp]
   \centering
   \begin{tabular}{ |lllllll|} %*{4}{|r|}}
     \hline
     %\multicolumn{4}{|l|}{Vocab size - En: 30,165, Fr: 30,398}\\
-    \domain{bank} & \domain{eco} & \domain{med} & \domain{gov} & \domain{news} & \domain{tourism} & \domain{web} \\
+    \domain{bank} & \domain{eco} & \domain{med} & \domain{gov} & \domain{news} & \domain{tour} & \domain{web} \\
     \hline
     4 (0.00022) & 2857 (0.15) & 347 (0.018) & 1828 (0.095) & 3696 (0.19) & 7 (0.00039) & 10473 (0.54) \\
     \hline
   \end{tabular}
-\caption{Corpora statistics for En$\rightarrow$De: number of parallel lines ($\times 10^3$) and proportion in the basic domain mixture. \domain{web} is the largest domain, containing about 54\% of the sentences, while \domain{bank} and \domain{tourism} are very small.}
+\caption{Corpora statistics for En$\rightarrow$De: number of parallel lines ($\times 10^3$) and proportion in the basic domain mixture. \domain{web} is the largest domain, containing about 54\% of the sentences, while \domain{bank} and \domain{tour} are very small.}
 \label{tab:Corpora-en-de}
 \end{table*}
 
@@ -272,7 +272,7 @@ Models for En$\rightarrow$De are larger and rely on embeddings size as well as h
 \end{table*}
 
 \subsection{Varying the positions and number of residual adapters}
-Tables \ref{tab:Corpora-en-fr} and \ref{tab:performance-en-de} display the performace of NMT model in 6 domains: \domain{med},\domain{law},\domain{bank},\domain{talk},\domain{it} and \domain{rel} for the language pair En-Fr; \domain{gov}, \domain{eco}, \domain{tourism}, \domain{bank}, \domain{med} and \domain{news} for En-De. The original version \system{FT-Block} outperforms the baseline \system{mixed} in almost all domains while stays equivalent to the baseline in \domain{med} in En-Fr and \domain{news}, \domain{gov}, \domain{eco}, \domain{med} in En-De. However, \system{FT-full} still stay as best model in all domain tests.
+Tables \ref{tab:Corpora-en-fr} and \ref{tab:performance-en-de} display the performace of NMT model in 6 domains: \domain{med},\domain{law},\domain{bank},\domain{talk},\domain{it} and \domain{rel} for the language pair En-Fr; \domain{gov}, \domain{eco}, \domain{tour}, \domain{bank}, \domain{med} and \domain{news} for En-De. The original version \system{FT-Block} outperforms the baseline \system{mixed} in almost all domains while stays equivalent to the baseline in \domain{med} in En-Fr and \domain{news}, \domain{gov}, \domain{eco}, \domain{med} in En-De. However, \system{FT-full} still stay as best model in all domain tests.
 
 By varying the number and positions of residual adapters as aforementioned in section \ref{ssec:architecture}, we assess several variants of applying residual adapters. \fyTodo{Fix style here} Because the set of possible configurations is large, we only perform experiments on layers at position: 2, 4, 6 on each side of NMT model (encoder and decoder) which covers a wide range in the hierarchy of attention layers. To observe how much the number of residual adapters affects the performance of the adapted model. By the limit of computation resources, we limit our study to the case of 3 adapters at positions: 2,4,6 in each side of the NMT model. By doing this, we could cover 3 situations: 1 adapter (mentioned in the previous paragraph), 3 adapters and 6 adapters (in the normal setting) in each side (encoder and decoder).\fyTodo{We have 12 layers, have we not ?}
 
@@ -293,7 +293,7 @@ By varying the number and positions of residual adapters as aforementioned in se
    \system{FT-Block$_{(2)}$}     & 37.8 & 55.5 & 51.4 & 34 & 43.8 & 86.7 & 51.5 \\
      \hline
   \end{tabular}
-  \caption{Translation performance of various fine-tuned systems (En:Fr). We report BLEU scores for each domain, as well as averages across languages.}\fyTodo{Boldface ?}
+  \caption{Translation performance of various fine-tuned systems (En$\rightarrow$Fr). We report BLEU scores for each domain, as well as averages across languages.}\fyTodo{Boldface ?}
   \label{tab:performance-en-fr}
 \end{table*}
 
@@ -302,7 +302,7 @@ By varying the number and positions of residual adapters as aforementioned in se
   \fyDone{Fix column size}
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
-    Model / Domain & \multicolumn{1}{c|}{\domain{gov}} & \multicolumn{1}{c|}{\domain{eco}} & \multicolumn{1}{c|}{\domain{tourism}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{ med }} & \multicolumn{1}{c|}{\domain{ news}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
+    Model / Domain & \multicolumn{1}{c|}{\domain{gov}} & \multicolumn{1}{c|}{\domain{eco}} & \multicolumn{1}{c|}{\domain{tour}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{ med }} & \multicolumn{1}{c|}{\domain{ news}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
     \system{Mixed}  & 29.31 & 30.48 & 17.64 & 38.11 & 47.94 & 20.95  & 30.59 \\
     \system{FT-Full}       & 29.8 & 30.97 & 19.81 & 53.43 & 49.98 & 20.84 & 34.14 \\
    \system{FT-Block}     & 29.65 & 30.45 & 19.21 & 48.99 & 47.22 & 20.63 & 33.14 \\ 
@@ -313,13 +313,13 @@ By varying the number and positions of residual adapters as aforementioned in se
    \system{FT-Block$_{(2,4,6)}$}  & 29.68  & 30.55 & 18.85 & 49.57 & 47.09 & 20.63 &  32.73  \\
      \hline
   \end{tabular}
-  \caption{Translation performance of various fine-tuned systems (En:De). We report BLEU scores for each domain, as well as averages across domains.}
+  \caption{Translation performance of various fine-tuned systems (En$\rightarrow$De). We report BLEU scores for each domain, as well as averages across domains.}
   \label{tab:performance-en-de}
 \end{table*}
 
 \fyTodo{Why HW worse than standard version ?} \fyTodo{Why is regularization not helping ? It helps for small domain - domain-specific regularization ??}
 \subsection{Regularization of fine-tuning}
-In the translation from English into German, we find that domains \domain{tourism}, \domain{ecb} are extremely small and account for a very small percentage of the training data, with respective proportions of 0.039\% and 0.022\%. Fine-tuning on these domains can lead to serious overfitting. We assess two well-known regularization techniques for adapter modules, that could help avoid the overfitting issues: weight decay and layer regularization. 
+In the translation from English into German, we find that domains \domain{tour}, \domain{ecb} are extremely small and account for a very small percentage of the training data, with respective proportions of 0.039\% and 0.022\%. Fine-tuning on these domains can lead to serious overfitting. We assess two well-known regularization techniques for adapter modules, that could help avoid the overfitting issues: weight decay and layer regularization. 
 
 We choose optimal hyper-parameter $\lambda$ by grid search with a small set of values $\{ 10^{-3}, 10^{-4}, 10^{-5}$.
 
@@ -347,14 +347,14 @@ Results in Table~\ref{tab:performance-en-de-reg} show that weight decay (\system
   \centering
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
-    Model / Domain & \multicolumn{1}{c|}{\domain{gov}} & \multicolumn{1}{c|}{\domain{eco}} & \multicolumn{1}{c|}{\domain{tourism}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{ med }} & \multicolumn{1}{c|}{\domain{ news}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
+    Model / Domain & \multicolumn{1}{c|}{\domain{gov}} & \multicolumn{1}{c|}{\domain{eco}} & \multicolumn{1}{c|}{\domain{tour}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{med}} & \multicolumn{1}{c|}{\domain{news}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
     \system{Mixed}  & 29.3 & 30.5 & 17.6 & 38.1 & 47.9 & 20.9  & 30.6 \\
    \system{FT-Block} & 29.7 &	30.5 &	19.2 &	49.6 &	49.3 &	20.5 &	33.1     \\
-   \system{FT-Block-WD}     & 29.68 & 30.8 & 20.4 & 50.2 & 47.68 & 20.6 & 33.2 \\
-   \system{FT-Block-LR}     & 29.65 & 30.4 & 19.2 & 49.0 & 47.2 & 20.6 & 33.1 \\ 
+   \system{FT-Block-WD}     & 29.7 & 30.8 & 20.4 & 50.2 & 47.7 & 20.6 & 33.2 \\
+   \system{FT-Block-LR}     & 29.6 & 30.4 & 19.2 & 49.0 & 47.2 & 20.6 & 33.1 \\ 
      \hline
   \end{tabular}
-  \caption{Translation performance of various finetuned systems. We report BLEU scores for each domain, as well as averages.}
+  \caption{Translation performance of various fine-tuned systems. We report BLEU scores for each domain, as well as averages.}
   \label{tab:performance-en-de-reg}
 \end{table*}
 
