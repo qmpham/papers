@@ -398,7 +398,11 @@ We also report the number of parameters of each model in table \ref{tab:params-m
 \end{table*}
 
 \subsection{Gated Residual Adaptaters \label{ssec:gate-exp}}
-To measure the robustness against out-of-domain examples, we perform translations with wrong domain information to trick the systems that need to know domain a priori. In the table \ref{tab:performance-random}, the column \domain{RND} stores the score of multi-domain models, that use domain information to translate, in the situation in which we assign random domain tag to each test sentence. The phenomenon of Catastrophic Forgetting manifests clearly in this situation where the performance of all multi-domain systems drops dramatically by approximately 10 points BLEU compared to generic model \system{Mixed}. Our proposed model \system{FT-gate-block} maintains equivalent performance to the generic model in \system{RND} thanks to the application of adaptive weight on the output of the residual adapter. \system{FT-gate-block} avoids relying on the residual adapters when predicting examples that come from domain far from the domain of the adapters.
+To measure the robustness against out-of-domain examples, we perform translations with wrong domain information to trick the systems that need to know domain a priori. In the table \ref{tab:performance-random}, the column \domain{RND} stores the score of multi-domain models, that use domain information to translate, in the situation in which we assign random domain tag to each test sentence. 
+
+Beside multi-domain approaches reported in previous section, we report model \system{FT-full-UEW} which is obtained by full-finetuning generic model using uniform elastic weight to avoid catatrophic forgetting.
+
+The phenomenon of Catastrophic Forgetting manifests clearly in this situation where the performance of all multi-domain systems drops dramatically by approximately 10 points BLEU compared to generic model \system{Mixed}. Our proposed model \system{FT-gate-block} maintains equivalent performance to the generic model in \system{RND} thanks to the application of adaptive weight on the output of the residual adapter. \system{FT-gate-block} avoids relying on the residual adapters when predicting examples that come from domain far from the domain of the adapters.
 
 \begin{table*}[htbp]
   \centering
