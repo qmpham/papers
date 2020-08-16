@@ -313,13 +313,11 @@ The table \ref{tab:performance-multi} shows that the full-finetuning outperforms
 \end{table*}
 
 \subsection{Varying the positions and number of residual adapters}
-Tables \ref{tab:performance-en-fr-pos-reg} and \ref{tab:performance-en-de-pos-reg} display the performace of NMT model in 6 domains: \domain{med},\domain{law},\domain{bank},\domain{talk},\domain{it} and \domain{rel} for the language pair En-Fr; \domain{gov}, \domain{eco}, \domain{tour}, \domain{bank}, \domain{med} and \domain{news} for En-De. The original version \system{FT-Block} outperforms the baseline \system{mixed} in almost all domains while stays equivalent to the baseline in \domain{med} in En-Fr and \domain{news}, \domain{gov}, \domain{eco}, \domain{med} in En-De. However, \system{FT-full} still stay as best model in all domain tests.
-
 By varying the number and positions of residual adapters as aforementioned in section \ref{ssec:architecture}, we assess several variants of applying residual adapters. \fyTodo{Fix style here} Because the set of possible configurations is large, we only perform experiments on layers at position: 2, 4, 6 on each side of NMT model (encoder and decoder) which covers a wide range in the hierarchy of attention layers. To observe how much the number of residual adapters affects the performance of the adapted model. By the limit of computation resources, we limit our study to the case of 3 adapters at positions: 2,4,6 in each side of the NMT model. By doing this, we could cover 3 situations: 1 adapter (mentioned in the previous paragraph), 3 adapters and 6 adapters (in the normal setting) in each side (encoder and decoder).\fyTodo{We have 12 layers, have we not ?}
 
- In most cases, the performance increases with respect to the number of residual adapters used in architecture. The setting \system{FT-block} using residual adapters at all levels outperforms setting \system{FT-Block$_{(2,4,6)}$} using residual adapter at 3 levels, which outperforms \system{FT-Block$_{(2)}$}, \system{FT-Block$_{(4)}$} , \system{FT-Block$_{(6)}$} using residual adapter at only one level. However, the difference in performance between positions is not significant except the case of domain \domain{rel} (En-Fr) in which the lower position shows the lower performance.\fyTodo{What does bold mean ?}\fyTodo{Number of parameters ?} 
+ Tables ~\ref{tab:performance-en-fr} and ~\ref{tab:performance-en-de-pos-reg} show that in most cases, the performance increases with respect to the number of residual adapters used in architecture. The setting \system{FT-Block} using residual adapters at all levels outperforms setting \system{FT-Block$_{(2,4,6)}$} using residual adapter at 3 levels, which outperforms \system{FT-Block$_{(2)}$}, \system{FT-Block$_{(4)}$} , \system{FT-Block$_{(6)}$} using residual adapter at only one level. However, the difference in performance between positions is not significant except the case of domain \domain{rel} (En-Fr) in which the lower position shows the lower performance.\fyTodo{What does bold mean ?}\fyTodo{Number of parameters ?} 
 
-\begin{table*}
+\begin{table*}[htbp]
   \centering
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
@@ -334,8 +332,8 @@ By varying the number and positions of residual adapters as aforementioned in se
    \system{FT-Block$_{(2)}$}     & 37.8 & 55.5 & 51.4 & 34 & 43.8 & 86.7 & 51.5 & 65M/2M\\
      \hline
   \end{tabular}
-  \caption{Translation performance of various fine-tuned systems (En$\rightarrow$Fr). We report BLEU scores for each domain, as well as averages across languages. In column \domain{params}, we report number of domain-agnostic/domain-specific parameters} \fyDone{Boldface ?}
-  \label{tab:performance-en-fr-pos-reg}
+  \caption{Translation performance of various fine-tuned systems (En$\rightarrow$Fr). We report BLEU scores for each domain, as well as averages across languages. In column \domain{params}, we report number of domain-agnostic/domain-specific parameters}
+  \label{tab:performance-en-fr}
 \end{table*}
 
 \begin{table*}[htbp]
