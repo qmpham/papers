@@ -322,17 +322,12 @@ These results first show that full fine-tuning outperforms all other methods for
 % Multi-task training system \system{MDL-Res} gains important improvement compared to baseline \system{Mixed}. However, \system{MDL-Res} is outperformed by \system{Res-Adap}. It means that independently fine tuning the generic models is better than multi-task training. However, \system{MDL-Res} is better than other methods in multi-domain learning including:  \system{DC-Tag},  \system{DC-Feat}, \system{LDR}, \system{TTM}, \system{DM}, \system{ADM}.
 
 \subsection{Varying the positions and number of residual adapters}
-
 Tables~\ref{tab:performance-en-fr-pos-reg} and \ref{tab:performance-en-de-pos-reg} report the BLEU scores for 6 domains in each language pair: \domain{med},\domain{law},\domain{bank},\domain{talk},\domain{it} and \domain{rel} for En$\rightarrow$Fr; \domain{gov}, \domain{eco}, \domain{tour}, \domain{bank}, \domain{med} and \domain{news} for En$\rightarrow$De. We first see that for the latter direction, the basic version \system{Res-Adap} also outperforms the \system{mixed} baseline on average, with large gains for the small domains \domain{tour}, \domain{bank} and comparable results for the other domains.
 % in almost all domains while stays equivalent to the baseline in \domain{med} in En$\rightarrow$Fr and \domain{news}, \domain{gov}, \domain{eco}, \domain{med} in En$\rightarrow$De.
    %    However, \system{FT-full} still remains the best model for all test domains.
 \fyFuture{Full FT for en->DE ? }
 
 By varying the number and position of residual adapters (see Section~\ref{ssec:architecture}), we then contrast several implementation of residual adapters. \fyDone{Fix style here} Because the set of possible configurations is large, we only perform experiments for layers $i= 2, 4, 6$ (both for the encoder and decoder). Two settings are considered: keeping just one adapter, or keeping the three. The trend is the same for the two language directions: suppressing adapters always decrease the overall performance, albeit by a small margin: having six adapters is better than three, which is better than keeping only one. With only one adapter active, we observe small, unsignificant changes in performance. Based on these experiments, it seems that adaptation remains useful even for the deeper layers of the architecture.
-
-% which covers a wide range in the hierarchy of attention layers. To observe how much the number of residual adapters affects the performance of the adapted model. By the limit of computation resources, we limit our study to the case of 3 adapters at positions: 2,4,6 in each side of the NMT model. By doing this, we could cover 3 situations: 1 adapter (mentioned in the previous paragraph), 3 adapters and 6 adapters (in the normal setting) in each side (encoder and decoder).\fyTodo{We have 12 layers, have we not ?}
-
-%  In most cases, the performance increases with respect to the number of residual adapters used in architecture. The setting \system{FT-block} using residual adapters at all levels outperforms setting \system{Res-Adap$_{(2,4,6)}$} using residual adapter at 3 levels, which outperforms \system{Res-Adap$_{(2)}$}, \system{Res-Adap$_{(4)}$} , \system{Res-Adap$_{(6)}$} using residual adapter at only one level. However, the difference in performance between positions is not significant except the case of domain \domain{rel} (En-Fr) in which the lower position shows the lower performance.\fyDone{What does bold mean ?}\fyDone{Number of parameters ?} 
 
 \begin{table*}[htbp]
   \centering
