@@ -86,13 +86,16 @@
   \IfBooleanTF{#1}{\norm*{#3}}{\norm[#2]{#3}}_{L_1}%
 }
 
-\title{Rebuttal: Revisiting Multi-Domain Machine Translation}
-\author{}
+\title{Responses to the reviews of TACL paper \#2327:
+  ``Revisiting Multi-Domain Machine Translation''
+}
+\author{Action Editor: G. Foster}
 \date{}
 
 \begin{document}
 \maketitle
-\section*{General comments}
+
+\section*{Cover mail}
 As TACL action editor for submission 2327, "Revisiting Multi-Domain Machine Translation", I am happy to tell you that I am accepting your paper subject (conditional) to your making specific revisions within two months.
 
 Please address all comments by the reviewers, paying special attention to the following:
@@ -103,11 +106,21 @@ Please address all comments by the reviewers, paying special attention to the fo
 \end{itemize}
 
 You are allowed one to two extra pages of content to accommodate these
-revisions. 
+revisions. To submit your revised version, follow the instructions in the
+"Revision and Resubmission Policy for TACL Submissions" section of the
+Author Guidelines at
+\url{https://transacl.org/ojs/index.php/tacl/about/submissions\#authorGuidelines}.
+
+Thank you for submitting to TACL, and I look forward to your revised
+version! \\[2\parskip]
+
+\noindent George Foster\\
+\noindent Google Research\\
+\noindent geord.foster@gmail.com
+
 
 \section*{Reviewer A}
-Reviewer A:
-\\
+
 Overall, I'm a bit ambivalent about the paper. It is a well-written paper with a carefully-executed set of experiments. An important contribution of the paper is to formulate a set of expected properties of multi-domain MT (MDMT) (against which existing approaches are evaluated), and I generally like the choice of properties and that the paper draws attention to them, for example systematically testing how multi-domain approaches behave when gold domain labels are suboptimal. However, it is ambitious to systematically compare domain adaptation or multi-domain approaches which were developed with various conditions in mind. In several cases, I get the feeling that in an attempt to be broad and systematic, the authors have drawn boundaries and distinctions where none need exist, or drew conclusions that are too general. Details follow below.
 \\
 The authors have chosen a setting where domain labels are generally
@@ -120,23 +133,24 @@ The large number of approaches considered is admirable. However, the depth of th
 770-771), this deterioration is actually small or non-existent when
 comparing table 3 and table 5 averages (-0.2 BLEU for DC-Tag; -0.3 BLEU for TTM; +0.9 BLEU for ADM).
 \\
-Question to authors:
-\\
-- can you describe in more detail the differences between FT-Block and MDL Res, apart from the fact that the former is fine-tuned from a generic model, the latter trained from scratch?
-\\
-\textcolor{red}{The two methods use the same architecture composing of one standard Transformer model and domain adapters presented in the paper of \cite{Bapna19simple}. The only difference between FT-block and MDL Res is their training process.
-\\
-To train FT-block, we plug residual adapters to the output of each self-attention layer of the model Mixed-NAT, then resume the training with the learning rate captured in the end of the training of the model Mixed-NAT while freezing all of the parameters of the model Mixed-NAT. We use only the in-domain data as the training data of the finetuning procedure. 
-\\
-To train MDL res, we optimize the parameters of the Transformer model and the parameters of the residual adapters from scratch. Precisely, to create a training batch, we randomly pick a domain with a probability equal to the proportion of the domain in training data, then we sample a batch from its corpora. Given a batch from domain i, we optimize the parameters of Transformer model and the parameters of the residual adapters corresponding to the domain i by plugging the residual adapters of domain i to the Transformer model and calculating gradients of the activated parameters.}
-\\
-minor issues:
-\\
-- I disagree that generalization to unseen domains is similar to zero-shot multilingual MT. In zero-shot multilingual MT, both the source and target distribution have been observed at training time, just paired with other languages. In the generalization to unseen domains, there may be characteristics in the data that were never seen in the training data, including new vocabulary (in the source text, target text, or both).
-\\
-- 567-568: "having the domain tag on the source is better than on the
-target". I assume this refers to the comparison of "DC-Tag" and "TTM". However, TTM actually uses the predicted domain label on the target side, and could perform better with forced decoding of the gold domain label. More precisely, the statement should be that "having the gold tag is better than a predicted tag", but this is hardly surprising.
-\\
+\noindent Question to authors:
+\begin{itemize}
+\item can you describe in more detail the differences between FT-Block and MDL Res, apart from the fact that the former is fine-tuned from a generic model, the latter trained from scratch~?
+\end{itemize}
+\textcolor{red}{The two methods use the same architecture composed of one standard Transformer model extended with domain adapters following the design of \cite{Bapna19simple}. As the reviewer correctly points out, the only difference between FT-block and MDL Res is their training process and training data distribution.  
+  \\
+  To train FT-block, we plug residual adapters to the output of each self-attention layer of the generic model Mixed-NAT, then resume the training with the learning rate attained at the end of the training the generic model while freezing all of the other parameters of the model Mixed-NAT. For this step, we only use only the in-domain data, as we do during the full-tuning procedure.
+  \\
+  To train MDL res, we optimize the parameters of the Transformer model and the parameters of the residual adapters from scratch. More precisely, to create a training batch, we randomly pick a domain with a probability equal to the proportion of the domain in training data, and then sample a batch from the corresponding corpora. Given a batch from domain $i$, we simultaneously optimize the parameters of Transformer model and the parameters of the residual adapters for that domain. \\
+
+  We understand that our naming schemes was insisting on procedures, rather than architectures, thus possibly introducing some confusions. We have accordingly changed the name of FT-Block to XXX\fyTodo{fix this}, clarified the description see lines YYY\fyTodo{fix this}, and reported FT-Block as another multidomain system in all tables.\fyTodo{Make sure it is the case}.
+}
+\noindent Minor issues:
+\begin{itemize}
+\item I disagree that generalization to unseen domains is similar to zero-shot multilingual MT. In zero-shot multilingual MT, both the source and target distribution have been observed at training time, just paired with other languages. In the generalization to unseen domains, there may be characteristics in the data that were never seen in the training data, including new vocabulary (in the source text, target text, or both).
+\item 567-568: "having the domain tag on the source is better than on the target". I assume this refers to the comparison of "DC-Tag" and "TTM". However, TTM actually uses the predicted domain label on the target side, and could perform better with forced decoding of the gold domain label. More precisely, the statement should be that "having the gold tag is better than a predicted tag", but this is hardly surprising.
+\end{itemize}
+
 \textcolor{red}{We agree that the conclusion is not really fair for "TTM" because "TTM" intend to predict domain label rather than to use gold domain label and TTM could definitively translate with gold domain label as prefix of each hypothesis. We will report the performance of "TTM" when translating using gold domain label as prefix in target side.}
 \section*{Reviewer B}
 The paper presents a thorough review of Multi-Domain Machine Translation (MDMT) approaches, and the authors provide comprehensive experiments to study different aspects of MDMT. The innovation of this work can be seen in two main categories:
