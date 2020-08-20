@@ -185,7 +185,7 @@ I have a few comments:
 \item[*] On your discussion on the number of parameters (L. 591), could you share the number of parameters per each MDMT approach~? It will be helpful to see  the impact of the number of parameters on the MT results.
   \textcolor{red}{This information has been added in a new Table~ZZZ \fyTodo{Table number, page and line number and content}.}
 \\ 
-\item[*] Thinking about your seven operational requirements, I wonder if you could also define a domain or the minimum number of samples to specify a domain. I like your selections of domains that you include multiple domains with varying sizes, but what we expect in extreme cases. Having your Split experiments on REL (Table 4), or providing further details on your last analysis in Section 5.3, if you have tiny clusters could help.
+\item[*] Thinking about your seven operational requirements, I wonder if you could also define a domain or the minimum number of samples to specify a domain. I like your selections of domains that you include multiple domains with varying sizes, but what we expect in extreme cases. Having your Split experiments on REL (Table 4), or providing further details on your last analysis in Section 5.3, if you have tiny clusters could help.\fyTodo{Answer this with more experiments ?}
 \\
 \item[*] Please define Lambda coefficients in lines 142 and 146.
 \\
@@ -201,17 +201,19 @@ I have a few comments:
 \\
 \item[*] L. 503: It seems you refer to this method as LDR in the rest of the paper. Please make them consistent.
 \\
-\textcolor{red}{Thanks for pointing this out. We have made this notation more coherent.}
+\textcolor{red}{Thanks for pointing this out. We have made this notation more consistent.}
 \\
 \item[*] L. 576: Although you describe in footnote 11, it is better to mention that you compare WDCMT results with Mixed-NAT-RNN explicitly.
 \\
-\fyTodo{to explicitly compare WDCNMT with Mixed-NAT-RNN}
+\textcolor{blue}{This has been added in the text (see line YYY).}\fyTodo{to explicitly compare WDCNMT with Mixed-NAT-RNN. This is in the legend - change presentations ?}
 \\
 \item[*] L. 681-683: I don’t see it as a failure, and I think it is a property (requirement) as you describe in the definition of [P4-ERR], we expect deterioration in the presence of tag error. Am I right?
 \\
+\textcolor{blue}{This is correct - a drop is performance is expected when using wrong domain tags; [P4-ERR] is however about robustness against domain errors and a good MDMT system should minimize this loss. This is not what we see for the systems that use domain tags in testing.}
+
 \item[* L]. 687: Please describe how you predict the domain tag, and please share the tag prediction error rate on each domain test set. It is helpful to see the amount and the impact of the error on MDMT results.
 \\
-\textcolor{red}{We train a language model in source language for each domain using respective source training corpus. To predict domain tag of a sentence, we compute probability of the sentence according to each pretrained language model and choose the domain corresponding to the highest probability as domain tag of sentence.} \fyTodo{to compute error rate of domain prediction over each test set}
+\textcolor{blue}{We train a language model in source language for each domain using respective source training corpus. To predict domain tag of a sentence, we compute probability of the sentence according to each pretrained language model and choose the domain corresponding to the highest probability as domain tag of sentence. This is now explained in footnote ZZZ.}\fyTodo{to compute error rate of domain prediction over each test set, check comment, add footnote number.}
 \end{itemize}
 
 \section*{Reviewer D}
@@ -225,74 +227,50 @@ Even though I cannot easily name the one striking contribution of this work, it'
 \\
 Let me nevertheless formulate a few questions or points of criticism:
 \\
-- I'd like to see some analysis of vocabulary coverages (such as
+\begin{itemize}
+\item I'd like to see some analysis of vocabulary coverages (such as
 cross-domain OOV rates), and of "seen errors" and "new sense errors" as defined by Irvine et al. in "Measuring machine translation errors in new domains" (TACL 2013).
 \\
-\fyTodo{extra experiments to do.}
+\textcolor{blue}{. See table ZZZ.}\fyTodo{extra experiments to do.}
 \\
-- Maybe the (possible) effect of early stopping (and the choice of the validation set) should be discussed? E.g., the validation set for
-finetuning can originate from one single domain for each finetuned model. The way you're doing early stopping may even have had an impact on the results in Table 5. Is your validation set always a concatenation of 1000 lines from the six domains, without NEWS? Are you actually always training until the early stopping criterion is reached, and are you then using the model from the best checkpoint? (There are contradictory statements in the paper about "50,000  additional iterations" (?) for the experiments in Table 5.)
+\item Maybe the (possible) effect of early stopping (and the choice of the validation set) should be discussed~? E.g., the validation set for finetuning can originate from one single domain for each finetuned model. The way you're doing early stopping may even have had an impact on the results in Table 5. Is your validation set always a concatenation of 1000 lines from the six domains, without NEWS~? Are you actually always training until the early stopping criterion is reached, and are you then using the model from the best checkpoint? (There are contradictory statements in the paper about "50,000  additional iterations" (?) for the experiments in Table 5.)
 \\
-\textcolor{red}{For each domain, we create train/dev/test sets by randomly splitting the respective corpora. We maintain the size of validation sets and of test sets equal to 1000 lines for every domain. In the table 3 and 4, to train MDMT models except FT-full and FT-block we use a validation set which is a concatenation of 6 validation sets of 6 domains. In the table 5, to train MDMT models except FT-full and FT-block we concatenate the validation set of NEWS to the mixture of 6 validation sets. To train FT-full model and FT-block model we only use the in-domain validation set. We stop training if either the training iteration reach the maximal number of iterations or the score on the validation set does not increase in 3 consecutive evaluations. We average 5 checkpoints up to the best checkpoint to get the final model.}
+\textcolor{red}{For each domain, we create train/dev/test sets by randomly splitting the respective corpora. We maintain the size of validation sets and of test sets equal to 1,000 lines for every domain. In Tables 3 and 4, to train MDMT models except FT-full and FT-block, we use a validation set which is a concatenation of the 6 validation sets of 6 domains. In Table 5, to train MDMT models except FT-full and FT-block we concatenate the validation set of NEWS to the mixture of 6 validation sets. To train FT-full model and FT-block model we only use the in-domain validation sets. We stop training if either the training iteration reach the maximal number of iterations or the score on the validation set does not increase in 3 consecutive evaluations. We average 5 checkpoints up to the best checkpoint to get the final model.}
 \\
-- Report the learning rate. Is it decreased for finetuning?
+\item Report the learning rate. Is it decreased for finetuning?
 \\
-\textcolor{red}{The learning rate is determined by this formula $lr = d_{model}^{-0.5}*\min(step\_num^{-0.5},step\_num * warmup\_steps^{-1.5})$ where $d_{model}=512$,$warmup\_steps=4000$. In the finetuning procedure, we continue the training using the same learning rate schedule and the same $step\_num$}
+\textcolor{red}{The learning rate is determined according to $lr = d_{model}^{-0.5}*\min(step\_num^{-0.5},step\_num * warmup\_steps^{-1.5})$ where $d_{model}=512$,$warmup\_steps=4000$, as in the original Transformer paper. For the finetuning procedure, we continue training using the same learning rate schedule and the same $step\_num$.}\fyTodo{Fix this, add comments in appendix}
 \\
-- To some extent, I dislike Table 5. When not reading carefully, the
-difference values could be interpreted as differences wrt. scores in Table 3. (Except that the numbers would be wrong...) Differences wrt. to Table 3 are important and it took me a while to obtain an overview for myself. Furthermore, it should be immediately obvious which number is "resumed training" and which is training from scratch. (It isn't from the table caption alone.)
+\item To some extent, I dislike Table~5. When not reading carefully, the difference values could be interpreted as differences wrt. scores in Table 3. (Except that the numbers would be wrong...) Differences wrt. to Table 3 are important and it took me a while to obtain an overview for myself. Furthermore, it should be immediately obvious which number is "resumed training" and which is training from scratch. (It isn't from the table caption alone.)
 \\
-\textcolor{red}{In the table 5, we report the difference of the model's performance in 2 situations including resuming training and training from beginning with 7 domains. We would like to report the difference wrt to table 3 in the later version of the paper. We agree that the comparison to table 3 is also important, because it could assess the impact of new domain to the previously learned domains.}
+\textcolor{red}{In Table 5, we report the difference in performance between 2 situations: resuming training and training from beginning with 7 domains. We would like to report the difference wrt to Table 3 in the later version of the paper. We agree that the comparison to Table 3 is also important, because helps assess the impact of a new domain to the previously learned domains.}
 \\
-- How is "Mixed-Bal" achieved? By means of upsampling of the corpora from the less highly represented domains?
+\item How is \system{Mixed-Bal} achieved? By means of upsampling of the corpora from the less highly represented domains?
 \\
-\textcolor{red}{In all of our experiments, to get a training batch, we first sample a domain from a set of available domains in training procedure with a fixed probability, the we sample a from the corpora corresponding to the previously picked domain. Therefore, between our notations, "Mixed-NAT" uses a domain probability equal to proportion of domain in training data, and "Mixed-Bal" uses a domain probability equal to uniform probability.}
+\textcolor{blue}{In all of our experiments, to get a training batch, we first sample a domain from a set of available domains in training procedure with some fixed probability, then we sample a batch from the corpora corresponding to the previously picked domain. \system{Mixed-NAT} samples a domain based one the observed proportions of the training data (in Table~1), whereas \system{Mixed-Bal} samples domains with uniform probability.}
 \\
-- For "DC-Feat", is the feature added for each word or for each subword token? Is it attached to the word (increasing the vocabulary size a lot) or does it remain a separate token (increasing the input length a lot)?
+\item For \system{DC-Feat}, is the feature added for each word or for each subword token? Is it attached to the word (increasing the vocabulary size a lot) or does it remain a separate token (increasing the input length a lot)?
 \\
-\textcolor{red}{DC-Feat is a small embedding representing the domain. It is concatenated to every word embedding whenever its corresponding domain is detected. The use of DC-Feat increase the size of the input embedding, but does not increase the vocabulary size nor the input length.}
+\textcolor{red}{\system{DC-Feat} uses a small fixed embedding representing the domain. It is concatenated to every word embedding. The use of \system{DC-Feat} increases the size of the input embedding, but does not increase the vocabulary size nor the input length. This is clarified in the Appendix containing supplementary implementation details.}
 \\
-- How is the domain-weighted average (WAVG) calculated? Is the weight determined by proportion of the respective domain in the training data?
+\item How is the domain-weighted average (WAVG) calculated? Is the weight determined by proportion of the respective domain in the training data?
 \\
 \textcolor{red}{The domain-weighted average is calculated by weighting the performance of the model in each domain test with the proportion of the respective domain in the training data.}
 \\
-- Wasn't it possible to use standard test sets? The "REL" Bleu scores are suspiciously high and there might be considerable redundancy in the data, or rather: training data contaminated with test data. (Since duplicates are possible, have you verified that the test sentences don't still appear in the remaining training data?)
+\item Wasn't it possible to use standard test sets? The "REL" Bleu scores are suspiciously high and there might be considerable redundancy in the data, or rather: training data contaminated with test data. (Since duplicates are possible, have you verified that the test sentences don't still appear in the remaining training data?)
 \\
-\textcolor{red}{There are standard test sets for the domains including medical, IT, news and talk, but we could not find any standard test sets for the other domains including religion, law and bank. We carefully eliminated every duplicate in all of the experimental corpora. In our opinion, the reason why the models achieve extremely high scores in the domain religion is because the text in this domain is much less variable.}
+\textcolor{red}{There are standard test sets for some domains such as medical, IT, news and talk, but we could not find any standard test sets for the other domains including religion, law and bank. We carefully eliminated every duplicate sentence in all the corpora. In our opinion, the reason why the models achieve extremely high scores in the \domain{rel} domain is because texts in this domain is very repetitive and often predictable.}\fyTodo{sentence length ?, diversity index of vocab ?}
 \\
 Other (minor) remarks:
-- From the UFAL medical corpus, please say that you're using the indomain sections only (which is mostly PatTR Medical).
+\item From the UFAL medical corpus, please say that you're using the indomain sections only (which is mostly PatTR Medical).
 \\
-\textcolor{red}{From the UFAL medical corpus of the language pair En-Fr, we select only sentences in categories including EMEA, ParTR, CESTA, ECDC.}
+\textcolor{red}{From the UFAL medical corpus of the language pair En-Fr, we select only sentences in categories including EMEA, ParTR, CESTA, ECDC. This is now reflected in the text (lines XXX)}
 \\
-- The "DC-Feat" and "DC-Tag" lines in Table 5 should be swapped in order to be in line with Tables 3 and 4.
-\\
-\textcolor{red}{We agree to change the order of "DC-Feat" and "DC-Tag" to be consistent with tables 3 and 4.}
-\\
-- l. 503: "LDC-Feat" $\rightarrow$ "LDR"
-\\
-- l. 108: "automating" $\rightarrow$ "automatic"
-\\
-- l. 183: "accross" $\rightarrow$ "across"
-\\
-- l. 208: "under-resource" $\rightarrow$ "under-resourced"
-\\
-- l. 256: "ben" $\rightarrow$ "be"
-\\
-- l. 310: "used MT" $\rightarrow$ "used in MT"
-\\
-- l. 379: "Corpus statistics in Table 1." $\rightarrow$ "Corpus statistics are given in
-Table 1."
-\\
-- l. 380: "variable" $\rightarrow$ "available"
-\\
-- l. 426: "the all others" $\rightarrow$ "all others"
-\\
-- l. 696: "suplementary" $\rightarrow$ "supplementary"
-\\
-- l. 979: "drawed" $\rightarrow$ "drawn"
-\\
-- l. 991: "may be" $\rightarrow$ "maybe"
+\item The \system{DC-Feat} and "\item{DC-Tag} lines in Table 5 should be swapped in order to be in line with Tables 3 and 4.
+  \\
+  \textcolor{red}{We agree to change the order of "DC-Feat" and "DC-Tag" to be consistent with tables 3 and 4.}
+\end{itemize}
+The remaining style issues have been corrected.
 
 \bibliographystyle{acl_natbib}
 \bibliography{multidomain}
