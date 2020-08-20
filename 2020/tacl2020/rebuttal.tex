@@ -167,7 +167,6 @@ comparing table 3 and table 5 averages (-0.2 BLEU for DC-Tag; -0.3 BLEU for TTM;
     \fyTodo{Check prediction quality, moderate conclusion}
 \end{itemize}
 
-
 \section*{Reviewer B}
 The paper presents a thorough review of Multi-Domain Machine Translation (MDMT) approaches, and the authors provide comprehensive experiments to study different aspects of MDMT. The innovation of this work can be seen in two main categories:
 \begin{itemize}
@@ -180,7 +179,7 @@ I have a few comments:
 \\
 \begin{itemize}
 \item[*] You provide some useful experimental results on various MDMT approaches. To benefit from your results, we need access to the same segmentation of train/dev/test sets that I hope you will provide to the community.
-\textcolor{red}{Supplementary details regarding the settings used in our experiments have been added in a new Appendix YYY.\fyTodo{Fix this.}. We will also distribute the detailed composition of our train / dev / test split upon acceptance of the paper.}
+\textcolor{blue}{Supplementary details regarding the settings used in our experiments have been added in a new Appendix YYY.\fyTodo{Fix the appendix.}. We will also distribute the detailed composition of our train / dev / test split upon acceptance of the paper.}
 \\
 \item[*] On your discussion on the number of parameters (L. 591), could you share the number of parameters per each MDMT approach~? It will be helpful to see  the impact of the number of parameters on the MT results.
   \textcolor{red}{This information has been added in a new Table~ZZZ \fyTodo{Table number, page and line number and content}.}
@@ -189,7 +188,7 @@ I have a few comments:
 \\
 \item[*] Please define Lambda coefficients in lines 142 and 146.
 \\
-\textcolor{red}{We formalize the data distribution as a mixture of several in-domain distribution. $\lambda$ correspond to the mixing weights, that also define the prior distribution on domains. We hypothesize that training distribution is different from testing distribution, so we have need notation for two different mixtures. This has been clarified in the text (see line~XXX) \fyTodo{add lines}}
+\textcolor{blue}{We formalize the data distribution as a mixture of several in-domain distribution. $\lambda$ correspond to the mixing weights, that also define the prior distribution on domains. We hypothesize that training distribution is different from testing distribution, so we have need notation for two different mixtures. This has been clarified in the text (see line~XXX) \fyTodo{add lines}}
 \\
 \item[*] On dynamically changing the number of training and test domains, there is a new related work published recently that might worth citing it: Sharaf A, Hassan H, Daumé III H. Meta-Learning for Few-Shot NMT Adaptation.
 \\
@@ -201,7 +200,7 @@ I have a few comments:
 \\
 \item[*] L. 503: It seems you refer to this method as LDR in the rest of the paper. Please make them consistent.
 \\
-\textcolor{red}{Thanks for pointing this out. We have made this notation more consistent.}
+\textcolor{blue}{Thanks for pointing this out. We have made this notation more consistent.}
 \\
 \item[*] L. 576: Although you describe in footnote 11, it is better to mention that you compare WDCMT results with Mixed-NAT-RNN explicitly.
 \\
@@ -209,7 +208,7 @@ I have a few comments:
 \\
 \item[*] L. 681-683: I don’t see it as a failure, and I think it is a property (requirement) as you describe in the definition of [P4-ERR], we expect deterioration in the presence of tag error. Am I right?
 \\
-\textcolor{blue}{This is correct - a drop is performance is expected when using wrong domain tags; [P4-ERR] is however about robustness against domain errors and a good MDMT system should minimize this loss. This is not what we see for the systems that use domain tags in testing.}
+\textcolor{blue}{This is correct - a drop is performance is expected when using wrong domain tags; [P4-ERR] is however about robustness against domain errors and a good MDMT system should keep this loss small. This is not what we see for the systems that use domain tags in testing.}
 
 \item[* L]. 687: Please describe how you predict the domain tag, and please share the tag prediction error rate on each domain test set. It is helpful to see the amount and the impact of the error on MDMT results.
 \\
@@ -243,7 +242,7 @@ cross-domain OOV rates), and of "seen errors" and "new sense errors" as defined 
 \\
 \item To some extent, I dislike Table~5. When not reading carefully, the difference values could be interpreted as differences wrt. scores in Table 3. (Except that the numbers would be wrong...) Differences wrt. to Table 3 are important and it took me a while to obtain an overview for myself. Furthermore, it should be immediately obvious which number is "resumed training" and which is training from scratch. (It isn't from the table caption alone.)
 \\
-\textcolor{red}{In Table 5, we report the difference in performance between 2 situations: resuming training and training from beginning with 7 domains. We would like to report the difference wrt to Table 3 in the later version of the paper. We agree that the comparison to Table 3 is also important, because helps assess the impact of a new domain to the previously learned domains.}
+\textcolor{red}{In Table 5, we report the difference in performance between 2 situations: resuming training and training from beginning with 7 domains. We would like to report the difference wrt to Table 3 in the later version of the paper. We agree that the comparison to Table 3 is also important, because helps assess the impact of a new domain to the previously learned domains.}fytodo{What should we do about it ?}
 \\
 \item How is \system{Mixed-Bal} achieved? By means of upsampling of the corpora from the less highly represented domains?
 \\
@@ -251,26 +250,30 @@ cross-domain OOV rates), and of "seen errors" and "new sense errors" as defined 
 \\
 \item For \system{DC-Feat}, is the feature added for each word or for each subword token? Is it attached to the word (increasing the vocabulary size a lot) or does it remain a separate token (increasing the input length a lot)?
 \\
-\textcolor{red}{\system{DC-Feat} uses a small fixed embedding representing the domain. It is concatenated to every word embedding. The use of \system{DC-Feat} increases the size of the input embedding, but does not increase the vocabulary size nor the input length. This is clarified in the Appendix containing supplementary implementation details.}
+\textcolor{blue}{\system{DC-Feat} uses a small fixed embedding representing the domain. It is concatenated to every word embedding. The use of \system{DC-Feat} increases the size of the input embedding, but does not increase the vocabulary size nor the input length. This is clarified in the Appendix containing supplementary implementation details.}
 \\
 \item How is the domain-weighted average (WAVG) calculated? Is the weight determined by proportion of the respective domain in the training data?
 \\
-\textcolor{red}{The domain-weighted average is calculated by weighting the performance of the model in each domain test with the proportion of the respective domain in the training data.}
+\textcolor{blue}{This is correct: the domain-weighted average is computed by weighting the performance of the model in each domain test with the proportion of the respective domain in the training data.}
 \\
 \item Wasn't it possible to use standard test sets? The "REL" Bleu scores are suspiciously high and there might be considerable redundancy in the data, or rather: training data contaminated with test data. (Since duplicates are possible, have you verified that the test sentences don't still appear in the remaining training data?)
 \\
-\textcolor{red}{There are standard test sets for some domains such as medical, IT, news and talk, but we could not find any standard test sets for the other domains including religion, law and bank. We carefully eliminated every duplicate sentence in all the corpora. In our opinion, the reason why the models achieve extremely high scores in the \domain{rel} domain is because texts in this domain is very repetitive and often predictable.}\fyTodo{sentence length ?, diversity index of vocab ?}
-\\
+\textcolor{blue}{There are standard test sets for some domains such as medical, IT, news and talk, but we could not find any standard test sets for the other domains including religion, law and bank. We carefully removed every duplicate sentence in all the corpora. In our opinion, the reason why the models achieve extremely high scores in the \domain{rel} domain is because texts in this domain is very repetitive and often predictable.}\fyTodo{sentence length ?, diversity index of vocab ?}
+\end{itemize}
+
 Other (minor) remarks:
+
+\begin{itemize}
 \item From the UFAL medical corpus, please say that you're using the indomain sections only (which is mostly PatTR Medical).
 \\
-\textcolor{red}{From the UFAL medical corpus of the language pair En-Fr, we select only sentences in categories including EMEA, ParTR, CESTA, ECDC. This is now reflected in the text (lines XXX)}
+\textcolor{blue}{From the UFAL medical corpus of the language pair En-Fr, we select only sentences in categories including EMEA, ParTR, CESTA, ECDC. This is now mentioned in the text (lines XXX)}\fyTodo{Add lines num}
 \\
-\item The \system{DC-Feat} and "\item{DC-Tag} lines in Table 5 should be swapped in order to be in line with Tables 3 and 4.
+\item The \system{DC-Feat} and \system{DC-Tag} lines in Table 5 should be swapped in order to be in line with Tables 3 and 4.
   \\
-  \textcolor{red}{We agree to change the order of "DC-Feat" and "DC-Tag" to be consistent with tables 3 and 4.}
+  \textcolor{blue}{We have changed the order of "DC-Feat" and "DC-Tag" to be consistent with tables 3 and 4.}
 \end{itemize}
-The remaining style issues have been corrected.
+
+The remaining style issues have also been corrected.
 
 \bibliographystyle{acl_natbib}
 \bibliography{multidomain}
