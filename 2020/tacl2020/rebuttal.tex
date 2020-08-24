@@ -160,10 +160,10 @@ comparing table 3 and table 5 averages (-0.2 BLEU for DC-Tag; -0.3 BLEU for TTM;
 \begin{itemize}
 \item I disagree that generalization to unseen domains is similar to zero-shot multilingual MT. In zero-shot multilingual MT, both the source and target distribution have been observed at training time, just paired with other languages. In the generalization to unseen domains, there may be characteristics in the data that were never seen in the training data, including new vocabulary (in the source text, target text, or both).
   \\
-  \textcolor{red}{We agree lines XXX}
-\item 567-568: "having the domain tag on the source is better than on the target". I assume this refers to the comparison of "DC-Tag" and "TTM". However, TTM actually uses the predicted domain label on the target side, and could perform better with forced decoding of the gold domain label. More precisely, the statement should be that "having the gold tag is better than a predicted tag", but this is hardly surprising.
+  \textcolor{blue}{We agree with the reviewer that the analogy is misleading. As this is not central to our discussion, we have repharsed and dropped the comparison. See changes in line XXX}\fytodo{Changes line in.}
+\item 567-568: "having the domain tag on the source is better than on the target". I assume this refers to the comparison of "DC-Tag" and "TTM". However, TTM actually uses the predicted domain label on the target side and could perform better with forced decoding of the gold domain label. More precisely, the statement should be that "having the gold tag is better than a predicted tag", but this is hardly surprising.
   \\
-  \textcolor{red}{We agree that the conclusion is not really fair for "TTM" because "TTM" intend to predict domain label rather than to use gold domain label and TTM could definitively translate with gold domain label as prefix of each hypothesis.}
+  \textcolor{red}{We agree that the conclusion is not really fair for "TTM" because "TTM" intend to predict domain label rather than to use gold domain label and TTM could definitively translate with gold domain label as prefix of each hypothesis. In our experiments, we found that TTM is pretty accurate in its prediction, making about 2\% errors in the predicted tags, which make explain the small difference with observe. We have rephrased acccordingly}
     \fyTodo{Check prediction quality, moderate conclusion}
 \end{itemize}
 
