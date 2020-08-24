@@ -152,7 +152,7 @@ comparing table 3 and table 5 averages (-0.2 BLEU for DC-Tag; -0.3 BLEU for TTM;
     \\
     To train MDL res, we optimize the parameters of the Transformer model and the parameters of the residual adapters from scratch. More precisely, to create a training batch, we randomly pick a domain with a probability equal to the proportion of the domain in training data, then sample a batch from the corresponding corpus. Given a batch from domain $i$, we simultaneously optimize the parameters of Transformer model and the parameters of the residual adapters for that domain.
     \\
-    We understand that our naming schemes was insisting on training procedures, rather than on architectures, thus possibly introducing some confusions. We have accordingly changed the name of \system{FT-Block} to XXX\fyTodo{fix this}, clarified the description of the two systems (see lines YYY\fyTodo{fix this}), and reported \system{FT-Block}\fyTodo{or new name} as another multi-domain system in all tables.\fyTodo{Make sure it is the case}.}
+    We understand that our naming schemes was insisting on training procedures, rather than on architectures, thus possibly introducing some confusions. We have accordingly changed the name of \system{FT-Block} to \system{FT Res}, clarified the description of the two systems (see lines YYY\fyTodo{fix this}), and reported \system{FT Res}\fyTodo{or new name} as another multi-domain system in all tables.\fyTodo{Make sure it is the case}.}
   %}
 \end{itemize}
 
@@ -170,8 +170,8 @@ comparing table 3 and table 5 averages (-0.2 BLEU for DC-Tag; -0.3 BLEU for TTM;
 \section*{Reviewer B}
 The paper presents a thorough review of Multi-Domain Machine Translation (MDMT) approaches, and the authors provide comprehensive experiments to study different aspects of MDMT. The innovation of this work can be seen in two main categories:
 \begin{itemize}
-	\item suggesting a methodology to evaluate MDMT models based on seven properties that they defined in the paper.
-	\item empirical studies on eight recent MTMD approaches.
+\item suggesting a methodology to evaluate MDMT models based on seven properties that they defined in the paper.
+\item empirical studies on eight recent MTMD approaches.
 \end{itemize}
 In general, the paper has written well, and it is a good read for those who are researching in the domain adaptation field. 
 \\
@@ -182,17 +182,18 @@ I have a few comments:
 \textcolor{blue}{Supplementary details regarding the settings used in our experiments have been added in a new Appendix YYY.\fyTodo{Fix the appendix.}. We will also distribute the detailed composition of our train / dev / test split upon acceptance of the paper.}
 \\
 \item[*] On your discussion on the number of parameters (L. 591), could you share the number of parameters per each MDMT approach~? It will be helpful to see  the impact of the number of parameters on the MT results.
-  \textcolor{red}{This information has been added in a new Table~ZZZ \fyTodo{Table number, page and line number and content}.}
+  \textcolor{blue}{This information has been added in Table~3\fyTodo{Check number, page and line number and content}.}
 \\ 
 \item[*] Thinking about your seven operational requirements, I wonder if you could also define a domain or the minimum number of samples to specify a domain. I like your selections of domains that you include multiple domains with varying sizes, but what we expect in extreme cases. Having your Split experiments on REL (Table 4), or providing further details on your last analysis in Section 5.3, if you have tiny clusters could help.\fyTodo{Answer this with more experiments ?}
-\\
+  \\
+  \textcolor{red}{Answer this}
 \item[*] Please define Lambda coefficients in lines 142 and 146.
 \\
 \textcolor{blue}{We formalize the data distribution as a mixture of several in-domain distribution. $\lambda$ correspond to the mixing weights, that also define the prior distribution on domains. We hypothesize that training distribution is different from testing distribution, so we have need notation for two different mixtures. This has been clarified in the text (see line~XXX) \fyTodo{add lines}}
 \\
 \item[*] On dynamically changing the number of training and test domains, there is a new related work published recently that might worth citing it: Sharaf A, Hassan H, Daumé III H. Meta-Learning for Few-Shot NMT Adaptation.
 \\
-\textcolor{red}{This reference has been added to the related work section.}\fyTodo{Add citation}
+\textcolor{blue}{This reference has been added to the related work section.}\fyTodo{Add citation}
 \\
 \item[*] I’d prefer to see the number of running words in Table~1, especially when the batch size is given as the number of tokens (L. 485).
   \\
@@ -212,7 +213,7 @@ I have a few comments:
 
 \item[* L]. 687: Please describe how you predict the domain tag, and please share the tag prediction error rate on each domain test set. It is helpful to see the amount and the impact of the error on MDMT results.
 \\
-\textcolor{blue}{We train a language model in source language for each domain using respective source training corpus. To predict domain tag of a sentence, we compute probability of the sentence according to each pretrained language model and choose the domain corresponding to the highest probability as domain tag of sentence. This is now explained in footnote ZZZ.}\fyTodo{to compute error rate of domain prediction over each test set, check comment, add footnote number.}
+\textcolor{blue}{We train a language model in source language for each domain using respective source training corpus. To predict domain tag of a sentence, we compute probability of the sentence according to each pretrained language model and choose the domain corresponding to the highest probability as domain tag of sentence. Note that this classifier is only used for the \domain{news} test data. This is now explained in footnote ZZZ.}\fyTodo{to compute error rate of domain prediction over each test set, check comment, add footnote number.}
 \end{itemize}
 
 \section*{Reviewer D}
@@ -230,15 +231,15 @@ Let me nevertheless formulate a few questions or points of criticism:
 \item I'd like to see some analysis of vocabulary coverages (such as
 cross-domain OOV rates), and of "seen errors" and "new sense errors" as defined by Irvine et al. in "Measuring machine translation errors in new domains" (TACL 2013).
 \\
-\textcolor{blue}{. See table ZZZ.}\fyTodo{extra experiments to do.}
+\textcolor{blue}{Table 1 now contains the number of types as well as the number of types that are unique in a domain. We fill that performing an error analysis for each of the system / domain compared in this study would need to refocus more on a detailled analysis of each system, while our mail goal is to propose new methods to evaluate the actual abilities of MDMT systems.}\fyTodo{Will this be enough ?}
 \\
 \item Maybe the (possible) effect of early stopping (and the choice of the validation set) should be discussed~? E.g., the validation set for finetuning can originate from one single domain for each finetuned model. The way you're doing early stopping may even have had an impact on the results in Table 5. Is your validation set always a concatenation of 1000 lines from the six domains, without NEWS~? Are you actually always training until the early stopping criterion is reached, and are you then using the model from the best checkpoint? (There are contradictory statements in the paper about "50,000  additional iterations" (?) for the experiments in Table 5.)
 \\
-\textcolor{red}{For each domain, we create train/dev/test sets by randomly splitting the respective corpora. We maintain the size of validation sets and of test sets equal to 1,000 lines for every domain. In Tables 3 and 4, to train MDMT models except FT-full and FT-block, we use a validation set which is a concatenation of the 6 validation sets of 6 domains. In Table 5, to train MDMT models except FT-full and FT-block we concatenate the validation set of NEWS to the mixture of 6 validation sets. To train FT-full model and FT-block model we only use the in-domain validation sets. We stop training if either the training iteration reach the maximal number of iterations or the score on the validation set does not increase in 3 consecutive evaluations. We average 5 checkpoints up to the best checkpoint to get the final model.}
+\textcolor{red}{For each domain, we create train/dev/test sets by randomly each corpus. We maintain the size of validation sets and of test sets equal to 1,000 lines for every domain. In Tables 3 and 4, to train MDMT systems (except FT-full and FT Res), we use a validation set which is a concatenation of the 6 validation sets of 6 domains. In Table 5, to train MDMT systems (except \system{FT-Full} and \system{FT Res}) we append the validation set of \domain{news} to the concatenation of 6 validation sets. To train \system{FT-full} and \system{FT Res} model we only use the in-domain validation sets. We stop training if either the training iteration reach the maximal number of iterations or the score on the validation set does not increase in 3 consecutive evaluations. We average 5 checkpoints up to the best checkpoint to get the final model.}\fyTodo{up to the best ?}
 \\
 \item Report the learning rate. Is it decreased for finetuning?
 \\
-\textcolor{red}{The learning rate is determined according to $lr = d_{model}^{-0.5}*\min(step\_num^{-0.5},step\_num * warmup\_steps^{-1.5})$ where $d_{model}=512$,$warmup\_steps=4000$, as in the original Transformer paper. For the finetuning procedure, we continue training using the same learning rate schedule and the same $step\_num$.}\fyTodo{Fix this, add comments in appendix}
+\textcolor{blue}{The learning rate is determined according to $lr = d_{model}^{-0.5}*\min(step\_num^{-0.5},step\_num * warmup\_steps^{-1.5})$ where $d_{model}=512$,$warmup\_steps=4000$, as in the original Transformer paper. For the finetuning procedure, we continue training using the same learning rate schedule and the same $step\_num$. This is now clarified in the appendix}\fyDone{Fix this, add comments in appendix}
 \\
 \item To some extent, I dislike Table~5. When not reading carefully, the difference values could be interpreted as differences wrt. scores in Table 3. (Except that the numbers would be wrong...) Differences wrt. to Table 3 are important and it took me a while to obtain an overview for myself. Furthermore, it should be immediately obvious which number is "resumed training" and which is training from scratch. (It isn't from the table caption alone.)
 \\
