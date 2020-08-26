@@ -126,7 +126,6 @@ version! \\[2\parskip]
 \noindent Google Research\\
 \noindent geord.foster@gmail.com
 
-
 \section*{Reviewer A}
 
 Overall, I'm a bit ambivalent about the paper. It is a well-written paper with a carefully-executed set of experiments. An important contribution of the paper is to formulate a set of expected properties of multi-domain MT (MDMT) (against which existing approaches are evaluated), and I generally like the choice of properties and that the paper draws attention to them, for example systematically testing how multi-domain approaches behave when gold domain labels are suboptimal. However, it is ambitious to systematically compare domain adaptation or multi-domain approaches which were developed with various conditions in mind. In several cases, I get the feeling that in an attempt to be broad and systematic, the authors have drawn boundaries and distinctions where none need exist, or drew conclusions that are too general. Details follow below.
@@ -134,16 +133,21 @@ Overall, I'm a bit ambivalent about the paper. It is a well-written paper with a
 The authors have chosen a setting where domain labels are generally
 available at training and test time, and in the the empirical comparison, focus on approaches that use domain labels at training and test time (533-537), but this is only partially true: their comparison does include systems which only use domain labels at training time (TTM/DM/ADM/WDCMT), and one set of experiments operates with automatically induced domain labels based on k-means clustering of sentence representations. Systems which were designed to work without domain labels, such as that by Farajian et al.(2017) would be a very relevant comparison at least in the latter setting without gold domain labels.
 \\
-The authors consider fine-tuning separate from MDMT, and declare failure in that no MDMT system meets the expectation that it should outperform fine-tuning. I'm confused why fine-tuning is specifically excluded, since it meets many of the reasons for building MDMT systems. Authors do mention that it would be cheaper to develop a single system instead of having to maintain multiple systems, but they include "MDL Res", which has domain-specific adaptation modules and is very similar to "FT-Block" (a baseline that also combines a general model with domain-specific adaptation modules). The line
-between a single system and multiple systems gets fuzzy here, and I see no clear motivation to draw this clear distinction and only consider "MDL Res" a multi-domain system.
+The authors consider fine-tuning separate from MDMT, and declare failure in that no MDMT system meets the expectation that it should outperform fine-tuning. I'm confused why fine-tuning is specifically excluded, since it meets many of the reasons for building MDMT systems. Authors do mention that it would be cheaper to develop a single system instead of having to maintain multiple systems, but they include "\system{MDL Res}", which has domain-specific adaptation modules and is very similar to "FT-Block" (a baseline that also combines a general model with domain-specific adaptation modules). The line
+between a single system and multiple systems gets fuzzy here, and I see no clear motivation to draw this clear distinction and only consider "\system{MDL Res}" a multi-domain system.
 \\
-The large number of approaches considered is admirable. However, the depth of the discussion suffers as a consequence, and the paper risks making over-general statements about the weaknesses of different approaches, despite related work that has already addressed them. The authors conclude that fine-tuning "incurs large losses [when applied on] the small data condition", and fails to deteriorate gracefully in the presence of tag errors, issues that have been addressed by Miceli Barone et al. (2017) and Thompson et al. (2019), respectively. Similarly, the negative impact of adding data from a "new" domain seems slightly overblown. Firstly, this is probably highly dependent on data mixtures, length of training and regularization strategies, so I'd be wary of drawing general conclusions from a single set of experiments. Secondly, when looking at the models where such a performance deterioration is said to happen (DC-Tag, TTM, ADM; lines
-770-771), this deterioration is actually small or non-existent when
-comparing table 3 and table 5 averages (-0.2 BLEU for DC-Tag; -0.3 BLEU for TTM; +0.9 BLEU for ADM).
+The large number of approaches considered is admirable. However, the depth of the discussion suffers as a consequence, and the paper risks making over-general statements about the weaknesses of different approaches, despite related work that has already addressed them. The authors conclude that fine-tuning "incurs large losses [when applied on] the small data condition", and fails to deteriorate gracefully in the presence of tag errors, issues that have been addressed by Miceli Barone et al. (2017) and Thompson et al. (2019), respectively. Similarly, the negative impact of adding data from a "new" domain seems slightly overblown. Firstly, this is probably highly dependent on data mixtures, length of training and regularization strategies, so I'd be wary of drawing general conclusions from a single set of experiments. Secondly, when looking at the models where such a performance deterioration is said to happen (\system{DC-Tag}, \system{TTM}, \system{ADM}; lines 770-771), this deterioration is actually small or non-existent when comparing table 3 and table 5 averages (-0.2 BLEU for \system{DC-Tag}; -0.3 BLEU for \system{TTM}; +0.9 BLEU for \system{ADM}).
 \\
+\textcolor{red}{%
+  We have tried to address these commentaries in the revised version of the paper. Notably, we have clarified the distinction between \system{FT-block} and \system{MDL Res} (see details below). We have also tried to clarify the distinction between multi-domain MT and fine-tuning; while the former is designed with an a priori knowledge that the test data is sampled from a single domain, the latter assumes that the test data will be sampled from multiple domains, using domain probabilities that are not known a priori. This raises the issue of robustness wrt to adversarial test distribution and even new domains, an issue that is irrelevant for DA.
+
+In our experiments, fine-tuned systems share no parameter and show large drops in performance when translating data from the wrong domain (even though this could be somewhat mitigated, as the reviewer points out). By contrast, the majority of the parameters of our MDMT systems are shared for all domains. Arguably, one could see here a continuum between no parameter sharing and full parameter sharing, with \system{MDL Res} and \system{FT Block} corresponding to some intermediay situation. 
+
+We also agree that the results for the ``new domain'' experiment should not be over-blown and we have rephrased our conclusions somehow. Yet, this experiments highlights the fact that increasing the heterogeneity of the data pool could be harmful 
+}
 \noindent Question to authors:
 \begin{itemize}
-\item can you describe in more detail the differences between FT-Block and MDL Res, apart from the fact that the former is fine-tuned from a generic model, the latter trained from scratch~?
+\item can you describe in more detail the differences between \system{FT-Block} and \system{MDL Res}, apart from the fact that the former is fine-tuned from a generic model, the latter trained from scratch~?
   \\
   \textcolor{red}{%
     The two methods use the same architecture composed of one standard Transformer model extended with domain adapters following the design of \cite{Bapna19simple}. As the reviewer correctly points out, the only difference between \system{FT-block} and \system{MDL Res} is their training process and training data distribution.
@@ -160,11 +164,10 @@ comparing table 3 and table 5 averages (-0.2 BLEU for DC-Tag; -0.3 BLEU for TTM;
 \begin{itemize}
 \item I disagree that generalization to unseen domains is similar to zero-shot multilingual MT. In zero-shot multilingual MT, both the source and target distribution have been observed at training time, just paired with other languages. In the generalization to unseen domains, there may be characteristics in the data that were never seen in the training data, including new vocabulary (in the source text, target text, or both).
   \\
-  \textcolor{blue}{We agree with the reviewer that the analogy is misleading. As this is not central to our discussion, we have repharsed and dropped the comparison. See changes in line XXX}\fytodo{Changes line in.}
+  \textcolor{blue}{We agree with the reviewer that the analogy is misleading. As this is not central to our discussion, we have repharsed and dropped the comparison. See changes in line XXX}\fyTodo{Changes line in.}
 \item 567-568: "having the domain tag on the source is better than on the target". I assume this refers to the comparison of "DC-Tag" and "TTM". However, TTM actually uses the predicted domain label on the target side and could perform better with forced decoding of the gold domain label. More precisely, the statement should be that "having the gold tag is better than a predicted tag", but this is hardly surprising.
   \\
-  \textcolor{red}{We agree that the conclusion is not really fair for "TTM" because "TTM" intend to predict domain label rather than to use gold domain label and TTM could definitively translate with gold domain label as prefix of each hypothesis. In our experiments, we found that TTM is pretty accurate in its prediction, making about 2\% errors in the predicted tags, which make explain the small difference with observe. We have rephrased acccordingly}
-    \fyTodo{Check prediction quality, moderate conclusion}
+  \textcolor{blue}{We agree that the conclusion is not really fair for "TTM" because "TTM" intend to predict domain label rather than to use gold domain label and TTM could definitively translate with gold domain label as prefix of each hypothesis. In our experiments, we found that TTM is pretty accurate in its prediction, making about 2\% errors in the predicted tags, which may explain the small difference with observe in Table~3. We have rephrased acccordingly in lines WWW.}\fyTodo{Add lines}
 \end{itemize}
 
 \section*{Reviewer B}
@@ -186,7 +189,8 @@ I have a few comments:
 \\ 
 \item[*] Thinking about your seven operational requirements, I wonder if you could also define a domain or the minimum number of samples to specify a domain. I like your selections of domains that you include multiple domains with varying sizes, but what we expect in extreme cases. Having your Split experiments on REL (Table 4), or providing further details on your last analysis in Section 5.3, if you have tiny clusters could help.\fyTodo{Answer this with more experiments ?}
   \\
-  \textcolor{red}{Answer this}
+  \textcolor{blue}{We agree that carefully analyzing the effects of using corpora of varying size is important, as this corresponds to practical training scenario. From our results in Table 6 (and Table XXX in appendix), we see that some techniques can work well with small in-domain corpora. However, this analysis must also take in account the similarity between domains, as these improvements will be stronger if similar or related data are also present in the training mixture -- a situation that we have artificially created in our split conditions. Precisely sorting out these two effects is beyond the scope of this study and left for future work.}
+  
 \item[*] Please define Lambda coefficients in lines 142 and 146.
 \\
 \textcolor{blue}{We formalize the data distribution as a mixture of several in-domain distribution. $\lambda$ correspond to the mixing weights, that also define the prior distribution on domains. We hypothesize that training distribution is different from testing distribution, so we have need notation for two different mixtures. This has been clarified in the text (see line~XXX) \fyTodo{add lines}}
@@ -231,7 +235,7 @@ Let me nevertheless formulate a few questions or points of criticism:
 \item I'd like to see some analysis of vocabulary coverages (such as
 cross-domain OOV rates), and of "seen errors" and "new sense errors" as defined by Irvine et al. in "Measuring machine translation errors in new domains" (TACL 2013).
 \\
-\textcolor{blue}{Table 1 now contains the number of types as well as the number of types that are unique in a domain. We fill that performing an error analysis for each of the system / domain compared in this study would need to refocus more on a detailled analysis of each system, while our mail goal is to propose new methods to evaluate the actual abilities of MDMT systems.}\fyTodo{Will this be enough ?}
+\textcolor{blue}{Table~1 now contains the number of types as well as the number of types that are unique in a domain. We fill that performing an error analysis for each of the system / domain compared in this study would require us to focus more on a detailled analysis of each system, while our main goal is to propose new ways to assess the actual abilities of existing MDMT systems.}\fyTodo{Will this be enough ?}
 \\
 \item Maybe the (possible) effect of early stopping (and the choice of the validation set) should be discussed~? E.g., the validation set for finetuning can originate from one single domain for each finetuned model. The way you're doing early stopping may even have had an impact on the results in Table 5. Is your validation set always a concatenation of 1000 lines from the six domains, without NEWS~? Are you actually always training until the early stopping criterion is reached, and are you then using the model from the best checkpoint? (There are contradictory statements in the paper about "50,000  additional iterations" (?) for the experiments in Table 5.)
 \\
@@ -239,11 +243,11 @@ cross-domain OOV rates), and of "seen errors" and "new sense errors" as defined 
 \\
 \item Report the learning rate. Is it decreased for finetuning?
 \\
-\textcolor{blue}{The learning rate is determined according to $lr = d_{model}^{-0.5}*\min(step\_num^{-0.5},step\_num * warmup\_steps^{-1.5})$ where $d_{model}=512$,$warmup\_steps=4000$, as in the original Transformer paper. For the finetuning procedure, we continue training using the same learning rate schedule and the same $step\_num$. This is now clarified in the appendix}\fyDone{Fix this, add comments in appendix}
+\textcolor{blue}{The learning rate is determined according to $lr = d_{model}^{-0.5}*\min(step\_num^{-0.5},step\_num * warmup\_steps^{-1.5})$ where $d_{model}=512$,$warmup\_steps=4000$, as in the original Transformer paper. For the finetuning procedure, we continue training using the same learning rate schedule and the same $step\_num$. This is now clarified in the appendix.}\fyDone{Fix this, add comments in appendix}
 \\
 \item To some extent, I dislike Table~5. When not reading carefully, the difference values could be interpreted as differences wrt. scores in Table 3. (Except that the numbers would be wrong...) Differences wrt. to Table 3 are important and it took me a while to obtain an overview for myself. Furthermore, it should be immediately obvious which number is "resumed training" and which is training from scratch. (It isn't from the table caption alone.)
 \\
-\textcolor{red}{In Table 5, we report the difference in performance between 2 situations: resuming training and training from beginning with 7 domains. We would like to report the difference wrt to Table 3 in the later version of the paper. We agree that the comparison to Table 3 is also important, because helps assess the impact of a new domain to the previously learned domains.}fytodo{What should we do about it ?}
+\textcolor{blue}{In Table 5, we report the difference in performance between 2 situations: resuming training and training from beginning with 7 domains. We agree that the comparison to Table 3 is also important, because helps assess the impact of a new domain to the previously learned domains, and have now reported this comparison in table 5. We have also modified the caption to clarify our reference situation (coldstart, with 7 domains). See changes in Table 5.}\fyDone{What should we do about it ?}
 \\
 \item How is \system{Mixed-Bal} achieved? By means of upsampling of the corpora from the less highly represented domains?
 \\

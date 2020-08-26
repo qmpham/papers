@@ -58,7 +58,8 @@
 \newcommand{\SW}[1]{\underline{#1}}
 \renewcommand\textfraction{.1}
 \renewcommand\floatpagefraction{.95}
-
+\newcommand{\sbcl}[2]{{\scriptsize #1 \hfill $|$ \hfill  #2}}
+  
 \title{Revisiting Multi-Domain Machine Translation}
 \fyFuture{A plea for more thoroughness in evaluation}
 \author{First Author \\
@@ -152,10 +153,10 @@ A first motivation for moving away from the one-domain / one-system solution are
 
 A second line of reasoning rests on linguistic properties of the translation function and contends that domain specificities are mostly expressed lexically and will primarily affect content words or multi-word expressions; function words, on the other hand, are domain agnostic and tend to remain semantically stable across domains, motivating some cross-domain parameter sharing. A MDMT system should simultaneously learn lexical domain peculiarities, and leverage cross-domain similarities to improve the translation of generic contexts and words \cite{Zeng18multidomain,Pham19generic}. It is here expected that the MDMT scenario should be more profitable when the domain mix includes domains that are closely related and can share more information.
 
-A third series of motivations are of statistical nature. The training data available for each domain is usually unevenly distributed, and domain-specific systems trained or adapted on small datasets are likely to have a high variance and generalize poorly. For some test domains, there may even be no data at all \cite{Farajian17neural}. Training mix-domain systems is likely to reduce this variance, at the expense of a larger statistical bias \cite{Clark12onesystem}. Under this view, MDMT would be especially beneficial for domains with little training data \revision{(see~\cite{Sharaf20metalearning} for a discussion of DA in low resource conditions and a meta-learning based approach to this problem)}. This is observed for multilingual MT from English: an increase for under-resourced languages due to positive transfer, at the cost of a decrease in performance for well-resourced languages \cite{Arivazhagan19massively}.
+A third series of motivations are of statistical nature. The training data available for each domain is usually unevenly distributed, and domain-specific systems trained or adapted on small datasets are likely to have a high variance and generalize poorly. For some test domains, there may even be no data at all \cite{Farajian17neural}. Training mix-domain systems is likely to reduce this variance, at the expense of a larger statistical bias \cite{Clark12onesystem}. Under this view, MDMT would be especially beneficial for domains with little training data \revision{(see also \cite{Sharaf20metalearning} for a discussion of DA in low-resource conditions and a meta-learning based approach to this problem)}\fyTodo{Best place ?}. This is observed for multilingual MT from English: an improvement for under-resourced languages due to positive transfer, at the cost of a decrease in performance for well-resourced languages \cite{Arivazhagan19massively}.
 
 Combining multiple domain-specific MTs can also be justified in the sake of distributional robustness \cite{Mansour09domainadaptation,Mansour09multiple}, for instance when the test mixture differs from the train mixture, or when it includes new domains unseen in training.
-% \sout{Such scenario is already well documented for zero-shot multilingual MT \cite{Firat16multiway,Ha16towards,Johnson17google,Platanios18contextual, where mixing languages has more than demonstrated its usefulness.}
+\sout{Such scenario is already well documented for zero-shot multilingual MT} \cite{Firat16multiway,Ha16towards,Johnson17google,Platanios18contextual}\sout{where mixing languages has more than demonstrated its usefulness.}
 An even more challenging case is when the MT would need to perform well for any test distribution, as studied for statistical MT in \cite{Huck15mixeddomain}. In all these cases, mixing domains in training and/or testing is likely to improve robustness against unexpected or adversarial test distribution \cite{Oren19distributionally}.
 
 A distinct line of reasoning is that mixing domains can have a positive regularization effect for all domains. By introducing variability in training, it prevents DA from overfitting the available adaptation data and could help improve generalization even for well-resourced domains. A related case is made in \cite{Joshi12multidomain}, which shows that part of the benefits of MD training is due to an ensembling effect, where systems from multiple domains are simultaneously used in the prediction phase; this effect may subsist even in the absence of clear domain separations.
@@ -214,7 +215,7 @@ We randomly select in each corpus a development and a test set of 1,000 lines an
     %\multicolumn{4}{|l|}{Vocab size - En: 30,165, Fr: 30,398}\\
     \multicolumn{1}{c|}{} & \multicolumn{1}{c}{\domain{med}} & \multicolumn{1}{c}{\domain{law}} & \multicolumn{1}{c}{\domain{bank}} & \multicolumn{1}{c}{\domain{it}} & \multicolumn{1}{c}{\domain{talk}} & \multicolumn{1}{c}{\domain{rel}} & \multicolumn{1}{c|}{\domain{news}} \\
     \hline 
-    \# lines & 2609 (0.68) & 190 (0.05)  & 501 (0.13) & 270 (0.07) & 160 (0.04) & 130 (0.03) & 260 (0) \\
+    \# lines & 2609 (0.68) & 501 (0.13) & 190 (0.05) & 270 (0.07) & 160 (0.04) & 130 (0.03) & 260 (0) \\
     \# \revision{tokens}  &  133 / 154  &  17.1 / 19.6 &  6.3 / 7.3 &  3.6 / 4.6 &  3.6 / 4.0 &  3.2 / 3.4 & 7.8 / 9.2   \\
     \# \revision{types}  & 771 / 720 & 52.7 / 63.1 & 92.3 / 94.7 & 75.8 / 91.4 & 61.5 / 73.3 & 22.4 / 10.5 & - \\
     \# \revision{uniq} & 700 / 640 & 20.2 / 23.7 & 42.9 / 40.1 & 44.7 / 55.7 & 20.7 / 25.6 & 7.1 / 2.1 & - \\
@@ -315,19 +316,18 @@ Note that we did not include here the system of \cite{Farajian17multidomain} whi
   \fyDone{Do we have significancy tests for averages?} %\fyTodo{Add tests wrt to RNN}
 \end{table*}
 
-
 In this section, we discuss the basic performance of MDMT systems trained and tested on $6$~domains. Results are in Table~\ref{tab:performance}. As expected, balancing data in the generic setting makes a great difference (the unweighted average is 2~BLEU points\fyDone{BP?} better, notably owing to the much better results for \domain{rel}). As explained above, this setting should be the baseline when the test distribution is assumed to be balanced across domains. As all other systems are trained with an unbalanced data distribution, we use the weighted average to perform global comparisons.
 
-Fine-tuning each domain separately provides us with better baselines, outperforming \system{Mixed-Nat} for all domains, with significant gains for domains that are distant from \domain{med}: \domain{rel}, \domain{it}, \domain{bank}, \domain{law}.
+Fine-tuning each domain separately provides us with a better baseline, outperforming \system{Mixed-Nat} for all domains, with significant gains for domains that are distant from \domain{med}: \domain{rel}, \domain{it}, \domain{bank}, \domain{law}.
 % A complete fine-tuning, updating all parameters, proves more effective than only adapting a subpart of the network - a result that could be due to keeping fixed the capacity of the adapter module.
 \fyDone{Add 2 averages ?}\fyDone{Significance testing wrt Mix Generic, Full Fine-tuned, for each domain}
 
-A  first group of MDMTs use an extra domain feature, at the sentence or at the word level: among these, having the domain tag on the source is better than on the target, and very comparable to repeating the tag for every source word. If all MDMTs (except \system{DM} and \system{ADM}) slightly improve over the generic baseline (for most domains), these improvements are rarely significant. \revision{The best contender overall are  \system{FT Res} and \system{MDL Res}, which significantly improve over \system{Mixed-Nat} for a majority of domains, and are the only ones to clearly fulfill [P1-LAB];} \system{WDCMT} also improves on three domains, but regresses on one. The use of a dedicated adaptation component, seems here to prove better than feature-based strategies; \revision{this comes at the cost of a large increase of the number of parameters.} The effect of the adaptation layer is especially significant for small domains (\domain{bank}, \domain{it} and \domain{rel}).
+All MDMTs (except \system{DM} and \system{ADM}) slightly improve over the generic baseline (for most domains), these improvements are rarely significant. \revision{Among systems using an extra domain feature, \system{DC-Tags} has a small edge over \system{DC-Feats} and also requires less paramaters; it also outperforms \system{TTM}, which however uses predicted rather than gold domain tags. \system{TTM} is also the best choice among the systems that to not use domain tags in inference.} \revision{The best contender overall are  \system{FT Res} and \system{MDL Res}, which significantly improve over \system{Mixed-Nat} for a majority of domains, and are the only ones to clearly fulfill [P1-LAB];} \system{WDCMT} also improves on three domains, but regresses on one. The use of a dedicated adaptation component, seems here to prove better than feature-based strategies; \revision{this comes at the cost of a large increase of the number of parameters.} The effect of the adaptation layer is especially significant for small domains (\domain{bank}, \domain{it} and \domain{rel}).
+
 % for which unplugging this layer (see line [MDL res (gen)] in Table~\ref{tab:performance}) causes dramatic drop in performance.\fyDone{why LDC does not outperform DC as in Minh's paper (for en2fr MED) ?}
 
 All systems fail to outperform fine-tuning, sometimes by a wide margin, especially for an ``isolated'' domain like \domain{rel}. This might be due to the fact that domains are well separated (cf.\ Section~\ref{ssec:corpora}) and are hardly helping each other. In this situation, MDMT systems should instead make sure that each domain is allocated a sufficient number of parameters, so as to close the gap with fine-tuning.
 \fyDone{More comments when we have all the results}\fyDone{Importance of sharing and unsharing}
-
 
 \subsection{Redefining domains \label{ssec:redomains}}
 
@@ -360,15 +360,15 @@ In the \textsl{merge} experiment, we merge two corpora in training, in order to 
   \label{tab:redomains}
 \end{table*}
 
-Our findings can be summarized as follows. For the split experiments, we see small variations that can be positive or negative compared to the baseline situation, but these are hardly significative. All systems show some robustness with respect to fuzzy domain boundaries; this is mostly notable for \system{ADM}, suggesting that when domain are close, ignoring domain differences is effective. In contrary, \system{FT-Full} incurs large losses across the board, especially for the small data condition. Even in this very favourable case however, very few MDMT systems are able to significantly outperform \system{FT-Full} and this is only observed for the smaller part of the \domain{med} domain. The merge condition is hardly different, with large losses for \system{FT-full}, and small variations for all systems. We even observe some rare improvements with respect to the situation where we use actual domains.\fyDone{More comments ?}
+Our findings can be summarized as follows. For the split experiments, we see small variations that can be positive or negative compared to the baseline situation, but these are hardly significative. All systems show some robustness with respect to fuzzy domain boundaries; this is mostly notable for \system{ADM}, suggesting that when domain are close, ignoring domain differences is effective. In contrary, \system{FT-Full} incurs clear losses across the board, especially for the small data condition \cite{Miceli-barone17regularization}. Even in this very favourable case however, very few MDMT systems are able to significantly outperform \system{FT-Full} and this is only observed for the smaller part of the \domain{med} domain. The merge condition is hardly different, with large losses for \system{FT-full}, and small variations for all systems. We even observe some rare improvements with respect to the situation where we use actual domains.\fyDone{More comments ?}
 
 \subsubsection{Handling wrong or unknown domains \label{sssec:unknowns}}
 
-\fyDone{Numbers for the rand domain analysis}In the last two columns of Table~\ref{tab:redomains}, we report the drop in performance when the domain information is not correct. In the first (\domain{rnd}), we use test data from the domains seen in training, presented with a random domain tag\fyDone{all configs use the same tag or is randomization is run for each config}. In this situation, the loss with respect to using the correct domain is generally large (more than 10 BLEU points), showing an overall failure to meet requirement [P4-ERR], except for systems which disregard domain tags in testing. \fyDone{Comments?}
+\fyDone{Numbers for the rand domain analysis}In the last two columns of Table~\ref{tab:redomains}, we report the drop in performance when the domain information is not correct. In the first (\domain{rnd}), we use test data from the domains seen in training, presented with a random domain tag\fyDone{all configs use the same tag or is randomization is run for each config}. In this situation, the loss with respect to using the correct tag is generally large (more than 10 BLEU points), showing an overall failure to meet requirement [P4-ERR], except for systems that ignore domain tags in testing. \fyDone{Comments?}
 
-In the second (\domain{new}), we assess [P5-UNK] by translating sentences from a domain unseen in training (\domain{news}).\fyDone{i would use RND / UNK rather than OLD / NEW} For each sentence, we automatically predict the most likely domain tag and use it for decoding.\footnote{\revision{To automatically predict domain tags, we train a language model in each domain and assign tag on a per-sentence basis based the language model log-probability (assuming uniform domain priors). Our domain classifier has a average prediction error of 16.4\% for in-domain data.}}
+In the second (\domain{new}), we assess [P5-UNK] by translating sentences from a domain unseen in training (\domain{news}).\fyDone{i would use RND / UNK rather than OLD / NEW} For each sentence, we automatically predict the most likely domain tag and use it for decoding.\footnote{\revision{To automatically predict domain tags, we train a language model in each domain and assign tag on a per-sentence basis based the language model log-probability (assuming uniform domain priors). Our domain classifier has an average prediction error of 16.4\% for in-domain data.}}
 % Results are in the rightmost column of Table~\ref{tab:redomains}.
-In this configuration, again, systems using domain tags in the inference step perform poorly, significantly worse than the \system{Mixed-Nat} baseline (Bleu=23.5)\fyDone{performance drop is now measured against Mixed-nat (leave it clearer?)}, sometimes by a large margin.\fyDone{Check significance, To be completed}
+In this configuration, again, systems using domain tags in the inference step perform poorly, significantly worse than the \system{Mixed-Nat} baseline (Bleu=23.5)\fyDone{performance drop is now measured against Mixed-nat (leave it clearer?)}, sometimes by a large margin.\fyDone{Check significance, To be completed}t
 
 \subsubsection{Handling growing numbers of domains}
 Another set of experiments evaluate the ability to dynamically handle supplementary domains (requirement [P6-DYN]) as follows. Starting with the existing MD systems of Section~\ref{ssec:rawperformance}, we introduce an extra domain (\domain{News}) and resume training with this new mixture of data\footnote{The design of a proper balance between domains in training is critical for achieving optimal performance: as our goal is to evaluate all systems in the same conditions, we consider a basic mixing policy based on the new training distribution. This is detrimental to the small domains, for which the ``negative transfer'' effect is stronger than for larger domains.} for 50,000 additional iterations.\fyDone{Training regime of continuation} We contrast this approach with training all systems from scratch and report differences in performance in Table~\ref{tab:warmrestart}.\footnote{WDCMT results are excluded from this table, as resuming training proved difficult to implement.}\fyDone{Ecrire un commentaire} 
@@ -376,46 +376,48 @@ We expect that MDMT systems should not to be significantly impacted by the addit
 
 \begin{table*}
   \centering
-  \begin{tabular}{|p{2.5cm}|*{9}{r|}} \hline \footnotesize
-    Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{news}} & \multicolumn{1}{c|}{w\domain{avg}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline
-     \system{Mixed-Nat}  & 37.1  & 54.1  & 49.6	& 34.1  & 42.1	& 77.0 & 28.9 & 40.8	& 49.0 \\ 
+  \begin{tabular}{|p{1.7cm}|*{9}{r|}} \hline
+    \footnotesize
+   \hfill Domain  Model \hfill & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{news}} & \multicolumn{1}{c|}{w\domain{avg}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
+    \footnotesize\system{Mixed-Nat}  & 37.1  & 54.1  & 49.6	& 34.1  & 42.1	& 77.0 & 28.9 & 40.8	& 49.0 \\[-2pt]
+                   & \sbcl{-0.2}{--}  &\sbcl{-0.5}{---} &\sbcl{-0.5}{--} &\sbcl{+0.6}{--} &\sbcl{-1.1}{--} &\sbcl{-6.5}{--} &\sbcl{+5.4}{--} &\sbcl{-0.3}{--} & \sbcl{-0.4}{--} \\
 %    \system{Mixed-Nat}  & 37.3  & 54.6   & 50.1   & 33.5  & 43.2  & 77.5  & 23.5 & 41.1 & 49.4 \\
 %    \system{FT-Full}       & 37.7  & 59.2   & 54.5   & 34.0  & 46.8  & 90.8  & **** & 42.8 & 53.8 \\
     \hline%\hline
-    \system{DC-Tag}      &  37.7 & 54.5   & 49.9    &  34.8 &  43.9  & 78.8 & 29.5  & 41.4 & 49.9\\[-2pt]
+    \footnotesize \system{DC-Tag}      &  37.7 & 54.5   & 49.9    &  34.8 &  43.9  & 78.8 & 29.5  & 41.4 & 49.9\\[-2pt]
 %                                   & 38.0  & 54.4   & 49.2    & \SW{33.6}  &  \SW{42.7}  &\SW{75.3}  & \SW{28.1}  & & 48.9\\
-                   & \scriptsize +0.3  & \scriptsize -0.1   & \scriptsize -0.6    & \scriptsize \SW{-1.1}  &  \scriptsize \SW{-1.3}  & \scriptsize \SW{-3.5}  & \scriptsize \SW{-1.4}  & \scriptsize -0.1 & \scriptsize \SW{-1.2}\\
+                   & \sbcl{-0.4}{+0.3}  & \sbcl{-0.8}{-0.1}   & \sbcl{-0.1}{-0.6}  & \sbcl{+1.6}{\SW{-1.1}}  &  \sbcl{+0.4}{\SW{-1.3}}  & \sbcl{-1.7}{\SW{-3.5}}  & \sbcl{+7.7}{\SW{-1.4}}  & \sbcl{-0.2}{-0.1} & \sbcl{-0.2}{\SW{-1.2}}\\
                    
-	\system{DC-Feat}     & 37.4 & 54.9   & 50.0    & 34.7  &  43.9  & 79.6 & 28.9  & 41.2 & 50.1\\[-2pt]
+    \footnotesize \system{DC-Feat}     & 37.4 & 54.9   & 50.0    & 34.7  &  43.9  & 79.6 & 28.9  & 41.2 & 50.1\\[-2pt]
 %                   & 37.2 & 54.7   & 49.9    & 34.2  &  43.0  & 79.9 & \SW{28.1}  & &\\
                    & \scriptsize -0.2 & \scriptsize -0.1  & \scriptsize -0.1 & \scriptsize -0.6 & \scriptsize -0.9 & \scriptsize +0.3 & \scriptsize \SW{-0.8} & \scriptsize -0.2 & \scriptsize -0.3\\
-
     
-    \system{LDR}    & 37.0   & 54.6  & 49.6    & 34.3  &  43.0  &77.0  & 28.7 & 40.8 & 49.2 \\[-2pt]
+    \footnotesize \system{LDR}    & 37.0   & 54.6  & 49.6    & 34.3  &  43.0  &77.0  & 28.7 & 40.8 & 49.2 \\[-2pt]
                     & \scriptsize -0.6 &	\scriptsize +0.5 & \scriptsize -0.4 & \scriptsize -0.6 &	\scriptsize +0.5 & \scriptsize +\SB{3.8} & \scriptsize \SW{-0.9} & \scriptsize +0.5 & \scriptsize -0.4 \\
 
-    \system{TTM}           &  37.3 & 54.4   & 49.6    & 33.8  &  42.9  &78.2  & 29.1 & 41 & 49.4\\[-2pt]
+    \footnotesize \system{TTM}           &  37.3 & 54.4   & 49.6    & 33.8  &  42.9  &78.2  & 29.1 & 41 & 49.4\\[-2pt]
 %                   & 37.1  & 54.2   & 49.1    & \SW{32.8}  &  42.0  &\SW{74.2}  & \SW{27.7}& 48.2\\
                     & \scriptsize -0.3  & \scriptsize -0.3  & \scriptsize -0.5    & \scriptsize \SW{-1.1}  &  \scriptsize \SW{-1.0}  & \scriptsize \SW{-4.0}  & \scriptsize \SW{-1.4}& \scriptsize -0.5 & \scriptsize \SW{-1.2}\\
     
-    \system{DM}            &36.0 &51.3&46.8&31.8&39.8&65.7&27.0 & 38.9 & 45.2\\[-2pt]
+    \footnotesize \system{DM}            &36.0 &51.3&46.8&31.8&39.8&65.7&27.0 & 38.9 & 45.2\\[-2pt]
 %                   &36.5&51.7&47.4&31.7&40.3&65.7&\SW{25.8}& & \\
                    & \scriptsize +0.6& \scriptsize +0.4& \scriptsize +0.6& \scriptsize -0.1& \scriptsize +0.5 & \scriptsize 0.0& \scriptsize \SW{-1.2}& \scriptsize +0.5 & \scriptsize +0.3\\    
     
-    \system{ADM}          &36.6&54.2&49.1&32.9&42.1&75.7&28.7 & 40.2 & 48.4 \\[-2pt]
+    \footnotesize \system{ADM}          &36.6&54.2&49.1&32.9&42.1&75.7&28.7 & 40.2 & 48.4 \\[-2pt]
 %                   &  36.9 &53.5&48.3&32.7&41.7&\SW{70.7}&\SW{26.8}& \\
                    & \scriptsize +0.3 & \scriptsize -0.8 & \scriptsize -0.8 & \scriptsize -0.2 & \scriptsize -0.4 & \scriptsize \SW{-5.0} & \scriptsize \SW{-1.9} & \scriptsize -0.2 & \scriptsize \SW{-1.1}\\
     
 %    \system{WDCMT}     &&&&&&& & &\\[-2pt]
 %                    &&&&&&&&& \\
-    \revision{\system{FT Res}}  &  \\
-    
-    \system{MDL-Res}    &37.7   & 55.6   & 51.1   & 34.4  & 44.5  & 87.5  & 29.1 & 41.9 & 51.8 \\[-2pt]
+    \footnotesize \revision{\system{FT Res}}  & 37.3 & 57.9 & 53.9 & 33.8 &	46.7 & 90.1 & 20.5 &	53.3 & 42.2 \\[-2pt]
+                               & \sbcl{}{+0.2} & \sbcl{}{-2.2} & \sbcl{}{-2.8} & \sbcl{}{-0.7} & \sbcl{}{-2.6} & \sbcl{}{-3.4} & \sbcl{}{-3.0} & \sbcl{}{-1.9} & \sbcl{}{-0.6} \\
+    % 37.53	55.74	51.15	33.06	44.15	86.67	23.05	51.38	41.64
+    \footnotesize \system{MDL-Res}    &37.7   & 55.6   & 51.1   & 34.4  & 44.5  & 87.5  & 29.1 & 41.9 & 51.8 \\[-2pt]
 %                      & 37.5 & 56.1 & 51.1 & 34.0  &  44.3 & 87.3 & \SW{28.4} & & 51.7 & \\
                         & \scriptsize -0.2 & \scriptsize +0.5 & \scriptsize 0.0 & \scriptsize -0.4  &  \scriptsize -0.2 & \scriptsize -0.2 & \scriptsize \SW{-0.8} & \scriptsize -0.2 & \scriptsize -0.1 \\
      \hline
   \end{tabular}
-  \caption{Ability to handle a new domain: BLEU scores for the ``resume training'' mode compared to a complete training session. Averages only take into account the six initial domains (\domain{News} excluded). Underline denotes a significant loss between warmstart and coldstart, bold a significant gain.}
+  \caption{Ability to handle a new domain. \revision{We report BLEU scores for a complete training session with 7 domains, as well as differences with (left) training with 6 domains (from Table~\ref{tab:performance}); (right) continuous training mode.} Averages only take into account the six initial domains (\domain{News} excluded). Underline denotes a significant loss between warmstart and coldstart, bold a significant gain.}
   \label{tab:warmrestart}
   \fyDone{Fill the table, significancy testing against initial learning condition, for each domain, and averages ? }
   \fyDone{Need correct number / differences for Mixed-Nat}
@@ -423,10 +425,10 @@ We expect that MDMT systems should not to be significantly impacted by the addit
   \fyDone{i used smaller number for differences (easier to read...)}
 \end{table*}
 
-We can first compare the results of coldstart training with six (Table~\ref{tab:performance}) or seven domains (Table~\ref{tab:warmrestart}): the most striking observation is that the extra training data is detrimental for almost all systems and domains\fyDone{is this significant ?}. Increasing the heterogeneity of the mix with supplementary out-of-domain data hurts performance across the board.
+We can first compare the results of coldstart training with six or seven domains (Table~\ref{tab:warmrestart}): the most striking observation is that the extra training data is detrimental for most systems and domains, except for \domain{News} where we see a large gain.\fyDone{is this significant ?}. Increasing the heterogeneity of the mix with supplementary out-of-domain data thus seems to hurt performance across the board.
 % Adding is not helping here, especially when domains are well separated.
-Comparing now the coldstart with the warmstart scenarios, we see that the former is always significantly better for \domain{news}, as expected, and that resuming training can negatively impact the performance for other domains. This happens notably for \system{DC-Tag}, \system{TTM} and \system{ADM}. In this setting \system{MDL Res} and \system{DM} show the smaller average loss, with the former achieving the best balance of training cost and average translation performance.% of all systems.
-
+Comparing now the coldstart with the warmstart scenario, we see that the former is always significantly better for \domain{news}, as expected, and that resuming training also negatively impact the performance for other domains. This happens notably for \system{DC-Tag}, \system{TTM} and \system{ADM}. In this setting \system{MDL Res} and \system{DM} show the smaller average loss, with the former achieving the best balance of training cost and average translation performance.% of all systems.
+\fyTodo{Numbers for MDL Res need significancy testing; and they are weird - why do we see this ? Because the generic is bad ?}
 % \begin{itemize}
 % \item even when trained from entirely scratch, very few systems are able to take advantage of the additional data for the 6 initial domains - this is observed on the averaged scores in Table~\ref{tab:warmrestart} with hardly surpass those in Table~\ref{tab:performance}
 % \item restart is computationally cheaper (\fyTodo{how much cheaper here ?}) but underperforms cold start for all systems, sometimes by a wide margin.
@@ -444,7 +446,7 @@ Table~\ref{tab:subdomains} reports the effect of using automatic domain tags for
   \fyDone{Fix column size}
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
-    Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{w\domain{avg}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
+    Domain / Model  & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{w\domain{avg}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline % & \multicolumn{1}{c|}{\domain{news}} 
   %    \system{Mixed-Nat}  & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  & 41.1  & 49.4 \\% & 23.5\\
   %     \system{FT-Full}       & 37.7 & \SB{59.2} & \SB{54.5} & 34.0 & \SB{46.8} & \SB{90.8}   & 42.8 & 53.8\\
   %   Full-finetuned on extended in-domain corpora (news) & && 33.96&&& & &\\nn
@@ -454,12 +456,12 @@ Table~\ref{tab:subdomains} reports the effect of using automatic domain tags for
     \system{TTM}            & 37.4 & \SW{53.7} & 48.9 & 32.8 & 41.3 & \SW{75.8} & 40.7 & \SW{48.3}   \\% &  23.4 \\
     \system{DM}             & 35.4 & 49.3  & 45.2 & 29.7 & 37.1 & \SW{60.0} & 37.8 & 42.8 \\ % & 22.6\\
     \system{ADM}           & 36.1 & 53.5  & 48.0 & 32.0 & 41.1 & 72.1 & 39.5 & 47.1\\% & 23.3 \\
+    \revision{\system{FT Res}}     & 37.5 & \SW{55.7}  & \SW{51.1}   & 33.1   &  \SW{44.1}  & \SW{86.7} & 41.6 & \SW{51.4}\\%  & \SW{21.2} \\
+    \system{MDL Res}     & 37.3 & 55.5  & \SW{50.2}   & \SW{32.2}   &  \SW{42.1}  & \SW{86.7} & 41.2 & \SW{50.7}\\%  & \SW{21.2} \\
     \system{WDCMT}       & 35.6 & 53.1 & 48.4 & 30.5 & \SW{37.7} & \SW{56.0} & 38.5 & 43.6 \\ % & 20.4 \\ 
-    \revision{\system{FT Res}}     & 37.5 & 55.7  & 51.1   & 33.1   &  44.1  & \SW{86.7} & 41.6 & 51.4\\%  & \SW{21.2} \\
-    \system{MDL Res}     & 37.3 & 55.5  & \SW{50.2}   & \SW{32.2}   &  \SW{42.1}  & \SW{86.7} & 41.2 & \SB{50.7}\\%  & \SW{21.2} \\
-     \hline
+    \hline
   \end{tabular}
-  \caption{Translation performance with automatic domains, computed with the original test sets. Significancy tests are for comparisons with the 6-domain scenario.}
+  \caption{Translation performance with automatic domains, computed with the original test sets. Significancy tests are for comparisons with the 6-domain scenario \revision{(Table~\ref{tab:performance}).}}
   \label{tab:subdomains}
   \fyDone{Fill the table with correct results,}\fyDone{Change wavg and avg}
 \end{table*}
@@ -491,7 +493,7 @@ Finally, \newcite{Farajian17multidomain}, \newcite{li-etal-2018-one} and \newcit
 
 \section{Conclusion and outlook \label{sec:conclusion}}
 \fyDone{Write conclusions}\fyFuture{no mixture of experts}
-In this study, we have carefully reconsidered the idea of multi-domain machine translation, which seems to be taken for granted in many recent studies. We have spelled out the various motivations for building such systems and the associated expectations in terms of system performance. We have then designed a series of requirements that MDMT systems should meet, and proposed a series of test procedures. In our experiments with a representative sample of MDMTs, we have found that most requirements were hardly met for our experimental conditions. If MDMT systems are able to outperform the mixed-domain baseline, at least for some domains, they all fall short to match the performance of fine-tuning on each individual domain, which remains the best choice in multi-source single domain adaptation. In this scenario, architecture-based strategies aimed at parameter sharing and/or representation normalization obtain the best results. \fyDone{Mitigate this}
+In this study, we have carefully reconsidered the idea of multi-domain machine translation, which seems to be taken for granted in many recent studies. We have spelled out the various motivations for building such systems and the associated expectations in terms of system performance. We have then designed a series of requirements that MDMT systems should meet, and proposed a series of test procedures. In our experiments with a representative sample of MDMTs, we have found that most requirements were hardly met for our experimental conditions. If MDMT systems are able to outperform the mixed-domain baseline, at least for some domains, they all fall short to match the performance of fine-tuning on each individual domain, which remains the best choice in multi-source single domain adaptation. In this scenario, architecture-based strategies aimed at parameter sharing and/or representation normalization obtain the best results.\fyDone{Mitigate this}
 As expected however, MDMTs are less brittle than fine-tuning when domain frontiers are uncertain, and can, to a certain extend, dynamically accommodate additional domains, this is especially easy for feature-based methodologies. Our experiments finally suggest that all methods show decreasing performance when the number of domain increases (for a fixed data size).
 
 Two other main conclusions can be drawn from this study: first, it seems that more work is needed to make MDMT systems make the best out of the variety of the available data, both to effectively share what needs to be shared while at the same time separating what needs to be kept separated. We notably see two areas worthy of further explorations: the development of parameter sharing strategies when the number of domains is large; the design of training strategies that can effectively handle a change of the training mixture, including an increase in the number of domains. Both problems are of practical relevance in industrial settings. Second, and maybe more importantly, there is a general need to adopt better evaluation methodologies for evaluating MDMT systems, which require systems developers to clearly spell out the testing conditions and the associated expected distribution of testing instances, and to report more than mere comparisons with simple baselines on a fixed and known handful of domains.
@@ -513,7 +515,7 @@ Two other main conclusions can be drawn from this study: first, it seems that mo
 
 \subsection*{A - Description of multi-domain systems \label{ssec:implementation-details}}
 \revision{%
-The description of model in each MDMT approach is as follows:
+The description of the systems used in this study :
 \begin{itemize}
 \item \system{Mixed-NAT}, \system{FT-full}, \system{TTM}, \system{DC-Tag} use the a medium Transformer model of \cite{Vaswani17attention} with the following settings: embeddings size and hidden layers size are set to~512. Multi-head attention comprises 8 heads in each of the 6 layers; the inner feedforward layer contains 2048 cells. 
 % The gated variant is made of a dense layer, followed by a layer normalization and a sigmoid activation.
