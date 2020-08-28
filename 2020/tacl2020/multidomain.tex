@@ -210,7 +210,7 @@ We randomly select in each corpus a development and a test set of 1,000 lines an
 
 \begin{table*}[htbp]
   \centering
-  \begin{tabular}{|l|rrrrrrr|} %*{4}{|r|}}
+  \begin{tabular}{|l|ccccccc|} %*{4}{|r|}}
     \cline{2-8} 
     %\multicolumn{4}{|l|}{Vocab size - En: 30,165, Fr: 30,398}\\
     \multicolumn{1}{c|}{} & \multicolumn{1}{c}{\domain{med}} & \multicolumn{1}{c}{\domain{law}} & \multicolumn{1}{c}{\domain{bank}} & \multicolumn{1}{c}{\domain{it}} & \multicolumn{1}{c}{\domain{talk}} & \multicolumn{1}{c}{\domain{rel}} & \multicolumn{1}{c|}{\domain{news}} \\
@@ -235,8 +235,9 @@ We measure the distance between domains using the $\mathcal{H}$-Divergence \cite
 Our discriminator is a SVM independently trained for each pair of domains, with sentence representations derived via mean pooling from the source side representation of the generic Transformer model. We used the scikit-learn\footnote{\url{https://scikit-learn.org}} implementation with default values.\fyDone{Inform the classifier details}\fyDone{Insert tableau} Results in Table~\ref{tab:domaindist} show that all domains are well separated from all others, with \domain{rel} being the furthest apart, while \domain{talk} is slightly more central.
 
 \begin{table}\centering
-  \begin{tabular}{|l*{5}{|r}|} \hline
-    & \domain{law} & \domain{bank} & \domain{talk} & \domain{IT} & \domain{rel} \\ \hline
+  \begin{tabular}{|l*{5}{|r}|} 
+  \cline{2-6}
+  \multicolumn{1}{c|}{} & \domain{law} & \domain{bank} & \domain{talk} & \domain{IT} & \domain{rel} \\ \hline
     \domain{med} &1.93 &1.97 &1.9 &1.93 &1.97 \\
     \domain{law}   && 1.94 & 1.97 &1.93 & 1.99 \\
     \domain{bank} &&&1.98 &1.94 &1.99 \\
