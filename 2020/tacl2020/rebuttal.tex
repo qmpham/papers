@@ -106,9 +106,9 @@ As TACL action editor for submission 2327, "Revisiting Multi-Domain Machine Tran
 Please address all comments by the reviewers, paying special attention to the following:
 \begin{itemize}
 \item Address the concern by reviewer~A about the difference between \system{MDL Res} and \system{FT-Block}, and include \system{FT-block} (and ideally \system{FT-Full} also) in the later experiments (5.2.2 and 5.3). \\
-  \textcolor{blue}{The differences between these two systems is explained in our response to reviewer A below, and has lead us to substantially revise section 4.3 where we describe our multi-domain systems. As requested,  \system{FT-Block} has now been included in all the comparative evaluations. }
+  \textcolor{blue}{The difference between these two systems is explained in our response to reviewer~A below and has lead us to substantially revise Section~4.3 where we describe our multi-domain systems. As requested, \system{FT-Block} (now \system{FT-Res}) has now been included in all the comparative evaluations. }
 \item Carefully specify the number of parameters for all models, including the proportions that are domain-specific and domain-independent. \\
-  \textcolor{blue}{These numbers now appear in the revised version of Table 3.}
+  \textcolor{blue}{These numbers now appear in the revised version of Table~3.}
 \item Provide all the experimental details requested, and in particular give enough information to allow the corpora to be reproduced, or (ideally) make them publicly available.\\
   \textcolor{blue}{We have added an appendix devoted to the system details, giving all the necessary information regarding meta-parameter settings and training procedures. The exact split of train / dev / test data used in this study will be distributed together with the final version of the paper.}
 \end{itemize}
@@ -139,7 +139,7 @@ The large number of approaches considered is admirable. However, the depth of th
 \textcolor{red}{%
   We have tried to address these comments in the revised version of the paper. Notably, we have clarified the distinction between \system{FT-block} and \system{MDL Res} (see details below). We have also tried to clarify the distinction between multi-domain MT and fine-tuning; while the former is designed given the (mono-domain) test data distribution, the latter assumes that the test data will be sampled from multiple domains, using domain probabilities that are not known in advance. This raises the issues of robustness with respect to adversarial test distribution and even new domains, two issues that are somewhat irrelevant for DA.
 \newline
-In our experiments, fine-tuned systems share no parameter and show large drops in performance when translating data from the wrong domain (even though this could be somewhat mitigated through regularization, as the reviewer points out). By contrast, the majority of the parameters of our MDMT systems are shared for all domains. Arguably, one could see here a continuum between no parameter sharing and full parameter sharing, with \system{MDL Res} and \system{FT Block} corresponding to some intermediay situation.
+In our experiments, fine-tuned systems share no parameter and show drops in performance when translating data from the wrong domain (even though this could be somewhat mitigated through regularization, as the reviewer points out). By contrast, the majority of the parameters of our MDMT systems are shared for all domains. Arguably, one could see here a continuum between no parameter sharing and full parameter sharing, with \system{MDL-Res} and \system{FT-Block} corresponding to some intermediary situation. Sharing parameters is important when the number of target domains becomes larger.
 }
 \noindent Question to authors:
 \begin{itemize}
