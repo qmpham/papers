@@ -315,7 +315,7 @@ The reference methods included in our experiments are the following:
 
 The two variants of the residual adapter model included in this first round of experiment have presented in Section~\ref{ssec:architecture}: \system{Res-Adap} is the multi-domain version of the approach of \citet{Bapna19simple} based on a two step training procedure; while \system{Res-Adap-MT} is the ``multi-task'' version, where the parameters of the generic model and of the adapter  are learned simultaneously from scratch.
 
-Because of the limit of our computational resources, we restrict our experiments in this section to the En$\rightarrow$Fr task. Results are in Table~\ref{tab:performance-multi}.
+Because of the limit of our computational resources, we restrict the experiments in this section to the En$\rightarrow$Fr task. Results are in Table~\ref{tab:performance-multi}.\fyFuture{Perform experiments for de:en}\fyFuture{Restore results where residual are removed from other paper.}
 
 These results first show that full fine-tuning outperforms all other methods for the in-domain test sets. However, \system{Res-Adap} is able to reduce the gap with this approach for several domains, showing the effectiveness of residual adapters. The ``multi-task'' variant is slightly less effective in our experiments than the basic version, where optimization is performed in two steps. As it turns out, using residual adapters prove here to be much more effective on average than the other reference multi-domain systems; it is also much better than the generic system for translating data from known domains, outperforming the \system{Mixed} system by more than 4 BLEU points in average. Gains are especially large for small domains such as \domain{law} and \domain{rel}.
 
