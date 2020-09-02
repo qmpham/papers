@@ -189,7 +189,7 @@ One obvious benefit of this variant is that it allows us to reuse the hidden vec
 \mpDone{Formalizing problem, network design, training algorithm}
 The basic architecture presented above rests on a rather simplistic view of ``domains'' as made of well-separated and unrelated pieces of texts that are processed independently during adaptation. Likewise, when translating test documents, one needs to make a choice between either using one specific domain-adapted model or resorting to the generic model. In this context, using wrong domain labels can have a strong (negative) on translation performance. 
 
-Therefore, we would like to design a version of applying residual adapter that is more robust to such domains error. This variant, called the \emph{gated residual adapter models}, relies on the training of a supplementary trained component that will help decide whether to activate, on a word per word basis, a given residual layer, and to regulate the strength of this activation. To this end , we extend the highway version of residual adapters as follows.
+Therefore, we would like to design a version of applying residual adapter that is more robust to such domains error. This variant, called the \emph{gated residual adapter models}, relies on the training of a supplementary trained component that will help decide whether to activate, on a word per word basis, a given residual layer, and to regulate the strength of this activation. To this end, we extend the highway version of residual adapters as follows.
 \fyDone{Consistency of notations wrt section 2.1}
 
 Formally, we replace the adapter computation of equation~\eqref{eq:highway-output} and take the adapted hidden (topmost) layer to be computed as (this is for domain $k$):
@@ -387,7 +387,6 @@ To also evaluate the robustness with respect to out-of-domain examples, we perfo
 A first observation is that for domains seen in training, our variants \system{Res-Adap-HW} and \system{Res-Adap-Gated} achieve BLEU scores that are on a par to those of the original version (\system{Res-Adap}), with insignificant variations across test sets. \fyFuture{Comment on processing time}
 
 The two other settings are instructive in several ways: they first clearly illustrate that the brittleness of domain-adapted systems, for which large drops in performance (more than 15 BLEU points on average) are observed when the domain label is randomly chosen. Our gated variant however proves much more robust than the other adaptation strategy, and performs almost on par to the generic system for that test condition. The same trend holds for the unseen \domain{news} domain, with \system{Res-Adap-Gated} being the best domain adapted system in our set, outperforming the other variants by about 2 BLEU points.
-
 % The phenomenon of Catastrophic Forgetting manifests clearly in this situation where the performance of all multi-domain systems drops dramatically by approximately 10 points BLEU compared to generic model \system{Mixed}. Our proposed model \system{FT-Gate-Block} maintains equivalent performance to the generic model in \system{RND} thanks to the application of adaptive weight on the output of the residual adapter. \system{FT-Gate-Block} avoids relying on the residual adapters when predicting examples that come from domain far from the domain of the adapters. 
 
 % In the new domain test \domain{news}, generic model outperforms other systems. Finetuning systems including \system{FT-Full}, \system{Res-Adap} and \system{FT-HW-Block} underperforms generic model by large margin. More regularized variants including \system{FT-Full-UEW}, and \system{FT-Gate-Block} are able to reduce the gap of performance compared to generic.
@@ -415,7 +414,6 @@ The two other settings are instructive in several ways: they first clearly illus
   \label{tab:performance-random}
 \end{table*}
 \fyFuture{Computation time should also report the time it takes for the complete tuning process, not one iteration which will be more or less the same}.
-
 \section{Related Work \label{sec:related}}
 \mpDone{related work}
 

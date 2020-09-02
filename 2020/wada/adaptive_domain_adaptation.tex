@@ -107,7 +107,7 @@ We consider a generic encoder-decoder architecture for a multi-domain sequence t
 \label{fig:hrl-architecture}
 \end{figure}
 
- A ``gated'' version uses $h' = h + a_k(h) \odot{} z_k(h)$\footnote{Or $a_k(h) = \sum_{l} a_{kl}(h)$, where the summation runs over layers, see Figure~\ref{fig:architecture}} \fyDone{$a_k(h)=$ somme tous les composants résiduels} where $z_k$ is a function of $h$ taking values in $[0,1]$. More precisely, $h$ and $h'$ are sequences of context vectors and the combination is performed element-wise, yielding:\fyDone{pourquoi pas gating: $(1-a_k(h(w))*hh(w)$ ? Notation mult. component wise ?}
+ A ``gated'' version uses $h' = h + a_k(h) \odot{} z_k(h)$\footnote{Or $a_k(h) = \sum_{l} a_{kl}(h)$, where the summation runs over layers, see Figure~\ref{fig:hrl-architecture}} \fyDone{$a_k(h)=$ somme tous les composants résiduels} where $z_k$ is a function of $h$ taking values in $[0,1]$. More precisely, $h$ and $h'$ are sequences of context vectors and the combination is performed element-wise, yielding:\fyDone{pourquoi pas gating: $(1-a_k(h(w))*hh(w)$ ? Notation mult. component wise ?}
 
 \begin{equation}
    \forall t \in [1 \dots{} T], h'(w_t) = h(w_t) + a_k(h(w_t)) \odot{} z_k(h(w_t)). \label{eq:gated-residual}
@@ -135,6 +135,7 @@ The training process comprises three main steps:
   \begin{align}
     h_{dec}(w^{tgt}_t)=Dec(x, y_{i<t})(w^{tgt}_t)  z^{dec}_k(w^{tgt}_t) = p(d=k| h_{dec}(w^{tgt}_t))
   \end{align}
+  Where x is source sentence, y is target sentence, $x=\lbrace w^{src}_0,..,w^{src}_{T_0}\rbrace$, $y=\lbrace w^{tgt}_0,..,w^{tgt}_{T_1} \rbrace$
   
 \item Training the parameters of adapters with in-domain data separately for each domain while freezing the parameters of the generic model and of the domain classifiers.
 \end{enumerate}
@@ -240,9 +241,6 @@ $$ \mathbf{1}_{\mathbf{\Omega_{k,p_{0}}^{c}}}(h) \leq \frac{p_k(h)}{p_0} $$
 Combining inequalities \ref{eq:4} and \ref{eq:5} we obtain the risk in general case of the adapted model $(M,a_k)$ $$R(M,a_k) \leq R + A * \frac{\mathbb{\varepsilon}_{insep}^k + \gamma}{p_0} + P(d=k)R_k$$
 
 If we consider the original version of the residual adapter, with the same assumption in the regularization of the adapter, the bound of the risk of translating out-of-domain (the second term in the inequality above) is only $A$ (the bound of loss function). By using an adaptive version, we reduce A by factor $\frac{p_0}{\epsilon^k_{insep}+\gamma}$, which is high if we choose $p_0$ is high enough, the domains are distant in the fixed representation space and the classifier is good enough. 
-
-Furthermore $ \varepsilon^k_{insep} < \varepsilon_{insep} $ which is the minimum of the error expectation over the hypothesis space of the classifier. With a trivial prediction $[\frac{1}{K},..,\frac{1}{K}]$ we have an error expectation equal to $0.5$. Therefore, $\varepsilon_{insep} \leq 0.5$, i.e, $\varepsilon_{insep}(k) < 0.5$.\fyTodo{Je ne comprends pas.} In the worst case where domains in the mixture are very close, we are still able to reduce the risk of predicting out-of-domain examples by a factor of 2.
-\fyTodo{I sort of buy the equations but then so what ? We should may be compare with non-adaptive ?}
 
 \end{document}
 

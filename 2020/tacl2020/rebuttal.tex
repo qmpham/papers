@@ -140,7 +140,7 @@ The large number of approaches considered is admirable. However, the depth of th
 \\
 \textcolor{red}{%
   We have tried to address these commentaries in the revised version of the paper. Notably, we have clarified the distinction between \system{FT-block} and \system{MDL Res} (see details below). We have also tried to clarify the distinction between multi-domain MT and fine-tuning; while the former is designed with an a priori knowledge that the test data is sampled from a single domain, the latter assumes that the test data will be sampled from multiple domains, using domain probabilities that are not known a priori. This raises the issues of robustness wrt to adversarial test distribution and even new domains, two issues that are somewhat irrelevant for DA.
-
+\\
 In our experiments, fine-tuned systems share no parameter and show large drops in performance when translating data from the wrong domain (even though this could be somewhat mitigated through regularization, as the reviewer points out). By contrast, the majority of the parameters of our MDMT systems are shared for all domains. Arguably, one could see here a continuum between no parameter sharing and full parameter sharing, with \system{MDL Res} and \system{FT Block} corresponding to some intermediay situation. 
 }
 \noindent Question to authors:
