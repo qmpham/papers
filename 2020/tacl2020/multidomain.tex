@@ -277,7 +277,7 @@ Our comparison of multi-domain systems includes our own reimplementations of rec
   % In a variant (\system{MDL Gated}), we use a gating mechanism to merge computations using the the adapter modules and with those that don not.
 % the entire multi-domain system from scratch.\fyDone{Check this.}
 \end{itemize}
-\revision{This list includes systems that slightly depart from our definition of MDMT: standard implementations of \system{TTM} and \system{WDCMT} rely on infered, rather than on gold, domain tags - which must somewhat affect their predictions; \system{DM} and {ADM} make no use of domain tags at all.} We however did not consider the proposal of \cite{Farajian17multidomain} which performs on-the-fly tuning for each test sentence and diverges more strongly from our notion of MDMT. % and should be able to handle available domain labels in training and testing.
+\revision{This list includes systems that slightly depart from our definition of MDMT: standard implementations of \system{TTM} and \system{WDCMT} rely on infered, rather than on gold, domain tags - which must somewhat affect their predictions; \system{DM} and \system{ADM} make no use of domain tags at all.} We however did not consider the proposal of \cite{Farajian17multidomain} which performs on-the-fly tuning for each test sentence and diverges more strongly from our notion of MDMT. % and should be able to handle available domain labels in training and testing.
 % This system has shown to meet several of requirements and would also have no problem scaling to a large number of domains.\fyDone{TBC}
 
 \section{Results and discussion \label{sec:results}}
@@ -355,7 +355,7 @@ In the \textsl{merge} experiment, we merge two corpora in training, in order to 
     \hline
   \end{tabular}
   \caption{Translation performance with variable domain definitions. In the Split/Merge experiments, we report BLEU differences for the related test set(s). Underline denotes significant loss when domains are changed wrt.\ the baseline situation; bold for a significant improvement over \system{FT-Full}; (*) tags systems ignoring test domains.
-    \fyDone{Check wrong and significance of diff for ``old''}\fyDone{How about wrong ?}\jcTodo{FTres results are odd... split LAW 0.5}
+    \fyDone{Check wrong and significance of diff for ``old''}\fyDone{How about wrong ?}\jcDone{FTres results are odd... split LAW 0.5}
   }
   \label{tab:redomains}
 \end{table*}
@@ -450,7 +450,7 @@ In this section, we experiment with automatic domains, obtained by clustering se
 10 small&29.3k&68.3&70.0&70.7&\bf 71.2&70.6&53.1&67.3&69.8&67.0&70.2\\
 10 mid&104.7k&44.8&\bf 48.0&46.0&45.7&44.8&44.3&44.5&43.7&41.6&44.5\\
 10 large&251.1k&50.4&\bf 52.9&52.0&51.3&49.6&43.2&49.1&48.5&44.3&49.5\\
-Avg& &128.4k&\bf 51.3&\bf 51.3&50.9&50.9&43.4&50.0&49.4&46.7&50.29 \\ \hline
+Avg&128.4k&54.5&\bf 57.0&56.2&56.1&55.0&46.9&53.6&54.0&51.0&54.7\\ \hline
   \end{tabular}
    \caption{BLEU scores computed by merging the 10 smaller, medium, and larger cluster test sets. Best score for each group is in boldface. For the small clusters, full-fine tuning is outperformed by several MDMT systems - see details in Appendix~B.}
    \label{tab:avg_automatic_domains}}
@@ -592,7 +592,7 @@ as in \cite{Vaswani17attention}. For the fine-tuning procedures used for \system
 }
 \subsection*{B - Experiments with automatic domains \label{ssec:full-automatic}}
 \revision{
-  This experiment aims to simulate with automatic domains a scenario where the number of ``domains'' is large and where some ``domains'' are close and can effectively share information. Full results in Table~\ref{tab:automatic_domains}. Cluster size vary from approximately 8k sentences (cluster~24) up to more than 350k sentences. More than 2/3 of these clusters comprise mostly texts from one single domain, as for cluster 12 which is predominantly \domain{med}, the remaining clusters typically mix 2 domains. Fine-tuning with small domains is often outperformed by other MDMT technique, an issue that a better regularization strategy might mitigate. Domain-control (\system{dc feat}) is very effective for small domains, but again less so in larger data conditions. Among the MD models, approaches using residual adapters have the best average performance.}
+  This experiment aims to simulate with automatic domains a scenario where the number of ``domains'' is large and where some ``domains'' are close and can effectively share information. Full results in Table~\ref{tab:automatic_domains}. Cluster size vary from approximately 8k sentences (cluster~24) up to more than 350k sentences. More than 2/3 of these clusters comprise mostly texts from one single domain, as for cluster 12 which is predominantly \domain{med}, the remaining clusters typically mix 2 domains. Fine-tuning with small domains is often outperformed by other MDMT technique, an issue that a better regularization strategy might mitigate. Domain-control (\system{DC-Feat}) is very effective for small domains, but again less so in larger data conditions. Among the MD models, approaches using residual adapters have the best average performance.}
 
 \clearpage{}
 
