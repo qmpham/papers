@@ -116,7 +116,7 @@ Please address all comments by the reviewers, paying special attention to the fo
 You are allowed one to two extra pages of content to accommodate these revisions. To submit your revised version, follow the instructions in the "Revision and Resubmission Policy for TACL Submissions" section of the
 Author Guidelines at \url{https://transacl.org/ojs/index.php/tacl/about/submissions\#authorGuidelines}.
 
-\textcolor{blue}{We have joint to this mail two versions of the revised paper: one where the main changes appear in red, and the appendix is placed before the references so has to highlight the differences with the first version; one version that looks like a regular submission. We hope that this will make it easier for reviewers to view the differences with the first version of the paper.}
+\textcolor{blue}{We have joint to this mail two versions of the revised paper: one version where the main changes appear in red, and the appendix is placed before the references so as to highlight the differences with the first version; one version that looks like a regular submission, with the appendix following the references. We hope that this will make it easier for reviewers to view the differences with the first version of the paper.}
 
 Thank you for submitting to TACL, and I look forward to your revised version! \\[2\parskip]
 
@@ -136,7 +136,7 @@ between a single system and multiple systems gets fuzzy here, and I see no clear
 \\
 The large number of approaches considered is admirable. However, the depth of the discussion suffers as a consequence, and the paper risks making over-general statements about the weaknesses of different approaches, despite related work that has already addressed them. The authors conclude that fine-tuning "incurs large losses [when applied on] the small data condition", and fails to deteriorate gracefully in the presence of tag errors, issues that have been addressed by Miceli Barone et al. (2017) and Thompson et al. (2019), respectively. Similarly, the negative impact of adding data from a "new" domain seems slightly overblown. Firstly, this is probably highly dependent on data mixtures, length of training and regularization strategies, so I'd be wary of drawing general conclusions from a single set of experiments. Secondly, when looking at the models where such a performance deterioration is said to happen (\system{DC-Tag}, \system{TTM}, \system{ADM}; lines 770-771), this deterioration is actually small or non-existent when comparing table 3 and table 5 averages (-0.2 BLEU for \system{DC-Tag}; -0.3 BLEU for \system{TTM}; +0.9 BLEU for \system{ADM}).
 \\
-\textcolor{red}{%
+\textcolor{blue}{%
   We have tried to address these comments in the revised version of the paper. Notably, we have clarified the distinction between \system{FT-block} and \system{MDL Res} (see details below). We have also tried to clarify the distinction between multi-domain MT and fine-tuning; while the former is designed given the (mono-domain) test data distribution, the latter assumes that the test data will be sampled from multiple domains, using domain probabilities that are not known in advance. This raises the issues of robustness with respect to adversarial test distribution and even new domains, two issues that are somewhat irrelevant for DA.
 \newline
 In our experiments, fine-tuned systems share no parameter and show drops in performance when translating data from the wrong domain (even though this could be somewhat mitigated through regularization, as the reviewer points out). By contrast, the majority of the parameters of our MDMT systems are shared for all domains. Arguably, one could see here a continuum between no parameter sharing and full parameter sharing, with \system{MDL-Res} and \system{FT-Block} corresponding to some intermediary situation. Sharing parameters is important when the number of target domains becomes larger.
@@ -145,14 +145,14 @@ In our experiments, fine-tuned systems share no parameter and show drops in perf
 \begin{itemize}
 \item can you describe in more detail the differences between \system{FT-Block} and \system{MDL Res}, apart from the fact that the former is fine-tuned from a generic model, the latter trained from scratch~?
   \\
-  \textcolor{red}{%
+  \textcolor{blue}{%
     The two methods use the same architecture composed of one standard Transformer model extended with domain adapters following the design of \cite{Bapna19simple}. As the reviewer correctly points out, the only difference between \system{FT-block} and \system{MDL Res} is their training process and training data distribution.
     \\
     To train \system{FT-block}, we plug residual adapters to the output of each self-attention layer of the generic model Mixed-NAT, then resume the training with the learning rate attained at the end of the training the generic model while freezing all of the other parameters of the model \system{Mixed-NAT}. For this step, we only use only the in-domain data, as we do during the full-tuning procedure.
     \\
     To train MDL res, we optimize the parameters of the Transformer model and the parameters of the residual adapters from scratch. More precisely, to create a training batch, we randomly pick a domain with a probability equal to the proportion of the domain in training data, then sample a batch from the corresponding corpus. Given a batch from domain $i$, we simultaneously optimize the parameters of Transformer model and the parameters of the residual adapters for that domain.
     \\
-    We understand that our naming schemes was insisting on training procedures, rather than on architectures, thus possibly introducing some confusions. We have accordingly changed the name of \system{FT-Block} to \system{FT Res}, clarified the description of the two systems (see lines~527-541\fyTodo{fix this}), and reported \system{FT-Res}\fyDone{or new name} as another multi-domain system in all tables.\fyTodo{Make sure it is the case}.}
+    We understand that our naming schemes was insisting on training procedures, rather than on architectures, thus possibly introducing some confusions. We have accordingly changed the name of \system{FT-Block} to \system{FT-Res}, clarified the description of the two systems (see lines~527-541\fyDone{fix this}), and reported \system{FT-Res}\fyDone{or new name} as another multi-domain system in all tables.\fyDone{Make sure it is the case}.}
   %}
 \end{itemize}
 
@@ -160,10 +160,10 @@ In our experiments, fine-tuned systems share no parameter and show drops in perf
 \begin{itemize}
 \item I disagree that generalization to unseen domains is similar to zero-shot multilingual MT. In zero-shot multilingual MT, both the source and target distribution have been observed at training time, just paired with other languages. In the generalization to unseen domains, there may be characteristics in the data that were never seen in the training data, including new vocabulary (in the source text, target text, or both).
   \\
-  \textcolor{blue}{We agree with the reviewer that the analogy is misleading. As this is not central to our discussion, we have rephrased and dropped the comparison. See changes in line~216-220}\fyTodo{Changes line in.}
+  \textcolor{blue}{We agree with the reviewer that the analogy is misleading. As this is not central to our discussion, we have rephrased and dropped the comparison. See changes in line~216-220}\fyDone{Changes line in.}
 \item 567-568: "having the domain tag on the source is better than on the target". I assume this refers to the comparison of "DC-Tag" and "TTM". However, TTM actually uses the predicted domain label on the target side and could perform better with forced decoding of the gold domain label. More precisely, the statement should be that "having the gold tag is better than a predicted tag", but this is hardly surprising.
   \\
-  \textcolor{blue}{We agree that the conclusion is not really fair for "TTM" because "TTM" intend to predict domain label rather than to use gold domain label and TTM could definitively translate with gold domain label as prefix of each hypothesis. In our experiments, we found that TTM is pretty accurate in its prediction, making about 2\% errors in the predicted tags, which may explain the small difference with observe in Table~3. We have rephrased acccordingly in lines~542-544, 550-551, 580-582.}\fyTodo{Add lines}
+  \textcolor{blue}{We agree that the conclusion is not really fair for "TTM" because "TTM" intend to predict domain label rather than to use gold domain label and TTM could definitively translate with gold domain label as prefix of each hypothesis. In our experiments, we found that TTM is pretty accurate in its prediction, making about 2\% errors in the predicted tags, which may explain the small difference with observe in Table~3. We have rephrased acccordingly in lines~542-544, 550-551, 580-582.}\fyDone{Add lines}
 \end{itemize}
 
 \section*{Reviewer B}
@@ -178,26 +178,26 @@ I have a few comments:
 \\
 \begin{itemize}
 \item[*] You provide some useful experimental results on various MDMT approaches. To benefit from your results, we need access to the same segmentation of train/dev/test sets that I hope you will provide to the community.
-\textcolor{blue}{Supplementary details regarding the settings used in our experiments have been added in a new Appendix A.\fyTodo{Fix the appendix.}. We will also distribute the detailed composition of our train / dev / test split upon acceptance of the paper.}
+\textcolor{blue}{Supplementary details regarding the settings used in our experiments have been added in a new Appendix A.\fyDone{Fix the appendix.}. We will also distribute the detailed composition of our train / dev / test split upon acceptance of the paper.}
 \\
 \item[*] On your discussion on the number of parameters (L. 591), could you share the number of parameters per each MDMT approach~? It will be helpful to see  the impact of the number of parameters on the MT results.
-  \textcolor{blue}{This information has been added in Table~3 lines~614-617 \fyTodo{Check number, page and line number and content}.}
+  \textcolor{blue}{This information has been added in Table~3\fyDone{Check number, page and line number and content}.}
 \\ 
-\item[*] Thinking about your seven operational requirements, I wonder if you could also define a domain or the minimum number of samples to specify a domain. I like your selections of domains that you include multiple domains with varying sizes, but what we expect in extreme cases. Having your Split experiments on REL (Table 4), or providing further details on your last analysis in Section 5.3, if you have tiny clusters could help.\fyTodo{Answer this with more experiments ?}
+\item[*] Thinking about your seven operational requirements, I wonder if you could also define a domain or the minimum number of samples to specify a domain. I like your selections of domains that you include multiple domains with varying sizes, but what we expect in extreme cases. Having your Split experiments on \domain{REL} (Table~4), or providing further details on your last analysis in Section 5.3, if you have tiny clusters could help.\fyDone{Answer this with more experiments ?}
   \\
-  \textcolor{blue}{We agree that carefully analyzing the effects of using corpora of varying size is important, as this corresponds to practical training scenario. From our results in Table 7 (and Table 8 in Appendix B), we see that some techniques can work well with small in-domain corpora. However, this analysis must also take in account the similarity between domains, as these improvements will be stronger if similar or related data are also present in the training mixture -- a situation that we have artificially created in our split conditions. Precisely sorting out these two effects is beyond the scope of this study and left for future work.}
+  \textcolor{blue}{We agree that carefully analyzing the effects of using corpora of varying size is important, as this corresponds to practical training scenario. From our results in a new Table 6 (and Table 8 in Appendix B), we see that some techniques can work well with small in-domain corpora. However, this analysis must also take in account the similarity between domains, as these improvements will be stronger if similar or related data are also present in the training mixture -- a situation that we have artificially created in our split conditions. Precisely sorting out these two effects is beyond the scope of this study and left for future work.}
   
 \item[*] Please define Lambda coefficients in lines 142 and 146.
 \\
-\textcolor{blue}{We formalize the data distribution as a mixture of several in-domain distribution. $\lambda$ correspond to the mixing weights, that also define the prior distribution on domains. We hypothesize that training distribution is different from testing distribution, so we have need notation for two different mixtures. This has been clarified in the text (see line~143-144) \fyTodo{add lines}}
+\textcolor{blue}{We formalize the data distribution as a mixture of several in-domain distribution. $\lambda$ correspond to the mixing weights, that also define the prior distribution on domains. We hypothesize that training distribution is different from testing distribution, so we have need notation for two different mixtures. This has been clarified in the text (see line~143-144) \fyDone{add lines}}
 \\
 \item[*] On dynamically changing the number of training and test domains, there is a new related work published recently that might worth citing it: Sharaf A, Hassan H, Daumé III H. Meta-Learning for Few-Shot NMT Adaptation.
 \\
-\textcolor{blue}{This reference has been added to the related work section.}\fyTodo{Add citation}
+\textcolor{blue}{This reference has been added to the related work section.}\fyDone{Add citation}
 \\
 \item[*] I’d prefer to see the number of running words in Table~1, especially when the batch size is given as the number of tokens (L. 485).
   \\
-  \textcolor{blue}{The table has been updated accordingly.}\fyTodo{to report number of tokens of the datasets}
+  \textcolor{blue}{The table has been updated accordingly.}\fyDone{to report number of tokens of the datasets}
 \\
 \item[*] L. 503: It seems you refer to this method as LDR in the rest of the paper. Please make them consistent.
 \\
@@ -205,7 +205,7 @@ I have a few comments:
 \\
 \item[*] L. 576: Although you describe in footnote 11, it is better to mention that you compare WDCMT results with Mixed-NAT-RNN explicitly.
 \\
-\textcolor{blue}{This has been added in the text (see line~586-587 ).}\fyTodo{to explicitly compare WDCNMT with Mixed-NAT-RNN. This is in the legend - change presentations ?}
+\textcolor{blue}{This has been added in the text (see line~586-587 ).}\fyDone{to explicitly compare WDCNMT with Mixed-NAT-RNN. This is in the legend - change presentations ?}
 \\
 \item[*] L. 681-683: I don’t see it as a failure, and I think it is a property (requirement) as you describe in the definition of [P4-ERR], we expect deterioration in the presence of tag error. Am I right?
 \\
@@ -213,7 +213,7 @@ I have a few comments:
 
 \item[*] L. 687: Please describe how you predict the domain tag, and please share the tag prediction error rate on each domain test set. It is helpful to see the amount and the impact of the error on MDMT results.
 \\
-\textcolor{blue}{We train a language model in source language for each domain using the corresponding training corpus. To predict the domain tag of a sentence, we compute the probability of the sentence according to each pretrained language model and choose the domain having the highest probability as the domain tag for that sentence. Note that this classifier is only used for the \domain{news} test data. This is now explained in footnote lines~739-743.}\fyTodo{to compute error rate of domain prediction over each test set, check comment, add footnote number.}
+\textcolor{blue}{We train a language model in source language for each domain using the corresponding training corpus. To predict the domain tag of a sentence, we compute the probability of the sentence according to each pretrained language model and choose the domain having the highest probability as the domain tag for that sentence. Note that this classifier is only used for the \domain{news} test data. This is now explained in footnote lines~739-743.}\fyDone{to compute error rate of domain prediction over each test set, check comment, add footnote number.}
 \end{itemize}
 
 \section*{Reviewer D}
@@ -231,11 +231,11 @@ Let me nevertheless formulate a few questions or points of criticism:
 \item I'd like to see some analysis of vocabulary coverages (such as
 cross-domain OOV rates), and of "seen errors" and "new sense errors" as defined by Irvine et al. in "Measuring machine translation errors in new domains" (TACL 2013).
 \\
-\textcolor{blue}{Table~1 now contains the number of types as well as the number of types that are unique in a domain. We fill that performing an error analysis for each of the system / domain compared in this study would require us to focus more on a detailled analysis of each system, while our main goal is to propose new ways to assess the actual abilities of existing MDMT systems.}\fyTodo{Will this be enough ?}
+\textcolor{blue}{Table~1 now contains the number of types as well as the number of types that are unique in a domain. We fill that performing an error analysis for each of the system / domain compared in this study would require us to focus more on a detailled analysis of each system, while our main goal is to propose new ways to assess the actual abilities of existing MDMT systems.}\fyDone{Will this be enough ?}
 \\
 \item Maybe the (possible) effect of early stopping (and the choice of the validation set) should be discussed~? E.g., the validation set for finetuning can originate from one single domain for each finetuned model. The way you're doing early stopping may even have had an impact on the results in Table 5. Is your validation set always a concatenation of 1000 lines from the six domains, without NEWS~? Are you actually always training until the early stopping criterion is reached, and are you then using the model from the best checkpoint? (There are contradictory statements in the paper about "50,000  additional iterations" (?) for the experiments in Table 5.)
 \\
-\textcolor{red}{For each domain, we create train/dev/test sets by randomly splitting each corpus. We maintain the size of validation sets and of test sets equal to 1,000 lines for every domain. In Tables 3 and 4, to train MDMT systems (except FT-full and FT Res), we use a validation set which is a concatenation of the 6 validation sets of 6 domains. In Table 5, to train MDMT systems (except \system{FT-Full} and \system{FT Res}) we append the validation set of \domain{news} to the concatenation of 6 validation sets. To train \system{FT-full} and \system{FT Res} model we only use the in-domain validation sets. We stop training if either the training iteration reach the maximal number of iterations or the score on the validation set does not increase in 3 consecutive evaluations. We average 5 checkpoints preceding the best checkpoint to get the final model. All these details are in Appendix B}\fyDone{up to the best ?}
+\textcolor{blue}{For each domain, we create train/dev/test sets by randomly splitting each corpus. We maintain the size of validation sets and of test sets equal to 1,000 lines for every domain. In Tables 3 and 4, to train MDMT systems (except FT-full and FT Res), we use a validation set which is a concatenation of the 6 validation sets of 6 domains. In Table 5, to train MDMT systems (except \system{FT-Full} and \system{FT Res}) we append the validation set of \domain{news} to the concatenation of 6 validation sets. To train \system{FT-full} and \system{FT Res} model we only use the in-domain validation sets. We stop training if either the training iteration reach the maximal number of iterations or the score on the validation set does not increase in 3 consecutive evaluations. We average 5 checkpoints preceding the best checkpoint to get the final model. All these details are in Appendix B}\fyDone{up to the best ?}
 \\
 \item Report the learning rate. Is it decreased for finetuning?
 \\
@@ -259,7 +259,7 @@ cross-domain OOV rates), and of "seen errors" and "new sense errors" as defined 
 \\
 \item Wasn't it possible to use standard test sets? The "REL" Bleu scores are suspiciously high and there might be considerable redundancy in the data, or rather: training data contaminated with test data. (Since duplicates are possible, have you verified that the test sentences don't still appear in the remaining training data?)
 \\
-\textcolor{blue}{There are standard test sets for some domains such as medical, IT, news and talk, but we could not find any standard test sets for the other domains including religion, law and bank. We carefully removed every duplicate sentence in all the corpora. In our opinion, the reason why the models achieve extremely high scores in the \domain{rel} domain is because texts in this domain is very repetitive and often predictable.}\fyTodo{sentence length ?, diversity index of vocab ?}
+\textcolor{blue}{There are standard test sets for some domains such as medical, IT, news and talk, but we could not find any standard test sets for the other domains including religion, law and bank. We carefully removed every duplicate sentence in all the corpora. In our opinion, the reason why the models achieve extremely high scores in the \domain{rel} domain is because texts in this domain is very repetitive and often predictable.}\fyDone{sentence length ?, diversity index of vocab ?}
 \end{itemize}
 
 Other (minor) remarks:
@@ -267,7 +267,7 @@ Other (minor) remarks:
 \begin{itemize}
 \item From the UFAL medical corpus, please say that you're using the indomain sections only (which is mostly PatTR Medical).
 \\
-\textcolor{blue}{From the UFAL medical corpus of the language pair En-Fr, we select only sentences in categories including EMEA, ParTR, CESTA, ECDC. This is now mentioned in the text (lines~396-397)}\fyTodo{Add lines num}
+\textcolor{blue}{From the UFAL medical corpus of the language pair En-Fr, we select only sentences in categories including EMEA, ParTR, CESTA, ECDC. This is now mentioned in the text (lines~396-397)}\fyDone{Add lines num}
 \\
 \item The \system{DC-Feat} and \system{DC-Tag} lines in Table 5 should be swapped in order to be in line with Tables 3 and 4.
   \\
