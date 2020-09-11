@@ -167,7 +167,7 @@ An alternative scheme is \emph{layer regularization}, which penalizes the output
   \end{split}
 \end{equation*}
 
-Finally, another independant design choice relates to the training strategy for adapters. A first option is to generalize supervised domain adaptation to multi-domain adaptation and to proceed in two steps: (a) train a generic model with all the available data; (b) train each adapter layer with domain-specific data, keeping the generic model parameters unchanged. Another strategy is to adopt the view of \citet{Dredze08online}, where the multi-domain setting is viewed as an instance of multi-task learning \cite{Caruana97multitask} with each domain corresponding to a specific task. This suggest to train all the parameters from scratch, as we would do in a multi-task mode. The generic parameters will still depend on all the available data, while each adapter will only be trained with the corresponding in-domain data.\fyFuture{Does everyone need a domain?}
+Finally, another independant design choice relates to the training strategy for adapters. A first option is to generalize supervised domain adaptation to multi-domain adaptation and to proceed in two steps: (a) train a generic model with all the available data; (b) train each adapter layer with domain-specific data, keeping the generic model parameters unchanged. Another strategy is to adopt the view of \citet{Dredze08online}, where the multi-domain setting is viewed as an instance of multi-task learning \cite{Caruana97multitask} with each domain corresponding to a specific task. This suggest to train all the parameters from scratch, as we would do in a multi-task mode. The generic parameters will still depend on all the available data, while each adapter will only be trained with the corresponding in-domain data.\fyFuture{Does everyone need a domain? Do we need this discussion - talk about sentence level adaptation, better classifier pour MDL}
 
 \subsection{Highway Residual Adapters \label{ssec:highway}}
 
@@ -204,7 +204,7 @@ Training gated residual adapters thus comprises three steps, instead of two for 
 \item train a domain classifier on top of the encoder and decoder; during this step, the parameters of the generic model are frozen. This model computes the posterior domain probability $P(k|h^L[t])$ for each word $w_t$, based on the representation computed by the last layer.
 \item train the parameters of adapters with in-domain data separately for each domain, while freezing all the other parameters.
 \end{enumerate}
-\fyFuture{is this classifier important, can we train with the rest of the system ?}
+\fyFuture{is this classifier important, can we train with the rest of the system ? Yes we could, but do we want the encoder to be good at classification?}\fyFuture{Check writing to indicate label smoothing for this has been used.}\fyFuture{Can we train a more complex training model ? should we us emore monolingual data ? etc} 
 
 \section{Experimental settings \label{sec:exp}}
 
@@ -306,6 +306,7 @@ The reference methods included in our experiments are the following:
     \hline
     \system{Res-Adap}         & 37.3 & 57.9 & 53.9 & 33.8 & 46.7 & 90.2 & 53.3 \\ 
     \system{Res-Adap-MT}  & 37.9 & 56.0 & 51.2  & 33.5 & 44.4 & 88.3 & 51.9 \\
+    %  \hfill MDL Res (gen)    & 37.7 & 51.0 & 34.0 & 30.4 & 34.2 & 15.2 & 36.4 & 33.7\\
     \hline
   \end{tabular}
   \caption{Baseline translation performance of various multi-domain MT systems (En$\rightarrow$Fr).}
@@ -325,7 +326,7 @@ Tables~\ref{tab:performance-en-fr-pos-reg} and \ref{tab:performance-en-de-pos-re
    %    However, \system{FT-full} still remains the best model for all test domains.
 \fyFuture{Full FT for en->DE ? }
 
-By varying the number and position of residual adapters (see Section~\ref{ssec:architecture}), we then contrast several implementation of residual adapters. \fyDone{Fix style here} Because the set of possible configurations is large, we only perform experiments for layers $i= 2, 4, 6$ (both for the encoder and decoder). Two settings are considered: keeping just one adapter, or keeping the three. The trend is the same for the two language directions: suppressing adapters always hurts the overall performance, albeit by a small margin: having six adapters is better than three, which is better than keeping only one. With only one adapter active, we observe small, unsignificant changes in performance when varying the adapter's depth. Based on these experiments, it seems that adaptation remains useful even for the deeper layers of the architecture.\fyFuture{More configuration ?}
+By varying the number and position of residual adapters (see Section~\ref{ssec:architecture}), we then contrast several implementation of residual adapters. \fyDone{Fix style here} Because the set of possible configurations is large, we only perform experiments for layers $i= 2, 4, 6$ (both for the encoder and decoder). Two settings are considered: keeping just one adapter, or keeping the three. The trend is the same for the two language directions: suppressing adapters always hurts the overall performance, albeit by a small margin: having six adapters is better than three, which is better than keeping only one. With only one adapter active, we observe small, unsignificant changes in performance when varying the adapter's depth. Based on these experiments, it seems that adaptation remains useful even for the deeper layers of the architecture.\fyFuture{More configurations ?}
 
 \begin{table*}[htbp]
   \centering
@@ -369,7 +370,7 @@ By varying the number and position of residual adapters (see Section~\ref{ssec:a
 
 The translation from English into German includes two domains (\domain{tour} and \domain{bank}) that are extremely small and account only for a very small fraction of the training data (respectively for 0.039\% and 0.022\% of the total number of sentences). Fine-tuning on these domains can lead to serious overfitting. We assess two well-known regularization techniques for adapter modules, that could help mitigate this problem: weight decay and layer regularization. 
 
-For each method, the optimal hyper-parameters (weight decay or layer regularization coefficient, see Section~\ref{sssec:design-space}) $\lambda$ by chosen by grid search among a small set of values ($\{ 10^{-3}, 10^{-4}, 10^{-5} \}$).\fyFuture{Better grid}
+For each method, the optimal hyper-parameters (weight decay or layer regularization coefficient, see Section~\ref{sssec:design-space}) $\lambda$ by chosen by grid search among a small set of values ($\{ 10^{-3}, 10^{-4}, 10^{-5} \}$).\fyFuture{Better grid even better EWC.}
 
 Results in Tables~\ref{tab:performance-en-fr-pos-reg} and \ref{tab:performance-en-de-pos-reg} show that regularizing the adapter model can positively affect the test performance for the smallest domains (this is especially clear for weight-decay (\system{Res-Adap-WD}) in En$\rightarrow$De), at the cost however of a small drop in performance for the other domains. Using layer regularization proves here to be comparatively less effective. Finding better ways to set the regularization parameters, for instance by varying $\lambda$ for each domain based on the available supervision data, is left for future work.  
 \fyDone{How is the weight decay parameter set ?}
@@ -382,7 +383,7 @@ We now turn to the evaluation of our new architectural variants: Highway residua
 To also evaluate the robustness with respect to out-of-domain examples, we perform two additional experiments. We first generate translations with erroneous (more precisely: randomly assigned) domain information: the corresponding results appear in Table~\ref{tab:performance-random} under the column \domain{rnd}. We also compute translation for a domain unseen in training (\domain{news}) as follows. For each sentence of this test set, we automatically evaluate the closest domain,\footnote{As measured by the perplexity of a language model trained with only in-domain data.\fyFuture{More on this for reproducibility}.} then use the predicted domain label to compute the translation. This is an error prone process, which also challenges the robustness of our multi-domain systems. Results are in Table~\ref{tab:performance-random}.
 \fyFuture{This is a baseline, and we have not discussed it - keep for next time: We also report model \system{FT-Full-UEW} which is obtained by full-finetuning the generic model using uniform elastic weight to avoid catastrophic forgetting.}
 
-A first observation is that for domains seen in training, our variants \system{Res-Adap-HW} and \system{Res-Adap-Gated} achieve BLEU scores that are on a par to those of the original version (\system{Res-Adap}), with insignificant variations across test sets. \fyFuture{Comment on processing time}
+A first observation is that for domains seen in training, our variants \system{Res-Adap-HW} and \system{Res-Adap-Gated} achieve BLEU scores that are on a par to those of the original version (\system{Res-Adap}), with insignificant variations across test sets. \fyFuture{Comment on processing time.}
 
 The two other settings are instructive in several ways: they first clearly illustrate that the brittleness of domain-adapted systems, for which large drops in performance (more than 15 BLEU points on average) are observed when the domain label is randomly chosen. Our gated variant however proves much more robust than the other adaptation strategy, and performs almost on par to the generic system for that test condition. The same trend holds for the unseen \domain{news} domain, with \system{Res-Adap-Gated} being the best domain adapted system in our set, outperforming the other variants by about 2 BLEU points.
 % The phenomenon of Catastrophic Forgetting manifests clearly in this situation where the performance of all multi-domain systems drops dramatically by approximately 10 points BLEU compared to generic model \system{Mixed}. Our proposed model \system{FT-Gate-Block} maintains equivalent performance to the generic model in \system{RND} thanks to the application of adaptive weight on the output of the residual adapter. \system{FT-Gate-Block} avoids relying on the residual adapters when predicting examples that come from domain far from the domain of the adapters. 
@@ -434,7 +435,7 @@ In this paper, we have performed an experimental study of the residual adapter a
 % without creating lots of domain-specific parameters even though full finetuning still outperforms this method by an important gap in in-domain test sets. For extremely small domains, we are able to reduce the number of adapters incorporated to the NMT model without losing performance, also using Weight-Decay in finetuning over small domains demonstrates significant improvement. The proposed highway variant shows an equivalent performance to the original version of \cite{Bapna19simple} which allows us to process the hidden layer of the NMT model only once. The extended version of the highway residual adapter to gated residual adapter shows the benefit in the robustness against wrong domain prediction and out-of-domain examples. 
 
 \fyFuture{Example of gating ?}
-\fyFuture{Why MDMT does not work well - full train from generic?}
+\fyTodo{Why MDMT does not work well - full train from generic? - add new results}
 \fyFuture{Structured domain? A Bayesian version?}
 \fyFuture{Let the machine decide domains in learning? - domains and their organization - how could it?}
 
