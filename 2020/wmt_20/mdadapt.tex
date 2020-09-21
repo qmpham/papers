@@ -29,6 +29,10 @@
 \usepackage{mathrsfs}
 \newcommand{\R}{\ensuremath{\mathbb{R}}}
 
+\usepackage{footnote}
+\makesavenoteenv{tabular*}
+\makesavenoteenv{table*}
+
 % This is not strictly necessary, and may be commented out,
 % but it will improve the layout of the manuscript,
 % and will typically save some space.Boldface denotes significant gains with respect to \system{Mix-Nat} (or \system{Mix-Nat-RNN}, for WDCMT), underline denotes significant losses.
@@ -204,7 +208,7 @@ Training gated residual adapters thus comprises three steps, instead of two for 
 \item train a domain classifier on top of the encoder and decoder; during this step, the parameters of the generic model are frozen. This model computes the posterior domain probability $P(k|h^L[t])$ for each word $w_t$, based on the representation computed by the last layer.
 \item train the parameters of adapters with in-domain data separately for each domain, while freezing all the other parameters.
 \end{enumerate}
-\fyFuture{is this classifier important, can we train with the rest of the system ? Yes we could, but do we want the encoder to be good at classification?}\fyFuture{Check writing to indicate label smoothing for this has been used.}\fyFuture{Can we train a more complex training model ? should we us emore monolingual data ? etc} 
+\fyFuture{is this classifier important, can we train with the rest of the system ? Yes we could, but do we want the encoder to be good at classification?}\fyFuture{Check writing to indicate label smoothing for this has been used.}\fyFuture{Can we train a more complex training model ? should we use more monolingual data ? etc} 
 
 \section{Experimental settings \label{sec:exp}}
 
@@ -291,7 +295,7 @@ The reference methods included in our experiments are the following:
 
 \begin{table*}[t!]
   \centering
-  \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
+  \begin{tabular}{|p{4.3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Mixed}        & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  &  49.4 \\
@@ -306,6 +310,7 @@ The reference methods included in our experiments are the following:
     \hline
     \system{Res-Adap}         & 37.3 & 57.9 & 53.9 & 33.8 & 46.7 & 90.2 & 53.3 \\ 
     \system{Res-Adap-MT}  & 37.9 & 56.0 & 51.2  & 33.5 & 44.4 & 88.3 & 51.9 \\
+    \system{Res-Adap-MT-ptr\footnote{We initialized shared parameters by values of parameters of \system{mixed} model and train Res-Adap using multi-task learning}} & 37.47 & 57.06 & 52.39 & 33.72 & 46.17 & 89.47 & 52.7 \\
     %  \hfill MDL Res (gen)    & 37.7 & 51.0 & 34.0 & 30.4 & 34.2 & 15.2 & 36.4 & 33.7\\
     \hline
   \end{tabular}
@@ -354,10 +359,11 @@ By varying the number and position of residual adapters (see Section~\ref{ssec:a
     Model / Domain & \multicolumn{1}{c|}{\domain{gov}} & \multicolumn{1}{c|}{\domain{eco}} & \multicolumn{1}{c|}{\domain{tour}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{ med }} & \multicolumn{1}{c|}{\domain{ news}} & \multicolumn{1}{c|}{\domain{avg}} & \multicolumn{1}{c|}{\domain{params}} \\ \hline
     \system{Mixed}          & 29.3 & 30.5 & 17.6 & 38.1 & 47.9 & 20.9  & 30.6 & 213M/0M\\
    \system{Res-Adap}     & 29.6 & 30.4 & 19.2 & 49.0 & 47.2 & 20.6 & 33.1 & 213M/96M \\ \hline
-    \system{Res-Adap$_{(2,4,6)}$} & 29.7  & 30.5 & 18.8 & 49.6 & 47.1 & 20.6 &  32.7 & 213M/48M \\ \hline
+    \system{Res-Adap$_{(2,4,6)}$} & 29.7  & 30.5 & 18.8 & 49.6 & 47.1 & 20.6 &  32.7 & 213M/48M \\ 
     \system{Res-Adap$_{(6)}$}      & 29.5 & 30.4 & 18.1 & 49.1 & 46.9 & 20.4 & 32.4 & 213M/16M \\
-   \system{Res-Adap$_{(4)}$}       & 29.7 & 30.4 & 18.1 & 49.6 & 47.0 & 20.6 & 32.6 & 213/16M\\
+   \system{Res-Adap$_{(4)}$}       & 29.7 & 30.4 & 18.1 & 49.6 & 47.0 & 20.6 & 32.6 & 213M/16M\\
    \system{Res-Adap$_{(2)}$}       & 29.6 & 30.4 & 18.3 & 49.4 & 46.7 & 20.6 & 32.5  & 213M/16M\\
+   \hline
     \system{Res-Adap-WD}         & 29.7 & 30.8 & 20.4 & 50.2 & 47.7 & 20.6 & 33.2 & 213M/96M \\
     \system{Res-Adap-LR}           & 29.6 & 30.4 & 19.2 & 49.0 & 47.2 & 20.6 & 33.1  & 213M/96M\\
     \hline
@@ -396,13 +402,15 @@ The two other settings are instructive in several ways: they first clearly illus
 
 \begin{table*}[htbp]
   \centering
-  \begin{tabular}{|p{3cm}|*{7}{r|}|r|r|} \hline
+  \begin{tabular}{|p{4.8cm}|*{7}{r|}|r|r|} \hline
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c||}{\domain{avg}} & \multicolumn{1}{c|}{\domain{rnd}} & \multicolumn{1}{c|}{\domain{news}} \\ \hline % & \multicolumn{1}{c|}{\domain{PROC}} \\ \hline  
     \system{Mixed}             & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5     &  49.4 & 49.4 & 23.5 \\ %& 34s \\ %
     \system{FT-Full}             & 37.7 & 59.2 & 54.5 & 34.0 & 46.8 & 90.8   & 53.8 & 32.5 & 20.2  \\ %& 34s \\
     \system{Res-Adap}         & 37.3 & 57.9 & 53.9 & 33.8 & 46.7 & 90.2   & 53.3 & 38.4 & 20.5 \\ %& 22s\\ 
     \system{Res-Adap-HW}   & 37.5 & 57.2 & 53.4 & 33.1 & 46.3 & 91.0  & 53.1 & 36.6 & 20.2 \\ %& 19s \\
+    \system{Res-Adap-HW-MT} & 37.4 & 56.4 & 52.1 & 33.7 & 44.8 & 89.8 & 52.4 & 27.1 & 20.4 \\ %&  \\
+    \system{Res-Adap-HW-MT-ptr \footnote{We initialized shared parameters by values of parameters of \system{mixed} model and train Res-Adap-HW using multi-task learning}} & 37.7 & 57 & 52.5 & 33.5 & 46.1 & 89 & 52.6 & 46.5 & 21.4 \\ %&  \\
     \system{Res-Adap-Gate}  & 38.0 & 57.5& 53.0 & 33.5 & 46.0 & 90.1  & 53.0 & 49.0 & 22.5 \\ %& 21s \\
 %    \system{FT-Full-UEW}      & 37.9 & 56.0 & 52.1 & 33.7 & 44.9 & 89.1 &	52.3 & 46.5 & 22.11 \\ %& 34s \\
     \hline
