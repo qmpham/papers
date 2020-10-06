@@ -1475,3 +1475,49 @@ url = {http://papers.nips.cc/paper/8075-adversarial-multiple-source-domain-adapt
     pages = "287--297",
     abstract = "The attention mechanism is a successful technique in modern NLP, especially in tasks like machine translation. The recently proposed network architecture of the \textit{Transformer} is based entirely on attention mechanisms and achieves new state of the art results in neural machine translation, outperforming other sequence-to-sequence models. However, so far not much is known about the internal properties of the model and the representations it learns to achieve that performance. To study this question, we investigate the information that is learned by the attention mechanism in Transformer models with different translation quality. We assess the representations of the encoder by extracting dependency relations based on self-attention weights, we perform four probing tasks to study the amount of syntactic and semantic captured information and we also test attention in a transfer learning scenario. Our analysis sheds light on the relative strengths and weaknesses of the various encoder representations. We observe that specific attention heads mark syntactic dependency relations and we can also confirm that lower layers tend to learn more about syntax while higher layers tend to encode more semantics.",
 }
+
+@InProceedings{houlsby19parameter,
+  title =        {Parameter-Efficient Transfer Learning for {NLP}},
+  author =       {Houlsby, Neil and Giurgiu, Andrei and Jastrzebski, Stanislaw and Morrone, Bruna and De Laroussilhe, Quentin and Gesmundo, Andrea and Attariyan, Mona and Gelly, Sylvain},
+  pages =        {2790--2799},
+  year =         {2019},
+  editor =       {Kamalika Chaudhuri and Ruslan Salakhutdinov},
+  volume =       {97},
+  series =       {Proceedings of Machine Learning Research},
+  address =      {Long Beach, California, USA},
+  month =        {09--15 Jun},
+  publisher =    {PMLR},
+  pdf =          {http://proceedings.mlr.press/v97/houlsby19a/houlsby19a.pdf},
+  url =          {http://proceedings.mlr.press/v97/houlsby19a.html},
+  abstract =     {Fine-tuning large pretrained models is an effective transfer mechanism in NLP. However, in the presence of many downstream tasks, fine-tuning is parameter inefficient: an entire new model is required for every task. As an alternative, we propose transfer with adapter modules. Adapter modules yield a compact and extensible model; they add only a few trainable parameters per task, and new tasks can be added without revisiting previous ones. The parameters of the original network remain fixed, yielding a high degree of parameter sharing. To demonstrate adapter’s effectiveness, we transfer the recently proposed BERT Transformer model to $26$ diverse text classification tasks, including the GLUE benchmark. Adapters attain near state-of-the-art performance, whilst adding only a few parameters per task. On GLUE, we attain within $0.8%$ of the performance of full fine-tuning, adding only $3.6%$ parameters per task. By contrast, fine-tuning trains $100%$ of the parameters per task.}
+}
+
+@inproceedings{wuebker18compact,
+    title = "Compact Personalized Models for Neural Machine Translation",
+    author = "Wuebker, Joern  and
+      Simianer, Patrick  and
+      DeNero, John",
+    booktitle = "Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing",
+    month = oct # "-" # nov,
+    year = "2018",
+    address = "Brussels, Belgium",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/D18-1104",
+    doi = "10.18653/v1/D18-1104",
+    pages = "881--886",
+    abstract = "We propose and compare methods for gradient-based domain adaptation of self-attentive neural machine translation models. We demonstrate that a large proportion of model parameters can be frozen during adaptation with minimal or no reduction in translation quality by encouraging structured sparsity in the set of offset tensors during learning via group lasso regularization. We evaluate this technique for both batch and incremental adaptation across multiple data sets and language pairs. Our system architecture{--}combining a state-of-the-art self-attentive model with compact domain adaptation{--}provides high quality personalized machine translation that is both space and time efficient.",
+}
+@inproceedings{michel18extreme,
+    title = "Extreme Adaptation for Personalized Neural Machine Translation",
+    author = "Michel, Paul  and
+      Neubig, Graham",
+    booktitle = "Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)",
+    month = jul,
+    year = "2018",
+    address = "Melbourne, Australia",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/P18-2050",
+    doi = "10.18653/v1/P18-2050",
+    pages = "312--318",
+    abstract = "Every person speaks or writes their own flavor of their native language, influenced by a number of factors: the content they tend to talk about, their gender, their social status, or their geographical origin. When attempting to perform Machine Translation (MT), these variations have a significant effect on how the system should perform translation, but this is not captured well by standard one-size-fits-all models. In this paper, we propose a simple and parameter-efficient adaptation technique that only requires adapting the bias of the output softmax to each particular user of the MT system, either directly or through a factored approximation. Experiments on TED talks in three languages demonstrate improvements in translation accuracy, and better reflection of speaker traits in the target text.",
+}
