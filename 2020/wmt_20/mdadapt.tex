@@ -258,7 +258,7 @@ For all En$\rightarrow$Fr models, we set the embeddings size and the hidden laye
 
 % The gated variant is made of a dense layer, followed by a layer normalization and a sigmoid activation.
 % The domain control systems are exactly as their baseline counterparts (RNN and Transformer), with an additional 2 cells encoding the domain on the input layer.
-Training uses a batch size of~12,288 tokens; optimization uses Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$ and Noam decay ($warmup\_steps=4,000$), and a dropout rate of $0.1$ for all layers. \revision{For the \system{mixed} model, we use an initial learning rate of 1.0 and take the concatenation of the validation sets of 6 domains for development. In the fine-tuning experiments, we continue training using \system{mixed} as starting point, using the same learning rate schedule, and continuing the incrementation of the number of steps. In the multi-task training, we use the same learning rate schedule as for \system{mixed}: for each iteration, we sample a domain a probability proportional to its size; we then sample a batch of~12,288 tokens that is used to update the shared parameters and the parameters of the corresponding adapter.}\fyDone{Describe the block adaptation layer - voir slides}
+Training uses a batch size of~12,288 tokens; optimization uses Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$ and Noam decay ($warmup\_steps=4,000$), and a dropout rate of $0.1$ for all layers. \revision{For the \system{Mixed} model, we use an initial learning rate of 1.0 and take the concatenation of the validation sets of 6 domains for development. In the fine-tuning experiments, we continue training using \system{Mixed} as starting point, using the same learning rate schedule, and continuing the incrementation of the number of steps. In the multi-task training, we use the same learning rate schedule as for \system{Mixed}: for each iteration, we sample a domain a probability proportional to its size; we then sample a batch of~12,288 tokens that is used to update the shared parameters and the parameters of the corresponding adapter.}\fyDone{Describe the block adaptation layer - voir slides}
 
 Models for En$\rightarrow$De are larger and rely on embeddings as well as hidden layers of size~1024; each Transformers layer contains 16~attention heads; the inner feedforward layer contains 4,096 cells. Adapter modules have the same architecture as for the other language pair, except for their size, which is doubled ($b=2,048$).%\fyTodo{Check: is it $b$?}
 %The number of parameters in each model is reported in Table~\ref{tab:params}.
@@ -291,7 +291,7 @@ The reference methods included in our experiments are the following:
 
 \begin{table*}[t!]
   \centering
-  \begin{tabular}{|p{4.3cm}|*{8}{r|}} \hline
+  \begin{tabular}{|p{3.5cm}|*{8}{r|}} \hline
 %     &&&&&& \\
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Mixed}        & 37.3 & 54.6 & 50.1 & 33.5 & 43.2 & 77.5  &  49.4 \\
@@ -306,14 +306,14 @@ The reference methods included in our experiments are the following:
     \hline
     \system{Res-Adap}         & 37.3 & 57.9 & 53.9 & 33.8 & 46.7 & 90.2 & 53.3 \\ 
     \system{Res-Adap-MT}  & 37.9 & 56.0 & 51.2  & 33.5 & 44.4 & 88.3 & 51.9 \\
-    \system{Res-Adap-MT-ptr\footnote{We initialized shared parameters by values of parameters of \system{mixed} model and train Res-Adap using multi-task learning}} & 37.47 & 57.06 & 52.39 & 33.72 & 46.17 & 89.47 & 52.7 \\
+    \system{Res-Adap-MT}$^{+}$ & 37.5 & 57.1 & 52.4 & 33.7 & 46.2 & 89.5 & 52.7 \\
     %  \hfill MDL Res (gen)    & 37.7 & 51.0 & 34.0 & 30.4 & 34.2 & 15.2 & 36.4 & 33.7\\
     \hline
   \end{tabular}
   \caption{Baseline translation performance of various multi-domain MT systems (En$\rightarrow$Fr).}
   \label{tab:performance-multi}
 \end{table*}
-The two variants of the residual adapter model included in this first round of experiment have been presented in Section~\ref{ssec:architecture}: \system{Res-Adap} is the multi-domain version of the approach of \citet{Bapna19simple} based on a two-step training procedure; while \system{Res-Adap-MT} is the ``multi-task'' version, where the parameters of the generic model and of the adapters are jointly learned from scratch.
+The two variants of the residual adapter model included in this first round of experiment have been presented in Section~\ref{ssec:architecture}: \system{Res-Adap} is the multi-domain version of the approach of \citet{Bapna19simple} based on a two-step training procedure; while \system{Res-Adap-MT} is the ``multi-task'' version, where the parameters of the generic model and of the adapters are jointly learned from scratch. We also report results for the same system, using the the parameters of the \system{Mixed} model as initialization (\system{Res-Adap-MT}${^+}$).
 
 Because of the limit of our computational resources, we restrict the experiments in this section to the En$\rightarrow$Fr task. Results are in Table~\ref{tab:performance-multi}.\fyFuture{Perform experiments for de:en}\fyFuture{Restore results where residual are removed from other paper.}
 
@@ -327,7 +327,7 @@ Tables~\ref{tab:performance-en-fr-pos-reg}-\ref{tab:performance-en-de-pos-reg} r
    %    However, \system{FT-full} still remains the best model for all test domains.
 \fyFuture{Full FT for en->DE ?}
 
-By varying the number and position of residual adapters (see Section~\ref{ssec:architecture}), we then contrast several implementations of residual adapters. \fyDone{Fix style here} Because the set of possible configurations is large, we only perform experiments for layers $i= 2, 4, 6$ (both for the encoder and decoder). Two settings are considered: keeping just one adapter or keeping the three. The trend is the same for the two language directions: suppressing adapters always hurts the overall performance, albeit by a small margin: having six adapters is better than three, which is better than keeping only one. With only one adapter active, we observe small, insignificant changes in performance when varying the adapter's depth. \revision{Based on these experiments, it seems that adaptation remains useful even for the deeper layers of the architecture.}\fyFuture{More configurations ?}
+By varying the number and position of residual adapters (see Section~\ref{ssec:architecture}), we then contrast several implementations of residual adapters. \fyDone{Fix style here} Because the set of possible configurations is large, we only perform experiments for layers $i= 2, 4, 6$ (both for the encoder and decoder). Two settings are considered: keeping just one adapter or keeping the three. The trend is the same for the two language directions: suppressing adapters always hurts the overall performance, albeit by a small margin: having six adapters is better than three, which is better than keeping only one. With only one adapter active, we observe small, insignificant changes in performance when varying the adapter's depth. %\revision{Based on these experiments, it seems that adaptation remains useful even for the deeper layers of the architecture.}\fyFuture{More configurations ?}
 
 \begin{table*}[htbp]
   \centering
@@ -344,7 +344,7 @@ By varying the number and position of residual adapters (see Section~\ref{ssec:a
     \system{Res-Adap-LR}      & 37.4 & 56.1 & 51.8 & 33.3 & 45.0 & 89.7 & 52.2 & 65M/12M \\  
      \hline
   \end{tabular}
-  \caption{Translation performance of various fine-tuned systems (En$\rightarrow$Fr). We report BLEU scores for each domain, as well as averages across languages. Column \domain{params} reports the number of domain-agnostic/domain-specific parameters \label{tab:performance-en-fr-pos-reg}} \fyDone{Boldface ?}
+  \caption{Translation performance of various fine-tuned systems (En$\rightarrow$Fr). We report BLEU scores for each domain, as well as averages across languages. Column \domain{params} reports the number of domain-agnostic/domain-specific parameters.\label{tab:performance-en-fr-pos-reg}} \fyDone{Boldface ?}
 \end{table*}
 
 \begin{table*}[htbp]
@@ -352,7 +352,7 @@ By varying the number and position of residual adapters (see Section~\ref{ssec:a
   \fyDone{Fix column size}
   \begin{tabular}{|p{3cm}|*{8}{r|}} \hline
 %     &&&&&& \\
-    Model / Domain & \multicolumn{1}{c|}{\domain{gov}} & \multicolumn{1}{c|}{\domain{eco}} & \multicolumn{1}{c|}{\domain{tour}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{ med }} & \multicolumn{1}{c|}{\domain{ news}} & \multicolumn{1}{c|}{\domain{avg}} & \multicolumn{1}{c|}{\domain{params}} \\ \hline
+    Model / Domain & \multicolumn{1}{c|}{\domain{ gov}} & \multicolumn{1}{c|}{\domain{ eco}} & \multicolumn{1}{c|}{\domain{tour}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{news}} & \multicolumn{1}{c|}{\domain{avg}} & \multicolumn{1}{c|}{\domain{params}} \\ \hline
     \system{Mixed}          & 29.3 & 30.5 & 17.6 & 38.1 & 47.9 & 20.9  & 30.6 & 213M/0M\\
    \system{Res-Adap}     & 29.6 & 30.4 & 19.2 & 49.0 & 47.2 & 20.6 & 33.1 & 213M/48M \\ \hline
     \system{Res-Adap$_{(2,4,6)}$} & 29.7  & 30.5 & 18.8 & 49.6 & 47.1 & 20.6 &  32.7 & 213M/24M \\ 
@@ -364,7 +364,7 @@ By varying the number and position of residual adapters (see Section~\ref{ssec:a
     \system{Res-Adap-LR}           & 29.6 & 30.4 & 19.2 & 49.0 & 47.2 & 20.6 & 33.1  & 213M/48M\\
     \hline
   \end{tabular}
-  \caption{Translation performance of various fine-tuned systems (En$\rightarrow$De). We report BLEU scores for each domain, as well as averages across domains. In column \domain{params}, we report the number of domain-agnostic/domain-specific parameters}
+  \caption{Translation performance of various fine-tuned systems (En$\rightarrow$De). We report BLEU scores for each domain, as well as averages across domains. Column \domain{params} reports the number of domain-agnostic/domain-specific parameters.}
   \label{tab:performance-en-de-pos-reg}
 \end{table*}
 
@@ -372,9 +372,9 @@ By varying the number and position of residual adapters (see Section~\ref{ssec:a
 
 The translation from English into German includes two domains (\domain{tour} and \domain{bank}) that are extremely small and account only for a very small fraction of the training data (respectively for 0.039\% and 0.022\% of the total number of sentences). Fine-tuning on these domains can lead to serious overfitting. We assess two well-known regularization techniques for adapter modules, that could help mitigate this problem: weight decay and layer regularization. 
 
-For each method, the optimal hyper-parameters (weight decay or layer regularization coefficient, see Section~\ref{sssec:design-space}) $\lambda$ by chosen by grid search among a small set of values ($\{ 10^{-3}, 10^{-4}, 10^{-5} \}$).\fyFuture{Better grid even better EWC.}
+For each method, the optimal hyper-parameter $\lambda$ (weight decay or layer regularization coefficient, see Section~\ref{sssec:design-space}) are chosen by grid search in a small set of values ($\{ 10^{-3}, 10^{-4}, 10^{-5} \}$).\fyFuture{Better grid even better EWC.}
 
-Results in Tables~\ref{tab:performance-en-fr-pos-reg} and \ref{tab:performance-en-de-pos-reg} show that regularizing the adapter model can positively affect the test performance for the smallest domains (this is especially clear for weight-decay (\system{Res-Adap-WD}) in En$\rightarrow$De), at the cost however of a small drop in performance for the other domains. Using layer regularization proves here to be comparatively less effective. Finding better ways to set the regularization parameters, for instance by varying $\lambda$ for each domain based on the available supervision data, is left for future work.  
+Results in Tables~\ref{tab:performance-en-fr-pos-reg} and \ref{tab:performance-en-de-pos-reg} show that regularizing the adapter model can positively impact the test performance for the smallest domains (this is especially clear for weight-decay (\system{Res-Adap-WD}) in En$\rightarrow$De), at the cost however of a small drop in performance for the other domains. Using layer regularization proves here to be comparatively less effective. Finding better ways to set the regularization parameters, for instance by varying $\lambda$ for each domain based on the available supervision data, is left for future work.  
 \fyDone{How is the weight decay parameter set ?}
 \fyDone{Why is regularization not helping? It helps for the small domain - domain-specific regularization ??}
 
@@ -382,12 +382,12 @@ Results in Tables~\ref{tab:performance-en-fr-pos-reg} and \ref{tab:performance-e
 
 We now turn to the evaluation of our new architectural variants: Highway residual adapters \system{Res-Adap-HW} on the one hand, and Gated residual adapters \system{Res-Adap-Gated} on the other hand. We use the same domains and settings as before, focusing here exclusively on the language direction En$\rightarrow$Fr.
 
-To also evaluate the robustness with respect to out-of-domain examples, we perform two additional experiments. We first generate translations with erroneous (more precisely: randomly assigned) domain information: the corresponding results appear in Table~\ref{tab:performance-random} under the column \domain{rnd}. We also compute translation for a domain unseen in training (\domain{news}) as follows. For each sentence of this test set, we automatically evaluate the closest domain,\footnote{As measured by the perplexity of a language model trained with only in-domain data.\fyFuture{More on this for reproducibility}.} then use the predicted domain label to compute the translation. This is an error-prone process, which also challenges the robustness of our multi-domain systems. Results are in Table~\ref{tab:performance-random}.
+To also evaluate the robustness with respect to out-of-domain examples, we perform two additional experiments. We first generate translations with erroneous (more precisely: randomly assigned) domain information: the corresponding results appear in Table~\ref{tab:performance-random} under column \domain{rnd}. We also compute translation for a domain unseen in training (\domain{news}) as follows. For each sentence of this test set, we automatically evaluate the closest domain,\footnote{As measured by the perplexity of a language model trained with only in-domain data.\fyFuture{More on this for reproducibility}.} then use the predicted domain label to compute the translation. This is an error-prone process, which also challenges the robustness of our multi-domain systems. Results are in Table~\ref{tab:performance-random}.
 \fyFuture{This is a baseline, and we have not discussed it - keep for next time: We also report model \system{FT-Full-UEW} which is obtained by full-finetuning the generic model using uniform elastic weight to avoid catastrophic forgetting.}
 
-A first observation is that for domains seen in training, our variants \system{Res-Adap-HW} and \system{Res-Adap-Gated} achieve BLEU scores that are on a par to those of the original version (\system{Res-Adap}), with insignificant variations across test sets. \fyFuture{Comment on processing time.}
+A first observation is that for domains seen in training, our variants \system{Res-Adap-HW} and \system{Res-Adap-Gated} achieve BLEU scores that are on a par to those of the original version (\system{Res-Adap}), with insignificant variations across test sets.\fyFuture{Comment on processing time.}
 
-The two other settings are instructive in several ways: they first clearly illustrate that the brittleness of domain-adapted systems, for which large drops in performance (more than 15 BLEU points on average) are observed when the domain label is randomly chosen. Our gated variant however proves much more robust than the other adaptation strategy and performs almost on par to the generic system for that test condition. The same trend holds for the unseen \domain{news} domain, with \system{Res-Adap-Gated} being the best domain adapted system in our set, outperforming the other variants by about 2 BLEU points.
+The two other settings are instructive in several ways: they first clearly illustrate the brittleness of domain-adapted systems, for which large drops in performance (more than 15 BLEU points on average) are observed when the domain label is randomly chosen. Our gated variant however proves much more robust than the other adaptation strategy and performs almost on par to the generic system for that test condition. The same trend holds for the unseen \domain{news} domain, with \system{Res-Adap-Gated} being the best domain adapted system in our set, outperforming the other variants by about 2 BLEU points.
 % The phenomenon of Catastrophic Forgetting manifests clearly in this situation where the performance of all multi-domain systems drops dramatically by approximately 10 points BLEU compared to generic model \system{Mixed}. Our proposed model \system{FT-Gate-Block} maintains equivalent performance to the generic model in \system{RND} thanks to the application of adaptive weight on the output of the residual adapter. \system{FT-Gate-Block} avoids relying on the residual adapters when predicting examples that come from domain far from the domain of the adapters. 
 
 % In the new domain test \domain{news}, generic model outperforms other systems. Finetuning systems including \system{FT-Full}, \system{Res-Adap} and \system{FT-HW-Block} underperforms generic model by large margin. More regularized variants including \system{FT-Full-UEW}, and \system{FT-Gate-Block} are able to reduce the gap of performance compared to generic.
@@ -406,7 +406,7 @@ The two other settings are instructive in several ways: they first clearly illus
     \system{Res-Adap}         & 37.3 & 57.9 & 53.9 & 33.8 & 46.7 & 90.2   & 53.3 & 38.4 & 20.5 & 65M/12M \\ %& 22s\\ 
     \system{Res-Adap-HW}   & 37.5 & 57.2 & 53.4 & 33.1 & 46.3 & 91.0  & 53.1 & 36.6 & 20.2 & 65M/12M \\ %& 19s \\
     \system{Res-Adap-HW-MT} & 37.4 & 56.4 & 52.1 & 33.7 & 44.8 & 89.8 & 52.4 & 27.1 & 20.4 & 65M/12M \\ %&  \\
-    \system{Res-Adap-HW-MT-ptr} & 37.7 & 57 & 52.5 & 33.5 & 46.1 & 89 & 52.6 & 46.5 & 21.4 & 65M/12M \\ %&  \\
+    \system{Res-Adap-HW-MT}$^{+}$ & 37.7 & 57 & 52.5 & 33.5 & 46.1 & 89 & 52.6 & 46.5 & 21.4 & 65M/12M \\ %&  \\
     \system{Res-Adap-Gate}  & 38.0 & 57.5& 53.0 & 33.5 & 46.0 & 90.1  & 53.0 & 49.0 & 22.5 & 65M/13M \\ %& 21s \\
 %    \system{FT-Full-UEW}      & 37.9 & 56.0 & 52.1 & 33.7 & 44.9 & 89.1 &	52.3 & 46.5 & 22.11 \\ %& 34s \\
 	\hline
@@ -419,7 +419,7 @@ The two other settings are instructive in several ways: they first clearly illus
   }
   \label{tab:performance-random}
 \end{table*}
-\fyFuture{Computation time should also report the time it takes for the complete tuning process, not one iteration which will be more or less the same}.
+\fyFuture{Computation time should also report the time it takes for the complete tuning process, not one iteration which will be more or less the same.}
 \section{Related Work \label{sec:related}}
 \mpDone{related work}
 
@@ -427,13 +427,13 @@ Training with data from multiple, heterogeneous sources is a common scenario in 
 
 Early approaches to multi-domain MT were proposed for statistical MT, either considering multiple data sources (eg.\ \cite{Banerjee10combining,Clark12onesystem,Sennrich13multidomain,Huck15mixeddomain}) or domains containing several topics \cite{Eidelman12topic,Hasler14dynamic-topic}. Two main strategies emerge: feature-based methods, where domain labels are integrated through supplementary features; and instance-based methods, involving a measure of similarity between train and test domains. 
 
-The former approach has also been adapted to NMT: \newcite{Kobus17domaincontrol,Tars18multidomain} use an additional domain feature in an RNN model, in the form of an extra domain-token or of additional domain-features associated with each word. \citet{Chen16guided} apply domain control on the \emph{target} side, using a topic vector to describe the whole document context. Similar ideas are developed in \citet{Chu18multilingual,Pham19generic}, where domain differences and similarities are enforced through parameter sharing schemes. Parameter-sharing also lies at the core of the work by \citet{Jiang19multidomain}, who consider a Transformer model containing both domain-specific and domain-agnostic heads.
+The former approach has also been adapted to NMT: \newcite{Kobus17domaincontrol,Tars18multidomain} use an additional domain feature in an RNN model, in the form of an extra domain-token or of additional domain-features associated with each word. \citet{Chen16guided} apply domain control on the \emph{target} side, using a topic vector to describe the whole document context. Similar ideas are developed in \citep{Chu18multilingual,Pham19generic}, where domain differences and similarities are enforced through parameter sharing schemes. Parameter-sharing also lies at the core of the work by \citet{Jiang19multidomain}, who consider a Transformer model containing both domain-specific and domain-agnostic heads.
 
 \citet{Britz17mixing} study three general techniques to take domain information into account in training: they rely on either domain classification or domain normalization on the source or target side. A contribution of this study is an adversarial training scheme to normalize representations across domains and make the combination of multiple data sources more effective. Similar techniques (parameter sharing, automatic domain classification/normalization) are at play in \citet{Zeng18multidomain}: in this work, the lower layers of the MT use auxiliary classification tasks to disentangle domain-specific from domain-agnostic representations. These representations are first processed separately, then merged to compute the final translation.
 
-\citet{Farajian17multidomain,li-etal-2018-one} are two recent representatives of the instance-based approach: for each test sentence, a small adaptation corpus is collected based on similarity measures and used to fine-tune a mix-domain model.
+\citet{Farajian17multidomain,li-etal-2018-one} are two recent representatives of the instance-based approach: for each test sentence, a small adaptation corpus is collected based on similarity measures and used to fine-tune a mix-domain model. As shown in the former work, also adapting the training regime is crucial to make these techniques really effective. 
 
-Finally, note that a distinct evolution of the residual adapter model of \citet{Bapna19simple} is presented in \citet{Sharaf20metalearning} where meta-learning techniques are used to make fine-tuning more effective in a standard domain-adaptation setting.
+Finally, note that a distinct evolution of the residual adapter model of \citet{Bapna19simple} is presented in \citep{Sharaf20metalearning} where meta-learning techniques are used to make fine-tuning more effective in a standard domain-adaptation setting.
 
 \section{Conclusion and outlook \label{sec:discussion}}
 \mpDone{discussion}
@@ -442,7 +442,7 @@ In this paper, we have performed an experimental study of the residual adapter a
 % without creating lots of domain-specific parameters even though full finetuning still outperforms this method by an important gap in in-domain test sets. For extremely small domains, we are able to reduce the number of adapters incorporated to the NMT model without losing performance, also using Weight-Decay in finetuning over small domains demonstrates significant improvement. The proposed highway variant shows an equivalent performance to the original version of \cite{Bapna19simple} which allows us to process the hidden layer of the NMT model only once. The extended version of the highway residual adapter to gated residual adapter shows the benefit in the robustness against wrong domain prediction and out-of-domain examples. 
 
 \fyFuture{Example of gating ?}
-\fyTodo{Why MDMT does not work well - full train from generic? - add new results}
+\fyDone{Why MDMT does not work well - full train from generic? - add new results}
 \fyFuture{Structured domain? A Bayesian version?}
 \fyFuture{Let the machine decide domains in learning? - domains and their organization - how could it?}
 
