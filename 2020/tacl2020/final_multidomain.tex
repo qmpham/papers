@@ -62,17 +62,13 @@
 \usepackage{multirow}
 \title{Revisiting Multi-Domain Machine Translation}
 \fyFuture{A plea for more thoroughness in evaluation}
-\author{First Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\\And
-  Second Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\}
 
+\author{MinhQuang Pham$^{\dag\ddag}$,\ \  Josep Crego$^{\dag}$,\ \  Fran\c cois Yvon$^{\ddag}$, \ \ Jean Senellart$^{\dag}$ \\ \\
+  $^\ddag$Universit\'e Paris-Saclay, CNRS, LIMSI, 91400, Orsay, France \\
+  \texttt{firstname.lastname@limsi.fr} \\
+  $^\dag$SYSTRAN, 5 rue Feydeau, 75002 Paris, France \\
+  \texttt{firstname.lastname@systrangroup.com} \\
+}
 \date{}
 
 \begin{document}
@@ -516,7 +512,9 @@ As expected however, MDMTs are less brittle than fine-tuning when domain frontie
 Two other main conclusions can be drawn from this study: first, it seems that more work is needed to make MDMT systems make the best out of the variety of the available data, both to effectively share what needs to be shared while at the same time separating what needs to be kept separated. We notably see two areas worthy of further explorations: the development of parameter sharing strategies when the number of domains is large; the design of training strategies that can effectively handle a change of the training mixture, including an increase in the number of domains. Both problems are of practical relevance in industrial settings. Second, and maybe more importantly, there is a general need to adopt better evaluation methodologies for evaluating MDMT systems, which require systems developers to clearly spell out the testing conditions and the associated expected distribution of testing instances, and to report more than comparisons with simple baselines on a fixed and known handful of domains.
 
 % --------------
-% \section*{Acknowledgements}
+\section*{Acknowledgements}
+
+The work presented in this paper was partially supported by the European Commission under contract H2020-787061 ANITA.
 % This work was granted access to the HPC resources of [TGCC/CINES/IDRIS] under the allocation 20XX- [numéro de dossier] made by GENCI (Grand Equipement National de Calcul Intensif)
 % The acknowledgements should go immediately before the references.  Do
 % not number the acknowledgements section. Do not include this section
