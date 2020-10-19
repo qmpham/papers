@@ -1,0 +1,151 @@
+\documentclass[12pt,times,a4paper,twoside]{article}
+
+\usepackage[utf8]{inputenc}	% Para caracteres en español
+\usepackage[left=3cm,right=3cm,top=2cm,bottom=3cm]{geometry}
+\usepackage{pagenote}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{mathtools,xparse}
+\usepackage{mathrsfs}
+
+\usepackage{multirow,booktabs}
+\usepackage[table]{xcolor}
+\usepackage{fullpage}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{setspace}
+\usepackage{calc}
+% \usepackage{color,soul}
+\usepackage{multicol}
+\usepackage{cancel}
+\usepackage[retainorgcmds]{IEEEtrantools}
+% \usepackage{xcolor} -- implied by xcolor
+
+\usepackage{listings}
+\usepackage{spverbatim}
+\usepackage{fancyvrb}
+\usepackage{hyperref}
+\usepackage{float} 
+\usepackage{natbib}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+
+\usepackage{soulutf8}
+\usepackage{tabularx}
+
+\usepackage[draft]{todo}
+\newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyTodostar}[1]{\Todo*[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyDonestar}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+
+\colorlet{shadecolor}{orange!15}
+\parindent 0in
+\parskip 12pt
+\geometry{margin=1in, headsep=0.25in}
+\setlength{\belowdisplayskip}{8pt} \setlength{\belowdisplayshortskip}{8pt}
+\setlength{\abovedisplayskip}{8pt} \setlength{\abovedisplayshortskip}{8pt}
+\setlist{nosep}
+\setlength{\parskip}{0.1cm}
+\setlength{\parindent}{1em}
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{definition}{Definition}[section]
+\DeclareMathOperator*{\argmax}{argmax}
+\newcommand{\R}{\ensuremath{\mathbb{R}}}
+
+\pgfkeys{
+    /tr/rowfilter/.style 2 args={
+        /pgfplots/x filter/.append code={
+            \edef\arga{\thisrow{#1}}
+            \edef\argb{#2}
+            \ifx\arga\argb
+            \else
+                \def\pgfmathresult{}
+            \fi
+        }
+    }
+}
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\NewDocumentCommand{\normL}{ s O{} m }{%
+  \IfBooleanTF{#1}{\norm*{#3}}{\norm[#2]{#3}}_{L_1}%
+}
+
+\title{Multi-task training of multi-domain NMT}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+\begin{center}
+{\LARGE \bf}\fyDone{Make a proper title}
+\end{center}
+\cite{Caruana97multitask} proposes a multi-task model with large shared stack of layers followed by multiple independent task-specific layers. The training is to simply average the gradients of separate learning objectives. The author admitted that the achieved optimal model is outperformed by far by different "snap shot" taken along the training by applying early stopping independently to each individual task. We might wonder whether this simple strategy can be improved.
+
+Let $\theta_s, \{\theta_i\}_{i=[1..T]}$ be the parameters of our MD-MT model and the data generation process be 
+\begin{align*}
+Y_k^i | X_k^i : P_{\theta_s, \theta_i}(Y_k^i | X_k^i) \\
+X_k^i : D^i(X_k)
+\end{align*}
+
+The objective of the training is $$\displaystyle{\mathop{\min \sum_{i=1}^{T}\sum_{X_k^i, Y_k^i} -log(P_{\theta_s,\theta_i}(Y_k^i | X_k^i))}}$$
+
+The loss is a sum of prediction losses over all the domains of interest. However, the gradient is calculated partially over randomly picked batch from one of in-domain corpora. The gradient along the curve of a member loss may be harmful to other member losses of the total multi-domain loss. In order to prevent the bad influence of the partial gradient, we could regularize it by a constraint on the shifting between probabilities $P(\theta_s, \theta_i)$ before and after update. 
+
+In the optimization by gradient descent, at each iteration, the parameter is updated by gradient of loss function at current point in the space of hypothesis.
+
+\begin{equation}
+\theta^{t+1} = \theta^t - \mu * \frac{\delta L}{\delta \theta}(\theta_t)
+\end{equation}
+
+We can interpret this in an other point of view in which at each iteration, we search an displacement, whose magnitude is limited, following which the loss decreases the most.
+\begin{align}\label{eq}
+	\displaystyle{\mathop{\argmax_{\Delta \theta}} L(\theta^t + \mu \Delta \theta)} \\
+	\parallel \Delta \theta \parallel \leq 1  \nonumber
+\end{align}
+This optimization problem results in $-\frac{\delta L}{\delta \theta}(\theta_t)$ as solution. 
+
+Using this approach, we replaces the constraint on magnitude of the displacement by a constraint on the magnitude of the distribution shifting over domains.
+\begin{align}
+	\displaystyle{\mathop{\argmax_{\Delta \theta}} L_i(\theta_s^t + \mu \Delta \theta_s, \theta_i^t + \mu \Delta \theta_i)} \\
+	\mathop{\sum_{j=1}^{T}} E_{x_j}[KL(P_{\theta^t_s, \theta^t_j}(y_j|x_j)|P_{\theta^t_s + \mu \Delta \theta_s, \theta^t_j + \mu \delta_{i}(j) \Delta \theta_i}(y_j|x_j))] \leq c \nonumber
+\end{align}
+
+For a small displacement, the KL distance can be approximated by Fisher information matrix.
+\begin{align}
+KL(P_{\theta^t_s, \theta^t_j}(y_j|x_j)|P_{\theta^t_s - \Delta \theta_s, \theta^t_j}(y_j|x_j)) \approx <\Delta \theta_s , I_{\theta^t_s, \theta^t_j}^{\theta_s} \Delta \theta_s > \\
+KL(P_{\theta^t_s, \theta^t_i}(y_i|x_i)|P_{\theta^t_s - \Delta \theta_s, \theta^t_i - \Delta \theta_i}(y_i|x_i)) \approx <\Delta \theta , I_{\theta^t_s, \theta^t_i}^{\theta} \Delta \theta >
+\end{align}
+Where $I_{\theta^t_s, \theta^t_j}^{\theta_s} = E_{y:P_{\theta^t_s, \theta^t_j}(y|x)}[\frac{\delta P_{\theta_s, \theta_j}(y|x)}{\delta \theta_s} \times \frac{\delta P_{\theta_s, \theta_j}(y|x)}{\delta \theta_s}^T]$; $\theta = (\theta_s, \theta_i)$. As in \citet{Thompson19overcoming} and \citet{Kirkpatrick17overcoming}, matrix Fisher is usually approximated by its diagonal, therefore we could use following approximation $<\Delta \theta , I_{\theta^t_s, \theta^t_i}^{\theta} \Delta \theta > \approx <\Delta \theta_s , I_{\theta^t_s, \theta^t_i}^{\theta_s} \Delta \theta_s > + <\Delta \theta_i , I_{\theta^t_s, \theta^t_i}^{\theta_i} \Delta \theta_i >$
+
+Therefore, we could rewrite the constraint as
+\begin{align}
+\mathop{\sum_{j=1}^{T}}  E_{x_j}[<\Delta \theta_s , I_{\theta^t_s, \theta^t_j}^{\theta_s} \Delta \theta_s >] + E_{x_i}[<\Delta \theta_i , I_{\theta^t_s, \theta^t_i}^{\theta_i} \Delta \theta_i >] \leq  c \\
+\Longleftrightarrow <\Delta \theta_s , \mathop{\sum_{j=1}^{T}}  E_{x_j}[I_{\theta^t_s, \theta^t_j}^{\theta_s}] \Delta \theta_s > + <\Delta \theta_i , E_{x_i}[I_{\theta^t_s, \theta^t_i}^{\theta_i}] \Delta \theta_i > \leq c 
+\end{align} 
+
+Similar to equation \ref{eq}, we obtain a solution as follow 
+\begin{align}
+\Delta \theta_s = -(\mathop{\sum_{j=1}^{T}}  E_{x_j}[I_{\theta^t_s, \theta^t_j}^{\theta_s}])^{-1}\frac{\delta L_i}{\delta \theta_s} \\
+\Delta \theta_i = -(E_{x_i}[I_{\theta^t_s, \theta^t_i}^{\theta_i}])^{-1}\frac{\delta L_i}{\delta \theta_i}
+\end{align}
+
+\bibliographystyle{acl_natbib}
+\bibliography{multidomain}
+\end{document}
