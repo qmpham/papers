@@ -146,6 +146,61 @@ Similar to equation \ref{eq}, we obtain a solution as follow
 \Delta \theta_i = -(E_{x_i}[I_{\theta^t_s, \theta^t_i}^{\theta_i}])^{-1}\frac{\delta L_i}{\delta \theta_i}
 \end{align}
 
+\section{Algorithm}
+\begin{algorithm}[h]
+\caption{Multi-domain Training}
+\label{alg:multidomain}
+\begin{algorithmic}[1]
+\REQUIRE {Corpora $C_i, i\in [1,..,d]$ for $d$ domains, Batch size $B$}%, Optimization algorithm $\operatorname{Opt}$}
+\REPEAT 
+\STATE{Iteration t}
+\STATE{If $t mod 1000 == 0$: Update $H_t$ via \ref{alg:Fisher} else $H_t = H_{t-1}$}
+\STATE{Randomly pick $i \in [1,..,d]$ w.r.t the multinomial distribution $[\frac{|C_i|}{\sum_{i\in [1,..,d]}|C_i|}]$.}
+\STATE{Randomly pick $B$ sentences from $C_i$.}
+\STATE{Activate residual adapters of domain $i$.}
+\STATE{Calculate gradients $\frac{\delta L_i(B_i)}{\delta \theta_i}$, $\frac{\delta L_i(B_i)}{\delta \theta_s}$}
+\STATE{Correct gradient by Fisher diagonal matrix $H_t$: 
+\begin{align*}
+\Delta \theta_i &= -\frac{1}{R} (H_t^i + \mu)^{-1} \frac{\delta L_i}{\delta \theta_i} \\
+\Delta \theta_s &= -\frac{1}{R} (H_t^s + \mu)^{-1} \frac{\delta L_i}{\delta \theta_s} \\
+R &=  (H_t^i + \mu)^{-1} \frac{\delta L_i}{\delta \theta_i} * \frac{\delta L_i}{\delta \theta_i}^T + (H_t^s + \mu)^{-1} \frac{\delta L_i}{\delta \theta_s} * \frac{\delta L_i}{\delta \theta_s}^T \\
+\end{align*}
+}
+\STATE{Update parameters:
+\begin{align*}
+\theta_i^{t+1} = \theta_i^{t} - lr * \Delta \theta_i \\
+\theta_s^{t+1} = \theta_s^{t} - lr * \Delta \theta_s \\
+\end{align*}}
+\UNTIL{convergence}
+\end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}[h]
+\caption{Compute Fisher matrix}
+\label{alg:Fisher}
+\begin{algorithmic}[1]
+\REQUIRE {Corpora $C_i, i\in [1,..,d]$ for $d$ domains, Batch size $B$}
+\STATE{Pick batch $B_i$ from $C_i$ $\forall i \in [1,..,d]$}
+\FOR{$i\in [1,..,d]$}
+     \STATE{$H^i = 0$, $H^s = 0$}
+\ENDFOR
+\FOR{$i\in [1,..,d]$}
+   \FOR{$j\in [1,..,B]$}
+        \STATE{Compute gradient wrt example $B_i^j$ of batch $B_i$: $\Delta H_i = \frac{\delta L_i(B_i^j)}{\delta \theta_i}$, $\Delta H_s =\frac{\delta L_i(B_i^j)}{\delta \theta_s}$}
+        \STATE{Update $H_i$, $H_s$:
+\begin{align*}
+H_i &+= \Delta H_i ** 2 \\
+H_s &+= \Delta H_s ** 2 \\
+\end{align*}}
+   \ENDFOR
+\ENDFOR
+\FOR{$i\in [1,..,d]$}
+     \STATE{$H^i \setminus= B $, $H^s \setminus= B*d$}
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
 \bibliographystyle{acl_natbib}
 \bibliography{multidomain}
 \end{document}
