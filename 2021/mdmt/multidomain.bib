@@ -1,6 +1,52 @@
 % -*- mode:bibtex -*-
 % encoding:utf-8
 
+@inproceedings{Wang20balancing,
+    title = "Balancing Training for Multilingual Neural Machine Translation",
+    author = "Wang, Xinyi  and
+      Tsvetkov, Yulia  and
+      Neubig, Graham",
+    booktitle = "Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/2020.acl-main.754",
+    doi = "10.18653/v1/2020.acl-main.754",
+    pages = "8526--8537",
+    abstract = "When training multilingual machine translation (MT) models that can translate to/from multiple languages, we are faced with imbalanced training sets: some languages have much more training data than others. Standard practice is to up-sample less resourced languages to increase representation, and the degree of up-sampling has a large effect on the overall performance. In this paper, we propose a method that instead automatically learns how to weight training data through a data scorer that is optimized to maximize performance on all test languages. Experiments on two sets of languages under both one-to-many and many-to-one MT settings show our method not only consistently outperforms heuristic baselines in terms of average performance, but also offers flexible control over the performance of which languages are optimized.",
+}
+
+@inproceedings{Wang20learning-multi,
+    title = "Learning a Multi-Domain Curriculum for Neural Machine Translation",
+    author = "Wang, Wei and Tian, Ye and Ngiam, Jiquan and Yang, Yinfei and Caswell, Isaac and Parekh, Zarana",
+    booktitle = "Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/2020.acl-main.689",
+    doi = "10.18653/v1/2020.acl-main.689",
+    pages = "7711--7723",
+    abstract = "Most data selection research in machine translation focuses on improving a single domain. We perform data selection for multiple domains at once. This is achieved by carefully introducing instance-level domain-relevance features and automatically constructing a training curriculum to gradually concentrate on multi-domain relevant and noise-reduced data batches. Both the choice of features and the use of curriculum are crucial for balancing and improving all domains, including out-of-domain. In large-scale experiments, the multi-domain curriculum simultaneously reaches or outperforms the individual performance and brings solid gains over no-curriculum training.",
+}
+
+@inproceedings{Kumar19reinforcement,
+    title = "Reinforcement Learning based Curriculum Optimization for Neural Machine Translation",
+    author = "Kumar, Gaurav  and
+      Foster, George  and
+      Cherry, Colin  and
+      Krikun, Maxim",
+    booktitle = "Proceedings of the 2019 Conference of the North {A}merican Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)",
+    month = jun,
+    year = "2019",
+    address = "Minneapolis, Minnesota",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/N19-1208",
+    doi = "10.18653/v1/N19-1208",
+    pages = "2054--2061",
+    abstract = "We consider the problem of making efficient use of heterogeneous training data in neural machine translation (NMT). Specifically, given a training dataset with a sentence-level feature such as noise, we seek an optimal curriculum, or order for presenting examples to the system during training. Our curriculum framework allows examples to appear an arbitrary number of times, and thus generalizes data weighting, filtering, and fine-tuning schemes. Rather than relying on prior knowledge to design a curriculum, we use reinforcement learning to learn one automatically, jointly with the NMT system, in the course of a single training run. We show that this approach can beat uniform baselines on Paracrawl and WMT English-to-French datasets by +3.4 and +1.3 BLEU respectively. Additionally, we match the performance of strong filtering baselines and hand-designed, state-of-the-art curricula.",
+}
 
 @inproceedings{Li18onesentence,
     title = "One Sentence One Model for Neural Machine Translation",
