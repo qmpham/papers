@@ -72,7 +72,7 @@
 \usepackage{multirow}
 
 
-\title{}
+\title{Improving Multi-Domain Neural Machine Translation by Differential Data Selection}
 
 \author{First Author \\
   Affiliation / Address line 1 \\
@@ -94,11 +94,41 @@ When building machine translation systems, one often needs to make the best out 
 In this study, we first formulate the most general algorithm for training the Neural Machine Translation (NMT) model given a predefined priority of the domains. Then, we apply a recently proposed method Differential Data Selection (DDS) to solve the problem. We also report a disadvantage of DDS and fix it by proposing a minor development for DDS. Our experiments with a large sample of multi-domain systems show several important benefits of DDS in multi-domain NMT.
 \end{abstract}
 
+\section{Introduction}\label{sec:intro}
+
+\section{Formalizing multi-domain translation}
+\begin{algorithm}[h!]
+\caption{Multi-domain Training} \label{alg:mdmt}
+\label{alg:multidomain}
+\begin{algorithmic}[1]
+\REQUIRE {
+\begin{itemize}
+	\item Corpora $C^i, i\in [1,..,K]$ for $K$ domains.
+	\item Dev sets $Dev^i, i\in [1,..,K]$ for $K$ domains.
+	\item Importance weights of domains in the final evaluation $\lambda_{t,d}^i, i\in [1,..,K]$
+	\item Batch size $B$.
+	\item Temporal Data Selection Distribution(T-DSD)$$P_{\system{T-DSD}}(t)(x,y)=\sum_{i}\lambda_{l,d}^i(t)P_i(t)(x,y)$$
+	\item $Eval\_scores = []$
+	\item $Early\_stopping$ criterion.
+\end{itemize}}
+\REPEAT 
+\STATE{Iteration t.}
+\STATE{Randomly pick $i \in [1,..,K]$ w.r.t  $[\lambda_{l,d}^1 \dots \lambda_{l,d}^K](t)$.}
+\STATE{Sample $B$ sentences from $C^i$ with empirical distribution $P_i(t)(x,y)$.}
+\STATE{Update model by applying SGD computed from $B$ sampled sentences.}
+\IF{$t \equiv 0 \mod{eval\_step}$}
+	\STATE{Evaluate current model with K dev sets. Denote $S_t^i$ performance of model at iteration t on domain i.}
+	\STATE{Report weighted score using Domain Importance Weights(DI-Weights) $\lambda_{t,d}^i, i\in [1,..,K]$. $$eval(t) = \displaystyle{\mathop{\sum}_i \lambda_{t,d}^i S_t^i}$$}
+	\STATE{$Eval\_scores.append(eval(t))$.}
+\ENDIF
+\IF{$Early\_stopping(Eval\_scores)$}
+	\STATE{Stop training loop.}
+\ENDIF
+\UNTIL{convergence}
+\end{algorithmic}
+\end{algorithm}
+\section*{Acknowledgments}
 \bibliographystyle{acl_natbib}
-\bibliography{acl2021}
-
+\bibliography{multidomain}
 %\appendix
-
-
-
 \end{document}
