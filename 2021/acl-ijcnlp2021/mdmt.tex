@@ -72,7 +72,7 @@
 \usepackage{multirow}
 
 
-\title{Improving Multi-Domain Neural Machine Translation by Differential Data Selection}
+\title{Improving Multi-Domain Neural Machine Translation with Differential Data Selection}
 
 \author{First Author \\
   Affiliation / Address line 1 \\
@@ -98,6 +98,15 @@
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
+A typical setting in machine translation, is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for a task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen; a key component in training is then to mitigate the detrimental effects of this mismatch between distributions. Single-source and multi-source domain adaptation is a well-studied instance of this setting (see \cite{Chu2017comparison} for a review) , and so is multi-domain learning \cite{Chu18multilingual}\cite{Zeng18multidomain}\cite{Jiang19multidomain}. A related situation is multi-lingual machine translation \cite{Firat16multiway}\cite{Johnson17google}\cite{Ha16towards}\fytodo{Add more recent work}, where the heterogeneity of training data correspond not only to variation in topic or genre, but also in languages.
+
+\fyTodo{Label or covariate shift ?}
+This problem is often approached with instance selection or reweighting strategies, where the available training data is used in proportion to its relevance for the test conditions. [Additional techniques : GANs for feau]
+
+
+one often needs to make the best out of heterogeneous sets of parallel data in training to achieve the best test performance in one or several domain(s) of interest. This multi-source (multi-domain) adaptation problem is often approached with instance selection or reweighting strategies, most of which pre-supposes an ad-hoc assessment of relevance for training sentences. In this contribution, we study the recently proposed Differential Data Selection (DDS) model  and explore its ability to serve an effective generic framework for these various situations. Our experiments for both domain adaptation and multi-domain learning show that DDS often enables to outperform heuristic training strategies; we also introduce a variant that boosts DDS performance of adapter-based multi-domain systems.
+
+
 
 \section{Formalizing multi-domain translation}
 \begin{algorithm}[h!]
