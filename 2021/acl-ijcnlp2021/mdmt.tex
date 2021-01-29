@@ -47,6 +47,7 @@
 \usepackage[draft]{todo}
 \usepackage[normalem]{ulem}
 \usepackage{xspace}
+\usepackage{float}
 \usepackage{amsmath,amsfonts,amssymb}
 \usepackage{algorithm, algorithmic}
 \newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
@@ -66,11 +67,14 @@
 % \newcommand{\SW}[1]{\textcolor{red}{#1}}
 \newcommand{\SB}[1]{\textbf{#1}}
 \newcommand{\SW}[1]{\underline{#1}}
+% limits underneath
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
 \renewcommand\textfraction{.1}
 \renewcommand\floatpagefraction{.95}
 \newcommand{\sbcl}[2]{{\scriptsize #1 \hfill $|$ \hfill  #2}}
 \usepackage{multirow}
-
+\usepackage{adjustbox}
 
 \title{Improving Multi-Domain Neural Machine Translation with Differential Data Selection}
 
@@ -108,29 +112,36 @@ one often needs to make the best out of heterogeneous sets of parallel data in t
 
 
 
-\section{Formalizing multi-domain translation}
-\begin{algorithm}[h!]
+\section{Formalizing multi-domain translation} \label{sec:mdmt}
+We conventionally define a domain $d$ as a distribution $\mathcal{D}_d(x)$ over some feature space $\mathcal{X}$ that is shared across domains \cite{Pan10asurvey}: in machine translation, $\mathcal{X}$ is the representation space for source sentences; each domain corresponds to a specific source of data, and differs from the other data sources in terms of textual genre, thematic content \cite{Chen16guided,Zhang16topicinformed}, register \cite{Sennrich16politeness}, style \cite{Niu18multitask}, etc. Translation in domain $d$ is formalized by a translation function $h_d(y|x)$ pairing sentences in a source language with sentences in a target language $y \in \mathcal{Y}$. $h_d$ is usually assumed to be deterministic (hence $y = h_d(x)$), but can differ from one domain to the other.
+
+A typical learning scenario in MT is to have access to samples from $n_d$ domains, which means that the training distribution $\mathcal{D}^s$ is a mixture $\mathcal{D}^s(x) = \sum_d \lambda^{s}_{d} \mathcal{D}_d(x)$\revision{, with $\{\lambda^{s}_d, d=1 \dots n_d\}$ the corresponding mixture weights ($\sum_d \lambda^{s}_d=1$)}. Multi-domain learning, as defined in \citet{Dredze08online} further assumes that domain tags are also available in testing; the implication being that the test distribution is also as a mixture $\mathcal{D}^t(x) = \sum_d \lambda^{t}_{d} \mathcal{D}_d(x)$ of several domains, making the problem distinct from mere domain adaption. A multi-domain learner is then expected to use these tags effectively \cite{Joshi12multidomain} when computing the combined translation function $h(x,d)$, and to perform well in all domains \cite{Finkel09hierarchical}. This setting is closely related to the multi-source adaptation problem formalized in \cite{Mansour09domainadaptation,Mansour09multiple,Hoffman18algorithms}.
+
+This definition seems to be the most accepted view of a multi-domain MT\footnote{An exception is \citep{Farajian17multidomain}, where test translations rely on similarity scores between test and train sentences, rather than on domain labels.} and one that we also adopt here. Note that in the absence of further specification, the naive answer to the MD setting should be to estimate one translation function $\hat{h}_d(x)$ separately for each domain, then to translate using $\hat{h}(x,d) = \sum_{d'} h_{d'}(x) \indic{d' = d}$, where $\indic{x}$ is the indicator function.
+
+Given an objective mixture over test distribution $\lambda^{t}_{d}$,$d\in[1,\dots,K]$ and a mixture of training data $\lambda^{s}_{d}$, the Multi-domain training course is determined by the below algorithm \ref{alg:mdmt}. The training mixture can be constant or changing through time. Optimizing the training mixture is an interesting problem that we would like to address in the paper.
+\begin{algorithm}[H]
 \caption{Multi-domain Training} \label{alg:mdmt}
 \label{alg:multidomain}
 \begin{algorithmic}[1]
 \REQUIRE {
 \begin{itemize}
-	\item Corpora $C^i, i\in [1,..,K]$ for $K$ domains.
-	\item Dev sets $Dev^i, i\in [1,..,K]$ for $K$ domains.
-	\item Importance weights of domains in the final evaluation $\lambda_{t,d}^i, i\in [1,..,K]$
+	\item Corpora $C^d, d\in [1,..,K]$ for $K$ domains equipped by an empirical distribution $D_d(x,y)$
+	\item Dev sets $Dev^d, d\in [1,..,K]$ for $K$ domains.
+	\item Testing mixture weights in the final evaluation $\lambda^t_d, d\in [1,..,K]$
 	\item Batch size $B$.
-	\item Temporal Data Selection Distribution(T-DSD)$$P_{\system{T-DSD}}(t)(x,y)=\sum_{i}\lambda_{l,d}^i(t)P_i(t)(x,y)$$
+	\item Temporal Data Selection Distribution(T-DSD)$$P_{\system{T-DSD}}(t)(x,y)=\sum_{d}\lambda^s_d(t)D_d(x,y)$$
 	\item $Eval\_scores = []$
 	\item $Early\_stopping$ criterion.
 \end{itemize}}
 \REPEAT 
 \STATE{Iteration t.}
-\STATE{Randomly pick $i \in [1,..,K]$ w.r.t  $[\lambda_{l,d}^1 \dots \lambda_{l,d}^K](t)$.}
-\STATE{Sample $B$ sentences from $C^i$ with empirical distribution $P_i(t)(x,y)$.}
+\STATE{Randomly pick $d \in [1,..,K]$ w.r.t  $[\lambda^s_1 \dots \lambda^s_K](t)$.}
+\STATE{Sample $B$ sentences from $C^d$ with empirical distribution $D_d(x,y)$.}
 \STATE{Update model by applying SGD computed from $B$ sampled sentences.}
 \IF{$t \equiv 0 \mod{eval\_step}$}
-	\STATE{Evaluate current model with K dev sets. Denote $S_t^i$ performance of model at iteration t on domain i.}
-	\STATE{Report weighted score using Domain Importance Weights(DI-Weights) $\lambda_{t,d}^i, i\in [1,..,K]$. $$eval(t) = \displaystyle{\mathop{\sum}_i \lambda_{t,d}^i S_t^i}$$}
+	\STATE{Evaluate current model with K dev sets. Denote $S^t_d$ performance of model at iteration t on domain d.}
+	\STATE{Report weighted score using testing mixture weights $\lambda^t_d, d\in [1,..,K]$. $$eval(t) = \displaystyle{\mathop{\sum}_d \lambda^t_d S^t_d}$$}
 	\STATE{$Eval\_scores.append(eval(t))$.}
 \ENDIF
 \IF{$Early\_stopping(Eval\_scores)$}
@@ -139,8 +150,158 @@ one often needs to make the best out of heterogeneous sets of parallel data in t
 \UNTIL{convergence}
 \end{algorithmic}
 \end{algorithm}
+\section{Differential Data Selection} \label{sec:dds}
+\cite{Wang20balancing,Wang20learning-multi} formulate the problem optimizing the distribution over the training data in a bi-level optimization problem as follow.
+\begin{equation} \label{eq:bilevel}
+\begin{split}
+D_{trn}^* &= \displaystyle{\mathop{\argmin}_{D_{trn}} J(\theta^*(D_{trn}), D_{dev})} \\
+					& \theta^*(D_{trn}) = \displaystyle{\mathop{\argmin} J(\theta, D_{trn})}
+\end{split}
+\end{equation}
+Where
+\begin{align*}
+J(\theta, D_{dev}) &= \displaystyle{\mathop{\sum}_{x,y \in D_{dev}} l(\theta,x,y)} \\
+J(\theta, D_{trn}) &= \displaystyle{\mathop{E_{x,y \sim D_{trn}}[l(\theta,x,y)]}} \\
+l(\theta,x,y) &= - log P(\theta,x,y)
+\end{align*}
+The problem \ref{eq:bilevel} can be approached by coordinate gradient descent alternating between $D_{trn}$ and $\theta$. We limit the search space of $D_{trn}$ to a parameterized differential function $D_{trn}(\psi)$. Given $\psi^t$, $\theta^t$ is update via usual gradient descent as follow
+\begin{align*}
+\theta^{t+1} &= \theta^t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta^t, x,y)}{\partial \theta} \\
+x,y &\sim D_{trn}(\psi^t) 
+\\
+\end{align*}
+Given $\theta^t$, $\psi^t$ is updated via Reinforce algorithm as follow
+\begin{align*}
+\psi^{t+1} &= \psi^t + \mathbf{lr}_{data} * R(x,y) * \frac{\partial log(D_{trn}(\psi^t)(x,y))}{\partial \psi} \\
+x,y &\sim D_{trn}(\psi^t) \\
+R(x,y) &= \langle \frac{\partial l(\theta',x,y)}{\partial \theta}, \frac{\partial J(\theta^{t+1},D_{dev})}{\partial \theta} \rangle \\
+\theta' &= \theta^t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta^t, x,y)}{\partial \theta} \\
+\end{align*}
+
+To apply this method to multi-domain training (\system{Multi-DDS}), we limit the search family of training distribution $D_{trn}$ to the family of mixture of K in-domain training distribution such as $\sum_d \lambda^{s}_{d} \mathcal{D}_d(x,y)$. We also parameterize $\lambda^{s}_{d}$ using Softmax function so that $\lambda^{s}_{d} = \text{Softmax}(\psi)_d$ where $\psi \in \mathbb{R}^K$.
+
+\section{Experimental settings} \label{sec:exp}
+\subsection{Data and metrics \label{ssec:corpora}}
+We experiment with translation from English into French and use texts initially originating from 6~domains, corresponding to the following data sources: the UFAL Medical corpus V1.0 (\domain{med})\footnote{\url{https://ufal.mff.cuni.cz/ufal_medical_corpus}. \revision{We only use the in-domain (medical) subcorpora: PATR, EMEA, CESTA, ECDC.}}, the European Central Bank corpus (\domain{bank}) \cite{Tiedemann12parallel}; The JRC-Acquis Communautaire corpus (\domain{law}) \cite{Steinberger06acquis}, documentations for KDE, Ubuntu, GNOME and PHP from Opus collection \cite{Tiedemann09news}, collectively merged in a \domain{it}-domain, Ted Talks (\domain{talk}) \cite{Cettolo12wit}, and the Koran (\domain{rel}). Complementary experiments also use v12 of the News Commentary corpus (\domain{news}). Most corpora are available from the Opus web site.\footnote{\url{http://opus.nlpl.eu}} These corpora were deduplicated and tokenized with in-house tools; statistics are in Table~\ref{tab:Corpora}. To reduce the number of types and build open-vocabulary systems, we use Byte-Pair Encoding \cite{Sennrich16BPE} with 30,000 merge operations on a corpus containing all sentences in both languages.\fyDone{Add \# number of tokens, also specificity ?}%
+
+We randomly select in each corpus a development and a test set of 1,000 lines and keep the rest for training. Validation sets are used to chose the best model according to the average BLEU score \cite{Papineni02bleu}.\footnote{We use truecasing and the \texttt{multibleu} script.}\fyDone{A word about meta-parameter settings} Significance testing is performed using bootstrap resampling \cite{Koehn04statistical}, implemented in compare-mt\footnote{\url{https://github.com/neulab/compare-mt}} \cite{Neubig19compare-mt}. We report significant differences at the level of $p=0.05$.\fyDone{Fix correct p value}
+
+%for contrast experiments, we also use supplementary test sets from three other domains: the official Khresmoi testset \cite{Khresmoi17test}, which is close to EMEA, News test 2014 \cite{Bojar14findings}, and IWSLT 2010 (Talk track) \cite{Paul10overview}. This enables us to evaluate the loss in performance when the test set is from a domain not seen in training.
+% The model is also required to achieve comparable performance to generic model. To do so, we use newstest 2009 and IWSLT 2010 whose contain does not particularly belong to any domain.
+
+\begin{table*}[htbp]
+  \centering
+  \begin{tabular}{|l|ccccccc|} %*{4}{|r|}}
+    \cline{2-8} 
+    %\multicolumn{4}{|l|}{Vocab size - En: 30,165, Fr: 30,398}\\
+    \multicolumn{1}{c|}{} & \multicolumn{1}{c}{\domain{med}} & \multicolumn{1}{c}{\domain{law}} & \multicolumn{1}{c}{\domain{bank}} & \multicolumn{1}{c}{\domain{it}} & \multicolumn{1}{c}{\domain{talk}} & \multicolumn{1}{c}{\domain{rel}} & \multicolumn{1}{c|}{\domain{news}} \\
+    \hline 
+    \# lines & 2609 (0.68) & 501 (0.13) & 190 (0.05) & 270 (0.07) & 160 (0.04) & 130 (0.03) & 260 (0) \\
+    \# \revision{tokens}  &  133 / 154  &  17.1 / 19.6 &  6.3 / 7.3 &  3.6 / 4.6 &  3.6 / 4.0 &  3.2 / 3.4 & 7.8 / 9.2   \\
+    \# \revision{types}  & 771 / 720 & 52.7 / 63.1 & 92.3 / 94.7 & 75.8 / 91.4 & 61.5 / 73.3 & 22.4 / 10.5 & - \\
+    \# \revision{uniq} & 700 / 640 & 20.2 / 23.7 & 42.9 / 40.1 & 44.7 / 55.7 & 20.7 / 25.6 & 7.1 / 2.1 & - \\
+    \hline
+  \end{tabular}
+  \caption{Corpora statistics: number of parallel lines ($\times 10^3$) and proportion in the basic domain mixture (which does not include the \domain{news} domain), number of tokens in English and French ($\times 10^6$), number of types in English and French ($\times 10^3$), number of types that only appear in a given domain ($\times 10^3$). \domain{med} is the largest domain, containing almost 70\% of the sentences, while \domain{rel} is the smallest, with only 3\% of the data.
+  }
+\label{tab:Corpora}
+\end{table*}
+
+We measure the distance between domains using the $\mathcal{H}$-Divergence \cite{Ben-David09atheory}, which relates domain similarity to the test error of a domain discriminator: the larger the error, the closer the domains.
+%Formally, given test sets of size $m$ for domains $A$ and $B$, and $h(x)$ a trained domain predictor, $\mathcal{H}(A,B)$ is computed %as:
+%$$
+%\mathcal{H}(A,B) = 2(1 - [\frac{1}{m} \sum_{x:h(x) = B} \mathbb{I}( x \in A) + \frac{1}{m} \sum_{x: h(x) = A} \mathbb{I}(x \in B)]),
+% $$
+% where $\mathbb{I}$ is the indicator function.
+Our discriminator is a SVM independently trained for each pair of domains, with sentence representations derived via mean pooling from the source side representation of the generic Transformer model. We used the scikit-learn\footnote{\url{https://scikit-learn.org}} implementation with default values.\fyDone{Inform the classifier details}\fyDone{Insert tableau} Results in Table~\ref{tab:domaindist} show that all domains are well separated from all others, with \domain{rel} being the furthest apart, while \domain{talk} is slightly more central.
+
+\begin{table}\centering
+  \begin{tabular}{|l*{5}{|r}|} 
+  \cline{2-6}
+  \multicolumn{1}{c|}{} & \domain{law} & \domain{bank} & \domain{talk} & \domain{IT} & \domain{rel} \\ \hline
+    \domain{med} &1.93 &1.97 &1.9 &1.93 &1.97 \\
+    \domain{law}   && 1.94 & 1.97 &1.93 & 1.99 \\
+    \domain{bank} &&&1.98 &1.94 &1.99 \\
+    \domain{talk}   &&&&1.92 &1.93 \\
+     \domain{IT}     &&&&& 1.99 \\ \hline
+  \end{tabular}
+  \caption{The $\mathcal{H}$-divergence between domains}
+  \label{tab:domaindist}
+\end{table}
+\subsection{Baseline architectures \label{ssec:baseline}}
+Our baselines are standard for multi-domain systems.\footnote{We however omit domain-specific systems trained only with the corresponding subset of the data, which are always inferior to the mix-domain strategy \cite{Britz17mixing}.} Using Transformers \cite{Vaswani17attention} implemented in OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}, we build the following systems:
+
+\begin{itemize}
+\itemsep0em 
+\item Generic models trained with several prefixed mixtures of training data,
+\begin{align} \label{mixture:trn}
+\lambda^s_d = \frac{q_d^{\alpha}}{\displaystyle{\mathop{\sum}_{i=1}^Kq_i^{\alpha}}} &&
+q_i = \frac{\mid D_d \mid}{\displaystyle{\mathop{\sum}_{i=1}^K\mid D_i \mid}}
+\end{align} 
+with $\alpha \in [0,0.25,0.5,0.75,1.0]$. We denote these systems \system{Mixed-$\alpha$}
+%on a concatenation of all corpora (\texttt{Mixed}). We develop two versions\footnote{In fact three: to enable a fair comparison with WDCMT, a RNN-based variant is also trained and evaluated. \revision{This system appears as \system{Mixed-Nat-RNN} in Table~\ref{tab:performance}}.} of this system, one where the domain unbalance reflects the distribution of our training data \revision{given in Table~\ref{tab:Corpora}} (\system{Mixed-Nat}) and one where all domains are equally represented in training (\system{Mixed-Bal}). The former is the best option when the train mixture $\mathcal{D}^s$ is also expected in testing; the latter should be used when the test distribution is uniform across domains. Accordingly, we report two aggregate scores: a weighted average reflecting the training distribution, and an unweighted average, meaning that test domains are equally important.
+\item fine-tuned models \cite{Luong15stanford,Freitag16fast}, based on the \system{Mixed-$1.0$} system, further trained on each domain for at most 20~000 iterations, with early stopping when the dev BLEU stops increasing. The full fine-tuning (\system{FT-Full}) procedure may update all the parameters of the initial generic model, resulting in six systems adapted for one domain, with no parameter sharing across domains.
+
+\item two multi-domain versions of the approach of \newcite{Bapna19simple}, denoted \system{FT-Res} and \system{MDL-Res}, where a domain-specific adaptation module is added to all the Transformer layers; within each layer, residual connections enable to short-cut this adapter. The former variant corresponds to the original proposal of \citet{Bapna19simple} (see also \cite{Sharaf20metalearning}). It fine-tunes the adapter modules of a \system{Mixed-$1.0$} system independently for each domain, keeping all the other parameters frozen. The latter uses the same architecture, but a different training procedure and learns all parameters jointly from scratch with the prefixed mixtures of training data \ref{mixture:trn}.
+\end{itemize}
+
+All models use embeddings and the hidden layers sizes of dimension~512. Transformers contain with 8 attention heads in each of the 6+6 layers; the inner feedforward layer contains 2048 cells. The adapter-based systems (see below) additionally use an adaptation block in each layer, composed of a 2-layer perceptron, with an inner $\operatorname{ReLU}$ activation function operating on normalized entries of dimension~1024. 
+Training uses batches of~12,288 tokens, Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$, Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ in all layers.
+\subsection{Multi-domain systems} \label{ssec:mdsys}
+Our comparison of multi-domain systems includes our own reimplementations of recent proposals from the literature:\footnote{\revision{Further implementation details are in Appendix~A.}}
+\begin{itemize}
+\itemsep0em 
+\item NMT models trained with Multi-DDS mixture given several objective testing distributions: uniform, uni-domain and natural.
+\item \system{MDL-Res} trained from scratch with Multi-DDS mixture.
+\end{itemize}
+\section{Results and discussion \label{sec:results}}
+\begin{table*}
+  \centering% \small
+  \begin{adjustbox}{width=2\columnwidth,center}
+  \begin{tabular}{|p{3.0cm}|*{13}{r|}} \hline
+    \multirow{2}{*}{Training} & \multicolumn{6}{|c}{$\lambda^t_d$} & \multicolumn{6}{|c|}{BLEU} & \multirow{2}{*}{BLEU} \\ \cline{2-13}	
+  mixture & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & average \\
+    \hline
+  \system{Mixed-$0.0$} & 0.166&0.166 &0.166 &0.166 &0.166 & 0.166 & 35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
+  \system{Mixed-$0.25$} & 0.166&0.166 &0.166 &0.166 &0.166 & 0.166 &35.92& 54.87& 52.55& 32.55& 44.98& 90.28& 51.86\\
+  \system{Mixed-$0.5$} & 0.166&0.166 &0.166 &0.166 &0.166 & 0.166 &36.11& 55.37& 51.76& 33.52& 46.23& 89.99& 52.16\\
+  \system{Mixed-$0.75$} & 0.166&0.166 &0.166 &0.166 &0.166 & 0.166 &36.53&	55.03& 51.15& 33.98& 44.28& 87.22& 51.365\\
+  \system{Mixed-$1.0$} & 0.166&0.166 &0.166 &0.166 &0.166 & 0.166 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
+  \system{Multi-DDS} & 0.166&0.166 &0.166 &0.166 &0.166 & 0.166 & & & & & & & \\
+  \system{Multi-DDS-v1} & 0.166&0.166 &0.166 &0.166 &0.166 & 0.166 & & & & & & & \\
+  \hline
+  \end{tabular}
+  \end{adjustbox}
+\end{table*}
+\begin{table*}
+  \centering% \small
+  \begin{adjustbox}{width=2\columnwidth,center}
+  \begin{tabular}{|p{2cm}|*{13}{r|}} \hline
+    \multirow{2}{*}{Training} & \multicolumn{6}{|c}{$\lambda^t_d$} & \multicolumn{6}{|c|}{BLEU} & \multirow{2}{*}{BLEU} \\ \cline{2-13}	
+  mixture & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & average \\
+    \hline
+  \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
+  \system{Multi-DDS} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
+  \system{FT-Full} & 0.0 &1.0 & 0.0 &0.0 &0.0 & 0.0 &35.92& 54.87& 52.55& 32.55& 44.98& 90.28& 51.86\\
+  \system{Multi-DDS} & 0.0 &1.0 & 0.0 &0.0 &0.0 & 0.0 &35.92& 54.87& 52.55& 32.55& 44.98& 90.28& 51.86\\
+  \system{FT-Full} & 0.0 &0.0 & 1.0 &0.0 &0.0 & 0.0 &36.11& 55.37& 51.76& 33.52& 46.23& 89.99& 52.16\\
+  \system{Multi-DDS} & 0.0 &0.0 & 1.0 &0.0 &0.0 & 0.0 &36.11& 55.37& 51.76& 33.52& 46.23& 89.99& 52.16\\
+  \system{FT-Full} & 0.0 &0.0 & 0.0 &1.0 &0.0 & 0.0 &36.53&	55.03& 51.15& 33.98& 44.28& 87.22& 51.365\\
+  \system{Multi-DDS} & 0.0 &0.0 & 0.0 &1.0 &0.0 & 0.0 &36.53&	55.03& 51.15& 33.98& 44.28& 87.22& 51.365\\
+  \system{FT-Full} & 0.0 &0.0 & 0.0 &0.0 &1.0 & 0.0 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
+  \system{Multi-DDS} & 0.0 &0.0 & 0.0 &0.0 &1.0 & 0.0 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
+  \system{FT-Full} & 0.0 &0.0 & 0.0 &0.0 &0.0 & 1.0 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
+  \system{Multi-DDS} & 0.0 &0.0 & 0.0 &0.0 &0.0 & 1.0 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
+  \hline
+  \end{tabular}
+  \end{adjustbox}
+  \label{tab:redomains}
+\end{table*}
+\section{Related Work \label{sec:related}}
+\section{Conclusion and outlook \label{sec:discussion}}
 \section*{Acknowledgments}
 \bibliographystyle{acl_natbib}
 \bibliography{multidomain}
 %\appendix
 \end{document}
+
