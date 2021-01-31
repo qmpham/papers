@@ -23,6 +23,7 @@
 % but it will improve the layout of the manuscript,
 % and will typically save some space.
 \usepackage{microtype}
+\usepackage{graphicx}
 
 %\aclfinalcopy % Uncomment this line for the final submission
 %\def\aclpaperid{***} %  Enter the acl Paper ID here
@@ -102,7 +103,7 @@
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
-A typical setting in machine translation, is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for a task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen; a key component in training is then to mitigate the detrimental effects of this mismatch between distributions. Single-source and multi-source domain adaptation is a well-studied instance of this setting (see \cite{Chu2017comparison} for a review) , and so is multi-domain learning \cite{Chu18multilingual}\cite{Zeng18multidomain}\cite{Jiang19multidomain}. A related situation is multi-lingual machine translation \cite{Firat16multiway}\cite{Johnson17google}\cite{Ha16towards}\fytodo{Add more recent work}, where the heterogeneity of training data correspond not only to variation in topic or genre, but also in languages.
+A typical setting in machine translation, is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for a task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen; a key component in training is then to mitigate the detrimental effects of this mismatch between distributions. Single-source and multi-source domain adaptation is a well-studied instance of this setting (see \cite{Chu2017comparison} for a review) , and so is multi-domain learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain}. A related situation is multi-lingual machine translation \cite{Firat16multiway,Ha16towards,Johnson17google}\fyTodo{Add more recent work}, where the heterogeneity of training data correspond not only to variation in topic or genre, but also in languages.
 
 \fyTodo{Label or covariate shift ?}
 This problem is often approached with instance selection or reweighting strategies, where the available training data is used in proportion to its relevance for the test conditions. [Additional techniques : GANs for feau]
@@ -110,75 +111,61 @@ This problem is often approached with instance selection or reweighting strategi
 
 one often needs to make the best out of heterogeneous sets of parallel data in training to achieve the best test performance in one or several domain(s) of interest. This multi-source (multi-domain) adaptation problem is often approached with instance selection or reweighting strategies, most of which pre-supposes an ad-hoc assessment of relevance for training sentences. In this contribution, we study the recently proposed Differential Data Selection (DDS) model  and explore its ability to serve an effective generic framework for these various situations. Our experiments for both domain adaptation and multi-domain learning show that DDS often enables to outperform heuristic training strategies; we also introduce a variant that boosts DDS performance of adapter-based multi-domain systems.
 
+\section{Learning with multiple data sources} \label{sec:mdmt}
 
+We conventionally define a domain $d$ as a distribution $\mathcal{D}_d(x)$ over some feature space $\mathcal{X}$ that is shared across domains \cite{Pan10asurvey}: in machine translation, $\mathcal{X}$ is the representation space for input sentences; each domain corresponds to a specific source of data, and may differ from the other data sources in terms of textual genre, thematic content \cite{Chen16guided,Zhang16topicinformed}, register \cite{Sennrich16politeness}, style \cite{Niu18multitask}, etc. Translation in domain $d$ is formalized by a translation function $h_d(y|x)$ pairing sentences in a source language with sentences in a target language $y \in \mathcal{Y}$. $h_d$ is usually assumed to be deterministic (hence $y = h_d(x)$), but might differ from one domain to the other.
 
-\section{Formalizing multi-domain translation} \label{sec:mdmt}
-We conventionally define a domain $d$ as a distribution $\mathcal{D}_d(x)$ over some feature space $\mathcal{X}$ that is shared across domains \cite{Pan10asurvey}: in machine translation, $\mathcal{X}$ is the representation space for source sentences; each domain corresponds to a specific source of data, and differs from the other data sources in terms of textual genre, thematic content \cite{Chen16guided,Zhang16topicinformed}, register \cite{Sennrich16politeness}, style \cite{Niu18multitask}, etc. Translation in domain $d$ is formalized by a translation function $h_d(y|x)$ pairing sentences in a source language with sentences in a target language $y \in \mathcal{Y}$. $h_d$ is usually assumed to be deterministic (hence $y = h_d(x)$), but can differ from one domain to the other.
+It is usual in MT to opportunistically collect training samples from multiple domains, which means that the training distribution $\mathcal{D}^s$ is a mixture $\mathcal{D}^s(x) = \sum_{d=1}^{n_d} \lambda^{s}_{d} \mathcal{D}_d(x)$\revision{, with $\{\lambda^{s}_d, d=1 \dots n_d\}$ the corresponding mixture weights such that $\sum_d \lambda^{s}_d=1$)}.
 
-A typical learning scenario in MT is to have access to samples from $n_d$ domains, which means that the training distribution $\mathcal{D}^s$ is a mixture $\mathcal{D}^s(x) = \sum_d \lambda^{s}_{d} \mathcal{D}_d(x)$\revision{, with $\{\lambda^{s}_d, d=1 \dots n_d\}$ the corresponding mixture weights ($\sum_d \lambda^{s}_d=1$)}. Multi-domain learning, as defined in \citet{Dredze08online} further assumes that domain tags are also available in testing; the implication being that the test distribution is also as a mixture $\mathcal{D}^t(x) = \sum_d \lambda^{t}_{d} \mathcal{D}_d(x)$ of several domains, making the problem distinct from mere domain adaption. A multi-domain learner is then expected to use these tags effectively \cite{Joshi12multidomain} when computing the combined translation function $h(x,d)$, and to perform well in all domains \cite{Finkel09hierarchical}. This setting is closely related to the multi-source adaptation problem formalized in \cite{Mansour09domainadaptation,Mansour09multiple,Hoffman18algorithms}.
+The main challenge is then to make the best of this heterogeneous data, with the aim to achieve the best possible system for the intended test conditions. These might correspond to data from just one of the training domains, as in standard supervised (multi-source) domain adaptation; a more difficult case is when the test data is from one domain unseen in training (unsupervised domain adaptation); in multi-domain adaptation the test distribution is itself a mixture of domains, some of which may also be observed in training.  Without loss of generality, one may then assume that the test distribution takes the form $\mathcal{D}^t(x) = \sum_d \lambda^{t}_{d} \mathcal{D}_d(x)$ - with only one non-null  $\lambda^{t}_{d}$ in the case of domain adaptation.
+These situations are illustrated in Figure~\ref{fig:mdmt-lambdas}.
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.48\textwidth]{mdmt-lambdas}
+  \caption{Training and testing with distribution mismatch. We consider just three domains, and represent the mixture weights $\lambda^{s}$ and $\lambda^{t}$ in the 3-dimensional simplex. Training with weights in (a) and testing with weights in (c) is standard multi-source domain adaptation to $d_2$, while (b)-(c) is unsupervised adapation; training with weights in (a) and testing with weights in (d) is multi-domain learning, also illustrated with configurations (a)-(e) (training domain $d_1$ is not seen in test), and (b)-(d)  (test domain $d_2$ is unseen in training).}\label{fig:mdmt-lambdas}
+\end{figure}
 
-This definition seems to be the most accepted view of a multi-domain MT\footnote{An exception is \citep{Farajian17multidomain}, where test translations rely on similarity scores between test and train sentences, rather than on domain labels.} and one that we also adopt here. Note that in the absence of further specification, the naive answer to the MD setting should be to estimate one translation function $\hat{h}_d(x)$ separately for each domain, then to translate using $\hat{h}(x,d) = \sum_{d'} h_{d'}(x) \indic{d' = d}$, where $\indic{x}$ is the indicator function.
+Theses situations have been amply documented from a theoretical perspective (eg.\ \cite{Mansour09multiple,Mansour09domainadaptation,Hoffman18algorithms}). A general recommandation in the DA setting  is to adjust the sampling distribution used to optimize the system so as to compensate for the mismatch between $\mathcal{D}^s(x)$ and $\mathcal{D}^t(x)$. This can be approximated by reweighting instances, or more conveniently domains, which are selected during training with a probability $Q^{trnn}(d)$, with $Q^{trn}(d) \neq \lambda^{s}(d)$.
 
-Given an objective mixture over test distribution $\lambda^{t}_{d}$,$d\in[1,\dots,K]$ and a mixture of training data $\lambda^{s}_{d}$, the Multi-domain training course is determined by the below algorithm \ref{alg:mdmt}. The training mixture can be constant or changing through time. Optimizing the training mixture is an interesting problem that we would like to address in the paper.
-\begin{algorithm}[H]
-\caption{Multi-domain Training} \label{alg:mdmt}
-\label{alg:multidomain}
-\begin{algorithmic}[1]
-\REQUIRE {
-\begin{itemize}
-	\item Corpora $C^d, d\in [1,..,K]$ for $K$ domains equipped by an empirical distribution $D_d(x,y)$
-	\item Dev sets $Dev^d, d\in [1,..,K]$ for $K$ domains.
-	\item Testing mixture weights in the final evaluation $\lambda^t_d, d\in [1,..,K]$
-	\item Batch size $B$.
-	\item Temporal Data Selection Distribution(T-DSD)$$P_{\system{T-DSD}}(t)(x,y)=\sum_{d}\lambda^s_d(t)D_d(x,y)$$
-	\item $Eval\_scores = []$
-	\item $Early\_stopping$ criterion.
-\end{itemize}}
-\REPEAT 
-\STATE{Iteration t.}
-\STATE{Randomly pick $d \in [1,..,K]$ w.r.t  $[\lambda^s_1 \dots \lambda^s_K](t)$.}
-\STATE{Sample $B$ sentences from $C^d$ with empirical distribution $D_d(x,y)$.}
-\STATE{Update model by applying SGD computed from $B$ sampled sentences.}
-\IF{$t \equiv 0 \mod{eval\_step}$}
-	\STATE{Evaluate current model with K dev sets. Denote $S^t_d$ performance of model at iteration t on domain d.}
-	\STATE{Report weighted score using testing mixture weights $\lambda^t_d, d\in [1,..,K]$. $$eval(t) = \displaystyle{\mathop{\sum}_d \lambda^t_d S^t_d}$$}
-	\STATE{$Eval\_scores.append(eval(t))$.}
-\ENDIF
-\IF{$Early\_stopping(Eval\_scores)$}
-	\STATE{Stop training loop.}
-\ENDIF
-\UNTIL{convergence}
-\end{algorithmic}
-\end{algorithm}
+Another practical standard approach to supervised DA is fine-tuning \cite{Luong15stanford,Freitag16fast}, where $q(x)$ is allowed to vary during the course of learning. With our notations, this approach amounts to first learning a initial parameter value with all data ($Q^{trn}(d) = \lambda^{s}(d)$), then to continue training with only batches from the test domain ($Q^{trn}(d) = \lambda^{s}(d) = \lambda^{t}(d)$). Note that this strategy may be suboptimal, since some out-of-domain samples may still be useful for the final performance due to eg.\ domain overlap. Optimizing the learning distribution in multi-domain learning is even more challenging, as the learner has to best take advantage of domain overlap, and also of the fact that some domains might be easier to learn than others.\fyTodo{How to measure this?} 
+
+Differentiable data selection (DDS), introduced in \cite{Wang20optimizing} and later applied to multilingual machine translation in \cite{Wang20balancing}, introduces an additional degree of freedom and allows $Q^{trn}(d)$ to change more often in the course of training, as we now explain.
+
+% === The part on multidomain training has been moved to the end.
+
 \section{Differential Data Selection} \label{sec:dds}
-\cite{Wang20balancing,Wang20learning-multi} formulate the problem optimizing the distribution over the training data in a bi-level optimization problem as follow.
+We assume a training sample consisting of data from $n_d$ domains $d_1 \dots d_{n_d}$; we denote the size of the training subcorpus from domain $d$ as  $N^{trn}_d$, and $N^{trn} = \sum_d N^{trn}_d$ is the total number of training samples. We assume a fixed and pre-defined test distribution, approximated with an equivalent number of development corpora as $\widehat{\mathcal{D}^t}(x) = \sum_{d} Q^{dev}(d) \frac{[[x \in d]]}{N^{dev}_d}$, where $[[x \in d]]$ is the indicator function for domain $d$. Training is modeled as optimizing the parameters $\theta$ of a neural translation model.
+
+Sampling training instances from a distribution $Q^{trn}(d)$ over domains results in a parameter estimate $\theta(Q^{trn})$, delivering performance that can be estimated using $Q^{dev}$. \cite{Wang20optimizing,Wang20balancing} then formulate the problem of finding an optimal sampling $Q^{trn}_{*}$ maximizing performance on the development data as the following bi-level optimization problem.
 \begin{equation} \label{eq:bilevel}
 \begin{split}
-D_{trn}^* &= \displaystyle{\mathop{\argmin}_{D_{trn}} J(\theta^*(D_{trn}), D_{dev})} \\
-					& \theta^*(D_{trn}) = \displaystyle{\mathop{\argmin} J(\theta, D_{trn})}
+Q^{trn}_* &= \displaystyle{\mathop{\argmin}_{Q^{trn}} J(\theta^*(Q^{trn}), Q^{dev})} \\
+					& \theta^*(Q^{trn}) = \displaystyle{\mathop{\argmin} J(\theta, Q^{trn})}, 
 \end{split}
 \end{equation}
-Where
+where we use the following notations:\fyTodo{Overload Q, from domain to instances to pairs}
 \begin{align*}
-J(\theta, D_{dev}) &= \displaystyle{\mathop{\sum}_{x,y \in D_{dev}} l(\theta,x,y)} \\
-J(\theta, D_{trn}) &= \displaystyle{\mathop{E_{x,y \sim D_{trn}}[l(\theta,x,y)]}} \\
+J(\theta, Q^{dev}) &= \displaystyle{\mathop{\sum}_{(x,y) \in Q^{dev}} l(\theta,x,y)} \\
+J(\theta, Q^{trn}) &= \displaystyle{\mathop{E_{(x,y) \sim Q^{trn}}[l(\theta,x,y)]}} \\
 l(\theta,x,y) &= - log P(\theta,x,y)
 \end{align*}
-The problem \ref{eq:bilevel} can be approached by coordinate gradient descent alternating between $D_{trn}$ and $\theta$. We limit the search space of $D_{trn}$ to a parameterized differential function $D_{trn}(\psi)$. Given $\psi^t$, $\theta^t$ is update via usual gradient descent as follow
+Problem~\eqref{eq:bilevel} can be approached by coordinate gradient descent alternating between $Q^{trn}$ and $\theta$. \citet{Wang20balancing} limit the search space of $Q^{trn}$ to a parameterized differentiable function $Q^{trn}(\psi)$. Given $\psi_t$ at time step $s$, $\theta_t$ is updated via usual gradient descent as follows:
 \begin{align*}
-\theta^{t+1} &= \theta^t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta^t, x,y)}{\partial \theta} \\
-x,y &\sim D_{trn}(\psi^t) 
-\\
-\end{align*}
-Given $\theta^t$, $\psi^t$ is updated via Reinforce algorithm as follow
-\begin{align*}
-\psi^{t+1} &= \psi^t + \mathbf{lr}_{data} * R(x,y) * \frac{\partial log(D_{trn}(\psi^t)(x,y))}{\partial \psi} \\
-x,y &\sim D_{trn}(\psi^t) \\
-R(x,y) &= \langle \frac{\partial l(\theta',x,y)}{\partial \theta}, \frac{\partial J(\theta^{t+1},D_{dev})}{\partial \theta} \rangle \\
-\theta' &= \theta^t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta^t, x,y)}{\partial \theta} \\
+\theta_{t+1} &= \theta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta_t, x,y)}{\partial \theta} \\
+x,y &\sim Q^{trn}(\psi_t) \\
 \end{align*}
 
-To apply this method to multi-domain training (\system{Multi-DDS}), we limit the search family of training distribution $D_{trn}$ to the family of mixture of K in-domain training distribution such as $\sum_d \lambda^{s}_{d} \mathcal{D}_d(x,y)$. We also parameterize $\lambda^{s}_{d}$ using Softmax function so that $\lambda^{s}_{d} = \text{Softmax}(\psi)_d$ where $\psi \in \mathbb{R}^K$.
+Given $\theta_t$, $\psi_t$ is updated via the Reinforce algorithm:\fyTodo{Ref Reinforce}
+\begin{align*}
+  \psi_{t+1} &= \psi_t + \mathbf{lr}_{data} * R(x,y) * \\
+  & \quad\quad \frac{\partial log(Q^{trn}(\psi_t)(x,y))}{\partial \psi} \\
+x,y &\sim Q^{trn}(\psi_t) \\
+R(x,y) &= \langle \frac{\partial l(\theta',x,y)}{\partial \theta}, \frac{\partial J(\theta_{t+1},Q^{dev})}{\partial \theta} \rangle \\
+\theta' &= \theta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta_t, x,y)}{\partial \theta} \\
+\end{align*}
+
+\fyTodo{Explain lr, may be more}
+% To apply this method to multi-domain training (\system{Multi-DDS}), we limit the search family of training distribution $D_{trn}$ to the family of mixture of K in-domain training distribution such as $\sum_d \lambda^{s}_{d} \mathcal{D}_d(x,y)$. We also parameterize $\lambda^{s}_{d}$ using Softmax function so that $\lambda^{s}_{d} = \text{Softmax}(\psi)_d$ where $\psi \in \mathbb{R}^K$.
 
 \section{Experimental settings} \label{sec:exp}
 \subsection{Data and metrics \label{ssec:corpora}}
@@ -202,11 +189,12 @@ We randomly select in each corpus a development and a test set of 1,000 lines an
     \# \revision{uniq} & 700 / 640 & 20.2 / 23.7 & 42.9 / 40.1 & 44.7 / 55.7 & 20.7 / 25.6 & 7.1 / 2.1 & - \\
     \hline
   \end{tabular}
-  \caption{Corpora statistics: number of parallel lines ($\times 10^3$) and proportion in the basic domain mixture (which does not include the \domain{news} domain), number of tokens in English and French ($\times 10^6$), number of types in English and French ($\times 10^3$), number of types that only appear in a given domain ($\times 10^3$). \domain{med} is the largest domain, containing almost 70\% of the sentences, while \domain{rel} is the smallest, with only 3\% of the data.
+  \caption{Corpora statistics: number of parallel lines ($\times 10^3$) and proportion in the training domain mixture (which does not contain \domain{news}), number English and French tokens ($\times 10^6$), number English and French types ($\times 10^3$), number of types that only appear in a given domain ($\times 10^3$). \domain{med} is the largest domain, containing almost 70\% of the sentences, while \domain{rel} is the smallest, with only 3\% of the data.
   }
 \label{tab:Corpora}
 \end{table*}
 
+\fyTodo{Keep this ?}
 We measure the distance between domains using the $\mathcal{H}$-Divergence \cite{Ben-David09atheory}, which relates domain similarity to the test error of a domain discriminator: the larger the error, the closer the domains.
 %Formally, given test sets of size $m$ for domains $A$ and $B$, and $h(x)$ a trained domain predictor, $\mathcal{H}(A,B)$ is computed %as:
 %$$
@@ -228,17 +216,18 @@ Our discriminator is a SVM independently trained for each pair of domains, with 
   \caption{The $\mathcal{H}$-divergence between domains}
   \label{tab:domaindist}
 \end{table}
+
 \subsection{Baseline architectures \label{ssec:baseline}}
 Our baselines are standard for multi-domain systems.\footnote{We however omit domain-specific systems trained only with the corresponding subset of the data, which are always inferior to the mix-domain strategy \cite{Britz17mixing}.} Using Transformers \cite{Vaswani17attention} implemented in OpenNMT-tf\footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}, we build the following systems:
 
 \begin{itemize}
 \itemsep0em 
-\item Generic models trained with several prefixed mixtures of training data,
+\item Generic models trained with various predefined mixtures of the training data taking the form:
 \begin{align} \label{mixture:trn}
-\lambda^s_d = \frac{q_d^{\alpha}}{\displaystyle{\mathop{\sum}_{i=1}^Kq_i^{\alpha}}} &&
-q_i = \frac{\mid D_d \mid}{\displaystyle{\mathop{\sum}_{i=1}^K\mid D_i \mid}}
+Q^{trn}(d) = \frac{q_d^{\alpha}}{\displaystyle{\mathop{\sum}_{d=1}^{n_d}q_d^{\alpha}}} &&
+q_d = \frac{\mid N^{trn}_d \mid}{\displaystyle{N^{trn}}} % \mathop{\sum}_{i=1}^K\mid D_i \mid}}
 \end{align} 
-with $\alpha \in [0,0.25,0.5,0.75,1.0]$. We denote these systems \system{Mixed-$\alpha$}
+with $\alpha \in [0,0.25,0.5,0.75,1.0]$. We denote below these systems \system{Mixed-$\alpha$}
 %on a concatenation of all corpora (\texttt{Mixed}). We develop two versions\footnote{In fact three: to enable a fair comparison with WDCMT, a RNN-based variant is also trained and evaluated. \revision{This system appears as \system{Mixed-Nat-RNN} in Table~\ref{tab:performance}}.} of this system, one where the domain unbalance reflects the distribution of our training data \revision{given in Table~\ref{tab:Corpora}} (\system{Mixed-Nat}) and one where all domains are equally represented in training (\system{Mixed-Bal}). The former is the best option when the train mixture $\mathcal{D}^s$ is also expected in testing; the latter should be used when the test distribution is uniform across domains. Accordingly, we report two aggregate scores: a weighted average reflecting the training distribution, and an unweighted average, meaning that test domains are equally important.
 \item fine-tuned models \cite{Luong15stanford,Freitag16fast}, based on the \system{Mixed-$1.0$} system, further trained on each domain for at most 20~000 iterations, with early stopping when the dev BLEU stops increasing. The full fine-tuning (\system{FT-Full}) procedure may update all the parameters of the initial generic model, resulting in six systems adapted for one domain, with no parameter sharing across domains.
 
@@ -304,4 +293,41 @@ Our comparison of multi-domain systems includes our own reimplementations of rec
 \bibliography{multidomain}
 %\appendix
 \end{document}
+
+Multi-domain learning, as defined in \citet{Dredze08online} further assumes that domain tags are also available in testing; the implication being that the test distribution is also as a mixture of several domains, making the problem distinct from mere domain adaption. A multi-domain learner is then expected to use these tags effectively \cite{Joshi12multidomain} when computing the combined translation function $h(x,d)$, and to perform well in all domains \cite{Finkel09hierarchical}. This setting is closely related to the multi-source adaptation problem formalized in \cite{Mansour09domainadaptation,Mansour09multiple,Hoffman18algorithms}.
+
+This definition seems to be the most accepted view of a multi-domain MT\footnote{An exception is \citep{Farajian17multidomain}, where test translations rely on similarity scores between test and train sentences, rather than on domain labels.} and one that we also adopt here. In the absence of further specification, the naive answer to the MD setting should be to estimate one translation function $\hat{h}_d(x)$ separately for each domain, then to translate using $\hat{h}(x,d) = \sum_{d'} h_{d'}(x) \indic{d' = d}$, where $\indic{x}$ is the indicator function.
+
+Given an objective mixture over test distribution $\lambda^{t}_{d}$,$d\in[1,\dots,K]$ and a mixture of training data $\lambda^{s}_{d}$, the Multi-domain training course is determined by the below algorithm \ref{alg:mdmt}. The training mixture can be constant or changing through time. Optimizing the training mixture is an interesting problem that we would like to address in the paper.
+
+\begin{algorithm}[H]
+\caption{Multi-domain Training} \label{alg:mdmt}
+\label{alg:multidomain}
+\begin{algorithmic}[1]
+\REQUIRE {
+\begin{itemize}
+	\item Corpora $C^d, d\in [1,..,K]$ for $K$ domains equipped by an empirical distribution $D_d(x,y)$
+	\item Dev sets $Dev^d, d\in [1,..,K]$ for $K$ domains.
+	\item Testing mixture weights in the final evaluation $\lambda^t_d, d\in [1,..,K]$
+	\item Batch size $B$.
+	\item Temporal Data Selection Distribution(T-DSD)$$P_{\system{T-DSD}}(t)(x,y)=\sum_{d}\lambda^s_d(t)D_d(x,y)$$
+	\item $Eval\_scores = []$
+	\item $Early\_stopping$ criterion.
+\end{itemize}}
+\REPEAT 
+\STATE{Iteration t.}
+\STATE{Randomly pick $d \in [1,..,K]$ w.r.t  $[\lambda^s_1 \dots \lambda^s_K](t)$.}
+\STATE{Sample $B$ sentences from $C^d$ with empirical distribution $D_d(x,y)$.}
+\STATE{Update model by applying SGD computed from $B$ sampled sentences.}
+\IF{$t \equiv 0 \mod{eval\_step}$}
+	\STATE{Evaluate current model with $K$ dev sets. $S^t_d$ is the performance at iteration $t$ on domain $d$.}
+	\STATE{Report weighted score using testing mixture weights $\lambda^t_d, d\in [1,..,K]$. $$eval(t) = \displaystyle{\mathop{\sum}_d \lambda^t_d S^t_d}$$}
+	\STATE{$Eval\_scores.append(eval(t))$.}
+\ENDIF
+\IF{$Early\_stopping(Eval\_scores)$}
+	\STATE{Stop training loop.}
+\ENDIF
+\UNTIL{convergence}
+\end{algorithmic}
+\end{algorithm}
 
