@@ -106,10 +106,11 @@
 A typical setting in machine translation, is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for a task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen; a key component in training is then to mitigate the detrimental effects of this mismatch between distributions. Single-source and multi-source domain adaptation is a well-studied instance of this setting (see \cite{Chu2017comparison} for a review) , and so is multi-domain learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain}. A related situation is multi-lingual machine translation \cite{Firat16multiway,Ha16towards,Johnson17google,Arivazhagan19massively}\fyTodo{Add more recent work}, where the heterogeneity of training data not only corresponds to variation in topic or genre, but also in language.
 
 \fyTodo{Label or covariate shift ?}
-This problem is often approached with instance selection or reweighting strategies, where the available training data is used in proportion to its relevance for the chosen test conditions. Finding the optimal balance of training data is however a challenging task due for instance to similarity between domains / languages. Several recent proposals \cite{Kumar19reinforcement}
+This problem is often approached with instance selection or reweighting strategies, where the available training data is used in proportion to its relevance for the chosen test conditions. Finding the optimal balance of training data is however a challenging task due for instance to similarity between domains / languages; it may also be suboptimal, as some domains or languages might be easier to train than others. Several recent proposals \cite{Wang17instance,Kumar19reinforcement, Wang20learning-multi} have explored ways to instead consider dynamic data selection strategy. We study in this contribution the proposal of \cite{Wang20balancing}, initially introduced for multilingual MT, with the goal to evaluate its potential in various single domain and multi-domain adaptation settings and assess DDS as an effective replacement to standard heuristics approaches.
 
+Based on experimental results obtained on a diverse set of domains, our main conclusions are that (a) using DDS often yields overall performance that are as good as the standard fine-tuning strategy for domain adaptation; (b) DDS can effectively handle a variety of test target distributions without any meta-parameter search; (c) our extension of DDS is able to boost its performance when used in conjunction to the adapter model of \citet{Bapna19simple}.
 
-one often needs to make the best out of heterogeneous sets of parallel data in training to achieve the best test performance in one or several domain(s) of interest. This multi-source (multi-domain) adaptation problem is often approached with instance selection or reweighting strategies, most of which pre-supposes an ad-hoc assessment of relevance for training sentences. In this contribution, we study the recently proposed Differential Data Selection (DDS) model  and explore its ability to serve an effective generic framework for these various situations. Our experiments for both domain adaptation and multi-domain learning show that DDS often enables to outperform heuristic training strategies; we also introduce a variant that boosts DDS performance of adapter-based multi-domain systems.
+% one often needs to make the best out of heterogeneous sets of parallel data in training to achieve the best test performance in one or several domain(s) of interest. This multi-source (multi-domain) adaptation problem is often approached with instance selection or reweighting strategies, most of which pre-supposes an ad-hoc assessment of relevance for training sentences. In this contribution, we study the recently proposed Differential Data Selection (DDS) model  and explore its ability to serve an effective generic framework for these various situations. Our experiments for both domain adaptation and multi-domain learning show that DDS often enables to outperform heuristic training strategies; we also introduce a variant that boosts DDS performance of adapter-based multi-domain systems.
 
 \section{Learning with multiple data sources} \label{sec:mdmt}
 
@@ -243,6 +244,7 @@ Our comparison of multi-domain systems includes our own reimplementations of rec
 \item NMT models trained with Multi-DDS mixture given several objective testing distributions: uniform, uni-domain and natural.
 \item \system{MDL-Res} trained from scratch with Multi-DDS mixture.
 \end{itemize}
+
 \section{Results and discussion \label{sec:results}}
 \begin{table*}
   \centering% \small
@@ -287,6 +289,10 @@ Our comparison of multi-domain systems includes our own reimplementations of rec
   \label{tab:redomains}
 \end{table*}
 \section{Related Work \label{sec:related}}
+\cite{Wang17instance} uses dynamic weighting (for sentences and domains) for DA.
+
+\cite{Wang20multidomain} for multidomain DA.
+
 \section{Conclusion and outlook \label{sec:discussion}}
 \section*{Acknowledgments}
 \bibliographystyle{acl_natbib}
