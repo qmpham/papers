@@ -106,7 +106,7 @@
 A typical setting in machine translation, is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for a task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen; a key component in training is then to mitigate the detrimental effects of this mismatch between distributions. Single-source and multi-source domain adaptation is a well-studied instance of this setting (see \cite{Chu2017comparison} for a review) , and so is multi-domain learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain}. A related situation is multi-lingual machine translation \cite{Firat16multiway,Ha16towards,Johnson17google,Arivazhagan19massively}\fyTodo{Add more recent work}, where the heterogeneity of training data not only corresponds to variation in topic or genre, but also in language.
 
 \fyTodo{Label or covariate shift ?}
-This problem is often approached with instance selection or reweighting strategies, where the available training data is used in proportion to its relevance for the chosen test conditions. Finding the optimal balance of training data is however a challenging task due for instance to similarity between domains / languages; it may also be suboptimal, as some domains or languages might be easier to train than others. Several recent proposals \cite{Wang17instance,Kumar19reinforcement, Wang20learning-multi} have explored ways to instead consider dynamic data selection strategy. We study in this contribution the proposal of \cite{Wang20balancing}, initially introduced for multilingual MT, with the goal to evaluate its potential in various single domain and multi-domain adaptation settings and assess DDS as an effective replacement to standard heuristics approaches.
+This problem is often approached with \emph{static} instance selection or re-weighting strategies, where the available training data is used in proportion to its relevance for the chosen test conditions. Finding the optimal balance of training data is however a challenging task due for instance to similarity between domains / languages, but also due to regularization effects of out-of-domain data; it may also be suboptimal, as some domains or languages might be easier to train than others. Several recent proposals \cite{Wang17instance,Kumar19reinforcement,Wang20learning-multi} have explored ways to instead consider \emph{dynamic} data selection strategy. We study in this contribution the proposal of \cite{Wang20balancing}, initially introduced for multilingual MT, with the goal to evaluate its potential in various single domain and multi-domain adaptation settings and assess DDS as an effective replacement to standard heuristics approaches.
 
 Based on experimental results obtained on a diverse set of domains, our main conclusions are that (a) using DDS often yields overall performance that are as good as the standard fine-tuning strategy for domain adaptation; (b) DDS can effectively handle a variety of test target distributions without any meta-parameter search; (c) our extension of DDS is able to boost its performance when used in conjunction to the adapter model of \citet{Bapna19simple}.
 
@@ -297,7 +297,9 @@ Our comparison of multi-domain systems includes our own reimplementations of rec
 \section{Related Work \label{sec:related}}
 \cite{Wang17instance} uses dynamic weighting (for sentences and domains) for DA.
 
-\cite{Wang20multidomain} for multidomain DA.
+\cite{Wang20multidomain} adapts curriculum learning \cite{BengioXX} for multi-domain adaptation, where an optimal instance weighting scheme is found using Bayesian optimization techniques.
+
+Also \cite{Saunders19adaptive}.
 
 \section{Conclusion and outlook \label{sec:discussion}}
 \section*{Acknowledgments}
