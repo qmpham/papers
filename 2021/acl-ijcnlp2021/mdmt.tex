@@ -95,7 +95,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-  When building machine translation systems, one often needs to make the best out of heterogeneous sets of parallel data in training to achieve the best test performance in one or several domain(s) of interest. This multi-source (multi-domain) adaptation problem is often approached with instance selection or reweighting strategies, most of which pre-supposes an ad-hoc assessment of relevance for training sentences. In this contribution, we study the recently proposed Differential Data Selection (DDS) model  and explore its ability to serve an effective generic framework for these various situations. Our experiments for both domain adaptation and multi-domain learning show that DDS often enables to outperform heuristic training strategies; we also introduce a variant that boosts DDS performance of adapter-based multi-domain systems.
+  When building machine translation systems, one often needs to make the best out of heterogeneous sets of parallel data in training to achieve the best test performance in one or several domain(s) of interest. This multi-source (multi-domain) adaptation problem is often approached with instance selection or reweighting strategies, most of which pre-suppose an ad-hoc assessment of the relevance of training instances. In this paper, we study the recently proposed Differential Data Selection (DDS) model and explore its ability to serve as a generic framework for these various situations. Our experiments study both domain adaptation and multi-domain learning and show that DDS often enables to outperform more heuristic adaptation strategies. We also introduce a variant that boosts DDS performance of adapter-based multi-domain systems.\fyTodo{Keep this part ?}
 %   This is a well-known issue, which has given raise to a rich litterature in under the umbrellas of domain adaptation or multi-domain 
 
 %   The priority of the in-domain performance in the overall evaluation affects the choice of choosing data. The problem falls in the data selection category in the domain adaptation topic. Several data selection methods pre-compute the domain-relatedness of training examples and use these scores to build mini-batches in the training while other works propose dynamic strategies to build training mini-batches based on reinforcement learning.
@@ -103,10 +103,10 @@
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
-A typical setting in machine translation, is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for a task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen; a key component in training is then to mitigate the detrimental effects of this mismatch between distributions. Single-source and multi-source domain adaptation is a well-studied instance of this setting (see \cite{Chu2017comparison} for a review) , and so is multi-domain learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain}. A related situation is multi-lingual machine translation \cite{Firat16multiway,Ha16towards,Johnson17google,Arivazhagan19massively}\fyTodo{Add more recent work}, where the heterogeneity of training data not only corresponds to variation in topic or genre, but also in language.
+A typical setting in machine translation (MT) is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for a task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen and fixed; a key component in training is then to mitigate the detrimental effects of a possible mismatch between these distributions. Single-source and multi-source domain adaptation (DA) is a well-studied instance of this setting (see \cite{Chu2017comparison} for a review) , and so is multi-domain (MD) learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain,Pham21revisiting}. A related situation is multi-lingual machine translation \cite{Firat16multiway,Ha16towards,Johnson17google,Arivazhagan19massively}\fyTodo{Add more recent work}, where the heterogeneity of training data not only corresponds to variations in topic, genre or register, but also in language.
 
 \fyTodo{Label or covariate shift ?}
-This problem is often approached with \emph{static} instance selection or re-weighting strategies, where the available training data is used in proportion to its relevance for the chosen test conditions. Finding the optimal balance of training data is however a challenging task due for instance to similarity between domains / languages, but also due to regularization effects of out-of-domain data; it may also be suboptimal, as some domains or languages might be easier to train than others. Several recent proposals \cite{Wang17instance,Kumar19reinforcement,Wang20learning-multi} have explored ways to instead consider \emph{dynamic} data selection strategy. We study in this contribution the proposal of \cite{Wang20balancing}, initially introduced for multilingual MT, with the goal to evaluate its potential in various single domain and multi-domain adaptation settings and assess DDS as an effective replacement to standard heuristics approaches.
+This problem is often approached with \emph{static} instance selection or re-weighting strategies, where the available training data is used in proportion to its relevance for the chosen test conditions. Finding the optimal balance of training data is however a challenging task due, for instance, to similarity between domains / languages, but also due to regularization effects of out-of-domain data; it may also be suboptimal, as some target domains or languages might be easier to train than others. Several recent proposals \cite{Wang17instance,Kumar19reinforcement,Wang20learning-multi} have explored ways to instead consider \emph{dynamic} data selection strategies. We study in this contribution the proposal of \citet{Wang20balancing}, initially introduced for multilingual MT, with the goal to evaluate its potential in various single-domain and multi-domain adaptation settings and assess DDS, both in its basic version and with our improvements, as an effective replacement to standard heuristics approaches.
 
 Based on experimental results obtained on a diverse set of domains, our main conclusions are that (a) using DDS often yields overall performance that are as good as the standard fine-tuning strategy for domain adaptation; (b) DDS can effectively handle a variety of test target distributions without any meta-parameter search; (c) our extension of DDS is able to boost its performance when used in conjunction to the adapter model of \citet{Bapna19simple}.
 
@@ -114,69 +114,71 @@ Based on experimental results obtained on a diverse set of domains, our main con
 
 \section{Learning with multiple data sources} \label{sec:mdmt}
 
-We conventionally define a domain $d$ as a distribution $\mathcal{D}_d(x)$ over some feature space $\mathcal{X}$ that is shared across domains \cite{Pan10asurvey}: in machine translation, $\mathcal{X}$ is the representation space for input sentences; each domain corresponds to a specific source of data, and may differ from the other data sources in terms of textual genre, thematic content \cite{Chen16guided,Zhang16topicinformed}, register \cite{Sennrich16politeness}, style \cite{Niu18multitask}, etc. Translation in domain $d$ is formalized by a translation function $h_d(y|x)$ pairing sentences in a source language with sentences in a target language $y \in \mathcal{Y}$. $h_d$ is usually assumed to be deterministic (hence $y = h_d(x)$), but might differ from one domain to the other.
+We conventionally define a domain $d$ as a distribution $\mathcal{D}_d(x)$ over some feature space $\mathcal{X}$ that is shared across domains \citep{Pan10asurvey}: in machine translation, $\mathcal{X}$ is the representation space for input sentences; each domain corresponds to a specific source of data, and may differ from the other data sources in terms of textual genre, thematic content \cite{Chen16guided,Zhang16topicinformed}, register \cite{Sennrich16politeness}, style \cite{Niu18multitask}, etc. Translation in domain $d$ is formalized by a translation function $h_d(y|x)$ pairing sentences in a source language with sentences in a target language $y \in \mathcal{Y}$. $h_d$ is usually assumed to be deterministic (hence $y = h_d(x)$), but might differ from one domain to the other.
 
-It is usual in MT to opportunistically collect training samples from multiple domains, which means that the training distribution $\mathcal{D}^s$ is a mixture $\mathcal{D}^s(x) = \sum_{d=1}^{n_d} \lambda^{s}_{d} \mathcal{D}_d(x)$\revision{, with $\{\lambda^{s}_d, d=1 \dots n_d\}$ the corresponding mixture weights such that $\sum_d \lambda^{s}_d=1$)}.
+It is usual in MT to opportunistically collect training samples from several domains, which means that training instances are distributed according to the mixture $\mathcal{D}^s$ such that $\mathcal{D}^s(x) = \sum_{d=1}^{n_d} \lambda^{s}(d) \mathcal{D}_d(x)$, where $\{\lambda^{s}(d), d=1 \dots n_d\}$ are the corresponding mixture weights such that $\sum_d \lambda^{s}(d)=1$).
 
-The main challenge is then to make the best of this heterogeneous data, with the aim to achieve the best possible system for the intended test conditions. These might correspond to data from just one of the training domains, as in standard supervised (multi-source) domain adaptation; a more difficult case is when the test data is from one domain unseen in training (unsupervised domain adaptation); in multi-domain adaptation the test distribution is itself a mixture of domains, some of which may also be observed in training.  Without loss of generality, one may then assume that the test distribution takes the form $\mathcal{D}^t(x) = \sum_d \lambda^{t}_{d} \mathcal{D}_d(x)$ - with only one non-null  $\lambda^{t}_{d}$ in the case of domain adaptation.
+The main challenge is then to make the best of this heterogeneous data, with the aim to achieve the optimal performance for the intended test conditions. These might correspond to data from just one of the training domains, as in standard supervised (multi-source) domain adaptation; a more difficult case is when the test data is from one domain unseen in training (unsupervised domain adaptation); in multi-domain adaptation finally the test distribution is itself a mixture of domains, some of which may also be observed in training.  Without loss of generality, one may then assume that the test distribution takes the form $\mathcal{D}^{t}(x) = \sum_d \lambda^{t}(d) \mathcal{D}_d(x)$ - with only one non-null  $\lambda^{t}(d)$ in the case of domain adaptation.
 These situations are illustrated in Figure~\ref{fig:mdmt-lambdas}.
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.48\textwidth]{mdmt-lambdas}
-  \caption{Training and testing with distribution mismatch. We consider just three domains, and represent the mixture weights $\lambda^{s}$ and $\lambda^{t}$ in the 3-dimensional simplex. Training with weights in (a) and testing with weights in (c) is standard multi-source domain adaptation to $d_2$, while (b)-(c) is unsupervised adapation; training with weights in (a) and testing with weights in (d) is multi-domain learning, also illustrated with configurations (a)-(e) (training domain $d_1$ is not seen in test), and (b)-(d)  (test domain $d_2$ is unseen in training).}\label{fig:mdmt-lambdas}
+  \caption{Training and testing with distribution mismatch. We consider just three domains, and represent vectors of mixture weights $\lambda^{s}$ and $\lambda^{t}$ in the 3-dimensional simplex. Training with weights in (a) and testing with weights in (c) is standard multi-source domain adaptation to $d_2$, while (b)-(c) is unsupervised adaptation; training with weights in (a) and testing with weights in (d) is multi-domain learning, also illustrated with configurations (a)-(e) (training domain $d_1$ is not seen in test), and (b)-(d)  (test domain $d_2$ is unseen in training).}\label{fig:mdmt-lambdas}
 \end{figure}
 
-Theses situations have been amply documented from a theoretical perspective (eg.\ \cite{Mansour09multiple,Mansour09domainadaptation,Hoffman18algorithms}). A general recommandation in the DA setting  is to adjust the sampling distribution used to optimize the system so as to compensate for the mismatch between $\mathcal{D}^s(x)$ and $\mathcal{D}^t(x)$. This can be approximated by reweighting instances, or more conveniently domains, which are selected during training with a probability $Q^{trnn}(d)$, with $Q^{trn}(d) \neq \lambda^{s}(d)$.
+These situations have been amply documented from a theoretical perspective (eg.\ \cite{Mansour09multiple,Mansour09domainadaptation,Hoffman18algorithms}). A general recommandation in the DA setting  is to adjust the sampling distribution used to optimize the system so as to compensate for the mismatch between $\mathcal{D}^s(x)$ and $\mathcal{D}^t(x)$. This can be approximated by reweighting instances, or more conveniently domains, which are selected during training with a probability $\lambda^{l}(d)$, with $\lambda^{l}(d) \neq \lambda^{s}(d)$.
 
-Another practical standard approach to supervised DA is fine-tuning \cite{Luong15stanford,Freitag16fast}, where $q(x)$ is allowed to vary during the course of learning. With our notations, this approach amounts to first learning a initial parameter value with all data ($Q^{trn}(d) = \lambda^{s}(d)$), then to continue training with only batches from the test domain ($Q^{trn}(d) = \lambda^{s}(d) = \lambda^{t}(d)$). Note that this strategy may be suboptimal, since some out-of-domain samples may still be useful for the final performance due to eg.\ domain overlap. Optimizing the learning distribution in multi-domain learning is even more challenging, as the learner has to best take advantage of domain overlap, and also of the fact that some domains might be easier to learn than others.\fyTodo{How to measure this?} 
+A more practical standard approach to supervised DA is \emph{fine-tuning} \cite{Luong15stanford,Freitag16fast}, where $\lambda^{l}$ is allowed to vary during the course of learning. With our notations, this approach amounts to first learning an initial parameter value with all the data ($\forall d, \lambda^{l}(d) = \lambda^{s}(d)$), then to continue training with only batches from the test domain $d_t$ ($\lambda^{l}(d) = \indic{d = d_t}$) with $\indic{A}$ the indicator function for predicate $A$. Note that this strategy is potentially suboptimal, as some out-of-domain samples may contribute to the final performance due to eg.\ domain overlap. Optimizing the learning distribution in multi-domain settings is even more challenging, as the learner has to best take advantage of potential domains overlaps, and also of the fact that some domains are easier to learn than others.\fyTodo{How to measure this?} 
 
-Differentiable data selection (DDS), introduced in \cite{Wang20optimizing} and later applied to multilingual machine translation in \cite{Wang20balancing}, introduces an additional degree of freedom and allows $Q^{trn}(d)$ to change more often in the course of training, as we now explain.
+Differentiable data selection (DDS), proposed by \citet{Wang20optimizing} and later applied to multilingual machine translation by \citet{Wang20balancing}, introduces an additional degree of freedom and allows $\lambda^{l}(d)$ to change multiple times in the course of training, as we now explain.
 
 % === The part on multidomain training has been moved to the end.
 
 \section{Differential Data Selection} \label{sec:dds}
-We assume a training sample consisting of data from $n_d$ domains $d_1 \dots d_{n_d}$; we denote the size of the training subcorpus from domain $d$ as  $N^{trn}_d$, and $N^{trn} = \sum_d N^{trn}_d$ is the total number of training samples. We assume a fixed and pre-defined test distribution, approximated with an equivalent number of development corpora as $\widehat{\mathcal{D}^t}(x) = \sum_{d} Q^{dev}(d) \frac{[[x \in d]]}{N^{dev}_d}$, where $[[x \in d]]$ is the indicator function for domain $d$. Training is modeled as optimizing the parameters $\theta$ of a neural translation model.
+Assume training data from $n_d$ domains $d_1 \dots d_{n_d}$, we denote the size of the training corpus from domain $d$ as  $N^{s}_d$, and $N^{s} = \sum_d N^{s}_d$ is the total number of training samples. We use $\widehat{\mathcal{D}^l_d}$ and $\widehat{\mathcal{D}^t}_d$ to denote the empirical train and test distributions for domain $d$, and $\widehat{\mathcal{D}}(x;\lambda) = \sum_{d} \lambda(d) \widehat{\mathcal{D}^l_d}(x)$. In our setting,  $\lambda^t$, and hence $\widehat{\mathcal{D}^t}(x;\lambda^t)$ are fixed and predefined, approximated with an equivalent number of development corpora. Training optimizes the parameters $\theta$ of a neural translation model.
 
-Sampling training instances from a distribution $Q^{trn}(d)$ over domains results in a parameter estimate $\theta(Q^{trn})$, delivering performance that can be estimated using $Q^{dev}$. \cite{Wang20optimizing,Wang20balancing} then formulate the problem of finding an optimal sampling $Q^{trn}_{*}$ maximizing performance on the development data as the following bi-level optimization problem.
+Sampling training domains using a distribution $\lambda^{l}(d)$ results in a parameter estimate $\theta(\lambda^{l})$, delivering performance that can be estimated using $\lambda^{t}$. \cite{Wang20optimizing,Wang20balancing} then formulate the problem of finding an optimal sampling strategy $\lambda^{l}_{*}$ maximizing performance on the development data as the following bi-level optimization problem:
 \begin{equation} \label{eq:bilevel}
 \begin{split}
-Q^{trn}_* &= \displaystyle{\mathop{\argmin}_{Q^{trn}} J(\theta^*(Q^{trn}), Q^{dev})} \\
-					& \theta^*(Q^{trn}) = \displaystyle{\mathop{\argmin} J(\theta, Q^{trn})}, 
+\lambda^{l}_* &= \displaystyle{\mathop{\argmin}_{\lambda^{l}} J(\theta^*(\lambda^{l}), \lambda^{t})} \\
+					& \theta^*(\lambda^{l}) = \displaystyle{\mathop{\argmin_{\theta}} J(\theta, \lambda^{l})}, 
 \end{split}
 \end{equation}
-where we use the following notations:\fyTodo{Overload Q, from domain to instances to pairs}
+where we use the following notations:% \fyTodo{Overload Q, from domain to instances to pairs}
 \begin{align*}
-J(\theta, Q^{dev}) &= \displaystyle{\mathop{\sum}_{(x,y) \in Q^{dev}} l(\theta,x,y)} \\
-J(\theta, Q^{trn}) &= \displaystyle{\mathop{E_{(x,y) \sim Q^{trn}}[l(\theta,x,y)]}} \\
+J(\theta, \lambda^{t} ) &= \displaystyle{\mathop{\sum}_{(x,y) \sim \widehat{\mathcal{D}^{t}(x)}} \ell(\theta,x,y)} \\
+J(\theta, \lambda^{l}) &= \displaystyle{\mathop{E_{(x,y) \sim \widehat{\mathcal{D}^{l}(x)}}[\ell(\theta,x,y)]}} \\
 l(\theta,x,y) &= - log P(\theta,x,y)
 \end{align*}
-Problem~\eqref{eq:bilevel} can be approached by coordinate gradient descent alternating between $Q^{trn}$ and $\theta$. \citet{Wang20balancing} limit the search space of $Q^{trn}$ to a parameterized differentiable function $Q^{trn}(\psi)$. Given $\psi_t$ at time step $s$, $\theta_t$ is updated via usual gradient descent as follows:
+Problem~\eqref{eq:bilevel} can be approached by coordinate gradient descent alternating between $\lambda^{l}$ and $\theta$. \citet{Wang20balancing} limit the search space of $\lambda^{l}$ to a parameterized differentiable function $\lambda^{l}(d; \psi)$. Given $\psi_t$ at time step $t$, $\theta_t$ is updated via usual gradient descent as follows:
 \begin{align*}
 \theta_{t+1} &= \theta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta_t, x,y)}{\partial \theta} \\
-x,y &\sim Q^{trn}(\psi_t) \\
+x,y &\sim \widehat{\mathcal{D}^l}(x;\lambda(\psi_t)) \\
 \end{align*}
 
-Given $\theta_t$, $\psi_t$ is updated via the Reinforce algorithm:\fyTodo{Ref Reinforce}
+Given $\theta_t$, $\psi_t$ is updated via the Reinforce algorithm \cite{Williams92reinforce}:\fyTodo{Ref Reinforce}
 \begin{align*}
   \psi_{t+1} &= \psi_t + \mathbf{lr}_{data} * R(x,y) * \\
-  & \quad\quad \frac{\partial log(Q^{trn}(\psi_t)(x,y))}{\partial \psi} \\
-x,y &\sim Q^{trn}(\psi_t) \\
-R(x,y) &= \langle \frac{\partial l(\theta',x,y)}{\partial \theta}, \frac{\partial J(\theta_{t+1},Q^{dev})}{\partial \theta} \rangle \\
+  & \quad\quad \frac{\partial log(\lambda^l(\psi_t)(x,y))}{\partial \psi} \\
+x,y &\sim \lambda^l (\psi_t) \\
+R(x,y) &= \langle \frac{\partial l(\theta',x,y)}{\partial \theta}, \frac{\partial J(\theta_{t+1}, \lambda^l)}{\partial \theta} \rangle \\
 \theta' &= \theta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta_t, x,y)}{\partial \theta} \\
 \end{align*}
 
 \fyTodo{Explain lr, may be more}
 % To apply this method to multi-domain training (\system{Multi-DDS}), we limit the search family of training distribution $D_{trn}$ to the family of mixture of K in-domain training distribution such as $\sum_d \lambda^{s}_{d} \mathcal{D}_d(x,y)$. We also parameterize $\lambda^{s}_{d}$ using Softmax function so that $\lambda^{s}_{d} = \text{Softmax}(\psi)_d$ where $\psi \in \mathbb{R}^K$.
 
-\subsection{Sampler's parameterization}
+\subsection{Parameterizing the sampler \label{ssec:sampler}}
 
-\cite{Wang20balancing} used softmax to parameterize the sampler i.e $Q^{trn}(\psi_t) = \text{Softmax}(\psi_t)$ in which $\psi_t \in \mathbb{R}^K$. Parameterizing the sampler by softmax will induce the following gradient.
+\cite{Wang20balancing} used a simple softmax function and the following parameterization of the sampler $\lambda^l(d;\psi) = \operatorname{softmax}(\psi)$ where $\psi \in \mathbb{R}^{n_d}$. This parameterization of the sampler will induce the following gradient:
 \begin{align*}
-\frac{\partial l}{\partial \psi_i} & = \displaystyle{\mathop{\sum}_{j=1}^K} R_j \frac{\partial P_j}{\partial \psi_i} \\
-	& = R_i P_i*(1-P_i) - \displaystyle{\mathop{\sum}_{j\neq i}^K} R_j P_j P_i \\
-	& = P_i(R_i-l)\\
+\frac{\partial l}{\partial \psi_d} & = \displaystyle{\mathop{\sum}_{j=1}^{n_d}} R_j \frac{\partial \lambda^l(j; \psi)}{\partial \psi_d} \\
+	& = R_d \lambda^l(d; \psi)(1- \lambda^l(d; \psi)) - \displaystyle{\mathop{\sum}_{j\neq d}^{n_d}} R_j \lambda^l(d; \psi) \lambda^l(j; \psi)\\
+	& = P_d(R_d-l)\\
 \end{align*} 
-The fact that the change of $\psi_i$ is proportional to $p_i$ can explain that the optimization often leads to a critical solution in which the sampler ignore almost domains except a few ones. In order to avoid the appearance of the 
+The fact that the change of $\psi_d$ is proportional to $\lambda^l(d; \psi)$ can explain that the optimization often leads to a degenerate solution in which the sampler ignore almost domains except a few ones. In order to avoid the appearance of the
+
+
 \section{Experimental settings} \label{sec:exp}
 \subsection{Data and metrics \label{ssec:corpora}}
 We experiment with translation from English into French and use texts initially originating from 6~domains, corresponding to the following data sources: the UFAL Medical corpus V1.0 (\domain{med})\footnote{\url{https://ufal.mff.cuni.cz/ufal_medical_corpus}. \revision{We only use the in-domain (medical) subcorpora: PATR, EMEA, CESTA, ECDC.}}, the European Central Bank corpus (\domain{bank}) \cite{Tiedemann12parallel}; The JRC-Acquis Communautaire corpus (\domain{law}) \cite{Steinberger06acquis}, documentations for KDE, Ubuntu, GNOME and PHP from Opus collection \cite{Tiedemann09news}, collectively merged in a \domain{it}-domain, Ted Talks (\domain{talk}) \cite{Cettolo12wit}, and the Koran (\domain{rel}). Complementary experiments also use v12 of the News Commentary corpus (\domain{news}). Most corpora are available from the Opus web site.\footnote{\url{http://opus.nlpl.eu}} These corpora were deduplicated and tokenized with in-house tools; statistics are in Table~\ref{tab:Corpora}. To reduce the number of types and build open-vocabulary systems, we use Byte-Pair Encoding \cite{Sennrich16BPE} with 30,000 merge operations on a corpus containing all sentences in both languages.\fyDone{Add \# number of tokens, also specificity ?}%
@@ -246,8 +248,10 @@ with $\alpha \in [0,0.25,0.5,0.75,1.0]$. We denote below these systems \system{M
 
 All models use embeddings and the hidden layers sizes of dimension~512. Transformers contain with 8 attention heads in each of the 6+6 layers; the inner feedforward layer contains 2048 cells. The adapter-based systems (see below) additionally use an adaptation block in each layer, composed of a 2-layer perceptron, with an inner $\operatorname{ReLU}$ activation function operating on normalized entries of dimension~1024. 
 Training uses batches of~12,288 tokens, Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$, Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ in all layers.
+
 \subsection{Multi-domain systems} \label{ssec:mdsys}
-Our comparison of multi-domain systems includes our own reimplementations of recent proposals from the literature:\footnote{\revision{Further implementation details are in Appendix~A.}}
+
+Our comparison of multi-domain systems includes our own reimplementations of recent proposals from the literature:\footnote{\revision{Further implementation details are in supplementary material.}}
 \begin{itemize}
 \itemsep0em 
 \item NMT models trained with Multi-DDS mixture given several objective testing distributions: uniform, uni-domain and natural.
@@ -304,10 +308,11 @@ Our comparison of multi-domain systems includes our own reimplementations of rec
   \end{adjustbox}
   \label{tab:redomains}
 \end{table*}
+
 \section{Related Work \label{sec:related}}
 \cite{Wang17instance} uses dynamic weighting (for sentences and domains) for DA.
 
-\cite{Wang20multidomain} adapts curriculum learning \cite{BengioXX} for multi-domain adaptation, where an optimal instance weighting scheme is found using Bayesian optimization techniques.
+\cite{Wang20learning-multi} adapts curriculum learning \cite{BengioXX} for multi-domain adaptation, where an optimal instance weighting scheme is found using Bayesian optimization techniques.
 
 Also \cite{Saunders19adaptive}.
 
