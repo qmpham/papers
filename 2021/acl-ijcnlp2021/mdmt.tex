@@ -51,6 +51,19 @@
 \usepackage{float}
 \usepackage{amsmath,amsfonts,amssymb}
 \usepackage{algorithm, algorithmic}
+
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+
+\usepackage{soulutf8}
+\usepackage{tabularx}
+
+\usepackage{multirow}
+\usepackage{adjustbox}
+\usepackage{caption}
+\usepackage{subcaption}
+
 \newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
 \newcommand{\fyTodostar}[1]{\Todo*[FY:]{\textcolor{orange}{#1}}}
 \newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
@@ -135,9 +148,10 @@ Differentiable data selection (DDS), proposed by \citet{Wang20optimizing} and la
 % === The part on multidomain training has been moved to the end.
 
 \section{Differential Data Selection} \label{sec:dds}
-Assume training data from $n_d$ domains $d_1 \dots d_{n_d}$, we denote the size of the training corpus from domain $d$ as  $N^{s}_d$, and $N^{s} = \sum_d N^{s}_d$ is the total number of training samples. We use $\widehat{\mathcal{D}^l_d}$ and $\widehat{\mathcal{D}^t}_d$ to denote the empirical train and test distributions for domain $d$, and $\widehat{\mathcal{D}}(x;\lambda) = \sum_{d} \lambda(d) \widehat{\mathcal{D}^l_d}(x)$. In our setting,  $\lambda^t$, and hence $\widehat{\mathcal{D}^t}(x;\lambda^t)$ are fixed and predefined, approximated with an equivalent number of development corpora. Training optimizes the parameters $\theta$ of a neural translation model.
+\subsection{Basic principles}
+Assume training data from $n_d$ domains $d_1 \dots d_{n_d}$, we denote the size of the training corpus from domain $d$ as  $N^{s}_d$, and $N^{s} = \sum_d N^{s}_d$ is the total number of training samples. We use $\widehat{\mathcal{D}^l_d}$ and $\widehat{\mathcal{D}^t _d}$ to denote the empirical train and test distributions for domain $d$, and $\widehat{\mathcal{D}}(x;\lambda) = \sum_{d} \lambda(d) \widehat{\mathcal{D}^l_d}(x)$. In our setting,  $\lambda^t$, and hence $\widehat{\mathcal{D}^t}(x;\lambda^t)$ are fixed and predefined, approximated with an equivalent number of development corpora. Training optimizes the parameters $\theta$ of a neural translation model.
 
-Sampling training domains using a distribution $\lambda^{l}(d)$ results in a parameter estimate $\theta(\lambda^{l})$, delivering performance that can be estimated using $\lambda^{t}$. \cite{Wang20optimizing,Wang20balancing} then formulate the problem of finding an optimal sampling strategy $\lambda^{l}_{*}$ maximizing performance on the development data as the following bi-level optimization problem:
+Sampling training domains using a distribution $\lambda^{l}(d)$ results in a parameter estimate $\theta(\lambda^{l})$, delivering performance that can be estimated on the development set using $\lambda^{t}$. \cite{Wang20optimizing,Wang20balancing} then formulate the problem of finding an optimal sampling strategy $\lambda^{l}_{*}$ maximizing performance on the development data as the following bi-level optimization problem:
 \begin{equation} \label{eq:bilevel}
 \begin{split}
 \lambda^{l}_* &= \displaystyle{\mathop{\argmin}_{\lambda^{l}} J(\theta^*(\lambda^{l}), \lambda^{t})} \\
@@ -156,7 +170,7 @@ Problem~\eqref{eq:bilevel} can be approached by coordinate gradient descent alte
 x,y &\sim \widehat{\mathcal{D}^l}(x;\lambda(\psi_t)) \\
 \end{align*}
 
-Given $\theta_t$, $\psi_t$ is updated via the Reinforce algorithm \cite{Williams92reinforce}:\fyTodo{Ref Reinforce}
+Given $\theta_t$, $\psi_t$ is updated via the Reinforce algorithm \cite{Williams92reinforce}:\fyTodo{Rewrite this correctly with domain average reward}
 \begin{align*}
   \psi_{t+1} &= \psi_t + \mathbf{lr}_{data} * R(x,y) * \\
   & \quad\quad \frac{\partial log(\lambda^l(\psi_t)(x,y))}{\partial \psi} \\
@@ -165,21 +179,20 @@ R(x,y) &= \langle \frac{\partial l(\theta',x,y)}{\partial \theta}, \frac{\partia
 \theta' &= \theta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta_t, x,y)}{\partial \theta} \\
 \end{align*}
 
-\fyTodo{Explain lr, may be more}
+\fyTodo{Explain lr, may be more}\fyTodo{More refs to the algorithm }
 % To apply this method to multi-domain training (\system{Multi-DDS}), we limit the search family of training distribution $D_{trn}$ to the family of mixture of K in-domain training distribution such as $\sum_d \lambda^{s}_{d} \mathcal{D}_d(x,y)$. We also parameterize $\lambda^{s}_{d}$ using Softmax function so that $\lambda^{s}_{d} = \text{Softmax}(\psi)_d$ where $\psi \in \mathbb{R}^K$.
+\subsection{DDS for (multi) domain adaptation}
 
-\subsection{Parameterizing the sampler \label{ssec:sampler}}
+This setting is pretty general and can in principle accomodate the variety of situations mentioned  above, and many more: basic domain adaption, multi-domain adaptation with various target distribution, possibly including domains unseen in training. In our experiments we would like to better assess the actual potential of DDS is these settings, and seek to experimentally answer the following questions:
+\begin{itemize}
+\item is DDS a viable alternative to conventional fine-tuning ? In particular does it enable to better take advantage of relevant data from other domains ?
+\item is DDS a viable alternative in multidomain scenarios ?
+\item \fyTodo{TBContinued}
+\end{itemize}
 
-\cite{Wang20balancing} used a simple softmax function and the following parameterization of the sampler $\lambda^l(d;\psi) = \operatorname{softmax}(\psi)$ where $\psi \in \mathbb{R}^{n_d}$. This parameterization of the sampler will induce the following gradient:
-\begin{align*}
-\frac{\partial l}{\partial \psi_d} & = \displaystyle{\mathop{\sum}_{j=1}^{n_d}} R_j \frac{\partial \lambda^l(j; \psi)}{\partial \psi_d} \\
-	& = R_d \lambda^l(d; \psi)(1- \lambda^l(d; \psi)) - \displaystyle{\mathop{\sum}_{j\neq d}^{n_d}} R_j \lambda^l(d; \psi) \lambda^l(j; \psi)\\
-	& = P_d(R_d-l)\\
-\end{align*} 
-The fact that the change of $\psi_d$ is proportional to $\lambda^l(d; \psi)$ can explain that the optimization often leads to a degenerate solution in which the sampler ignore almost domains except a few ones. In order to avoid the appearance of the
-
-
+These questions are further discussed in Section~\ref{}. We now turn to our experimental conditions.
 \section{Experimental settings} \label{sec:exp}
+
 \subsection{Data and metrics \label{ssec:corpora}}
 We experiment with translation from English into French and use texts initially originating from 6~domains, corresponding to the following data sources: the UFAL Medical corpus V1.0 (\domain{med})\footnote{\url{https://ufal.mff.cuni.cz/ufal_medical_corpus}. \revision{We only use the in-domain (medical) subcorpora: PATR, EMEA, CESTA, ECDC.}}, the European Central Bank corpus (\domain{bank}) \cite{Tiedemann12parallel}; The JRC-Acquis Communautaire corpus (\domain{law}) \cite{Steinberger06acquis}, documentations for KDE, Ubuntu, GNOME and PHP from Opus collection \cite{Tiedemann09news}, collectively merged in a \domain{it}-domain, Ted Talks (\domain{talk}) \cite{Cettolo12wit}, and the Koran (\domain{rel}). Complementary experiments also use v12 of the News Commentary corpus (\domain{news}). Most corpora are available from the Opus web site.\footnote{\url{http://opus.nlpl.eu}} These corpora were deduplicated and tokenized with in-house tools; statistics are in Table~\ref{tab:Corpora}. To reduce the number of types and build open-vocabulary systems, we use Byte-Pair Encoding \cite{Sennrich16BPE} with 30,000 merge operations on a corpus containing all sentences in both languages.\fyDone{Add \# number of tokens, also specificity ?}%
 
@@ -236,17 +249,17 @@ Our baselines are standard for multi-domain systems.\footnote{We however omit do
 \itemsep0em 
 \item Generic models trained with various predefined mixtures of the training data taking the form:
 \begin{align} \label{mixture:trn}
-Q^{trn}(d) = \frac{q_d^{\alpha}}{\displaystyle{\mathop{\sum}_{d=1}^{n_d}q_d^{\alpha}}} &&
-q_d = \frac{\mid N^{trn}_d \mid}{\displaystyle{N^{trn}}} % \mathop{\sum}_{i=1}^K\mid D_i \mid}}
+\lambda^{l}(d;\alpha) = \frac{q_d^{\alpha}}{\displaystyle{\mathop{\sum}_{d=1}^{n_d}q_d^{\alpha}}} &&
+q_d = \frac{\mid N^{s}_d \mid}{\displaystyle{N^{s}}} % \mathop{\sum}_{i=1}^K\mid D_i \mid}}
 \end{align} 
-with $\alpha \in [0,0.25,0.5,0.75,1.0]$. We denote below these systems \system{Mixed-$\alpha$}
+with $\alpha \in [0,0.25,0.5,0.75,1.0]$. These systems are denoted \system{Mixed-$\alpha$} below.
 %on a concatenation of all corpora (\texttt{Mixed}). We develop two versions\footnote{In fact three: to enable a fair comparison with WDCMT, a RNN-based variant is also trained and evaluated. \revision{This system appears as \system{Mixed-Nat-RNN} in Table~\ref{tab:performance}}.} of this system, one where the domain unbalance reflects the distribution of our training data \revision{given in Table~\ref{tab:Corpora}} (\system{Mixed-Nat}) and one where all domains are equally represented in training (\system{Mixed-Bal}). The former is the best option when the train mixture $\mathcal{D}^s$ is also expected in testing; the latter should be used when the test distribution is uniform across domains. Accordingly, we report two aggregate scores: a weighted average reflecting the training distribution, and an unweighted average, meaning that test domains are equally important.
-\item fine-tuned models \cite{Luong15stanford,Freitag16fast}, based on the \system{Mixed-$1.0$} system, further trained on each domain for at most 20~000 iterations, with early stopping when the dev BLEU stops increasing. The full fine-tuning (\system{FT-Full}) procedure may update all the parameters of the initial generic model, resulting in six systems adapted for one domain, with no parameter sharing across domains.
+\item fine-tuned models \cite{Luong15stanford,Freitag16fast}, based on the \system{Mixed-$1.0$} system, further trained on each domain for at most 20~000 iterations, with early stopping when the dev BLEU stops increasing. The full fine-tuning (\system{FT-Full}) procedure may update all the parameters of the initial generic model, resulting in six systems each adapted for one domain, with no parameter sharing across domains.
 
-\item two multi-domain versions of the approach of \newcite{Bapna19simple}, denoted \system{FT-Res} and \system{MDL-Res}, where a domain-specific adaptation module is added to all the Transformer layers; within each layer, residual connections enable to short-cut this adapter. The former variant corresponds to the original proposal of \citet{Bapna19simple} (see also \cite{Sharaf20metalearning}). It fine-tunes the adapter modules of a \system{Mixed-$1.0$} system independently for each domain, keeping all the other parameters frozen. The latter uses the same architecture, but a different training procedure and learns all parameters jointly from scratch with the prefixed mixtures of training data \ref{mixture:trn}.
+\item two multi-domain versions of the approach of \newcite{Bapna19simple}, denoted \system{FT-Res} and \system{MDL-Res}, where a domain-specific adaptation module is added to all the Transformer layers; within each layer, residual connections enable to short-cut this adapter. The former variant corresponds to the original proposal of \citet{Bapna19simple} (see also \cite{Sharaf20metalearning}). It fine-tunes the adapter modules of a \system{Mixed-$1.0$} system independently for each domain, keeping all the other parameters frozen. The latter uses the same architecture, but a different training procedure and learns all parameters jointly from scratch with the prefixed mixtures of training data \ref{mixture:trn}.\fyTodo{Keep this ?}
 \end{itemize}
 
-All models use embeddings and the hidden layers sizes of dimension~512. Transformers contain with 8 attention heads in each of the 6+6 layers; the inner feedforward layer contains 2048 cells. The adapter-based systems (see below) additionally use an adaptation block in each layer, composed of a 2-layer perceptron, with an inner $\operatorname{ReLU}$ activation function operating on normalized entries of dimension~1024. 
+All models use embeddings and the hidden layers sizes of dimension~512. Transformer models contain with 8 attention heads in each of the 6+6 layers; the inner feedforward layer contains 2048 cells. The adapter-based systems (see below) additionally use an adaptation block in each layer, composed of a 2-layer perceptron, with an inner $\operatorname{ReLU}$ activation function operating on normalized entries of dimension~1024. 
 Training uses batches of~12,288 tokens, Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$, Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ in all layers.
 
 \subsection{Multi-domain systems} \label{ssec:mdsys}
@@ -259,6 +272,69 @@ Our comparison of multi-domain systems includes our own reimplementations of rec
 \end{itemize}
 
 \section{Results and discussion \label{sec:results}}
+
+\subsection{Fine tuning experiments}
+
+\fyTodo{Fix the table}
+In Table~\ref{tab:finetuning}, we compare the results of Fine tuning a system initially trained with a uniform mixture of domains with the result of learning from scratch, also with a initial uniform distribution ($\phi_0(d) = 0 \forall d$). \fyTodo{What do we see ? How about domain proximity ? - show a graph}. Note that the DDS systems are somewhat quicker to build, as we only train for 100K iterations (instead of 100K + 50K for the fine tuning part).
+
+% \begin{table*}
+%   \centering% \small
+%   \begin{adjustbox}{width=2\columnwidth,center}
+%   \begin{tabular}{|p{2cm}|*{13}{r|}} \hline
+%     \multirow{2}{*}{Training} & \multicolumn{6}{|c}{$\lambda^t_d$} & \multicolumn{6}{|c|}{BLEU} & \multirow{2}{*}{BLEU} \\ \cline{2-13}	
+%   mixture & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & average \\
+%     \hline
+%   \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &37.45&51.26&45.47&31.62&37.55&65.22& \\
+%   \system{FT-Res} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
+%   \system{Multi-DDS} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
+%   \system{FT-Full} & 0.0 &1.0 & 0.0 &0.0 &0.0 & 0.0 &35.92& 54.87& 52.55& 32.55& 44.98& 90.28& 51.86\\
+%   \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
+%   \system{Multi-DDS} & 0.0 &1.0 & 0.0 &0.0 &0.0 & 0.0 &35.92& 54.87& 52.55& 32.55& 44.98& 90.28& 51.86\\
+%   \system{FT-Full} & 0.0 &0.0 & 1.0 &0.0 &0.0 & 0.0 &36.11& 55.37& 51.76& 33.52& 46.23& 89.99& 52.16\\
+%   \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
+%   \system{Multi-DDS} & 0.0 &0.0 & 1.0 &0.0 &0.0 & 0.0 &36.11& 55.37& 51.76& 33.52& 46.23& 89.99& 52.16\\
+%   \system{FT-Full} & 0.0 &0.0 & 0.0 &1.0 &0.0 & 0.0 &36.53&	55.03& 51.15& 33.98& 44.28& 87.22& 51.365\\
+%   \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
+%   \system{Multi-DDS} & 0.0 &0.0 & 0.0 &1.0 &0.0 & 0.0 &36.53&	55.03& 51.15& 33.98& 44.28& 87.22& 51.365\\
+%   \system{FT-Full} & 0.0 &0.0 & 0.0 &0.0 &1.0 & 0.0 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
+%   \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
+%   \system{Multi-DDS} & 0.0 &0.0 & 0.0 &0.0 &1.0 & 0.0 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
+%   \system{FT-Full} & 0.0 &0.0 & 0.0 &0.0 &0.0 & 1.0 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
+%   \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
+%   \system{Multi-DDS} & 0.0 &0.0 & 0.0 &0.0 &0.0 & 1.0 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
+%   \hline
+%   \end{tabular}
+%   \end{adjustbox}
+%   \label{tab:redomains}
+% \end{table*}
+
+
+\begin{table*}[htb]
+  \centering% \small
+  \begin{adjustbox}{width=1.0\textwidth,center}
+  \begin{tabular}{|p{3.0cm}|*{13}{r|}} \hline
+    \multirow{2}{*}{Name} & \multirow{2}{*}{$sim\_iter$} & \multirow{2}{*}{parameterization} & \multirow{2}{*}{entropy constraint} & \multicolumn{6}{|c|}{BLEU} & \multirow{2}{*}{BLEU average} \\ \cline{5-10}	
+   & & & & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{it}} & \multicolumn{1}{c|}{\domain{ rel }} & \multicolumn{1}{c|}{\domain{ talk}} &  \\
+    \hline
+  \system{$DDS\_FT (med)$} & 1 & softmax & no & 36.7&51.14&52&44.32&90.41&33.22&51.3\\
+  \system{$DDS\_FT\_law$} & 1 & softmax & no &36.05&56.18&53.57&44.05&91.24&33.09&52.36\\
+  \system{$DDS\_FT\_bank$} & 1 & softmax & no &36.15&54.17&54.29&41.33&89.95&31.54&51.24 \\
+  \system{$DDS\_FT\_IT$} & 1 & softmax & no &34.39&48.98&52.82&46.8&85.3&31.37&49.94 \\
+  \system{$DDS\_FT\_rel$} & 1 & softmax & no & 34.54&52.29&51.46&44.8&91.77&31.84&51.12\\
+  \system{$DDS\_FT\_talk$} & 1 & softmax & no & 35.53&50.55&52.64&44.86&85.8&33.47&50.48\\
+  \system{$DDS\_FT\_full$} & NA & NA & NA & 37.74&59.21	&54.49&46.81&90.77&33.98&53.83\\
+    \hline
+    $\Delta$ & \\
+  \end{tabular}
+  \end{adjustbox}
+  \caption{DDS as a fine-tuning receipe. We report scores with DDS and each target domain, and compare with full-fine-tuning. Note that the last line reports the results of 6 different fine tuning procedures.}
+  \label{tab:finetuning}
+\end{table*}
+
+\subsection{Multi-domain experiments}
+Results for our multidomain experiments are in Table~\ref{tab:multidomains}.
+
 \begin{table*}
   \centering% \small
   \begin{adjustbox}{width=2\columnwidth,center}
@@ -275,39 +351,85 @@ Our comparison of multi-domain systems includes our own reimplementations of rec
   \system{Multi-DDS-v1} & 0.166&0.166 &0.166 &0.166 &0.166 & 0.166 & 36.96 & 55.55 & 52.88 & 33.06 & 44.52 &91.25 & 52.37\\
   \hline
   \end{tabular}
-  \end{adjustbox}
+\end{adjustbox}
+  \label{tab:multidomains}
 \end{table*}
 
+Looking again at the evolution of $\lambda^l$ during training we often observe a rich get richer effect, where a small number of domains manage to attract most of the probability mass, while other are completely ignore after a given number of iterations.
+
+\fyTodo{Explain issues}
+
 \begin{table*}
-  \centering% \small
-  \begin{adjustbox}{width=2\columnwidth,center}
-  \begin{tabular}{|p{2cm}|*{13}{r|}} \hline
-    \multirow{2}{*}{Training} & \multicolumn{6}{|c}{$\lambda^t_d$} & \multicolumn{6}{|c|}{BLEU} & \multirow{2}{*}{BLEU} \\ \cline{2-13}	
-  mixture & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & average \\
+  \centering % \small
+  \begin{adjustbox}{width=1.0\textwidth,center}
+  \begin{tabular}{|p{2.0cm}|*{13}{r|}} \hline
+    \multirow{2}{*}{Name} & \multirow{2}{*}{$sim\_iter$} & \multirow{2}{*}{parameterization} & \multirow{2}{*}{entropy constraint} & \multicolumn{6}{|c|}{BLEU} & \multirow{2}{*}{average} \\ \cline{5-10}	
+   & & & & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} &  \\
     \hline
-  \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &37.45&51.26&45.47&31.62&37.55&65.22& \\
-  \system{FT-Res} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
-  \system{Multi-DDS} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
-  \system{FT-Full} & 0.0 &1.0 & 0.0 &0.0 &0.0 & 0.0 &35.92& 54.87& 52.55& 32.55& 44.98& 90.28& 51.86\\
-  \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
-  \system{Multi-DDS} & 0.0 &1.0 & 0.0 &0.0 &0.0 & 0.0 &35.92& 54.87& 52.55& 32.55& 44.98& 90.28& 51.86\\
-  \system{FT-Full} & 0.0 &0.0 & 1.0 &0.0 &0.0 & 0.0 &36.11& 55.37& 51.76& 33.52& 46.23& 89.99& 52.16\\
-  \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
-  \system{Multi-DDS} & 0.0 &0.0 & 1.0 &0.0 &0.0 & 0.0 &36.11& 55.37& 51.76& 33.52& 46.23& 89.99& 52.16\\
-  \system{FT-Full} & 0.0 &0.0 & 0.0 &1.0 &0.0 & 0.0 &36.53&	55.03& 51.15& 33.98& 44.28& 87.22& 51.365\\
-  \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
-  \system{Multi-DDS} & 0.0 &0.0 & 0.0 &1.0 &0.0 & 0.0 &36.53&	55.03& 51.15& 33.98& 44.28& 87.22& 51.365\\
-  \system{FT-Full} & 0.0 &0.0 & 0.0 &0.0 &1.0 & 0.0 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
-  \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
-  \system{Multi-DDS} & 0.0 &0.0 & 0.0 &0.0 &1.0 & 0.0 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
-  \system{FT-Full} & 0.0 &0.0 & 0.0 &0.0 &0.0 & 1.0 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
-  \system{FT-Full} & 1.0 &0.0 & 0.0 &0.0 &0.0 & 0.0 &35.26 &54.09 &52.49& 31.86& 44.94& 89.54& 51.36\\
-  \system{Multi-DDS} & 0.0 &0.0 & 0.0 &0.0 &0.0 & 1.0 &37.33& 54.56& 50.05& 33.47& 43.23& 77.51& 49.36\\
+    \system{$config\_603$} & 1 & softmax & no & 37.26& 55.07& 50.96& 33.49& 43.41& 90.76& 51.83\\
+    \system{$config\_616$} & 1 & softmax & yes & 36.96& 55.55& 52.88& 33.06& 44.52& 91.25& 52.37 \\
+    \system{$config\_675$} & 10 & softmax & yes & 36.24& 55.67& 52.63& 32.74& 44.47& 90.45& 52.03\\
+    \system{$config\_673$} & 10 & linear & yes & 36.02& 56.18& 52.96& 32.06& 45.2 & 90.94 & 52.23 \\
   \hline
   \end{tabular}
   \end{adjustbox}
-  \label{tab:redomains}
+  \caption{Controlling / regularizing the training distribution}
+  \label{tab:performance}
 \end{table*}
+
+\begin{figure*}[htb]
+\begin{subfigure}{.5\textwidth}
+  \centering
+  % include first image
+  \includegraphics[width=.8\linewidth]{config603.png}  
+  \caption{config 603}
+  \label{fig:603}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+  \centering
+  % include second image
+  \includegraphics[width=.8\linewidth]{config616.png}  
+  \caption{Config 616}
+  \label{fig:616}
+\end{subfigure}
+\newline
+\begin{subfigure}{.5\textwidth}
+  \centering
+  % include third image
+  \includegraphics[width=.8\linewidth]{config675.png}  
+  \caption{Config 675}
+  \label{fig:675}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+  \centering
+  % include fourth image
+  \includegraphics[width=.8\linewidth]{config673.png}  
+  \caption{Config 673}
+  \label{fig:673}
+\end{subfigure}
+\caption{Sampling distribution}
+\label{fig:sampling}
+\end{figure*}
+
+\subsection{Stabilizing the sampler \label{ssec:sampler}}
+
+\cite{Wang20balancing} used a simple softmax function and the following parameterization of the sampler $\lambda^l(d;\psi) = \operatorname{softmax}(\psi)$ where $\psi \in \mathbb{R}^{n_d}$. This parameterization of the sampler will induce the following gradient:\fyTodo{Change name of obj. function}
+\begin{align*}
+\frac{\partial XXX}{\partial \psi_d} & = \displaystyle{\mathop{\sum}_{j=1}^{n_d}} R_j \frac{\partial \lambda^l(j; \psi)}{\partial \psi_d} \\
+%	& = R_d \lambda^l(d; \psi)(1- \lambda^l(d; \psi)) - \displaystyle{\mathop{\sum}_{j\neq d}^{n_d}} R_j \lambda^l(d; \psi) \lambda^l(j; \psi)\\
+	& = \lambda^l(d; \psi) (R_d- XXX)\\
+\end{align*} 
+The fact that the change of $\psi_d$ is proportional to $\lambda^l(d; \psi)$ can explain that the optimization often leads to a degenerate solution in which the sampler ignore almost domains except a few ones. In order to avoid the appearance of a ``rich-gets-richer'' effect and degenerate solutions such as Fig.~\ref{}, we consider two alternatives.
+
+The first one is to replace the softmax function by a simpler linear function, yielding the following updates:
+\begin{align*}
+\psi_d = \frac{\psi_d + \eta * R_d}{ 1 + \eta \displaystyle{\mathop{\sum}_{j=1}^{n_d}} R_j},
+\end{align*}
+where $\eta$ controls the learning rate of $\psi$.
+
+The second one simply adds an entropy constraint which ensures that the entropy of the domain distribution is always greater than a predefined value $\alpha$.\fyTodo{Explain the math}
+
+
 
 \section{Related Work \label{sec:related}}
 \cite{Wang17instance} uses dynamic weighting (for sentences and domains) for DA.
