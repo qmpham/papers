@@ -183,14 +183,15 @@ R(x,y) &= \langle \frac{\partial l(\theta',x,y)}{\partial \theta}, \frac{\partia
 % To apply this method to multi-domain training (\system{Multi-DDS}), we limit the search family of training distribution $D_{trn}$ to the family of mixture of K in-domain training distribution such as $\sum_d \lambda^{s}_{d} \mathcal{D}_d(x,y)$. We also parameterize $\lambda^{s}_{d}$ using Softmax function so that $\lambda^{s}_{d} = \text{Softmax}(\psi)_d$ where $\psi \in \mathbb{R}^K$.
 \subsection{DDS for (multi) domain adaptation}
 
-This setting is pretty general and can in principle accomodate the variety of situations mentioned  above, and many more: basic domain adaption, multi-domain adaptation with various target distribution, possibly including domains unseen in training. In our experiments we would like to better assess the actual potential of DDS is these settings, and seek to experimentally answer the following questions:
+This setting is pretty general and can in principle accomodate the variety of situations mentioned  above, and many more: basic domain adaption, multi-domain adaptation with various target distributions, possibly including domains unseen in training. In our experiments we would like to better assess the actual potential of DDS is these settings, and seek to experimentally answer the following questions:
 \begin{itemize}
 \item is DDS a viable alternative to conventional fine-tuning ? In particular does it enable to better take advantage of relevant data from other domains ?
 \item is DDS a viable alternative in multidomain scenarios ?
 \item \fyTodo{TBContinued}
 \end{itemize}
 
-These questions are further discussed in Section~\ref{}. We now turn to our experimental conditions.
+These questions are further discussed in Section~\ref{sec:results}. We now turn to our experimental conditions.
+
 \section{Experimental settings} \label{sec:exp}
 
 \subsection{Data and metrics \label{ssec:corpora}}
@@ -331,6 +332,11 @@ In Table~\ref{tab:finetuning}, we compare the results of Fine tuning a system in
   \caption{DDS as a fine-tuning receipe. We report scores with DDS and each target domain, and compare with full-fine-tuning. Note that the last line reports the results of 6 different fine tuning procedures.}
   \label{tab:finetuning}
 \end{table*}
+\fyTodo{Works best for small domains ?}
+\fyTodo{Curves for bank / medical ou law}
+
+\fyTodo{Fine tune pour 2 domains}
+
 
 \subsection{Multi-domain experiments}
 Results for our multidomain experiments are in Table~\ref{tab:multidomains}.
