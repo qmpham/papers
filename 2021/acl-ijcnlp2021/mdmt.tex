@@ -69,7 +69,7 @@
 \newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
 \newcommand{\fyFuture}[1]{\done[FY]\Todo[FY:]{\textcolor{red}{#1}}}
 \newcommand{\fyDonestar}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
-\newcommand{\revision}[1]{#1}
+\newcommand{\revision}[1]{\textcolor{red}{#1}}
 \newcommand{\revisiondel}[1]{}
 \newcommand{\src}{\ensuremath{\mathbf{f}}} % source sentence
 \newcommand{\trg}{\ensuremath{\mathbf{e}}} % target sentence
@@ -149,7 +149,7 @@ Differentiable data selection (DDS), proposed by \citet{Wang20optimizing} and la
 
 \section{Differential Data Selection} \label{sec:dds}
 \subsection{Basic principles}
-Assume training data from $n_d$ domains $d_1 \dots d_{n_d}$, we denote the size of the training corpus from domain $d$ as  $N^{s}_d$, and $N^{s} = \sum_d N^{s}_d$ is the total number of training samples. We use $\widehat{\mathcal{D}^l_d}$ and $\widehat{\mathcal{D}^t _d}$ to denote the empirical train and test distributions for domain $d$, and $\widehat{\mathcal{D}}(x;\lambda) = \sum_{d} \lambda(d) \widehat{\mathcal{D}^l_d}(x)$. In our setting,  $\lambda^t$, and hence $\widehat{\mathcal{D}^t}(x;\lambda^t)$ are fixed and predefined, approximated with an equivalent number of development corpora. Training optimizes the parameters $\theta$ of a neural translation model.
+Assume training data from $n_d$ domains $d_1 \dots d_{n_d}$, we denote the size of the training corpus from domain $d$ as  $N^{s}_d$, and $N^{s} = \sum_d N^{s}_d$ is the total number of training samples. We use $\widehat{\mathcal{D}^l_d}$ and $\widehat{\mathcal{D}^t _d}$ to denote the empirical train and test distributions for domain $d$, and \revision{$\widehat{\mathcal{D}}(x;\lambda) = \sum_{d} \lambda(d) \widehat{\mathcal{D}^l_d}(x)$} \fyTodo{$\widehat{\mathcal{D}}(x;\lambda) = \sum_{d} \lambda(d) \widehat{\mathcal{D}_d}(x)$}. In our setting,  $\lambda^t$, and hence $\widehat{\mathcal{D}^t}(x;\lambda^t)$ are fixed and predefined, approximated with an equivalent number of development corpora. Training optimizes the parameters $\theta$ of a neural translation model.
 
 Sampling training domains using a distribution $\lambda^{l}(d)$ results in a parameter estimate $\theta(\lambda^{l})$, delivering performance that can be estimated on the development set using $\lambda^{t}$. \cite{Wang20optimizing,Wang20balancing} then formulate the problem of finding an optimal sampling strategy $\lambda^{l}_{*}$ maximizing performance on the development data as the following bi-level optimization problem:
 \begin{equation} \label{eq:bilevel}
@@ -159,6 +159,7 @@ Sampling training domains using a distribution $\lambda^{l}(d)$ results in a par
 \end{split}
 \end{equation}
 where we use the following notations:% \fyTodo{Overload Q, from domain to instances to pairs}
+
 \begin{align*}
 J(\theta, \lambda^{t} ) &= \displaystyle{\mathop{\sum}_{(x,y) \sim \widehat{\mathcal{D}^{t}(x)}} \ell(\theta,x,y)} \\
 J(\theta, \lambda^{l}) &= \displaystyle{\mathop{E_{(x,y) \sim \widehat{\mathcal{D}^{l}(x)}}[\ell(\theta,x,y)]}} \\
@@ -167,19 +168,24 @@ l(\theta,x,y) &= - log P(\theta,x,y)
 Problem~\eqref{eq:bilevel} can be approached by coordinate gradient descent alternating between $\lambda^{l}$ and $\theta$. \citet{Wang20balancing} limit the search space of $\lambda^{l}$ to a parameterized differentiable function $\lambda^{l}(d; \psi)$. Given $\psi_t$ at time step $t$, $\theta_t$ is updated via usual gradient descent as follows:
 \begin{align*}
 \theta_{t+1} &= \theta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta_t, x,y)}{\partial \theta} \\
-x,y &\sim \widehat{\mathcal{D}^l}(x;\lambda(\psi_t)) \\
+x,y &\sim \widehat{\mathcal{D}^l}(x;\lambda^l(\psi_t)) = \displaystyle{\mathop{\sum}_{d=1}^K} \lambda^l(d,\psi_t) * \widehat{D_d}(x) \\
 \end{align*}
-
 Given $\theta_t$, $\psi_t$ is updated via the Reinforce algorithm \cite{Williams92reinforce}:\fyTodo{Rewrite this correctly with domain average reward}
+%\begin{align*}
+%  \psi_{t+1} &= \psi_t + \mathbf{lr}_{data} * R(x,y) * \\
+%  & \quad\quad \frac{\partial log(\lambda^l(\psi_t)(x,y))}{\partial \psi} \\
+%x,y &\sim \lambda^l (\psi_t) \\
+%R(x,y) &= \langle \frac{\partial l(\theta',x,y)}{\partial \theta}, \frac{\partial J(\theta_{t+1}, \lambda^l)}{\partial \theta} \rangle \\
+%\theta' &= \theta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta_t, x,y)}{\partial \theta} \\
+%\end{align*}
+
 \begin{align*}
-  \psi_{t+1} &= \psi_t + \mathbf{lr}_{data} * R(x,y) * \\
-  & \quad\quad \frac{\partial log(\lambda^l(\psi_t)(x,y))}{\partial \psi} \\
-x,y &\sim \lambda^l (\psi_t) \\
-R(x,y) &= \langle \frac{\partial l(\theta',x,y)}{\partial \theta}, \frac{\partial J(\theta_{t+1}, \lambda^l)}{\partial \theta} \rangle \\
-\theta' &= \theta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta_t, x,y)}{\partial \theta} \\
+\psi_{t+1} &= \psi_t + \mathbf{lr}_{data} * \displaystyle{\mathop{\sum}_{d=1}^K} R(d) * \frac{\partial log(\lambda^l(\psi_t)(d))}{\partial \psi} \\
+  R(d) &= E_{x,y \sim \widehat{D_d}}[\langle \frac{\partial l(\theta_t,x,y)}{\partial \theta}, \frac{\partial J(\theta', \lambda^t)}{\partial \theta} \rangle] \\
+  \theta' &= \theta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta_t, x,y)}{\partial \theta} \\
 \end{align*}
 
-\fyTodo{Explain lr, may be more}\fyTodo{More refs to the algorithm }
+$\mathbf{lr}_{data}$ is the learning rate of the parameter of the sampler. $\mathbf{lr}_{nmt}$ is the learning rate of the parameter of the NMT system. \fyTodo{Explain lr, may be more}\fyTodo{More refs to the algorithm }
 % To apply this method to multi-domain training (\system{Multi-DDS}), we limit the search family of training distribution $D_{trn}$ to the family of mixture of K in-domain training distribution such as $\sum_d \lambda^{s}_{d} \mathcal{D}_d(x,y)$. We also parameterize $\lambda^{s}_{d}$ using Softmax function so that $\lambda^{s}_{d} = \text{Softmax}(\psi)_d$ where $\psi \in \mathbb{R}^K$.
 \subsection{DDS for (multi) domain adaptation}
 
@@ -434,8 +440,6 @@ The first one is to replace the softmax function by a simpler linear function, y
 where $\eta$ controls the learning rate of $\psi$.
 
 The second one simply adds an entropy constraint which ensures that the entropy of the domain distribution is always greater than a predefined value $\alpha$.\fyTodo{Explain the math}
-
-
 
 \section{Related Work \label{sec:related}}
 \cite{Wang17instance} uses dynamic weighting (for sentences and domains) for DA.
