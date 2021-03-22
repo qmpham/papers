@@ -52,11 +52,11 @@
 {
     \inst{\dag} SYSTRAN, 5 rue Feydeau, 75002, Paris, France \and
     \vspace{-0.2cm}
-    \inst{\ddag} Universit\'e Paris-Saclay, CNRS, LIMSI, 91400, Orsay, France \\
+    \inst{\ddag} Universit\'e Paris-Saclay, CNRS, LISN, 91400, Orsay, France \\
     \vspace{0.5cm}
     \includegraphics[height=1.0cm]{systran-logo.png}
     \includegraphics[height=1.0cm]{cnrs-logo.png}
-    \includegraphics[height=1.0cm]{limsi-logo.png}
+%    \includegraphics[height=1.0cm]{limsi-logo.png}
     \includegraphics[height=1.0cm]{ups-logo.png}
     \vspace{1.5cm}
 }
@@ -79,7 +79,7 @@
 \AtBeginSection[]
 {
   \begin{frame}
-    \frametitle{Table of Contents}
+    \frametitle{Table of Contents} 
     \tableofcontents[currentsection]
   \end{frame}
 }
@@ -179,22 +179,22 @@
 \begin{itemize}
 	\item<1-> Domain control (Kobus et al 2017)
 	\begin{itemize}
-		\item<2-> Domain tag (denoted as DC-Tag)
-		\item<3-> Domain embedding (denoted as DC-Feat)
+		\item<2-> Domain tag (DC-Tag)
+		\item<3-> Domain embedding (DC-Feat)
 	\end{itemize}
-	\item<4-> Lexicalized Domain Representation (Pham et al 2019) (denoted as LDR)
+	\item<4-> Lexicalized Domain Representation (Pham et al 2019) (LDR)
 	\item<5-> Domain mixing (Britz et al 2018)
 	\begin{itemize}
-		\item<6-> Domain tag in target (denoted as TTM)
-		\item<7-> Domain mixing (denoted as DM)
-		\item<8-> Adversarial Domain mixing (denoted as ADM)
+		\item<6-> Domain tag in target TTM)
+		\item<7-> Domain mixing (DM)
+		\item<8-> Adversarial Domain mixing (ADM)
 	\end{itemize}
 	\item<9-> Residual Adapter (Bapna et al 2019)
 	\begin{itemize}
-		\item<10-> Fine-tuning (denoted as FT-Res)
-		\item<11-> Multi-task learning (denoted as MDL-Res)
+		\item<10-> Fine-tuning (FT-Res)
+		\item<11-> Multi-task learning (MDL-Res)
 	\end{itemize}
-	\item<12-> Full fine-tuning (denoted as FT-full)
+	\item<12-> Full fine-tuning (FT-full)
 \end{itemize}
 \end{frame}
 %---------------------------------------------------------
@@ -306,7 +306,8 @@
 \begin{itemize}
 	\item Multi-domain NMT is a hard problem that requires much more effort of research.
 	\item The standard evaluation, which is often reported in the papers working on multi-domain NMT, is naive.
-	\item A call for building robust NMT system against unseen domains and the continuous learning.
+	\item A call for building robust NMT systems in more realistic scenarios: \newline
+          eg.\ large number of domains, extreme unbalancing, unseen domains and continuous learning etc.
 	\item \fyTodo{To add more conclusions}
 	
 \end{itemize}
@@ -322,7 +323,7 @@ Thank you \\
 \vspace{1.5cm}
     \includegraphics[height=1.0cm]{systran-logo.png}
     \includegraphics[height=1.0cm]{cnrs-logo.png}
-    \includegraphics[height=1.0cm]{limsi-logo.png}
+%    \includegraphics[height=1.0cm]{limsi-logo.png}
     \includegraphics[height=1.0cm]{ups-logo.png}
 \end{frame}
 %---------------------------------------------------------
