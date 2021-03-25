@@ -105,21 +105,58 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-\frametitle{Multi domain MT}
-\begin{itemize}
-\item Training data: $(x_i, y_i, d_i)$.
-\item IID assumption is violated.
-\begin{align*}
-D^s &= \sum_{d} \lambda^s_d \mathcal{D}^s_d(x) \\
-D^t &= \sum_{d} \lambda^t_{d} \mathcal{D}^t_{d}(x)
-\end{align*}
-\end{itemize}
+\frametitle{High variety of parallel data}
+\begin{figure}
+\includegraphics[width=\textwidth]{variety.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Robust against the unbalance between domains}
+\begin{figure}
+\includegraphics[width=\textwidth]{unbalanced_question.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Robust against variable test distribution}
+\begin{figure}
+\includegraphics[width=\textwidth]{test_question.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Domain similarity}
+\begin{figure}
+\includegraphics[width=\textwidth]{split_question.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Large number of non-identified domains}
+\begin{figure}
+\includegraphics[width=\textwidth]{cluster_question.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Integrating new domain}
+\begin{figure}
+\includegraphics[width=\textwidth]{new_question.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{MDMT}
+\begin{figure}
+\includegraphics[width=\textwidth]{MDMT_question.png}
+\end{figure}
 \end{frame}
 
 %---------------------------------------------------------
 \begin{frame}
 \vspace{-0.2cm}
-\frametitle{Axiomatic of MDMT}
+\frametitle{Experiment design}
 \begin{figure}
 \includegraphics[width=\textwidth]{mdmt.png}
 \end{figure}
@@ -127,26 +164,13 @@ D^t &= \sum_{d} \lambda^t_{d} \mathcal{D}^t_{d}(x)
 %---------------------------------------------------------
 \begin{frame}
 \vspace{-0.2cm}
-\frametitle{Axiomatic of MDMT}
+\frametitle{Experiment design}
 \begin{figure}
 \includegraphics[width=\textwidth]{unlabeled.png}
 \caption{Data without domain label}
 \end{figure}
 \end{frame}
 %---------------------------------------------------------
-
-%---------------------------------------------------------
-\begin{frame}
-\frametitle{Multi-criteria evaluation}
-Multi-criteria evaluation:
-	\begin{itemize}
-		\item<1-> Variable-size in-domain corpora in training data.
-		\item<2-> Random domain labeling and out-of-domain test sets. 
-		\item<3-> Fuzzy domain separation.
-		\item<4-> Training in considering unsupervised clusters as domains.
-		\item<5-> Continuation of training with new domain data.
-	\end{itemize}
-\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Experimental setting} %%%%%%%%%%%%%%
@@ -156,24 +180,24 @@ Multi-criteria evaluation:
 \begin{frame}
 \frametitle{Revisited methods}
 \begin{itemize}
-	\item<1-> Domain control (Kobus et al 2017)
+	\item Domain control (Kobus et al 2017)
 	\begin{itemize}
-		\item<2-> Domain tag (DC-Tag)
-		\item<3-> Domain embedding (DC-Feat)
+		\item Domain tag (DC-Tag)
+		\item Domain embedding (DC-Feat)
 	\end{itemize}
-	\item<4-> Lexicalized Domain Representation (Pham et al 2019) (LDR)
-	\item<5-> Domain mixing (Britz et al 2018)
+	\item Lexicalized Domain Representation (Pham et al 2019) (LDR)
+	\item Domain mixing (Britz et al 2018)
 	\begin{itemize}
-		\item<6-> Domain tag in target (TTM)
-		\item<7-> Domain mixing (DM)
-		\item<8-> Adversarial Domain mixing (ADM)
+		\item Domain tag in target (TTM)
+		\item Domain mixing (DM)
+		\item Adversarial Domain mixing (ADM)
 	\end{itemize}
-	\item<9-> Residual Adapter (Bapna et al 2019)
+	\item Residual Adapter (Bapna et al 2019)
 	\begin{itemize}
-		\item<10-> Fine-tuning (FT-Res)
-		\item<11-> Multi-task learning (MDL-Res)
+		\item Fine-tuning (FT-Res)
+		\item Multi-task learning (MDL-Res)
 	\end{itemize}
-	\item<12-> Full fine-tuning (FT-full)
+	\item Full fine-tuning (FT-full)
 \end{itemize}
 \end{frame}
 %---------------------------------------------------------
@@ -283,11 +307,16 @@ Multi-criteria evaluation:
 %Two columns
 \begin{frame}
 \begin{itemize}
-	\item Multi-domain NMT is a hard problem that requires much more effort of research.
-	\item The standard evaluation, which is often reported in the papers working on multi-domain NMT, is naive.
-	\item A call for building robust NMT systems in more realistic scenarios: \newline
-          eg.\ large number of domains, extreme unbalancing, unseen domains and continuous learning etc.
-	\item \fyTodo{To add more conclusions}
+	%\item Multi-domain NMT is a hard problem that requires much more effort of research.
+	%\item The standard evaluation, which is often reported in the papers working on multi-domain NMT, is naive.
+	%\item A call for building robust NMT systems in more realistic scenarios: \newline
+     %     eg.\ large number of domains, extreme unbalancing, unseen domains and continuous learning etc.
+	%\item \fyTodo{To add more conclusions}
+	
+	\item Clarify the objective, wrt test distributions, design experiments accordingly.	
+	\item Use as many domains as possible.
+	\item Pay attention to the balance between domains, wrt their similarities.
+	
 	
 \end{itemize}
 \end{frame}
