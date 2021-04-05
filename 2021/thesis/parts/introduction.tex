@@ -1,0 +1,13 @@
+\chapter{Introduction}
+
+For a long time, Machine Translation(MT\nomenclature[mt]{MT}{Machine Translation}) has evolved around data-driven methods including Statistical Machine Translation (SMT\nomenclature[smt]{SMT}{Statistical Machine Translation}) and Neural Machine Translation (NMT\nomenclature[nmt]{NMT}{Neural Machine Translation}). Learning from data is the cheapest and the most computationally efficient road to building such intelligent systems for the Automatic Translation task. For nearly one decade, NMT models have surpassed SMT models in the high-resource language pairs such as French(Fr\nomenclature[fr]{Fr}{French}) - English(En\nomenclature[en]{En}{English}), German(De\nomenclature[de]{De}{German}) - English thanks to their extremely complex architecture. Since our first encounter with NMT models, it becomes a unique paradigm both in the research and in the industry that we feed all the available data to the NMT model with the belief that the more training data is fed, the better the model performs. However, recent works in Domain Adaptation (DA\nomenclature[da]{DA}{Domain Adaptation}), e.g \cite{rico13domain}, showed that the belief was no longer true when the NMT model was tested with text that came from a different context than training data. NMT model's quality, as SMT model's, is guaranteed by the relevance between training data and testing data. The goal of this thesis is to point out exactly what can happen if training distribution and testing distribution are mismatched, and to propose new methods to improve the NMT model's performance under such a situation.
+
+\section{What is a domain?}
+The notion of a domain is vaguely defined despite the fact that it is the subject of a large group of research works including DA and MDL. 
+The richness of data is not only demonstrated by the number of parallel sentences but is also expressed by the high variety of genres, topics, and style. Parallel text is usually grouped into parallel corpora such as the European Central Bank corpus \citep{Tiedemann12parallel}; The JRC-Acquis Communautaire corpus\citep{Steinberger06acquis}, documentations for KDE, Ubuntu, GNOME and PHP from Opus collection \citep{Tiedemann09news}and Ted Talks \citep{Cettolo12wit}. Each corpus is collected from activities of an organization or 
+
+\section{Multi-domain problem}
+
+\section{Thesis contribution}
+
+\section{Outline}

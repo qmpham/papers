@@ -1,0 +1,172 @@
+\documentclass[12pt,a4paper,twoside]{report}
+\usepackage[left=3cm,right=3cm,top=3cm,bottom=3cm]{geometry}
+\usepackage{pagenote}
+\geometry{margin=1in, headsep=0.25in}
+%\parindent 0in
+%\parskip 12pt
+
+%algo packages
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+%color packages
+\usepackage{xcolor}
+\colorlet{shadecolor}{orange!15}
+\usepackage{color,soul}
+\usepackage{soulutf8}
+\definecolor{bordeau}{rgb}{0.3515625,0,0.234375}
+
+%
+\usepackage[absolute,overlay]{textpos}
+
+%graphic packages
+\usepackage{graphicx}
+\graphicspath{ {figures/} }
+\usepackage{wrapfig}
+\usepackage{float} 
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+
+% table packages
+\usepackage{array}
+\usepackage{multirow,booktabs}
+\usepackage{multicol}
+\usepackage{tabularx}
+
+% font package
+\usepackage[utf8]{inputenc}	% Para caracteres en español
+
+% equation packages
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{mathrsfs}
+
+% header, footer packages
+\pagestyle{headings}
+
+% page package
+%\usepackage{fullpage}
+%\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{afterpage}
+
+\pagestyle{fancy}
+
+% space package
+\usepackage{setspace}
+\usepackage{calc}
+\usepackage{color,soul}
+\usepackage{cancel}
+\usepackage{listings}
+
+% theorem commands
+\theoremstyle{definition}
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{definition}{Definition}[section]
+
+% verbatim env
+\usepackage{fancyvrb}
+\usepackage{spverbatim}
+
+% reference
+\usepackage{hyperref}
+
+% abbreviation package
+\usepackage[intoc]{nomencl}
+\makenomenclature
+\setlength{\nomlabelwidth}{2cm}
+\setlength{\nomitemsep}{-1.5\parsep}
+\renewcommand{\nomname}{List of Abbreviations}
+\setcounter{tocdepth}{2}
+%%\nomenclature[⟨prefix⟩]{⟨symbol⟩}{⟨description⟩}: the prefix is used to sort the abbreviations in the printing list.
+
+%
+\usepackage{natbib}
+
+% new command
+\DeclareMathOperator*{\argmax}{argmax}
+\usepackage[draft]{todo}
+\newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyTodostar}[1]{\Todo*[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyDonestar}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+\usepackage{titlesec}
+\pgfkeys{
+    /tr/rowfilter/.style 2 args={
+        /pgfplots/x filter/.append code={
+            \edef\arga{\thisrow{#1}}
+            \edef\argb{#2}
+            \ifx\arga\argb
+            \else
+                \def\pgfmathresult{}
+            \fi
+        }
+    }
+}
+\newcommand{\system}[1]{\texttt{{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand\blankpage{%
+    \null
+    \thispagestyle{empty}%
+    \addtocounter{page}{-1}%
+    \newpage}
+
+%Bibliography style
+%\usepackage[square, numbers]{natbib}
+
+
+% Thesis title
+\newcommand{\PhDTitle}{Multi-domain neural machine translation} 
+
+% Name
+\newcommand{\PhDname}{Minh-Quang PHAM}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+	\doublespacing	
+
+    \input{layout/firstpage.tex}
+
+	\input{abstract.tex}
+
+	\input{acknowledgement.tex}
+
+%\thispagestyle{empty}
+
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+\newpage
+
+\printnomenclature
+\newpage
+
+\pagenumbering{arabic}
+
+\tableofcontents
+\clearpage 
+
+\setlength{\belowdisplayskip}{8pt} \setlength{\belowdisplayshortskip}{8pt}
+\setlength{\abovedisplayskip}{8pt} \setlength{\abovedisplayshortskip}{8pt}
+\setlist{nosep}
+\setlength{\parskip}{0.1cm}
+\setlength{\parindent}{1em}
+
+	\input{introduction.tex}
+	\input{state_of_the_art.tex}
+	
+\bibliography{bibliography}
+\bibliographystyle{apa-good}
+\end{document}
+
+
