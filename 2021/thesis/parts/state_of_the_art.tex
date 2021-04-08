@@ -1,11 +1,39 @@
-\part{State of the art}
-\chapter{Neural Machine Translation}
+\chapter{Neural Machine Translation's review \label{chap:2}} 
+This chapter of the thesis is dedicated to reviewing the recent developments in NMT research. We will focus particularly on an important part of the field which provides the foundation for the experiments of the thesis. Neural Machine Translation was first introduced in 2014 via the work of \cite{bahdanau14neural,cho14properties}. Since then, NMT has been largely developed and outperformed old approaches including Rule-based MT, SMT, and Hybrid MT in high-resource languages such as English-French, English-German. In general, NMT approaches use a parallel corpus to learn their parameters. Each sentence is processed into a sequence of tokens, which can be words, sub-words, or characters, then is indexed by a predetermined vocabulary. Given a choice of neural architecture, the parameters of the NMT model are optimized according to a training objective and training examples. After training, given any input, the NMT model predicts an output, which approximates the translation of that input, via a decoding algorithm such as beam search \citep{koehn04pharaoh}.
+\section{Text preprocessing for NMT \label{sec:2.1}}
+Typically a sentence can be split into a sequence of tokens and we call this process tokenization. There are 3 common types of a token including word, sub-word, and character. These tokens will be indexed by a predetermined corresponding vocabulary in the source or target language. The sequence of tokens is translated into a sequence of integers $IDs \in V$ where V is the set of the index of the corresponding vocabulary. The vocabulary of the NMT model is limited and fixed before and after the training. Any out of vocabulary (OOV\nomenclature[oov]{OOV}{Out of vocabulary}) words are mapped to the UNK token. The size of the vocabulary is chosen to balance the coverage with the practical constraint on the size of the model. An NMT model vocabulary is usually limited to 30 thousand tokens 
+\subsection{Word tokenization}
+The first type of token is the most natural because it does not need extra effort to separate the words of a sentence. However, this approach has several disadvantages as it treats words as isolated units and therefore can not handle the large vocabulary of the corresponding language and the growing number of unseen words.
+\subsection{Subword tokenization}
+However, the morphological property of languages allows us to go beyond the surface level of words and present a word as a compound of morphemes. This presentation increases largely the coverage of the vocabulary, therefore handles beautifully unseen words. These tokens are referred to as subwords. The vocabulary can be built by applying the morphological rules of the language or can be learned by heuristic algorithms such as Byte pair encoding (BPE\nomenclature[bpe]{BPE}{Byte pair encoding})\citep{sennrich16neural,gage94anew}. 
+
+Because BPE tokenization is the most popular tokenization in NMT research, we will review briefly this technique. In general, BPE vocabulary is first initialized with a set of characters; words in the collected corpora are represented as sequences of characters. BPE algorithm then counts the occurrences of each pair of BPE tokens, and iteratively merges the most frequent pair into a new token, and add it to BPE vocabulary until the vocabulary reaches a predetermined size. In the end, most frequent words become tokens in the vocabulary, less frequent words remain sequences of BPE tokens, which can be sequences of characters or characters in the worst case. BPE vocabulary can be learned separately from one language either source or target, or jointly from both source and target, or from multiple languages as in multi-lingual NMT. 
+
+Previous BPE tokenization is frequency-based; there are alternative paradigms for subword tokenization such as syllabification \cite{assylbekov17syllable}, subword-regularization\cite{taku18subword}, linguistically informed tokenization \cite{ataman17linguistically,huck17target,machcek18morphological}. BPE tokenization is not only applied to text representation but also to byte-level representation as \cite{wang19neural} showed comparable performance of byte-level BPE-based NMT compared to BPE-based NMT. Furthermore, byte-level BPE is able to represent any Unicode character, there to make an open vocabulary MT possible.
+\subsection{Character tokenization}
+The problem of finding optimal subword segmentation becomes more complex
+when an NMT system must handle multiple source/target languages, as in multilingual translation or zero-shot approaches. Translating characters instead of subword tokens avoids these problems and give the MT system
+access to all available information about source and target sentences regardless of their languages. Furthermore, character tokenization reduces the size of the vocabulary to a small number of written characters. However, because of extremely splitting words into character units, the length of the resulting sequence increases largely. Increasing sequence length increases both the computational requirements during training and the decoding time during the prediction. 
+
+First attempts of character based NMT including \cite{wang15character,luong16achieving} focused on solving the out-of-vocabulary and softmax bottleneck problems associated with word level models. \cite{costa16character,lee17fully,chung16character,costa17byte} proposed different fully character based NMT.
 \section{Recurrent Neural Network models}
+This section reviews the very first NMT architecture which is Recurrent Neural Network. In principle, the NMT model consists of 2 parts: encoder and decoder. The encoder maps (or encodes) the source sentence to either a sequence of real value vectors or a unique real value vector in a high dimension space called Latent space. The decoder iteratively encodes the target sequence from left to right, token by token, to a real value vector at each step and combine it with the output of the encoder into one real vector which then is mapped to a real vector of dimension equal to the size of target vocabulary, then passed to softmax activation function to produce the probability of words in the target vocabulary to appear at that step. The variants in the RNN category are different only in functions used to map sentences to Latent spaces.
+\subsection{Word embeddings}
+Each token in either source or target sequences is mapped to a real vector called word embedding. Word embeddings corresponding to words in the source$/$ target vocabulary are stored in a lookup table and will be extracted using the index of the corresponding token. The lookup table has the size of $V \times d$ where $V$ is the size of the corresponding vocabulary, $d$ is the dimension of word embedding space. Typically, d is 512 or 1024.
+
+Word embedding is not only used in the NMT model but also in the Neural language model\citep{bengio03aneural}(NLM\nomenclature{nlm}{NLM}{Neural language model}). \cite{le12continuous,schwenk12continuous} used NLM models for phrase-based statistical machine translation.
+
+Moreover, word embedding could be trained alone using Skip-gram model\citep{mikolov13distributed} or Continuous Bag of Word model\citep{mikolov13efficient}. After training such models, the resulting word embeddings possess semantic properties so that words having similar meanings or close meanings are mapped to similar vectors in terms of cosine similarity\citep{collobert11natural,mikolov13distributed}. This property is one of the ingredients in the success of neural model in text classification, text retrieval, language modeling and machine translation.
+
 \subsection{GRU, LSTM}
+
 \subsection{Attentional mechanism}
+\section{Convolution }
 \section{Transformer models}
-\subsection{self-attention, cross-attention layers}
+\subsection{Self-attention, cross-attention layers}
 \subsection{Variants}
-\chapter{Data centric domain adaptation}
-\chapter{Feature centric domain adaptation}
-\chapter{Model centric domain adaptation}
+\section{NMT training}
+\section{Decoding algorithms}
+\chapter{Data-centric domain adaptation}
+\chapter{Feature-centric domain adaptation}
+\chapter{Model-centric domain adaptation}

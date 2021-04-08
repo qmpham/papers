@@ -1,4 +1,4 @@
-@article{Michael89catastrophic,
+c@article{Michael89catastrophic,
 title = "Catastrophic Interference in Connectionist Networks: The Sequential Learning Problem",
 author = "Michael McCloskey and Cohen, {Neal J.}",
 year = "1989",
@@ -43,7 +43,21 @@ abstract = "This paper introduces stacked generalization, a scheme for minimizin
  publisher = {Association for Computational Linguistics},
  address = {Stroudsburg, PA, USA}
 } 
-
+@article{gage94anew,
+author = {Gage, Philip},
+title = {A New Algorithm for Data Compression},
+year = {1994},
+issue_date = {Feb. 1994},
+publisher = {R &amp; D Publications, Inc.},
+address = {USA},
+volume = {12},
+number = {2},
+issn = {0898-9788},
+journal = {C Users J.},
+month = feb,
+pages = {23–38},
+numpages = {16}
+}
 @article{Caruana97multitask,
  author = {Caruana, Rich},
  title = {Multitask Learning},
@@ -96,6 +110,22 @@ doi = {10.1023/A:1019956318069}
 	Title = {{BLEU:} a method for automatic evaluation of machine translation},
 	Year = {2002}}
 
+@article{bengio03aneural,
+author = {Bengio, Yoshua and Ducharme, R\'{e}jean and Vincent, Pascal and Janvin, Christian},
+title = {A Neural Probabilistic Language Model},
+year = {2003},
+issue_date = {3/1/2003},
+publisher = {JMLR.org},
+volume = {3},
+number = {null},
+issn = {1532-4435},
+abstract = {A goal of statistical language modeling is to learn the joint probability function of sequences of words in a language. This is intrinsically difficult because of the curse of dimensionality: a word sequence on which the model will be tested is likely to be different from all the word sequences seen during training. Traditional but very successful approaches based on n-grams obtain generalization by concatenating very short overlapping sequences seen in the training set. We propose to fight the curse of dimensionality by learning a distributed representation for words which allows each training sentence to inform the model about an exponential number of semantically neighboring sentences. The model learns simultaneously (1) a distributed representation for each word along with (2) the probability function for word sequences, expressed in terms of these representations. Generalization is obtained because a sequence of words that has never been seen before gets high probability if it is made of words that are similar (in the sense of having a nearby representation) to words forming an already seen sentence. Training such large models (with millions of parameters) within a reasonable time is itself a significant challenge. We report on experiments using neural networks for the probability function, showing on two text corpora that the proposed approach significantly improves on state-of-the-art n-gram models, and that the proposed approach allows to take advantage of longer contexts.},
+journal = {J. Mach. Learn. Res.},
+month = mar,
+pages = {1137–1155},
+numpages = {19}
+}
+
 @InProceedings{Utiyama03reliable,
   author = 	"Utiyama, Masao
 		and Isahara, Hitoshi",
@@ -123,6 +153,16 @@ doi = {10.1090/gsm/058}
   address =    "Sapporo, Japan",
   year = 	"2003",
   url = 	"http://aclweb.org/anthology/P03-1010"
+}
+
+@inproceedings{koehn04pharaoh,
+author = {Koehn, Philipp},
+year = {2004},
+month = {09},
+pages = {115-124},
+title = {Pharaoh: A Beam Search Decoder for Phrase-Based Statistical Machine Translation Models},
+isbn = {978-3-540-23300-8},
+doi = {10.1007/978-3-540-30194-3_13}
 }
 
 @InProceedings{Burago04metric,
@@ -275,7 +315,7 @@ language = "English (US)",
 note = "22nd Conference on Learning Theory, COLT 2009 ; Conference date: 18-06-2009 Through 21-06-2009",
 }
 
-@inproceedings{Daume09bayes,
+@inproceedings{daume09bayes,
  author = {Daum{\'e},III, Hal},
  title = {Bayesian Multitask Learning with Latent Hierarchies},
  booktitle = {Proceedings of the Twenty-Fifth Conference on Uncertainty in Artificial Intelligence},
@@ -300,7 +340,7 @@ note = "22nd Conference on Learning Theory, COLT 2009 ; Conference date: 18-06-2
  address = {Greenwich, CT, USA},
 } 
 
-@InProceedings{Moore10intelligent,
+@InProceedings{moore10intelligent,
   author = 	"Moore, Robert C.
 		and Lewis, William",
   title = 	"Intelligent Selection of Language Model Training Data",
@@ -312,7 +352,7 @@ note = "22nd Conference on Learning Theory, COLT 2009 ; Conference date: 18-06-2
   url = 	"http://aclweb.org/anthology/P10-2041"
 }
 
-@inproceedings{Paul10overview,
+@inproceedings{paul10overview,
   title={Overview of the {IWSLT} 2010 evaluation campaign},
   author={Paul, Michael and Federico, Marcello and St{\"u}ker, Sebastian},
   booktitle={International Workshop on Spoken Language Translation (IWSLT) 2010},
@@ -323,7 +363,7 @@ note = "22nd Conference on Learning Theory, COLT 2009 ; Conference date: 18-06-2
   url = {https://www.isca-speech.org/archive/iwslt_10/papers/slta_003.pdf}
 }  
 
-@inproceedings{Chang10necessity,
+@inproceedings{chang10necessity,
 	Address = {Cambridge, MA},
 	Author = {Chang, Ming-Wei and Connor, Michael and Roth, Dan},
 	Booktitle = {Proceedings of the 2010 Conference on Empirical Methods in Natural Language Processing},
@@ -334,7 +374,7 @@ note = "22nd Conference on Learning Theory, COLT 2009 ; Conference date: 18-06-2
 	Year = {2010},
 	Bdsk-Url-1 = {https://www.aclweb.org/anthology/D10-1075}}
 
-@InProceedings{Moore10selection,
+@InProceedings{moore10selection,
   author = 	"Moore, Robert C.
 		and Lewis, William",
   title = 	"Intelligent Selection of Language Model Training Data",
@@ -346,7 +386,7 @@ note = "22nd Conference on Learning Theory, COLT 2009 ; Conference date: 18-06-2
   url = 	"http://aclweb.org/anthology/P10-2041"
 }
 
-@inproceedings{Foster2010discriminative,
+@inproceedings{foster10discriminative,
     title = "Discriminative Instance Weighting for Domain Adaptation in Statistical Machine Translation",
     author = "Foster, George  and
       Goutte, Cyril  and
@@ -359,22 +399,8 @@ note = "22nd Conference on Learning Theory, COLT 2009 ; Conference date: 18-06-2
     url = "https://www.aclweb.org/anthology/D10-1044",
     pages = "451--459",
 }
-
-@InProceedings{Lambert11investigations,
-  author = 	"Lambert, Patrik
-		and Schwenk, Holger
-		and Servan, Christophe
-		and Abdul-Rauf, Sadaf",
-  title = 	"Investigations on Translation Model Adaptation Using Monolingual Data",
-  booktitle = 	"Proceedings of the Sixth Workshop on Statistical Machine Translation",
-  year = 	"2011",
-  publisher = 	"Association for Computational Linguistics",
-  pages = 	"284--293",
-  address = 	"Edinburgh, Scotland",
-  url = 	"http://aclweb.org/anthology/W11-2132"
-}	
 	
-@InProceedings{Axelrod11domain,
+@InProceedings{axelrod11domain,
   author = 	"Axelrod, Amittai
 		and He, Xiaodong
 		and Gao, Jianfeng",
@@ -387,7 +413,18 @@ note = "22nd Conference on Learning Theory, COLT 2009 ; Conference date: 18-06-2
   url = 	"http://aclweb.org/anthology/D11-1033"
 }
 
-@InProceedings{Lambert11investigation,
+@article{collobert11natural,
+  author  = {Ronan Collobert and Jason Weston and L{{\'e}}on Bottou and Michael Karlen and Koray Kavukcuoglu and Pavel Kuksa},
+  title   = {Natural Language Processing (Almost) from Scratch},
+  journal = {Journal of Machine Learning Research},
+  year    = {2011},
+  volume  = {12},
+  number  = {76},
+  pages   = {2493-2537},
+  url     = {http://jmlr.org/papers/v12/collobert11a.html}
+}
+
+@InProceedings{lambert11investigation,
   author = 	"Lambert, Patrik
 		and Schwenk, Holger
 		and Servan, Christophe
@@ -401,7 +438,7 @@ note = "22nd Conference on Learning Theory, COLT 2009 ; Conference date: 18-06-2
   url = 	"http://aclweb.org/anthology/W11-2132"
 }
 
-@article{Memoli11gromov,
+@article{memoli11gromov,
 author = {Mémoli, Facundo},
 year = {2011},
 month = {08},
@@ -446,6 +483,32 @@ pdf = {https://www-i6.informatik.rwth-aachen.de/publications/downloader.php?id=8
   publisher = {European Language Resources Association (ELRA)},
   isbn = {978-2-9517408-7-7},
  }
+ 
+@inproceedings{schwenk12continuous,
+    title = "Continuous Space Translation Models for Phrase-Based Statistical Machine Translation",
+    author = "Schwenk, Holger",
+    booktitle = "Proceedings of {COLING} 2012: Posters",
+    month = dec,
+    year = "2012",
+    address = "Mumbai, India",
+    publisher = "The COLING 2012 Organizing Committee",
+    url = "https://www.aclweb.org/anthology/C12-2104",
+    pages = "1071--1080",
+}
+
+@inproceedings{le12continuous,
+    title = "Continuous Space Translation Models with Neural Networks",
+    author = "Le, Hai Son  and
+      Allauzen, Alexandre  and
+      Yvon, Fran{\c{c}}ois",
+    booktitle = "Proceedings of the 2012 Conference of the North {A}merican Chapter of the Association for Computational Linguistics: Human Language Technologies",
+    month = jun,
+    year = "2012",
+    address = "Montr{\'e}al, Canada",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/N12-1005",
+    pages = "39--48",
+}
 
 @inproceedings{Joshi12multidomain,
         Abstract = {We present a systematic analysis of existing multi-domain learning approaches with respect to two questions. First, many multi-domain learning algorithms resemble ensemble learning algorithms. (1) Are multi-domain learning improvements the result of ensemble learning effects? Second, these algorithms are traditionally evaluated in a balanced label setting, although in practice many multi-domain settings have domain-specific label biases. When multi-domain learning is applied to these settings, (2) are multi-domain methods improving because they capture domain-specific class biases? An understanding of these two issues presents a clearer idea about where the field has had success in multi-domain learning, and it suggests some important open questions for improving beyond the current state of the art.},
@@ -470,6 +533,26 @@ pdf = {https://www-i6.informatik.rwth-aachen.de/publications/downloader.php?id=8
  publisher = {Curran Associates Inc.},
  address = {USA},
 }
+
+@inproceedings{mikolov13distributed,
+ author = {Mikolov, Tomas and Sutskever, Ilya and Chen, Kai and Corrado, Greg S and Dean, Jeff},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {C. J. C. Burges and L. Bottou and M. Welling and Z. Ghahramani and K. Q. Weinberger},
+ pages = {},
+ publisher = {Curran Associates, Inc.},
+ title = {Distributed Representations of Words and Phrases and their Compositionality},
+ url = {https://proceedings.neurips.cc/paper/2013/file/9aa42b31882ec039965f3c4923ce901b-Paper.pdf},
+ volume = {26},
+ year = {2013}
+}
+
+@inproceedings{mikolov13efficient,
+  title={Efficient Estimation of Word Representations in Vector Space},
+  author={Tomas Mikolov and Kai Chen and G. Corrado and J. Dean},
+  booktitle={ICLR},
+  year={2013}
+}
+
 
 @InProceedings{Duh13adaptation,
   author = 	"Duh, Kevin
@@ -573,6 +656,21 @@ The main contributions of this thesis are as follows:
 * We present an architecture to combine multiple MT systems, using techniques and ideas from domain adaptation. The hypotheses by external MT systems are treated as out-of-domain knowledge, and combined with in-domain data through instance weighting.
 * We introduce a sentence alignment algorithm that is able to robustly align even noisy parallel texts. We found that higher-quality sentence alignment of the in-domain parallel text has a significant effect on translation quality in our target domain.
 * We propose new translation model features that express how flexible, or general, translation units are, in order to prevent translations that only occur in the context of multiword expressions from being overgeneralised.}
+}
+@inproceedings{cho14properties,
+    title = "On the Properties of Neural Machine Translation: Encoder{--}Decoder Approaches",
+    author = {Cho, Kyunghyun  and
+      van Merri{\"e}nboer, Bart  and
+      Bahdanau, Dzmitry  and
+      Bengio, Yoshua},
+    booktitle = "Proceedings of {SSST}-8, Eighth Workshop on Syntax, Semantics and Structure in Statistical Translation",
+    month = oct,
+    year = "2014",
+    address = "Doha, Qatar",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/W14-4012",
+    doi = "10.3115/v1/W14-4012",
+    pages = "103--111",
 }
 
 @InProceedings{Wang14neural,
@@ -763,11 +861,28 @@ The main contributions of this thesis are as follows:
   Title = {Stanford Neural Machine Translation Systems for Spoken Language Domain},
   Year = {2015}}
 
-@inproceedings{durrani2015using,
+@inproceedings{durrani15using,
   title={Using Joint Models for Domain Adaptation in Statistical Machine Translation},
   author={Nadir Durrani and Hassan Sajjad and Shafiq R. Joty and Ahmed Abdelali and Stephan Vogel},
   year={2015}
 }  
+
+@article{wang15character,
+  author    = {Wang Ling and
+               Isabel Trancoso and
+               Chris Dyer and
+               Alan W. Black},
+  title     = {Character-based Neural Machine Translation},
+  journal   = {CoRR},
+  volume    = {abs/1511.04586},
+  year      = {2015},
+  url       = {http://arxiv.org/abs/1511.04586},
+  archivePrefix = {arXiv},
+  eprint    = {1511.04586},
+  timestamp = {Mon, 13 Aug 2018 16:48:11 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/LingTDB15.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
 
 @inproceedings{Yang15unified,
 	title = {A unified perspective on multi-domain and multi-task learning},
@@ -789,7 +904,7 @@ The main contributions of this thesis are as follows:
 	url = {https://arxiv.org/pdf/1409.0473.pdf},
 }
 
-@inproceedings{Sennrich16BPE,
+@inproceedings{sennrich16neural,
 	Address = {Berlin, Germany},
 	Author = {Sennrich, Rico and Haddow, Barry and Birch, Alexandra},
 	Booktitle = {Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
@@ -831,6 +946,34 @@ The main contributions of this thesis are as follows:
  publisher = {Curran Associates Inc.},
  address = {USA}
 } 
+
+@inproceedings{costa16character,
+    title = "Character-based Neural Machine Translation",
+    author = "Costa-juss{\`a}, Marta R.  and
+      Fonollosa, Jos{\'e} A. R.",
+    booktitle = "Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)",
+    month = aug,
+    year = "2016",
+    address = "Berlin, Germany",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/P16-2058",
+    doi = "10.18653/v1/P16-2058",
+    pages = "357--361",
+}
+
+@inproceedings{luong16achieving,
+    title = "Achieving Open Vocabulary Neural Machine Translation with Hybrid Word-Character Models",
+    author = "Luong, Minh-Thang  and
+      Manning, Christopher D.",
+    booktitle = "Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = aug,
+    year = "2016",
+    address = "Berlin, Germany",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/P16-1100",
+    doi = "10.18653/v1/P16-1100",
+    pages = "1054--1063",
+}
 
 @inproceedings{Liu16stein,
  author = {Liu, Qiang and Wang, Dilin},
@@ -1032,6 +1175,22 @@ archivePrefix = {arXiv},
        adsurl = {https://ui.adsabs.harvard.edu/abs/2016arXiv161200796K},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
+
+@inproceedings{chung16character,
+    title = "A Character-level Decoder without Explicit Segmentation for Neural Machine Translation",
+    author = "Chung, Junyoung  and
+      Cho, Kyunghyun  and
+      Bengio, Yoshua",
+    booktitle = "Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = aug,
+    year = "2016",
+    address = "Berlin, Germany",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/P16-1160",
+    doi = "10.18653/v1/P16-1160",
+    pages = "1693--1703",
+}
+
 @inproceedings{Konstantinos16domain,
  author = {Bousmalis, Konstantinos and Trigeorgis, George and Silberman, Nathan and Krishnan, Dilip and Erhan, Dumitru},
  title = {Domain Separation Networks},
@@ -1101,6 +1260,22 @@ publisher = {Curran Associates, Inc.},
 url = {http://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf}
 }
 
+@inproceedings{costa17byte,
+    title = "Byte-based Neural Machine Translation",
+    author = "Costa-juss{\`a}, Marta R.  and
+      Escolano, Carlos  and
+      Fonollosa, Jos{\'e} A. R.",
+    booktitle = "Proceedings of the First Workshop on Subword and Character Level Models in {NLP}",
+    month = sep,
+    year = "2017",
+    address = "Copenhagen, Denmark",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/W17-4123",
+    doi = "10.18653/v1/W17-4123",
+    pages = "154--158",
+    abstract = "This paper presents experiments comparing character-based and byte-based neural machine translation systems. The main motivation of the byte-based neural machine translation system is to build multi-lingual neural machine translation systems that can share the same vocabulary. We compare the performance of both systems in several language pairs and we see that the performance in test is similar for most language pairs while the training time is slightly reduced in the case of byte-based neural machine translation.",
+}
+
 @InProceedings{Kobus17domain,
   author = 	"Kobus, Catherine
 		and Crego, Josep
@@ -1126,6 +1301,19 @@ publisher = {Curran Associates, Inc.},
 url = {http://papers.nips.cc/paper/7209-learned-in-translation-contextualized-word-vectors.pdf}
 }
 
+@article{lee17fully,
+    title = "Fully Character-Level Neural Machine Translation without Explicit Segmentation",
+    author = "Lee, Jason  and
+      Cho, Kyunghyun  and
+      Hofmann, Thomas",
+    journal = "Transactions of the Association for Computational Linguistics",
+    volume = "5",
+    year = "2017",
+    url = "https://www.aclweb.org/anthology/Q17-1026",
+    doi = "10.1162/tacl_a_00067",
+    pages = "365--378",
+    abstract = "Most existing machine translation systems operate at the level of words, relying on explicit segmentation to extract tokens. We introduce a neural machine translation (NMT) model that maps a source character sequence to a target character sequence without any segmentation. We employ a character-level convolutional network with max-pooling at the encoder to reduce the length of source representation, allowing the model to be trained at a speed comparable to subword-level models while capturing local regularities. Our character-to-character model outperforms a recently proposed baseline with a subword-level encoder on WMT{'}15 DE-EN and CS-EN, and gives comparable performance on FI-EN and RU-EN. We then demonstrate that it is possible to share a single character-level encoder across multiple languages by training a model on a many-to-one translation task. In this multilingual setting, the character-level encoder significantly outperforms the subword-level encoder on all the language pairs. We observe that on CS-EN, FI-EN and RU-EN, the quality of the multilingual character-level translation even surpasses the models specifically trained on that language pair alone, both in terms of the BLEU score and human judgment.",
+}
 
 @InProceedings{Chen17cost,
   author = 	"Chen, Boxing
@@ -1426,6 +1614,20 @@ url = {http://papers.nips.cc/paper/7209-learned-in-translation-contextualized-wo
     abstract = "The performance of Neural Machine Translation (NMT) models relies heavily on the availability of sufficient amounts of parallel data, and an efficient and effective way of leveraging the vastly available amounts of monolingual data has yet to be found. We propose to modify the decoder in a neural sequence-to-sequence model to enable multi-task learning for two strongly related tasks: target-side language modeling and translation. The decoder predicts the next target word through two channels, a target-side language model on the lowest layer, and an attentional recurrent model which is conditioned on the source representation. This architecture allows joint training on both large amounts of monolingual and moderate amounts of bilingual data to improve NMT performance. Initial results in the news domain for three language pairs show moderate but consistent improvements over a baseline trained on bilingual data only.",
 }
 
+@article{lee17fully,
+    title = "Fully Character-Level Neural Machine Translation without Explicit Segmentation",
+    author = "Lee, Jason  and
+      Cho, Kyunghyun  and
+      Hofmann, Thomas",
+    journal = "Transactions of the Association for Computational Linguistics",
+    volume = "5",
+    year = "2017",
+    url = "https://www.aclweb.org/anthology/Q17-1026",
+    doi = "10.1162/tacl_a_00067",
+    pages = "365--378",
+    abstract = "Most existing machine translation systems operate at the level of words, relying on explicit segmentation to extract tokens. We introduce a neural machine translation (NMT) model that maps a source character sequence to a target character sequence without any segmentation. We employ a character-level convolutional network with max-pooling at the encoder to reduce the length of source representation, allowing the model to be trained at a speed comparable to subword-level models while capturing local regularities. Our character-to-character model outperforms a recently proposed baseline with a subword-level encoder on WMT{'}15 DE-EN and CS-EN, and gives comparable performance on FI-EN and RU-EN. We then demonstrate that it is possible to share a single character-level encoder across multiple languages by training a model on a many-to-one translation task. In this multilingual setting, the character-level encoder significantly outperforms the subword-level encoder on all the language pairs. We observe that on CS-EN, FI-EN and RU-EN, the quality of the multilingual character-level translation even surpasses the models specifically trained on that language pair alone, both in terms of the BLEU score and human judgment.",
+}
+
 @InProceedings{Britz2017mixing,
   author = 	"Britz, Denny
 		and Le, Quoc
@@ -1448,8 +1650,48 @@ url = {http://papers.nips.cc/paper/7209-learned-in-translation-contextualized-wo
  copyright = {Creative Commons - Attribution-{NonCommercial} 4.0 International ({CC} {BY}-{NC} 4.0)},
  year = {2017} }
 
+@inproceedings{assylbekov17syllable,
+    title = "Syllable-aware Neural Language Models: A Failure to Beat Character-aware Ones",
+    author = "Assylbekov, Zhenisbek  and
+      Takhanov, Rustem  and
+      Myrzakhmetov, Bagdat  and
+      Washington, Jonathan N.",
+    booktitle = "Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing",
+    month = sep,
+    year = "2017",
+    address = "Copenhagen, Denmark",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/D17-1199",
+    doi = "10.18653/v1/D17-1199",
+    pages = "1866--1872",
+    abstract = "Syllabification does not seem to improve word-level RNN language modeling quality when compared to character-based segmentation. However, our best syllable-aware language model, achieving performance comparable to the competitive character-aware model, has 18{\%}-33{\%} fewer parameters and is trained 1.2-2.2 times faster.",
+}
 
-@InProceedings{Chu2017comparison,
+@article{ataman17linguistically,
+  title={Linguistically Motivated Vocabulary Reduction for Neural Machine Translation from Turkish to English},
+  author={Duygu Ataman and Matteo Negri and M. Turchi and Marcello Federico},
+  journal={The Prague Bulletin of Mathematical Linguistics},
+  year={2017},
+  volume={108},
+  pages={331 - 342}
+}
+
+@inproceedings{huck17target,
+    title = "Target-side Word Segmentation Strategies for Neural Machine Translation",
+    author = "Huck, Matthias  and
+      Riess, Simon  and
+      Fraser, Alexander",
+    booktitle = "Proceedings of the Second Conference on Machine Translation",
+    month = sep,
+    year = "2017",
+    address = "Copenhagen, Denmark",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/W17-4706",
+    doi = "10.18653/v1/W17-4706",
+    pages = "56--67",
+}
+
+@InProceedings{chu2017comparison,
   author = 	"Chu, Chenhui
 		and Dabre, Raj
 		and Kurohashi, Sadao",
@@ -1493,6 +1735,13 @@ url = {http://papers.nips.cc/paper/7209-learned-in-translation-contextualized-wo
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
+@inproceedings{machcek18morphological,
+  title={Morphological and Language-Agnostic Word Segmentation for NMT},
+  author={Dominik Mach{\'a}cek and Jon{\'a}s Vidra and Ondrej Bojar},
+  booktitle={TSD},
+  year={2018}
+}
+
 @inproceedings{rebuffi18efficient,
   author    = {Sylvestre{-}Alvise Rebuffi and
                Hakan Bilen and
@@ -1510,7 +1759,26 @@ url = {http://papers.nips.cc/paper/7209-learned-in-translation-contextualized-wo
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
-@InProceedings{Michel2018extreme,
+@inproceedings{taku18subword,
+  author    = {Taku Kudo},
+  editor    = {Iryna Gurevych and
+               Yusuke Miyao},
+  title     = {Subword Regularization: Improving Neural Network Translation Models
+               with Multiple Subword Candidates},
+  booktitle = {Proceedings of the 56th Annual Meeting of the Association for Computational
+               Linguistics, {ACL} 2018, Melbourne, Australia, July 15-20, 2018, Volume
+               1: Long Papers},
+  pages     = {66--75},
+  publisher = {Association for Computational Linguistics},
+  year      = {2018},
+  url       = {https://www.aclweb.org/anthology/P18-1007/},
+  doi       = {10.18653/v1/P18-1007},
+  timestamp = {Mon, 16 Sep 2019 13:46:41 +0200},
+  biburl    = {https://dblp.org/rec/conf/acl/Kudo18.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@InProceedings{michel2018extreme,
   author = 	"Michel, Paul
 		and Neubig, Graham",
   title = 	"Extreme Adaptation for Personalized Neural Machine Translation",
@@ -1522,22 +1790,22 @@ url = {http://papers.nips.cc/paper/7209-learned-in-translation-contextualized-wo
   url = 	"http://aclweb.org/anthology/P18-2050"
 }
 
-@inproceedings{xu19systran,
-    title = "{SYSTRAN} @ {WAT} 2019: {R}ussian-{J}apanese News Commentary task",
-    author = "Xu, Jitao  and
-      Nguyen, TuAnh  and
-      Pham, MinhQuang  and
-      Crego, Josep  and
-      Senellart, Jean",
-    booktitle = "Proceedings of the 6th Workshop on Asian Translation",
-    month = nov,
-    year = "2019",
-    address = "Hong Kong, China",
+@inproceedings{cherry18revisiting,
+    title = "Revisiting Character-Based Neural Machine Translation with Capacity and Compression",
+    author = "Cherry, Colin  and
+      Foster, George  and
+      Bapna, Ankur  and
+      Firat, Orhan  and
+      Macherey, Wolfgang",
+    booktitle = "Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing",
+    month = oct # "-" # nov,
+    year = "2018",
+    address = "Brussels, Belgium",
     publisher = "Association for Computational Linguistics",
-    url = "https://www.aclweb.org/anthology/D19-5225",
-    doi = "10.18653/v1/D19-5225",
-    pages = "189--194",
-    abstract = "This paper describes Systran{'}s submissions to WAT 2019 Russian-Japanese News Commentary task. A challenging translation task due to the extremely low resources available and the distance of the language pair. We have used the neural Transformer architecture learned over the provided resources and we carried out synthetic data generation experiments which aim at alleviating the data scarcity problem. Results indicate the suitability of the data augmentation experiments, enabling our systems to rank first according to automatic evaluations.",
+    url = "https://www.aclweb.org/anthology/D18-1461",
+    doi = "10.18653/v1/D18-1461",
+    pages = "4295--4305",
+    abstract = "Translating characters instead of words or word-fragments has the potential to simplify the processing pipeline for neural machine translation (NMT), and improve results by eliminating hyper-parameters and manual feature engineering. However, it results in longer sequences in which each symbol contains less information, creating both modeling and computational challenges. In this paper, we show that the modeling problem can be solved by standard sequence-to-sequence architectures of sufficient depth, and that deep models operating at the character level outperform identical models operating over word fragments. This result implies that alternative architectures for handling character input are better viewed as methods for reducing computation time than as improved ways of modeling longer sequences. From this perspective, we evaluate several techniques for character-level NMT, verify that they do not match the performance of our deep character baseline model, and evaluate the performance versus computation time tradeoffs they offer. Within this framework, we also perform the first evaluation for NMT of conditional computation over time, in which the model learns which timesteps can be skipped, rather than having them be dictated by a fixed schedule specified before training begins.",
 }
 
 @inproceedings{koehn18findings,
@@ -1574,7 +1842,7 @@ url = {http://papers.nips.cc/paper/7209-learned-in-translation-contextualized-wo
     abstract = "Corpus-based approaches to machine translation rely on the availability of clean parallel corpora. Such resources are scarce, and because of the automatic processes involved in their preparation, they are often noisy. This paper describes an unsupervised method for detecting translation divergences in parallel sentences. We rely on a neural network that computes cross-lingual sentence similarity scores, which are then used to effectively filter out divergent translations. Furthermore, similarity scores predicted by the network are used to identify and fix some partial divergences, yielding additional parallel segments. We evaluate these methods for English-French and English-German machine translation tasks, and show that using filtered/corrected corpora actually improves MT performance.",
 }
 
-@InProceedings{Chu18asurvey,
+@InProceedings{chu18asurvey,
   author = 	"Chu, Chenhui and Wang, Rui",
   title = 	"A Survey of Domain Adaptation for Neural Machine Translation",
   booktitle = 	"Proceedings of the 27th International Conference on Computational Linguistics",
@@ -1632,7 +1900,7 @@ publisher = {Curran Associates, Inc.},
 url = {http://papers.nips.cc/paper/8046-algorithms-and-theory-for-multiple-source-adaptation.pdf}
 }
 
-@inproceedings{Pei18multi,
+@inproceedings{pei18multi,
   author    = {Zhongyi Pei and
                Zhangjie Cao and
                Mingsheng Long and
@@ -1664,7 +1932,7 @@ url = {http://papers.nips.cc/paper/8046-algorithms-and-theory-for-multiple-sourc
     publisher = "European Languages Resources Association (ELRA)",
     url = "https://www.aclweb.org/anthology/L18-1146",
 }
-@inproceedings{silva2018extracting,
+@inproceedings{silva18extracting,
     title = "Extracting In-domain Training Corpora for Neural Machine Translation Using Data Selection Methods",
     author = "Silva, Catarina Cruz  and
       Liu, Chao-Hong  and
@@ -1680,7 +1948,7 @@ url = {http://papers.nips.cc/paper/8046-algorithms-and-theory-for-multiple-sourc
     pages = "224--231",
 }
 
-@InProceedings{Zheng18multi,
+@InProceedings{zheng18multi,
   author = 	"Zeng, Jiali
 		and Su, Jinsong
 		and Wen, Huating
@@ -1697,7 +1965,7 @@ url = {http://papers.nips.cc/paper/8046-algorithms-and-theory-for-multiple-sourc
   url = 	"http://aclweb.org/anthology/D18-1041"
 }
 
-@InProceedings{Zhang18sentence,
+@InProceedings{zhang18sentence,
   author = 	"Zhang, Shiqi
 		and Xiong, Deyi",
   title = 	"Sentence Weighting for Neural Machine Translation Domain Adaptation",
@@ -1709,7 +1977,7 @@ url = {http://papers.nips.cc/paper/8046-algorithms-and-theory-for-multiple-sourc
   url = 	"http://aclweb.org/anthology/C18-1269"
 }
 
-@InProceedings{Thompson18freezing,
+@InProceedings{thompson18freezing,
   author = 	"Thompson, Brian
 		and Khayrallah, Huda
 		and Anastasopoulos, Antonios
@@ -1729,7 +1997,7 @@ url = {http://papers.nips.cc/paper/8046-algorithms-and-theory-for-multiple-sourc
   url = 	"http://aclweb.org/anthology/W18-6313"
 }
 
-@InProceedings{Vilar18learning,
+@InProceedings{vilar18learning,
   author = 	"Vilar, David",
   title = 	"Learning Hidden Unit Contribution for Adapting Neural Machine Translation      Models    ",
   booktitle = 	"Proceedings of the 2018 Conference of the North American Chapter of the      Association for Computational Linguistics: Human Language Technologies,      Volume 2 (Short Papers)    ",
@@ -1741,7 +2009,7 @@ url = {http://papers.nips.cc/paper/8046-algorithms-and-theory-for-multiple-sourc
   url = 	"http://aclweb.org/anthology/N18-2080"
 }
 
-@InProceedings{Michel18extreme,
+@InProceedings{michel18extreme,
   author = 	"Michel, Paul
 		and Neubig, Graham",
   title = 	"Extreme Adaptation for Personalized Neural Machine Translation",
@@ -1753,7 +2021,7 @@ url = {http://papers.nips.cc/paper/8046-algorithms-and-theory-for-multiple-sourc
   url = 	"http://aclweb.org/anthology/P18-2050"
 }
 
-@InProceedings{Chu18survey,
+@InProceedings{chu18survey,
   author = 	"Chu, Chenhui
 		and Wang, Rui",
   title = 	"A Survey of Domain Adaptation for Neural Machine Translation",
@@ -1784,7 +2052,7 @@ url = {http://papers.nips.cc/paper/8046-algorithms-and-theory-for-multiple-sourc
   bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
-@InProceedings{Alvarez18gromov,
+@InProceedings{alvarez18gromov,
   author = 	"Alvarez-Melis, David
 		and Jaakkola, Tommi",
   title = 	"Gromov-Wasserstein Alignment of Word Embedding Spaces",
@@ -1796,7 +2064,7 @@ url = {http://papers.nips.cc/paper/8046-algorithms-and-theory-for-multiple-sourc
   url = 	"http://aclweb.org/anthology/D18-1214"
 }
 
-@inproceedings{Niu18multitask,
+@inproceedings{niu18multitask,
   author    = {Xing Niu and Sudha Rao and Marine Carpuat},
   title     = {Multi-Task Neural Models for Translating Between Styles Within and Across Languages},
   booktitle = {Proceedings of the 27th International Conference on Computational Linguistics},
@@ -1809,7 +2077,7 @@ url = {http://papers.nips.cc/paper/8046-algorithms-and-theory-for-multiple-sourc
   url       = {https://aclanthology.info/papers/C18-1086/c18-1086},
 }
 
-@InProceedings{Chu18multilingual,
+@InProceedings{chu18multilingual,
   author = 	 {Chenhui Chu and Raj Dabre},
   title = 	 {Multilingual and multi-domain adaptation for neural machine translation},
   booktitle = {Proceedings of the 24st Annual Meeting of the Association for Natural Language Processing (NLP 2018)},
@@ -1817,7 +2085,7 @@ url = {http://papers.nips.cc/paper/8046-algorithms-and-theory-for-multiple-sourc
   pages = 	 {909-–912},
   address = 	 {Okayama, Japan}}
 
-@inproceedings{Lample18unsupervised,
+@inproceedings{lample18unsupervised,
 title={Unsupervised Machine Translation Using Monolingual Corpora Only},
 author={Guillaume Lample and Alexis Conneau and Ludovic Denoyer and Marc'Aurelio Ranzato},
 booktitle={International Conference on Learning Representations},
@@ -1826,7 +2094,7 @@ address = {Vancouver, Canada},
 url={https://openreview.net/forum?id=rkYTTf-AZ},
 }
 
-@inproceedings{Artetxe18unsupervised,
+@inproceedings{artetxe18unsupervised,
 title={Unsupervised Neural Machine Translation},
 author={Mikel Artetxe and Gorka Labaka and Eneko Agirre and Kyunghyun Cho},
 booktitle={International Conference on Learning Representations},
@@ -1835,7 +2103,7 @@ address = {Vancouver, Canada},
 url={https://openreview.net/forum?id=Sy2ogebAW},
 }
 
-@inproceedings{Platanios18contextual,
+@inproceedings{platanios18contextual,
 	Address = {Brussels, Belgium},
 	Author = {Platanios, Emmanouil Antonios and Sachan, Mrinmaya and Neubig, Graham and Mitchell, Tom},
 	Booktitle = {Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing},
@@ -1863,14 +2131,14 @@ url={https://openreview.net/forum?id=Sy2ogebAW},
     abstract = "Supervised domain adaptation{---}where a large generic corpus and a smaller in-domain corpus are both available for training{---}is a challenge for neural machine translation (NMT). Standard practice is to train a generic model and use it to initialize a second model, then continue training the second model on in-domain data to produce an in-domain model. We add an auxiliary term to the training objective during continued training that minimizes the cross entropy between the in-domain model{'}s output word distribution and that of the out-of-domain model to prevent the model{'}s output from differing too much from the original out-of-domain model. We perform experiments on EMEA (descriptions of medicines) and TED (rehearsed presentations), initialized from a general domain (WMT) model. Our method shows improvements over standard continued training by up to 1.5 BLEU.",
 }
 
-@inproceedings{Devlin19bert,
+@inproceedings{devlin19bert,
   title={BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding},
   author={Jacob Devlin and Ming-Wei Chang and Kenton Lee and Kristina Toutanova},
   booktitle={NAACL-HLT},
   year={2019}
 }
 
-@ARTICLE{Yan19wordbased,
+@ARTICLE{yan19wordbased,
        author = {{Yan}, Shen and {Dahlmann}, Leonard and {Petrushkov}, Pavel and
          {Hewavitharana}, Sanjika and {Khadivi}, Shahram},
         title = "{Word-based Domain Adaptation for Neural Machine Translation}",
@@ -1887,7 +2155,7 @@ archivePrefix = {arXiv},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 
-@article{So19theevolved,
+@article{so19theevolved,
   author    = {David R. So and
                Chen Liang and
                Quoc V. Le},
@@ -1905,7 +2173,7 @@ archivePrefix = {arXiv},
 
 
 
-@inproceedings{Junjie19domain,
+@inproceedings{junjie19domain,
     title = {Domain Adaptation of Neural Machine Translation by Lexicon Induction},
     author = {Junjie Hu and Mengzhou Xia and Graham Neubig and Jaime Carbonell},
     booktitle = {The 57th Annual Meeting of the Association for Computational Linguistics (ACL)},
@@ -1915,7 +2183,7 @@ archivePrefix = {arXiv},
     year = {2019}
 }
 
-@ARTICLE{Li19semisupervised,
+@ARTICLE{li19semisupervised,
        author = {{Li}, Yitong and {Baldwin}, Timothy and {Cohn}, Trevor},
         title = "{Semi-supervised Stochastic Multi-Domain Learning using Variational Inference}",
       journal = {arXiv e-prints},
@@ -1978,7 +2246,7 @@ archivePrefix = {arXiv},
     pages = "1957--1968",
     abstract = "Supervised models suffer from the problem of domain shifting where distribution mismatch in the data across domains greatly affect model performance. To solve the problem, training data selection (TDS) has been proven to be a prospective solution for domain adaptation in leveraging appropriate data. However, conventional TDS methods normally requires a predefined threshold which is neither easy to set nor can be applied across tasks, and models are trained separately with the TDS process. To make TDS self-adapted to data and task, and to combine it with model training, in this paper, we propose a reinforcement learning (RL) framework that synchronously searches for training instances relevant to the target domain and learns better representations for them. A selection distribution generator (SDG) is designed to perform the selection and is updated according to the rewards computed from the selected data, where a predictor is included in the framework to ensure a task-specific model can be trained on the selected data and provides feedback to rewards. Experimental results from part-of-speech tagging, dependency parsing, and sentiment analysis, as well as ablation studies, illustrate that the proposed framework is not only effective in data selection and representation, but also generalized to accommodate different NLP tasks.",
 }
-@ARTICLE{Dou19Unsupervised,
+@ARTICLE{dou19Unsupervised,
        author = {{Dou}, Zi-Yi and {Hu}, Junjie and {Anastasopoulos}, Antonios and
          {Neubig}, Graham},
         title = "{Unsupervised Domain Adaptation for Neural Machine Translation with Domain-Aware Feature Embeddings}",
@@ -2009,8 +2277,30 @@ archivePrefix = {arXiv},
     pages = "1538--1548",
     abstract = "Fine-tuning pre-trained Neural Machine Translation (NMT) models is the dominant approach for adapting to new languages and domains. However, fine-tuning requires adapting and maintaining a separate model for each target task. We propose a simple yet efficient approach for adaptation in NMT. Our proposed approach consists of injecting tiny task specific adapter layers into a pre-trained model. These lightweight adapters, with just a small fraction of the original model size, adapt the model to multiple individual tasks simultaneously. We evaluate our approach on two tasks: (i) Domain Adaptation and (ii) Massively Multilingual NMT. Experiments on domain adaptation demonstrate that our proposed approach is on par with full fine-tuning on various domains, dataset sizes and model capacities. On a massively multilingual dataset of 103 languages, our adaptation approach bridges the gap between individual bilingual models and one massively multilingual model for most language pairs, paving the way towards universal machine translation.",
 }
-
-@article{Naveen19massively,
+@inproceedings{aharoni19massively,
+    title = "Massively Multilingual Neural Machine Translation",
+    author = "Aharoni, Roee  and
+      Johnson, Melvin  and
+      Firat, Orhan",
+    booktitle = "Proceedings of the 2019 Conference of the North {A}merican Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)",
+    month = jun,
+    year = "2019",
+    address = "Minneapolis, Minnesota",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/N19-1388",
+    doi = "10.18653/v1/N19-1388",
+    pages = "3874--3884",
+    abstract = "Multilingual Neural Machine Translation enables training a single model that supports translation from multiple source languages into multiple target languages. We perform extensive experiments in training massively multilingual NMT models, involving up to 103 distinct languages and 204 translation directions simultaneously. We explore different setups for training such models and analyze the trade-offs between translation quality and various modeling decisions. We report results on the publicly available TED talks multilingual corpus where we show that massively multilingual many-to-many models are effective in low resource settings, outperforming the previous state-of-the-art while supporting up to 59 languages in 116 translation directions in a single model. Our experiments on a large-scale dataset with 103 languages, 204 trained directions and up to one million examples per direction also show promising results, surpassing strong bilingual baselines and encouraging future work on massively multilingual NMT.",
+}
+@misc{wang19neural,
+    title={Neural Machine Translation with Byte-Level Subwords},
+    author={Changhan Wang and Kyunghyun Cho and Jiatao Gu},
+    year={2019},
+    eprint={1909.03341},
+    archivePrefix={arXiv},
+    primaryClass={cs.CL}
+}
+@article{naveen19massively,
   author    = {Naveen Arivazhagan and
                Ankur Bapna and
                Orhan Firat and
@@ -2096,7 +2386,7 @@ archivePrefix = {arXiv},
     abstract = "We investigate adaptive ensemble weighting for Neural Machine Translation, addressing the case of improving performance on a new and potentially unknown domain without sacrificing performance on the original domain. We adapt sequentially across two Spanish-English and three English-German tasks, comparing unregularized fine-tuning, L2 and Elastic Weight Consolidation. We then report a novel scheme for adaptive NMT ensemble decoding by extending Bayesian Interpolation with source information, and report strong improvements across test domains without access to the domain label.",
 }
 
-@inproceedings{Pham19generic,
+@inproceedings{pham19generic,
 	Address = {Hong-Kong, CN},
 	Author = {Pham, Minh Quang AND Crego, Josep-Maria AND Senellart, Jean AND Yvon, Fran\c{c}ois},
 	Booktitle = {Proceedings of the 16th {International Workshop on Spoken Language Translation}},
@@ -2107,7 +2397,7 @@ archivePrefix = {arXiv},
 	Url = {https://zenodo.org/record/3524959/files/IWSLT2019_paper_10.pdf},
 	Year = {2019}}
 
-@ARTICLE{Gu20domain,
+@ARTICLE{gu20domain,
        author = {{Gu}, Yu and {Tinn}, Robert and {Cheng}, Hao and {Lucas}, Michael and
          {Usuyama}, Naoto and {Liu}, Xiaodong and {Naumann}, Tristan and
          {Gao}, Jianfeng and {Poon}, Hoifung},
