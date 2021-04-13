@@ -259,7 +259,7 @@ Our baselines are standard for multi-domain systems.\footnote{We however omit do
 \itemsep0em 
 \item Generic models trained with various predefined mixtures of the training data taking the form:
 \begin{align} \label{mixture:trn}
-\lambda^{l}(d;\alpha) = \frac{q_d^{\alpha}}{\displaystyle{\mathop{\sum}_{d=1}^{n_d}q_d^{\alpha}}} &&
+\lambda_{\alpha}(d) = \frac{q_d^{\alpha}}{\displaystyle{\mathop{\sum}_{d=1}^{n_d}q_d^{\alpha}}} &&
 q_d = \frac{\mid N^{s}_d \mid}{\displaystyle{N^{s}}} % \mathop{\sum}_{i=1}^K\mid D_i \mid}}
 \end{align} 
 with $\alpha \in [0,0.25,0.5,0.75,1.0]$. These systems are denoted \system{Mixed-$\alpha$} below. \system{Mixed-$0$} uses a uniform domain distribution, \system{Mixed-$1.0$} simple uses the observed domain distribution.
@@ -267,27 +267,49 @@ with $\alpha \in [0,0.25,0.5,0.75,1.0]$. These systems are denoted \system{Mixed
 \item fine-tuned models \cite{Luong15stanford,Freitag16fast}, based on the \system{Mixed-$1.0$} system, further trained on each domain for at most 20~000 iterations, with early stopping when the dev BLEU stops increasing. The full fine-tuning (\system{FT-Full}) procedure may update all the parameters of the initial generic model, resulting in six systems each adapted for one domain, with no parameter sharing across domains.
 
 \item two multi-domain versions of the approach of \newcite{Bapna19simple}, denoted \system{FT-Res} and \system{MDL-Res}, where a domain-specific adaptation module is added to all the Transformer layers; within each layer, residual connections enable to short-cut this adapter. The former variant corresponds to the original proposal of \citet{Bapna19simple} (see also \cite{Sharaf20metalearning}). It fine-tunes the adapter modules of a \system{Mixed-$1.0$} system independently for each domain, keeping all the other parameters frozen. The latter uses the same architecture, but a different training procedure and learns all parameters jointly from scratch with the prefixed mixtures of training data \ref{mixture:trn}.\fyTodo{Keep this ?}
+  
+\item Our comparison of multi-domain systems includes baselines with fixed data mixtures corresponding to $\vlambda_0$ and $\vlambda_1$, and our own reimplementations of recent proposals from the literature:\footnote{\revision{Further implementation details are in supplementary material.}}\fyTodo{Choose a reasonnable MD baseline }
+
 \end{itemize}
 
 All models use embeddings and hidden layers sizes of dimension~512. Transformer models contain 8~attention heads in each of the 6+6 layers; the inner feedforward layer contains 2048 cells. The adapter-based systems (see below) additionally use an adaptation block in each layer, composed of a 2-layer perceptron, with an inner $\operatorname{ReLU}$ activation function operating on normalized entries of dimension~1024. 
 Training uses batches of~12,288 tokens, Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$, Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ in all layers.
 
-\subsection{Multi-domain systems} \label{ssec:mdsys}
+\subsection{DDS-based systems } \label{ssec:dds-sys}
 
-Our comparison of multi-domain systems includes our own reimplementations of recent proposals from the literature:\footnote{\revision{Further implementation details are in supplementary material.}}
-\begin{itemize}
-\itemsep0em 
-\item NMT models trained with Multi-DDS mixture given several objective testing distributions: uniform, uni-domain and natural.
-\item \system{MDL-Res} trained from scratch with Multi-DDS mixture.
-\end{itemize}
+The architecture of DDS based-systems is identical to that of our baselines, and only differ in the training regime. Their behavior only depends on (a) the initial domain distribution at the start of training $\vlambda^{l}_{t=0}$, and (b) the targeted (dev/test) distribution $\vlambda^{t}$. We will thus report these systems as \system{DDS($\vlambda^{l}_{t=0}$, $\vlambda^{t}$)}. The domain distribution attained at the end of training will be denoted  $\vlambda^{l}_{*}$.
 
 \section{Results and discussion \label{sec:results}}
 
+\subsection{DDS for single-domain and multi-domain adapation}
 
 \subsubsection{Fine-tuning experiments}
 
 \fyTodo{Fix the table}
-In Table~\ref{tab:finetuning}, we compare the results of fine-tuning a system initially trained with a uniform mixture\fyTodo{uniform or natural?} of domains with the result of learning from scratch, also with a initial uniform distribution ($\phi_0(d) = 0 \forall d$). \fyTodo{What do we see ? How about domain proximity ? - show a graph}. Note that the DDS systems are somewhat quicker to build, as we only train for 100K iterations (instead of 100K + 50K for the fine-tuning part).
+In Table~\ref{tab:finetuning}, we compare the results of fine-tuning a system initially trained with a uniform mixture\fyTodo{uniform or natural?} of domains with the result of learning from scratch, also with a initial uniform distribution. \fyTodo{What do we see ? How about domain proximity ? - show a graph}. Note that the DDS systems are somewhat quicker to build, as we only train for 100K iterations (instead of 100K + 50K for the fine-tuning part).
+
+\begin{table*}
+  \centering \small
+  \begin{tabular}{|l|*8{r|}} \hline
+    domain \hfill $d=$ & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{mean} \\ \hline
+    Full-FT($d$) & \\
+    \system{DDS($\vlambda_0, \indic{d}$)} & \\
+    $- \log \lambda_*^{l}(d)$ ou \% & \\
+    $ \mathcal{H}(\vlambda_*^{l})$ &  \\ \hline\hline
+    \system{Mixed-0} & \\
+    \system{Mixed-1} & \\
+    \system{DDS($\vlambda_1, \vlambda_0$)} & \\
+    $\operatorname{KL}(\vlambda_*^{l}, \vlambda_0$) & \\
+     $ \mathcal{H}(\vlambda_*^{l})$ &  \\
+    \system{DDS($\vlambda_0, \vlambda_0$)} & \\ \hline
+  \end{tabular}
+  \caption{Baseline results for DDS. In the top part, for each domain, we report the scores of DDS targeting solely this domain and compare with full-fine-tuning. We also compute the percentage of in-domain data in the resulting mixture and its entropy.}
+  \label{tab:finetuning}
+\end{table*}
+
+A first observation is DDS only better than FT for \domain{rel}, and worse for \domain{med} and \domain{law}. There seem to be a connection with the domain size, as \domain{rel} is small and benefits from data from other domains, while the opposite effect is observed for the larger \domain{med} and \domain{law}. For the three other domains, we do not see any marked difference, which we view as a positive result.
+
+If we now look at the multi-domain results (bottom part of Table~\ref{}), we see that DDS actually does better than the two baseline strategies, but is not as good as using a fixed distribution with a well-chosen $\alpha$....\fyTodo{To be continued}
 
 % \begin{table*}
 %   \centering% \small
@@ -320,7 +342,6 @@ In Table~\ref{tab:finetuning}, we compare the results of fine-tuning a system in
 %   \label{tab:redomains}
 % \end{table*}
 
-
 \begin{table*}[htb]
   \centering% \small
   \begin{adjustbox}{width=1.0\textwidth,center}
@@ -339,16 +360,14 @@ In Table~\ref{tab:finetuning}, we compare the results of fine-tuning a system in
     $\Delta$ & \\
   \end{tabular}
   \end{adjustbox}
-  \caption{DDS as a fine-tuning receipe. We report scores with DDS and each target domain, and compare with full-fine-tuning. Note that the last line reports the results of 6 different fine tuning procedures.}
-  \label{tab:finetuning}
-\end{table*}
-
-\fyTodo{This table does not work- One line would be enough, where we compare autoFT with true FT}
+  \caption{DDS as a fine-tuning recipe. We report scores with DDS and each target domain, and compare with full-fine-tuning. Note that the last line reports the results of 6 different fine tuning procedures.}
+  \label{tab:finetuning-old}
+\end{table*}\fyTodo{This table does not work- One line would be enough, where we compare autoFT with true FT}
 
 \fyTodo{Works best for small domains ?}
 \fyTodo{Curves for bank / medical ou law}
+\fyTodo{Fine tune pour 2 domains ?}
 
-\fyTodo{Fine tune pour 2 domains}
 
 \subsubsection{Multi-domain experiments}
 Results for our multidomain experiments are in Table~\ref{tab:multidomains}.\fyTodo{Same table, line autoMD. We should be clear about the dev / test distribution - uniform ? so I would compare MIX with DDS(UNIF, UNIF) - DDS(NAT,UNIF) and not report / domain scores}
@@ -373,11 +392,10 @@ Results for our multidomain experiments are in Table~\ref{tab:multidomains}.\fyT
   \label{tab:multidomains}
 \end{table*}
 
-In this scenario, DDS is not as good as using a fixed distribution, with a well-chosen $\alpha$.
-
-Looking again at the evolution of $\vlambda^l$ during training we often observe a rich-get-richer effect, where a small number of domains manage to attract most of the samples, while others are almost completely ignored after a given number of iterations. This is illustrated on Figure~\ref{}, where we see..., and also when we look at the entropy of $\vlambda^l$ at the end of training, which also measures the KL divergence between $\vlambda^l$ and a uniform $\vlambda^t$.\fyTodo{Give numbers}
+It is however striking to see that the distribution at the end of training is concentrated on few domains, and is quite remote from the targeted test distribution. Looking at the evolution of $\vlambda^l$ during training, we often observe a rich-get-richer effect, where a small number of domains manage to attract most of the samples, while others are almost completely ignored after a given number of iterations. This is illustrated on Figure~\ref{}, where we see....\fyTodo{Give illustration and numbers}
 
 \subsection{Analysis}
+
 \subsubsection{Winner-takes-all}
 \cite{Wang20balancing} used a simple softmax function and the following parameterization of the sampler $\lambda^l(d;\psi) = \operatorname{softmax}(\psi)$ where $\psi \in \mathbb{R}^{n_d}$. This parameterization of the sampler will induce the following gradient:\fyTodo{Change name of obj. function}
 \begin{align*}
