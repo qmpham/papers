@@ -294,10 +294,14 @@ In Table~\ref{tab:finetuning}, we compare the results of fine-tuning a system in
     domain \hfill $d=$ & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{mean} \\ \hline
     Full-FT($d$) & \\
     \system{DDS($\vlambda_0, \indic{d}$)} & \\
-    $- \log \lambda_*^{l}(d)$ ou \% & \\
-    $ \mathcal{H}(\vlambda_*^{l})$ &  \\ \hline\hline
+    \% & \\ \hline
+    \system{DDS($\vlambda_0, \indic{d}$)} &  \\ \hline
+    \% & \\ \hline\hline
+    % Multidomain
     \system{Mixed-0} & \\
+    \system{Mixed-0.5} & \\
     \system{Mixed-1} & \\
+    \system{FT-Res} & \\\hline
     \system{DDS($\vlambda_1, \vlambda_0$)} & \\
     $\operatorname{KL}(\vlambda_*^{l}, \vlambda_0$) & \\
      $ \mathcal{H}(\vlambda_*^{l})$ &  \\
@@ -467,7 +471,16 @@ where $\eta$ controls the learning rate of $\psi$.
 
 The second one simply adds an entropy constraint which ensures that the entropy of the domain distribution is always greater than a predefined value $\alpha$.\fyTodo{Explain the math}
 
+\subsection{Our version}
+
+\fyTodo{Refaire table 3 + (unsupervised domain in source= classification) + new domain}
+
+
 \section{Related Work \label{sec:related}}
+1. DA
+2. Multi-DA
+3. Dynamic Data Selection and Curriculum learning
+
 \cite{Wang17instance} uses dynamic weighting (for sentences and domains) for DA.
 
 \cite{Wang20learning-multi} adapts curriculum learning \cite{BengioXX} for multi-domain adaptation, where an optimal instance weighting scheme is found using Bayesian optimization techniques.
