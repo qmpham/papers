@@ -1,6 +1,93 @@
 % -*- mode:bibtex -*-
 % encoding:utf-8
 
+@PhdThesis{Saunders21domain,
+  author = 	 {Danielle Saunders},
+  title = 	 {Domain Adaptation for Neural Machine Translation},
+  school = 	 {Department of Engineering, University of Cambridge},
+  year = 	 2021}
+
+@article{Kumar21learning,
+  title={Learning Policies for Multilingual Training of Neural Machine Translation Systems},
+  author={Kumar, Gaurav and Koehn, Philipp and Khudanpur, Sanjeev},
+  journal={arXiv e-prints},
+  pages={arXiv--2103},
+  year={2021}
+}
+
+@inproceedings{Zhou20uncertainty,
+    title = "Uncertainty-Aware Curriculum Learning for Neural Machine Translation",
+    author = "Zhou, Yikai and Yang, Baosong and Wong, Derek F. and Wan, Yu and Chao, Lidia S.",
+    booktitle = "Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/2020.acl-main.620",
+    doi = "10.18653/v1/2020.acl-main.620",
+    pages = "6934--6944",
+    abstract = "Neural machine translation (NMT) has proven to be facilitated by curriculum learning which presents examples in an easy-to-hard order at different training stages. The keys lie in the assessment of data difficulty and model competence. We propose uncertainty-aware curriculum learning, which is motivated by the intuition that: 1) the higher the uncertainty in a translation pair, the more complex and rarer the information it contains; and 2) the end of the decline in model uncertainty indicates the completeness of current training stage. Specifically, we serve cross-entropy of an example as its data difficulty and exploit the variance of distributions over the weights of the network to present the model uncertainty. Extensive experiments on various translation tasks reveal that our approach outperforms the strong baseline and related methods on both translation quality and convergence speed. Quantitative analyses reveal that the proposed strategy offers NMT the ability to automatically govern its learning schedule.",
+}
+
+@inproceedings{Bengio09curriculum,
+author = {Bengio, Yoshua and Louradour, J\'{e}r\^{o}me and Collobert, Ronan and Weston, Jason},
+title = {Curriculum Learning},
+year = {2009},
+isbn = {9781605585161},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1553374.1553380},
+doi = {10.1145/1553374.1553380},
+abstract = {Humans and animals learn much better when the examples are not randomly presented but organized in a meaningful order which illustrates gradually more concepts, and gradually more complex ones. Here, we formalize such training strategies in the context of machine learning, and call them "curriculum learning". In the context of recent research studying the difficulty of training in the presence of non-convex training criteria (for deep deterministic and stochastic neural networks), we explore curriculum learning in various set-ups. The experiments show that significant improvements in generalization can be achieved. We hypothesize that curriculum learning has both an effect on the speed of convergence of the training process to a minimum and, in the case of non-convex criteria, on the quality of the local minima obtained: curriculum learning can be seen as a particular form of continuation method (a general strategy for global optimization of non-convex functions).},
+booktitle = {Proceedings of the 26th Annual International Conference on Machine Learning},
+pages = {41–48},
+numpages = {8},
+location = {Montreal, Quebec, Canada},
+series = {ICML '09}
+}
+
+@inproceedings{Vanderwees17dynamic,
+    title = "Dynamic Data Selection for Neural Machine Translation",
+    author = "van der Wees, Marlies and Bisazza, Arianna and Monz, Christof",
+    booktitle = "Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing",
+    month = sep,
+    year = "2017",
+    address = "Copenhagen, Denmark",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/D17-1147",
+    doi = "10.18653/v1/D17-1147",
+    pages = "1400--1410",
+    abstract = "Intelligent selection of training data has proven a successful technique to simultaneously increase training efficiency and translation performance for phrase-based machine translation (PBMT). With the recent increase in popularity of neural machine translation (NMT), we explore in this paper to what extent and how NMT can also benefit from data selection. While state-of-the-art data selection (Axelrod et al., 2011) consistently performs well for PBMT, we show that gains are substantially lower for NMT. Next, we introduce {`}dynamic data selection{'} for NMT, a method in which we vary the selected subset of training data between different training epochs. Our experiments show that the best results are achieved when applying a technique we call {`}gradual fine-tuning{'}, with improvements up to +2.6 BLEU over the original data selection approach and up to +3.1 BLEU over a general baseline.",
+}
+
+
+@inproceedings{Zhang19curriculum,
+    title = "Curriculum Learning for Domain Adaptation in Neural Machine Translation",
+    author = "Zhang, Xuan and Shapiro, Pamela and Kumar, Gaurav  and McNamee, Paul  and Carpuat, Marine  and Duh, Kevin",
+    booktitle = "Proceedings of the 2019 Conference of the North {A}merican Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)",
+    month = jun,
+    year = "2019",
+    address = "Minneapolis, Minnesota",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/N19-1189",
+    doi = "10.18653/v1/N19-1189",
+    pages = "1903--1915",
+    abstract = "We introduce a curriculum learning approach to adapt generic neural machine translation models to a specific domain. Samples are grouped by their similarities to the domain of interest and each group is fed to the training algorithm with a particular schedule. This approach is simple to implement on top of any neural framework or architecture, and consistently outperforms both unadapted and adapted baselines in experiments with two distinct domains and two language pairs.",
+}
+
+
+@InProceedings{Pham20astudy,
+  author    = {Pham, Minh Quang  and  Crego, Josep Maria  and  Yvon, François  and  Senellart, Jean},
+  title     = {A Study of Residual Adapters for Multi-Domain Neural Machine Translation},
+  booktitle      = {Proceedings of the Fifth Conference on Machine Translation},
+  month          = {November},
+  year           = {2020},
+  address        = {Online},
+  publisher      = {Association for Computational Linguistics},
+  pages     = {615--626},
+  abstract  = {Domain adaptation is an old and vexing problem for machine translation systems. The most common approach and successful to supervised adaptation is to fine-tune a baseline system with in-domain parallel data. Standard fine-tuning however modifies all the network parameters, which makes this approach computationally costly and prone to overfitting. A recent, lightweight approach, instead augments a baseline model with supplementary (small) adapter layers, keeping the rest of the mode unchanged. This has the additional merit to leave the baseline model intact, and adaptable to multiple domains. In this paper, we conduct a thorough analysis of the adapter model in the context of a multidomain machine translation task. We contrast multiple implementations of this idea on two language pairs. Our main conclusions are that residual adapters provide a fast and cheap method for supervised multi-domain adaptation; our two variants prove as effective as the original adapter model, and open perspective to also make adapted models more robust to label domain errors.},
+  url       = {https://www.aclweb.org/anthology/2020.wmt-1.72}
+}
+
 @article{Williams92simple,
   title={Simple statistical gradient-following algorithms for connectionist reinforcement learning},
   author={Williams, Ronald J},
@@ -89,10 +176,7 @@ http://proceedings.mlr.press/v119/wang20p.html
 
 @inproceedings{Kumar19reinforcement,
     title = "Reinforcement Learning based Curriculum Optimization for Neural Machine Translation",
-    author = "Kumar, Gaurav  and
-      Foster, George  and
-      Cherry, Colin  and
-      Krikun, Maxim",
+    author = "Kumar, Gaurav and Foster, George and Cherry, Colin and Krikun, Maxim",
     booktitle = "Proceedings of the 2019 Conference of the North {A}merican Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)",
     month = jun,
     year = "2019",
