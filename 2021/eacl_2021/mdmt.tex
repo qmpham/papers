@@ -1,6 +1,6 @@
 \documentclass{beamer}
 \usepackage[utf8]{inputenc}
-
+\usepackage{xcolor}
 %fonts
 %\usepackage{bookman}
 %\usepackage{utopia} 
@@ -52,11 +52,10 @@
 {
     \inst{\dag} SYSTRAN, 5 rue Feydeau, 75002, Paris, France \and
     \vspace{-0.2cm}
-    \inst{\ddag} Universit\'e Paris-Saclay, CNRS, LISN, 91400, Orsay, France \\
+    \inst{\ddag} Universit\'e Paris-Saclay, LISN, CNRS, 91400, Orsay, France \\
     \vspace{0.5cm}
     \includegraphics[height=1.0cm]{systran-logo.png}
     \includegraphics[height=1.0cm]{cnrs-logo.png}
-    %\includegraphics[height=1.0cm]{limsi-logo.png}
     \includegraphics[height=1.0cm]{ups-logo.png}
     \vspace{1.5cm}
 }
@@ -76,13 +75,15 @@
 %------------------------------------------------------------
 %The next block of commands puts the table of contents at the 
 %beginning of each section and highlights the current section:
-\AtBeginSection[]
-{
-  \begin{frame}
-    \frametitle{Table of Contents}
-    \tableofcontents[currentsection]
-  \end{frame}
-}
+
+%\AtBeginSection[]
+%{
+%  \begin{frame}
+%    \frametitle{Table of Contents}
+%    \tableofcontents[currentsection]
+%  \end{frame}
+%}
+
 %------------------------------------------------------------
 
 \begin{document}
@@ -93,10 +94,10 @@
 %---------------------------------------------------------
 %This block of code is for the table of contents after
 %the title page
-\begin{frame}
-\frametitle{Table of Contents}
-\tableofcontents
-\end{frame}
+%\begin{frame}
+%\frametitle{Table of Contents}
+%\tableofcontents
+%\end{frame}
 %---------------------------------------------------------
 
 
@@ -105,44 +106,44 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
-\frametitle{High variety of parallel data}
+\frametitle{Multi-domain machine translation?}
 \begin{figure}
-\includegraphics[width=\textwidth]{variety.png}
+\includegraphics[width=0.8\textwidth]{variety.png}
 \end{figure}
 \end{frame}
 
 \begin{frame}
 \frametitle{Robust against the unbalance between domains}
 \begin{figure}
-\includegraphics[width=\textwidth]{unbalanced_question.png}
+\includegraphics[width=0.8\textwidth]{unbalanced_question.png}
 \end{figure}
 \end{frame}
 
 \begin{frame}
 \frametitle{Robust against variable test distribution}
 \begin{figure}
-\includegraphics[width=\textwidth]{test_question.png}
+\includegraphics[width=0.8\textwidth]{test_question.png}
 \end{figure}
 \end{frame}
 
 \begin{frame}
 \frametitle{Domain similarity}
 \begin{figure}
-\includegraphics[width=\textwidth]{split_question.png}
+\includegraphics[width=0.8\textwidth]{split_question.png}
 \end{figure}
 \end{frame}
 
 \begin{frame}
-\frametitle{Large number of non-identified domains}
+\frametitle{Large number of domains}
 \begin{figure}
-\includegraphics[width=\textwidth]{cluster_question.png}
+\includegraphics[width=0.8\textwidth]{cluster_question.png}
 \end{figure}
 \end{frame}
 
 \begin{frame}
-\frametitle{Integrating new domain}
+\frametitle{Integrating new domains}
 \begin{figure}
-\includegraphics[width=\textwidth]{new_question.png}
+\includegraphics[width=0.8\textwidth]{new_question.png}
 \end{figure}
 \end{frame}
 
@@ -156,7 +157,7 @@
 %---------------------------------------------------------
 \begin{frame}
 \vspace{-0.2cm}
-\frametitle{Experiment design}
+\frametitle{Experimental design}
 \begin{figure}
 \includegraphics[width=\textwidth]{mdmt.png}
 \end{figure}
@@ -164,16 +165,16 @@
 %---------------------------------------------------------
 \begin{frame}
 \vspace{-0.2cm}
-\frametitle{Experiment design}
+\frametitle{Experimental design}
 \begin{figure}
-\includegraphics[width=\textwidth]{unlabeled.png}
+\includegraphics[width=\textwidth]{cluster.png}
 \caption{Automatic clusters}
 \end{figure}
 \end{frame}
 %---------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Experimental setting} %%%%%%%%%%%%%%
+\section{Data and system} %%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %---------------------------------------------------------
@@ -182,22 +183,23 @@
 \begin{itemize}
 	\item Domain control (Kobus et al 2017)
 	\begin{itemize}
-		\item Domain tag (DC-Tag)
-		\item Domain embedding (DC-Feat)
+		\item Domain tag (\colorbox{green}{DC-Tag})
+		\item Domain embedding (\colorbox{green}{DC-Feat})
 	\end{itemize}
-	\item Lexicalized Domain Representation (Pham et al 2019) (LDR)
+	\item Lexicalized Domain Representation (Pham et al 2019) (\colorbox{green}{LDR})
 	\item Domain mixing (Britz et al 2018)
 	\begin{itemize}
-		\item Domain tag in target (TTM)
-		\item Domain mixing (DM)
-		\item Adversarial Domain mixing (ADM)
+		\item Domain tag in target (\colorbox{green}{TTM})
+		\item Domain mixing (\colorbox{green}{DM})
+		\item Adversarial Domain mixing (\colorbox{green}{ADM})
 	\end{itemize}
 	\item Residual Adapter (Bapna et al 2019)
 	\begin{itemize}
-		\item Fine-tuning (FT-Res)
-		\item Multi-task learning (MDL-Res)
+		\item Fine-tuning (\colorbox{green}{FT-Res})
+		\item Multi-task learning (\colorbox{green}{MDL-Res})
 	\end{itemize}
-	\item Full fine-tuning (FT-full)
+	\item Generic (\colorbox{green}{Mixed})
+	\item Full fine-tuning (\colorbox{green}{FT-full})
 \end{itemize}
 \end{frame}
 %---------------------------------------------------------
@@ -218,7 +220,6 @@
     \hline
   \end{tabular}
   }
-  \caption{Corpora statistics}
 \end{table}
 \end{figure}
 \begin{figure}
@@ -234,7 +235,6 @@
      \domain{IT}     &&&&& 1.99 \\ \hline
   \end{tabular}
   }
-  \caption{Proxy distances between domains}
 \end{table}
 \end{figure}
 
@@ -249,7 +249,7 @@
 \begin{frame}
 \frametitle{Unbalanced training data}
 \begin{figure}
-\includegraphics[width=\textwidth]{unbalanced.png}
+\includegraphics[width=\textwidth]{unbalanced_1.png}
 \end{figure}
 \end{frame}
 %---------------------------------------------------------
@@ -258,14 +258,14 @@
 \begin{frame}
 \frametitle{OOD test set}
 \begin{figure}
-\includegraphics[width=\textwidth]{news.png}
+\includegraphics[width=\textwidth]{news_1.png}
 \end{figure}
 \end{frame}
 %---------------------------------------------------------
 
 %---------------------------------------------------------
 \begin{frame}
-\frametitle{Random tagged test set}
+\frametitle{Random domain tag}
 \begin{figure}
 \includegraphics[width=\textwidth]{random_tag.png}
 \end{figure}
@@ -276,7 +276,7 @@
 \begin{frame}
 \frametitle{Fuzzy domain separation}
 \begin{figure}
-\includegraphics[width=\textwidth]{fuzzy_split.png}
+\includegraphics[width=\textwidth]{fuzzy_split_1.png}
 \end{figure}
 \end{frame}
 %---------------------------------------------------------
@@ -285,7 +285,7 @@
 \begin{frame}
 \frametitle{Automatic clustering}
 \begin{figure}
-\includegraphics[width=\textwidth]{auto_cluster.png}
+\includegraphics[width=\textwidth]{auto_cluster_1.png}
 \end{figure}
 \end{frame}
 %---------------------------------------------------------
@@ -294,7 +294,7 @@
 \begin{frame}
 \frametitle{Continuous training}
 \begin{figure}
-\includegraphics[width=\textwidth]{continuous_training.png}
+\includegraphics[width=\textwidth]{continuous_training_1.png}
 \end{figure}
 \end{frame}
 %---------------------------------------------------------
@@ -306,13 +306,9 @@
 %---------------------------------------------------------
 %Two columns
 \begin{frame}
-\begin{itemize}
-	%\item Multi-domain NMT is a hard problem that requires much more effort of research.
-	%\item The standard evaluation, which is often reported in the papers working on multi-domain NMT, is naive.
-	%\item A call for building robust NMT systems in more realistic scenarios: \newline
-     %     eg.\ large number of domains, extreme unbalancing, unseen domains and continuous learning etc.
-	%\item \fyTodo{To add more conclusions}
-	
+\frametitle{Recommendations for future MDMT studies}
+\begin{itemize}	
+	\item Be explicit about what Multi-domain means, and whether domain tag are known in train and test.
 	\item Clarify the objective, wrt test distributions, design experiments accordingly.	
 	\item Use as many domains as possible.
 	\item Pay attention to the balance between domains, wrt their similarities.
@@ -331,7 +327,6 @@ Thank you \\
 \vspace{1.5cm}
     \includegraphics[height=1.0cm]{systran-logo.png}
     \includegraphics[height=1.0cm]{cnrs-logo.png}
-    %\includegraphics[height=1.0cm]{limsi-logo.png}
     \includegraphics[height=1.0cm]{ups-logo.png}
 \end{frame}
 %---------------------------------------------------------
