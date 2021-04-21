@@ -173,7 +173,7 @@ Problem~\eqref{eq:bilevel} can be approached by coordinate gradient descent alte
 \vtheta_{t+1} &= \vtheta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\vtheta_t, x,y)}{\partial \vtheta} \\
 x,y &\sim \widehat{\mathcal{D}^l}(x;\vlambda^l(\psi_t)) = \displaystyle{\mathop{\sum}_{d=1}^K} \lambda^l(d;\psi_t) * \widehat{D_d}(x) \\
 \end{align*}
-Given $\vtheta_t$, $\psi_t$ is updated via the Reinforce algorithm \cite{Williams92reinforce}:\fyTodo{Rewrite this correctly with domain average reward}
+Given $\vtheta_t$, $\psi_t$ is updated via the Reinforce algorithm \cite{Williams92simple}:\fyTodo{Rewrite this correctly with domain average reward}
 %\begin{align*}
 %  \psi_{t+1} &= \psi_t + \mathbf{lr}_{data} * R(x,y) * \\
 %  & \quad\quad \frac{\partial log(\lambda^l(\psi_t)(x,y))}{\partial \psi} \\
@@ -292,11 +292,11 @@ In Table~\ref{tab:finetuning}, we compare the results of fine-tuning a system in
   \centering \small
   \begin{tabular}{|l|*8{r|}} \hline
     domain \hfill $d=$ & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{mean} \\ \hline
-    FT-Full($d$) \hfill [BLEU] & 37.74&59.21	&54.49&46.81&90.77&33.98&53.83\\
-    FT-Res($d$) \\ \hline
+    FT-Full($d$) \hfill [BLEU] &37.74&59.21&54.49&33.98&46.81&90.77&53.8\\
+    FT-Res($d$) \hfill &37.3&57.93&53.91&33.79&46.69&90.17&53.3\\ \hline
     \hline
-    \system{DDS($\vlambda_0, \vlambda_d$)} \hfill [BLEU] & \\
-    \% domain $d$ & \\ \hline
+    \system{DDS($\vlambda_0, \vlambda_d$)} \hfill [BLEU] &36.7&56.18&54.29&33.47&46.8&91.77&53.2\\
+    \% domain $d$ &59.7&14.9&86.1&6.4&67.2&6.4\\ \hline
     \system{DDS($\vlambda_0, \vlambda_d$)} \hfill [BLEU]&  \\ 
     \% domain $d$& \\ \hline\hline
     % Multidomain
@@ -305,11 +305,11 @@ In Table~\ref{tab:finetuning}, we compare the results of fine-tuning a system in
     \system{Mixed-0.5}   & 36.11 & 55.37 & 51.76 & 33.52 & 46.23 & 89.99& 52.16 \\
     \system{Mixed-0.75} & 36.53 & 55.03 & 51.15 & 33.98 & 44.28 & 87.22& 51.36 \\
     \system{Mixed-1}     & 37.33  & 54.56 & 50.05 & 33.47 & 43.23 & 77.51& 49.36 \\
-    \system{FT-Res} & \\\hline
-    \system{DDS($\vlambda_1, \vlambda_0$)} & 55.07&50.96&33.49&43.41&90.76& 51.83 \\
+    \system{MDL-Res} &37.08&57.42&53.57&33.17&46.01&90.65&52.98\\\hline
+    \system{DDS($\vlambda_1, \vlambda_0$)} & \\
     $\operatorname{KL}(\vlambda_*^{l}, \vlambda_0$) & \\
     $ \mathcal{H}(\vlambda_*^{l})$ &  \\
-    \system{DDS($\vlambda_0, \vlambda_0$)} & \\ \hline
+    \system{DDS($\vlambda_0, \vlambda_0$)} &37.26&55.07&50.96&33.49&43.41&90.76&51.83 \\ \hline
   \end{tabular}
   \caption{Baseline results for DDS in fine-tuning and multi-domain adaptation. In the top part, we report scores with DDS and each target domain, and compare with full-fine-tuning: each column corresponds to a different system. We also report the proportion of in-domain data in the final mixture. In the bottom part, we run multi-domain experiments: for a given line, all the columns \emph{correspond to the same system}. We also report the KL divergence between the optimal and the target mixtures.}
   \label{tab:basic-dds}
@@ -462,9 +462,9 @@ Experiments with these revised versions are for various settings in Table~\ref{t
 
 \section{Related Work \label{sec:related}}
 
-Domain adaptation is an ancient and vexing problem that has been studied from many angles both for SMT and NMT. A survey of supervised and unsupervised DA for NMT is in \cite{Chu18asurvey}, where they distinguish between data-centric and model-centric DA, a view also adapted in the more recent review of \cite{Saunders20domain}. Our approach to DA in this paper clearly falls under the former category. We refer interested readers to these refrences, and do not discuss review DA any further.
+Domain adaptation is an ancient and vexing problem that has been studied from many angles both for SMT and NMT. A survey of supervised and unsupervised DA for NMT is in \cite{Chu18asurvey}, where they distinguish between data-centric and model-centric DA, a view also adapted in the more recent review of \cite{Saunders21domain}. Our approach to DA in this paper clearly falls under the former category. We refer interested readers to these refrences, and do not discuss review DA any further.
 
-Multi-domain adaptation (MDA) aims to develop systems that simultaneously bode well for several domains. Like for DA, techniques for supervised MDA typically combine one or several ingredients: (a) the specialization of data representations \citep{KobKobus17domaincontrol} or of sub-networks \citep{Pham19generic} to differentiate the processing of each domain; (b) the use of adversarial techniques to neutralize differences between domains \cite{Britz17mixing,Zeng18multidomain}; (c) the use of automatic domain identification e.g.\ \citep{Jiang19multidomain}. Unsupervised MDA is considered in \citep{Farajian17multidomain} as an unsupervised DA problem.
+Multi-domain adaptation (MDA) aims to develop systems that simultaneously bode well for several domains. Like for DA, techniques for supervised MDA typically combine one or several ingredients: (a) the specialization of data representations \citep{Kobus17domaincontrol} or of sub-networks \citep{Pham19generic} to differentiate the processing of each domain; (b) the use of adversarial techniques to neutralize differences between domains \cite{Britz17mixing,Zeng18multidomain}; (c) the use of automatic domain identification e.g.\ \citep{Jiang19multidomain}. Unsupervised MDA is considered in \citep{Farajian17multidomain} as an unsupervised DA problem.
 
 Most approaches to adaptive / dynamic data selection take inspiration from \citep{Bengio09curriculum}, where the notion of \emph{curriculum learning} (CL) is initially introduced. CL is relies on a notion of ``easyness'' of a sample to schedule the presentation of the training data so that the easiest examples  presented first and the hardest, last. CL has been showed to speed up learning. While the initial aim was to improve and speed up training, it has also proven useful for domain adaptive / multi-domain / multi-lingual MT, based on alternative definitons of ``easyness''.
 
