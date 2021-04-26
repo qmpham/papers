@@ -29,6 +29,25 @@
     abstract = "Neural machine translation (NMT) has proven to be facilitated by curriculum learning which presents examples in an easy-to-hard order at different training stages. The keys lie in the assessment of data difficulty and model competence. We propose uncertainty-aware curriculum learning, which is motivated by the intuition that: 1) the higher the uncertainty in a translation pair, the more complex and rarer the information it contains; and 2) the end of the decline in model uncertainty indicates the completeness of current training stage. Specifically, we serve cross-entropy of an example as its data difficulty and exploit the variance of distributions over the weights of the network to present the model uncertainty. Extensive experiments on various translation tasks reveal that our approach outperforms the strong baseline and related methods on both translation quality and convergence speed. Quantitative analyses reveal that the proposed strategy offers NMT the ability to automatically govern its learning schedule.",
 }
 
+@InProceedings{alex17automated,
+  title =        {Automated Curriculum Learning for Neural Networks},
+  author =       {Alex Graves and Marc G. Bellemare and Jacob Menick and R{\'e}mi Munos and Koray Kavukcuoglu},
+  booktitle =    {Proceedings of the 34th International Conference on Machine Learning},
+  pages =        {1311--1320},
+  year =         {2017},
+  editor =       {Precup, Doina and Teh, Yee Whye},
+  volume =       {70},
+  series =       {Proceedings of Machine Learning Research},
+  month =        {06--11 Aug},
+  publisher =    {PMLR},
+  pdf =          {http://proceedings.mlr.press/v70/graves17a/graves17a.pdf},
+  url =          {
+http://proceedings.mlr.press/v70/graves17a.html
+},
+  abstract =     {We introduce a method for automatically selecting the path, or syllabus, that a neural network follows through a curriculum so as to maximise learning efficiency. A measure of the amount that the network learns from each data sample is provided as a reward signal to a nonstationary multi-armed bandit algorithm, which then determines a stochastic syllabus. We consider a range of signals derived from two distinct indicators of learning progress: rate of increase in prediction accuracy, and rate of increase in network complexity. Experimental results for LSTM networks on three curricula demonstrate that our approach can significantly accelerate learning, in some cases halving the time required to attain a satisfactory performance level.}
+}
+
+
 @inproceedings{Bengio09curriculum,
 author = {Bengio, Yoshua and Louradour, J\'{e}r\^{o}me and Collobert, Ronan and Weston, Jason},
 title = {Curriculum Learning},

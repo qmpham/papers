@@ -69,6 +69,7 @@
 \newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
 \newcommand{\fyFuture}[1]{\done[FY]\Todo[FY:]{\textcolor{red}{#1}}}
 \newcommand{\fyDonestar}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+
 \newcommand{\revision}[1]{\textcolor{red}{#1}}
 \newcommand{\revisiondel}[1]{}
 \newcommand{\src}{\ensuremath{\mathbf{f}}} % source sentence
@@ -110,6 +111,8 @@
 
 \begin{document}
 \maketitle
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
 \begin{abstract}
   When building machine translation systems, one often needs to make the best out of heterogeneous sets of parallel data in training to achieve the best test performance in one or several domain(s) of interest. This multi-source / multi-domain adaptation problem is often approached with instance selection or reweighting strategies, most of which pre-suppose an ex-ante assessment of the relevance of training instances. In this paper, we study the recently proposed Differential Data Selection (DDS) model and explore its ability to serve as a generic framework for these various situations. Our experiments study both domain adaptation and multi-domain learning and show that DDS often enables to outperform more heuristic adaptation strategies. We also introduce variants that boosts DDS performance of adapter-based multi-domain systems.\fyTodo{Keep this part ?}
 %   This is a well-known issue, which has given raise to a rich litterature in under the umbrellas of domain adaptation or multi-domain 
@@ -121,7 +124,7 @@
 \section{Introduction}\label{sec:intro}
 A typical setting in machine translation (MT) is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for a task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen and fixed; a key component in training is then to mitigate the detrimental effects of a possible mismatch between these distributions. Single-source and multi-source domain adaptation (DA) is a well-studied instance of this setting (see \citep{Chu2017comparison} for a review) , and so is multi-domain (MD) learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain,Pham21revisiting}. A related situation is multilingual machine translation \cite{Firat16multiway,Ha16towards,Johnson17google,Arivazhagan19massively}\fyTodo{Add more recent work}, where the heterogeneity of training data not only corresponds to variations in topic, genre or register, but also in language.
 
-\fyTodo{Label or covariate shift ?}
+\fyTodo{Label or covariate shift?} \revision{Answer: Covariate shift happens when D(x) differs between train and test; label shift happens when the conditional distribution $D(y|x)$ differs between train and test} 
 This problem is often approached with \emph{static} instance selection or re-weighting strategies, where the available training data is used in proportion to its relevance for the chosen test conditions. Finding the optimal balance of training data is however a challenging task due, for instance, to similarity between domains / languages, but also due to regularization effects of out-of-domain data; it may also be suboptimal, as some target domains or languages might be easier to train than others. Several recent proposals \cite{Wang17instance,Zhang19curriculum,Kumar19reinforcement,Wang20learning-multi} have explored ways to instead consider more \emph{dynamic} data selection and sampling strategies. We study in this contribution the proposal of \citet{Wang20balancing}, initially introduced for multilingual MT, with the goal to evaluate its potential in various single-domain and multi-domain adaptation settings and assess DDS, both in its basic version and with our improvements, as an effective replacement to standard heuristics approaches.
 
 Based on experimental results obtained on a diverse set of domains, our main conclusions are that (a) using DDS often yields overall performance that are as good as the standard fine-tuning strategy for domain adaptation; (b) DDS can effectively handle a variety of test target distributions without any meta-parameter search; (c) our extension of DDS is able to boost its performance when used in conjunction to the adapter model of \citet{Bapna19simple}.
@@ -144,7 +147,7 @@ These situations are illustrated in Figure~\ref{fig:mdmt-lambdas}.
 
 These situations have been amply documented from a theoretical perspective (eg.\ \cite{Mansour09multiple,Mansour09domainadaptation,Hoffman18algorithms}). A general recommandation in the DA setting  is to adjust the sampling distribution used to optimize the system so as to compensate for the mismatch between $\mathcal{D}^s(x)$ and $\mathcal{D}^t(x)$. This can be approximated by reweighting instances, or more conveniently domains, which are selected during training with a probability $\lambda^{l}(d)$, with $\lambda^{l}(d) \neq \lambda^{s}(d)$.
 
-A more practical standard approach to supervised DA is \emph{fine-tuning} \cite{Luong15stanford,Freitag16fast}, where $\vlambda^{l}$ is allowed to vary during the course of learning. With our notations, this approach amounts to first learning an initial parameter value with all the data ($\forall d, \lambda^{l}(d) = \lambda^{s}(d)$), then to continue training with only batches from the test domain $d_t$ ($\lambda^{l}(d) = \indic{d = d_t}$) with $\indic{A}$ the indicator function for predicate $A$. Note that this strategy is potentially suboptimal, as some out-of-domain samples may contribute to the final performance due to eg.\ domain overlap. Optimizing the learning distribution in multi-domain settings is even more challenging, as the learner has to best take advantage of potential domains overlaps, and also of the fact that some domains might be easier to learn than others.\fyTodo{How to measure this?} 
+A more practical standard approach to supervised DA is \emph{fine-tuning} \cite{Luong15stanford,Freitag16fast}, where $\vlambda^{l}$ is allowed to vary during the course of learning. With our notations, this approach amounts to first learning an initial parameter value with all the data ($\forall d, \lambda^{l}(d) = \lambda^{s}(d)$), then to continue training with only batches from the test domain $d_t$ ($\lambda^{l}(d) = \indic{d = d_t}$) with $\indic{A}$ the indicator function for predicate $A$. Note that this strategy is potentially suboptimal, as some out-of-domain samples may contribute to the final performance due to eg.\ domain overlap. Optimizing the learning distribution in multi-domain settings is even more challenging, as the learner has to best take advantage of potential domains overlaps, and also of the fact that some domains might be easier to learn than others.\fyTodo{How to measure this?} \revision{Answer: The graphic of \system{Mixed-0} shows that with same amount of data(batches) the convergences of the domains vary significantly}
 
 Differentiable data selection (DDS), proposed by \citet{Wang20optimizing} and later applied to multilingual machine translation by \citet{Wang20balancing}, introduces an additional degree of freedom and allows to iteratively learn an optimal value for $\lambda^{l}$, as we now explain.
 
@@ -154,40 +157,27 @@ Differentiable data selection (DDS), proposed by \citet{Wang20optimizing} and la
 \subsection{Basic principles}
 Assuming training data from $n_d$ domains $d_1 \dots d_{n_d}$, we denote the size of the training corpus from domain $d$ as  $N^{s}_d$, and $N^{s} = \sum_d N^{s}_d$ is the total number of training samples. We use $\widehat{\mathcal{D}^l_d}$ and $\widehat{\mathcal{D}^t _d}$ to denote the empirical train and test distributions for domain $d$, and \revision{$\widehat{\mathcal{D}^{u}}(x;\lambda^{u}) = \sum_{d} \lambda^{u}(d) \widehat{\mathcal{D}^{u}_d}(x)$ for $u\in\{l,t\}$} \fyTodo{$\widehat{\mathcal{D}}(x;\lambda) = \sum_{d} \lambda(d) \widehat{\mathcal{D}_d}(x)$}. In our setting,  $\vlambda^t$, and hence $\widehat{\mathcal{D}^t}(x;\vlambda^t)$ are fixed and predefined, approximated with an equivalent number of development corpora. Training optimizes the parameters $\vtheta$ of a neural translation model.
 
-Sampling training domains using a distribution $\lambda^{l}$ results in a parameter estimate $\theta(\lambda^{l})$, delivering performance that can be estimated on the development set using $\lambda^{t}$. \citet{Wang20optimizing,Wang20balancing} then formulate the problem of finding an optimal sampling strategy $\lambda^{l}_{*}$ maximizing performance on the development data as the following bi-level optimization problem:
-\begin{equation} \label{eq:bilevel}
-\begin{split}
-\vlambda^{l}_* &= \displaystyle{\mathop{\argmin}_{\lambda^{l}} J(\theta^*(\vlambda^{l}), \vlambda^{t})} \\
-					& \theta^*(\vlambda^{l}) = \displaystyle{\mathop{\argmin_{\vtheta}} J(\vtheta, \vlambda^{l})}, 
-\end{split}
-\end{equation}
-where we use the following notations:% \fyTodo{Overload Q, from domain to instances to pairs}
+Sampling training domains using a distribution $\lambda^{l}$ results in a parameter estimate $\theta(\lambda^{l})$, delivering performance that can be estimated on the development set using $\lambda^{t}$. \citet{Wang20optimizing,Wang20balancing} then formulate the problem of finding an optimal sampling strategy $\lambda^{l}_{*}$ maximizing performance on the development data as a bi-level optimization problem that can be approached by coordinate gradient descent alternating between $\lambda^{l}$ and $\vtheta$. \citet{Wang20balancing} limit the search space of $\vlambda^{l}$ to a parameterized differentiable function $\vlambda^{l}(\vpsi)$. Given $\vpsi_t$ at time step $t$, $\vtheta_t$ is updated via usual gradient descent as follows.
+\begin{align*}
+\vtheta_{t+1} &= \vtheta_t - \mathbf{lr}_{nmt} * \frac{1}{N} \displaystyle{\mathop{\sum}_{i=1}^N} \frac{\partial l(\vtheta_t, x_i,y_i)}{\partial \vtheta} \\
+x_i,y_i &\sim \widehat{\mathcal{D}^l}(x;\vlambda^l(\psi_t)) = \displaystyle{\mathop{\sum}_{d=1}^K} \lambda^l(d;\psi_t) * \widehat{D^l_d}(x) \\
+\end{align*}
+Where $l(\theta_t,x,y)$ is the loss on an example.
 
-\begin{align*}
-J(\vtheta, \vlambda^{t} ) &= \displaystyle{\mathop{\sum}_{(x,y) \sim \widehat{\mathcal{D}^{t}(x)}} \ell(\vtheta,x,y)} \\
-J(\vtheta, \vlambda^{l}) &= \displaystyle{\mathop{E_{(x,y) \sim \widehat{\mathcal{D}^{l}(x)}}[\ell(\vtheta,x,y)]}} \\
-l(\vtheta,x,y) &= - log P(x,y;\vtheta)
-\end{align*}
-Problem~\eqref{eq:bilevel} can be approached by coordinate gradient descent alternating between $\lambda^{l}$ and $\vtheta$. \citet{Wang20balancing} limit the search space of $\vlambda^{l}$ to a parameterized differentiable function $\vlambda^{l}(\vpsi)$. Given $\vpsi_t$ at time step $t$, $\vtheta_t$ is updated via usual gradient descent as follows:
-\begin{align*}
-\vtheta_{t+1} &= \vtheta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\vtheta_t, x,y)}{\partial \vtheta} \\
-x,y &\sim \widehat{\mathcal{D}^l}(x;\vlambda^l(\psi_t)) = \displaystyle{\mathop{\sum}_{d=1}^K} \lambda^l(d;\psi_t) * \widehat{D_d}(x) \\
-\end{align*}
 Given $\vtheta_t$, $\psi_t$ is updated via the Reinforce algorithm \cite{Williams92simple}:\fyTodo{Rewrite this correctly with domain average reward}
-%\begin{align*}
-%  \psi_{t+1} &= \psi_t + \mathbf{lr}_{data} * R(x,y) * \\
-%  & \quad\quad \frac{\partial log(\lambda^l(\psi_t)(x,y))}{\partial \psi} \\
-%x,y &\sim \lambda^l (\psi_t) \\
-%R(x,y) &= \langle \frac{\partial l(\theta',x,y)}{\partial \theta}, \frac{\partial J(\theta_{t+1}, \lambda^l)}{\partial \theta} \rangle \\
-%\theta' &= \theta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta_t, x,y)}{\partial \theta} \\
-%\end{align*}
-
 \begin{align*}
-\psi_{t+1} &= \psi_t + \mathbf{lr}_{data} * \displaystyle{\mathop{\sum}_{d=1}^K} R(d) * \frac{\partial log(\lambda^l(\psi_t)(d))}{\partial \psi} \\
-  R(d) &= E_{x,y \sim \widehat{D_d}}[\langle \frac{\partial l(\theta_t,x,y)}{\partial \theta}, \frac{\partial J(\theta', \lambda^t)}{\partial \theta} \rangle] \\
-  \theta' &= \theta_t - \mathbf{lr}_{nmt} * \frac{\partial l(\theta_t, x,y)}{\partial \theta} \\
+\psi_{t+1} &= \psi_t + \mathbf{lr}_{data} * \displaystyle{\mathop{\sum}_{d=1}^K} R(d) * \frac{\partial log(\lambda^l(d;\psi_t))}{\partial \psi} \\
+  R(d) &= \langle \frac{\partial J^l_d(\theta_t)}{\partial \theta}, \frac{\partial J^t(\theta', \lambda^t)}{\partial \theta} \rangle \\
 \end{align*}
-
+Where
+\begingroup
+\allowdisplaybreaks
+\begin{align*}
+\theta' &= \theta_t - \mathbf{lr}_{nmt} * \displaystyle{\mathop{\sum}_{i=1,x^i_d,y^i_d \in \widehat{D^l_d}}^N} \frac{\partial l(\theta_t,x^i_d,y^i_d)}{\partial \theta} \\
+  J^l_d(\theta_t) &= \displaystyle{\mathop{\sum}_{i=1,x^i_d,y^i_d \in \widehat{D^l_d}}^N} l(\theta_t,x^i_d,y^i_d) \\
+  J^t(\theta',\lambda_t) &= \displaystyle{\mathop{\sum}_{d}}\lambda^t(d)\displaystyle{\mathop{\sum}_{x^t_d,y^t_d \in \widehat{D^t_d}}} l(\theta',x^t_d,y^t_d)\\
+\end{align*}
+\endgroup
 $\mathbf{lr}_{data}$ is the learning rate of the parameter of the sampler. $\mathbf{lr}_{nmt}$ is the learning rate of the parameter of the NMT system. \fyTodo{Explain lr, may be more}\fyTodo{More refs to the algorithm }
 % To apply this method to multi-domain training (\system{Multi-DDS}), we limit the search family of training distribution $D_{trn}$ to the family of mixture of K in-domain training distribution such as $\sum_d \lambda^{s}_{d} \mathcal{D}_d(x,y)$. We also parameterize $\lambda^{s}_{d}$ using Softmax function so that $\lambda^{s}_{d} = \text{Softmax}(\psi)_d$ where $\psi \in \mathbb{R}^K$.
 \subsection{DDS for (multi) domain adaptation}
@@ -272,7 +262,7 @@ with $\alpha \in [0,0.25,0.5,0.75,1.0]$. These systems are denoted \system{Mixed
 
 \end{itemize}
 
-All models use embeddings and hidden layers sizes of dimension~512. Transformer models contain 8~attention heads in each of the 6+6 layers; the inner feedforward layer contains 2048 cells. The adapter-based systems (see below) additionally use an adaptation block in each layer, composed of a 2-layer perceptron, with an inner $\operatorname{ReLU}$ activation function operating on normalized entries of dimension~1024. 
+All models use embeddings and hidden layers sizes of dimension~512. Transformer models contain 8~attention heads in each of the 6+6 layers; the inner feedforward layer contains 2048 cells. The adapter-based systems (see below) additionally use an adaptation block in each layer, composed of a 2-layer perceptron, with an inner $\operatorname{ReLU}$EST activation function operating on normalized entries of dimension~1024. 
 Training uses batches of~12,288 tokens, Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$, Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ in all layers.
 
 \subsection{DDS-based systems } \label{ssec:dds-sys}
@@ -286,7 +276,10 @@ The architecture of DDS based-systems is identical to that of our baselines, and
 \subsubsection{Fine-tuning experiments}
 
 \fyTodo{Fix the table}
-In Table~\ref{tab:finetuning}, we compare the results of fine-tuning a system initially trained with a uniform mixture\fyTodo{uniform or natural?} of domains with the result of learning from scratch, also with a initial uniform distribution. \fyTodo{What do we see ? How about domain proximity ? - show a graph}. Note that the DDS systems are somewhat quicker to build, as we only train for 100K iterations (instead of 100K + 50K for the fine-tuning part).
+In Table ~\ref{tab:basic-dds}, we compare the results of fine-tuning a system initially trained with a natural mixture, which is proportional to the sizes of domains, of domains with the result of DDS learning from scratch with a initial uniform distribution. \fyTodo{What do we see ? How about domain proximity ? - show a graph}. 
+
+
+\fyTodo{Only if we compare on an individual domain} \revision{Note that the DDS systems are somewhat quicker to build, as we only train for 200K iterations (instead of 200K + 50K for the fine-tuning part)}. 
 
 \begin{table*}
   \centering \small
@@ -296,8 +289,10 @@ In Table~\ref{tab:finetuning}, we compare the results of fine-tuning a system in
     FT-Res($d$) \hfill &37.3&57.93&53.91&33.79&46.69&90.17&53.3\\ \hline
     \hline
     \system{DDS($\vlambda_0, \vlambda_d$)} \hfill [BLEU] &36.7&56.18&54.29&33.47&46.8&91.77&53.2\\
-    \% domain $d$ &59.7&14.9&86.1&6.4&67.2&6.4\\ \hline
-    \system{DDS($\vlambda_1, \vlambda_d$)} \hfill [BLEU]&  \\ 
+    \% domain $d$ (final / total) & 59.7 / 49.5 & 6.5 / 18.3 & 14.9 / 24.5 & 6.4 / 12.8 & 67.2/47.4 & 67.2 / 45.3&\\ \hline
+    \system{DDS($\vlambda_1, \vlambda_d$)} \hfill [BLEU]&36.4&56.3& 45.4& 32.6&44.5&43.1&43.1\\
+    \% domain $d$& 89 / 86.6 & 50/18.4 & 1.4 / 1.6 & 3.0 / 2.5 & 7.5 / 9.2 & 1.0 / 1.0 \\ \hline
+    \system{CL($d$)} \hfill [BLEU]&  \\ 
     \% domain $d$& \\ \hline\hline
     % Multidomain
     \system{Mixed-0}      & 35.26 & 54.09 & 52.49 & 31.86 & 44.94 & 89.54& 51.36 \\
@@ -306,8 +301,8 @@ In Table~\ref{tab:finetuning}, we compare the results of fine-tuning a system in
     \system{Mixed-0.75} & 36.53 & 55.03 & 51.15 & 33.98 & 44.28 & 87.22& 51.36 \\
     \system{Mixed-1}     & 37.33  & 54.56 & 50.05 & 33.47 & 43.23 & 77.51& 49.36 \\
     \system{MDL-Res} &37.08&57.42&53.57&33.17&46.01&90.65&52.98\\\hline
-    \system{DDS($\vlambda_1, \vlambda_0$)} & \\
-    $\operatorname{KL}(\vlambda_*^{l}, \vlambda_0$) & \\
+    \system{DDS($\vlambda_1, \vlambda_0$)} &37.86&50.22&47.22&31.22&40.83&58.56&44.32 \\
+    $\operatorname{KL}(\vlambda_*^{l}, \vlambda_0$) &36.96&55.55&52.88&33.06&44.52&91.25&52.37 \\
 %    $ \mathcal{H}(\vlambda_*^{l})$ &  \\
     \system{DDS($\vlambda_0, \vlambda_0$)} &37.26&55.07&50.96&33.49&43.41&90.76&51.83 \\ \hline
   \end{tabular}
@@ -354,25 +349,28 @@ It is notably striking to see that the distribution at the end of training ($\vl
 \subsection{Analysis and improvements}
 
 \subsection{Unsupervised DDS}
-To better analyse the behaviour of DDS, we study a scenario where $\vlambda^s$ and $\vlambda^t$ have different dimensions designed as follows. All training data is automatically clustered into $K=30$ of varying sizes using the k-means algorithm based on generic sentence representations obtained via mean pooling. The resulting classes contain from a tenths of thousands to several hundreds of thousand training samples. Most classes contain a dominant domain, which accounts for more of 90\% of the samples.\footnote{See detail in supplementary material} Using the same DA setting as before, we study (a) whether DDS is able to identify the classes that correspond to the domain of interest (b) whether having additional degrees of freedom can yield an improved training performance (c) how DDS scales when a large number of  domains is considered.\fyTodo{TBC - with what experiments?}
+To better analyze the behavior of DDS, we study a scenario where $\vlambda^s$ and $\vlambda^t$ have different dimensions designed as follows. All training data is automatically clustered into $K=30$ of varying sizes using the k-means algorithm based on generic sentence representations obtained via mean pooling. The resulting classes contain from a tenths of thousands to several hundreds of thousand training samples. Most classes contain a dominant domain, which accounts for more of 90\% of the samples.\footnote{See detail in supplementary material} Using the same DA setting as before, we study (a) whether DDS is able to identify the classes that correspond to the domain of interest (b) whether having additional degrees of freedom can yield an improved training performance (c) how DDS scales when a large number of  domains is considered.\fyTodo{TBC - with what experiments?}
 
 \subsubsection{Winner-takes-all}
 
 Following \citep{Wang20balancing}, our baseline uses the following parameterization of the sampling component $\vlambda^l(\vpsi) = \operatorname{softmax}(\vpsi)$ where $\vpsi \in \mathbb{R}^{n_d}$. This parameterization induces the following gradients:\fyTodo{Change name of obj. function}
 \begin{align*}
-\frac{\partial XXX}{\partial \vpsi[d]} & = \displaystyle{\mathop{\sum}_{j=1}^{n_d}} R_j \frac{\partial \lambda^l(j; \vpsi)}{\partial \vpsi[d]} \\
+\Delta \psi[d] & = \eta \times \displaystyle{\mathop{\sum}_{j=1}^{n_d}} R_j \frac{\partial \lambda^l(j; \vpsi)}{\partial \vpsi[d]} \\
 %	& = R_d \lambda^l(d; \psi)(1- \lambda^l(d; \psi)) - \displaystyle{\mathop{\sum}_{j\neq d}^{n_d}} R_j \lambda^l(d; \psi) \lambda^l(j; \psi)\\
-	& = \lambda^l(d; \psi) (R_d- XXX)\\
+	& = \eta \times \lambda^l(d; \psi) \big(R_d-\displaystyle{\mathop{\sum}_{j=1}^{n_d}} R_j \lambda^l(j;\psi) \big)\\
 \end{align*}
+where $\eta$ controls the learning rate of $\vpsi$.
 
-The fact that the change of $\psi(d)$ is proportional to $\lambda^l(d; \vpsi)$ explains that the optimization often leads to a degenerate solution in which only a small number of domains are considered. This behaviour is even more visible when using 30 automatic domains in training:\fyTodo{What results would be useful ?}.
+The fact that the change of $\psi(d)$ is proportional to $\lambda^l(d; \vpsi)$ explains that the optimization often leads to a degenerated solution in which only a small number of domains are considered. 
+%This behavior is even more visible when using 30 automatic domains in training:\fyTodo{What results would be useful ?}.
 
 In order to mitigate this behavior, two variants of the baseline are investigated:
 \begin{itemize}
 \item to ensure that $\vpsi$ remains sufficient diverse or close to the target distribution $\vlambda^t$. This is obtained by adding a constraint when updating $\vpsi$. 
-\item to replace the softmax function for which the rich-get-richer effect are attenuated. We consider functions of the form $f(\vpsi)[d] = \frac{\vpsi[d]^\beta}{\sum_d \vpsi[d]^\beta}$.
+\item to replace the softmax function for which the rich-get-richer effect are attenuated. We consider functions of the form $\lambda
+^l(d;\vpsi) = \frac{\vpsi[d]^\beta}{\sum_i \vpsi[i]^\beta}$. The gradient of $\psi$ will be as follows.
 \begin{align*}
-\psi[d] = \frac{\psi[d] + \eta * R_d}{ 1 + \eta \displaystyle{\mathop{\sum}_{j=1}^{n_d}} R_j},
+\Delta\psi[d] = \eta \times \beta \frac{\lambda^l(d;\psi)}{\psi[d]} \big( R_d - \displaystyle{\mathop{\sum}_{j=1}^{n_d}} R_j \lambda^l(j;\psi) \big)
 \end{align*}
 where $\eta$ controls the learning rate of $\vpsi$.
 \end{itemize}
@@ -435,9 +433,17 @@ Figures such as Figure~\ref{} show that the training signal given by the reward~
 
 Again, we have explored several options to improve this aspect of the algorithm. The first was to compute better estimates of the gradients in~\eqref{} by using larger batches, or performing multiple updates when computing $\vtheta_t$. This did not prove useful, and this option was quickly discontinued. The second, more promising alley, was to base the reward computation not on the gradient of the loss, but more directly on the development loss, replacing line~\ref{alg:number}\fyTodo{which line ?} with the following reward computation:
 \begin{align*}
-  \operatorname{TODO}
+  R_d = J^t(\theta_{t+k},\lambda^t) - J^t(\theta_t,\lambda^t)
 \end{align*}
-This idea is reminiscent of the work of \citet{Kumar19reinforcement}, who also design their curriculum trainng strategy based on the development loss.
+Where 
+\begin{equation}
+\begin{array}{rcl}
+\theta_{t+i} &=& \theta_{t+i-1} - \mathbf{lr}_{nmt} \frac{1}{N}\displaystyle{\mathop{\sum}_{j=1}^N}\frac{\partial l(\theta_{t+i-1}, x^i_j,y^i_j)}{\partial \theta} \\
+x^i_j, y^i_j &\sim& \widehat{D^l_d}(x)
+\end{array}
+\end{equation}
+
+This idea is reminiscent of the work of \citet{alex17automated} and  \citet{Kumar19reinforcement}, who also design their curriculum trainng strategy based on the development loss.
 
 \subsection{Improving dynamic data selection}
 Experiments with these revised versions are for various settings in Table~\ref{tab:improved-dds}. Results for DA directly compare with Table~{tab:basic-dds}; results for unsupervised DA used our 6 domains for training, but test on the \domain{News}, unseen in traning.
@@ -450,8 +456,10 @@ Experiments with these revised versions are for various settings in Table~\ref{t
     \\  \hline\hline 
     \multicolumn{9}{|c|}{\sl Multi-domain training} \\ \hline
     \\
-    \system{DDS($\vlambda_1, \vlambda_0$)} & \\
-    \system{DDS($\vlambda_0, \vlambda_0$)} & \\ \hline
+    \system{DDS-v1($\vlambda_0, \vlambda_0$)} &36.96&55.55&52.88&33.06&44.52&91.25&52.37&- \\
+    \system{DDS-v2($\vlambda_0, \vlambda_0$)}&35.45&55.46&53.7&32.3&45.6&91.11&52.27& - \\
+    \system{DDS-v1($\vlambda_1, \vlambda_0$)} & \\
+    \system{DDS-v2($\vlambda_1, \vlambda_0$)} & \\ \hline
   \end{tabular}
   \caption{Improved results for DDS in fine-tuning and various multi-domain adaptation settings.}
   \label{tab:basic-dds}
@@ -480,6 +488,17 @@ For instance, \citet{Zhang19curriculum} study supervised domain adaptation, and 
 \bibliography{multidomain}
 %\appendix
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
 
 Multi-domain learning, as defined in \citet{Dredze08online} further assumes that domain tags are also available in testing; the implication being that the test distribution is also as a mixture of several domains, making the problem distinct from mere domain adaption. A multi-domain learner is then expected to use these tags effectively \cite{Joshi12multidomain} when computing the combined translation function $h(x,d)$, and to perform well in all domains \cite{Finkel09hierarchical}. This setting is closely related to the multi-source adaptation problem formalized in \cite{Mansour09domainadaptation,Mansour09multiple,Hoffman18algorithms}.
 
@@ -518,3 +537,16 @@ Given an objective mixture over test distribution $\lambda^{t}_{d}$,$d\in[1,\dot
 \end{algorithmic}
 \end{algorithm}
 
+%\begin{equation} \label{eq:bilevel}
+%\begin{split}
+%\vlambda^{l}_* &= \displaystyle{\mathop{\argmin}_{\lambda^{l}} J(\theta^*(\vlambda^{l}), \vlambda^{t})} \\
+%					& \theta^*(\vlambda^{l}) = \displaystyle{\mathop{\argmin_{\vtheta}} J(\vtheta, \vlambda^{l})}, 
+%\end{split}
+%\end{equation}
+%where we use the following notations:% \fyTodo{Overload Q, from domain to instances to pairs}
+%
+%\begin{align*}
+%J(\vtheta, \vlambda^{t} ) &= \displaystyle{\mathop{\sum}_{(x,y) \sim \widehat{\mathcal{D}^{t}(x)}} \ell(\vtheta,x,y)} \\
+%J(\vtheta, \vlambda^{l}) &= \displaystyle{\mathop{E_{(x,y) \sim \widehat{\mathcal{D}^{l}(x)}}[\ell(\vtheta,x,y)]}} \\
+%l(\vtheta,x,y) &= - log P(x,y;\vtheta)
+%\end{align*}
