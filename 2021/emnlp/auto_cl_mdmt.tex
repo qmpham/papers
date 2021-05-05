@@ -94,7 +94,7 @@
 \usepackage{multirow}
 \usepackage{adjustbox}
 
-\title{Improving Multi-Domain Neural Machine Translation with Differential Data Selection}
+\title{Automated curriculum learning for Multi-Domain NMT by using loss-driven reward}
 
 \author{First Author \\
   Affiliation / Address line 1 \\
@@ -114,23 +114,16 @@
 \setlength{\abovedisplayskip}{2pt}
 \setlength{\belowdisplayskip}{2pt}
 \begin{abstract}
-  When building machine translation systems, one often needs to make the best out of heterogeneous sets of parallel data in training to achieve the best test performance in one or several domain(s) of interest. This multi-source / multi-domain adaptation problem is often approached with instance selection or reweighting strategies, most of which pre-suppose an ex-ante assessment of the relevance of training instances. In this paper, we study the recently proposed Differential Data Selection (DDS) model and explore its ability to serve as a generic framework for these various situations. Our experiments study both domain adaptation and multi-domain learning and show that DDS often enables to outperform more heuristic adaptation strategies. We also introduce variants that boosts DDS performance of adapter-based multi-domain systems.\fyTodo{Keep this part ?}
-%   This is a well-known issue, which has given raise to a rich litterature in under the umbrellas of domain adaptation or multi-domain 
-
-%   The priority of the in-domain performance in the overall evaluation affects the choice of choosing data. The problem falls in the data selection category in the domain adaptation topic. Several data selection methods pre-compute the domain-relatedness of training examples and use these scores to build mini-batches in the training while other works propose dynamic strategies to build training mini-batches based on reinforcement learning.
-% In this study, we first formulate the most general algorithm for training the Neural Machine Translation (NMT) model given a predefined priority of the domains. Then, we apply a recently proposed method to solve the problem. We also report a disadvantage of DDS and fix it by proposing a minor development for DDS. Our experiments with a large sample of multi-domain systems show several important benefits of DDS in multi-domain NMT.
+  When building machine translation systems, one often needs to make the best out of heterogeneous sets of parallel data in training to achieve the best test performance in one or several domain(s) of interest. This multi-source / multi-domain adaptation problem is often approached with instance selection or reweighting strategies, most of which pre-suppose an ex-ante assessment of the relevance of training instances. In this paper, we propose a novel dynamic data selection algorithm which re-evaluates the data utility and adapts the data selection policy along the training of the NMT model. We explore the ability of our method to serve as a generic framework for the previously mentioned situations.
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
 A typical setting in machine translation (MT) is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for a task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen and fixed; a key component in training is then to mitigate the detrimental effects of a possible mismatch between these distributions. Single-source and multi-source domain adaptation (DA) is a well-studied instance of this setting (see \citep{Chu2017comparison} for a review) , and so is multi-domain (MD) learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain,Pham21revisiting}. A related situation is multilingual machine translation \cite{Firat16multiway,Ha16towards,Johnson17google,Arivazhagan19massively}\fyTodo{Add more recent work}, where the heterogeneity of training data not only corresponds to variations in topic, genre or register, but also in language.
 
-\fyTodo{Label or covariate shift?} \revision{Answer: Covariate shift happens when D(x) differs between train and test; label shift happens when the conditional distribution $D(y|x)$ differs between train and test} 
-This problem is often approached with \emph{static} instance selection or re-weighting strategies, where the available training data is used in proportion to its relevance for the chosen test conditions. Finding the optimal balance of training data is however a challenging task due, for instance, to similarity between domains / languages, but also due to regularization effects of out-of-domain data; it may also be suboptimal, as some target domains or languages might be easier to train than others. Several recent proposals \cite{Wang17instance,Zhang19curriculum,Kumar19reinforcement,Wang20learning-multi} have explored ways to instead consider more \emph{dynamic} data selection and sampling strategies. We study in this contribution the proposal of \citet{Wang20balancing}, initially introduced for multilingual MT, with the goal to evaluate its potential in various single-domain and multi-domain adaptation settings and assess DDS, both in its basic version and with our improvements, as an effective replacement to standard heuristics approaches.
+This problem is often approached by \emph{static} instance selection or re-weighting strategies, where the available training data is used in proportion to its relevance for the chosen test conditions. Finding the optimal balance of training data is however a challenging task due, for instance, to similarity between domains / languages, but also due to regularization effects of out-of-domain data; it may also be suboptimal, as some target domains or languages might be easier to train than others. Several recent proposals \cite{Wang17instance,Zhang19curriculum,Kumar19reinforcement,Wang20learning-multi,alex17automated} have explored ways to instead consider \emph{dynamic} data selection and sampling strategies. In this paper, we propose a nouvel method of building an automated curriculum for training Multi-Domain NMT model, that is inspired by the work of \cite{alex17automated}. We evaluate our method in various single-domain and multi-domain adaptation settings. We compare our method with several contrasts including the work of \cite{Zhang19curriculum} and \cite{Wang20balancing}. From now on, we name our method MD-ACL
 
-Based on experimental results obtained on a diverse set of domains, our main conclusions are that (a) using DDS often yields overall performance that are as good as the standard fine-tuning strategy for domain adaptation; (b) DDS can effectively handle a variety of test target distributions without any meta-parameter search; (c) our extension of DDS is able to boost its performance when used in conjunction to the adapter model of \citet{Bapna19simple}.
-
-% one often needs to make the best out of heterogeneous sets of parallel data in training to achieve the best test performance in one or several domain(s) of interest. This multi-source (multi-domain) adaptation problem is often approached with instance selection or reweighting strategies, most of which pre-supposes an ad-hoc assessment of relevance for training sentences. In this contribution, we study the recently proposed Differential Data Selection (DDS) model  and explore its ability to serve an effective generic framework for these various situations. Our experiments for both domain adaptation and multi-domain learning show that DDS often enables to outperform heuristic training strategies; we also introduce a variant that boosts DDS performance of adapter-based multi-domain systems.
-
+Based on experimental results obtained on a diverse set of domains, our main conclusions are that (a) using MD-ACL often yields overall performance that are as good as the standard fine-tuning strategy for domain adaptation; (b) MD-ACL can effectively handle a variety of test target distributions without any meta-parameter search.
+%(c) our extension of DDS is able to boost its performance when used in conjunction to the adapter model of \citet{Bapna19simple}.
 \section{Learning with multiple data sources} \label{sec:mdmt}
 
 We conventionally define a domain $d$ as a distribution $\mathcal{D}_d(x)$ over some feature space $\mathcal{X}$ that is shared across domains \citep{Pan10asurvey}: in machine translation, $\mathcal{X}$ is the representation space for input sentences; each domain corresponds to a specific source of data, and may differ from the other data sources in terms of textual genre, thematic content \cite{Chen16guided,Zhang16topicinformed}, register \cite{Sennrich16politeness}, style \cite{Niu18multitask}, etc. Translation in domain $d$ is formalized by a translation function $h_d(y|x)$ pairing sentences in a source language with sentences in a target language $y \in \mathcal{Y}$. $h_d$ is usually assumed to be deterministic (hence $y = h_d(x)$), but might differ from one domain to the other.
@@ -277,10 +270,7 @@ The architecture of DDS based-systems is identical to that of our baselines, and
 \subsubsection{Fine-tuning experiments}
 
 \fyTodo{Fix the table}
-In Table ~\ref{tab:basic-dds}, we compare the results of fine-tuning a system initially trained with a natural mixture, which is proportional to the sizes of the domains, of domains with the result of DDS learning from scratch with a initial uniform distribution. \fyTodo{What do we see ? How about domain proximity ? - show a graph}. 
-
-
-\fyTodo{Only if we compare on an individual domain} \revision{Note that the DDS systems are somewhat quicker to build, as we only train for 200K iterations (instead of 200K + 50K for the fine-tuning part)}. 
+In Table ~\ref{tab:basic-dds}, we compare the results of fine-tuning a system initially trained with a natural mixture, which is proportional to the sizes of the domains, of domains with the result of DDS learning from scratch with a initial uniform distribution.
 
 \begin{table*}
   \centering \small
@@ -293,7 +283,8 @@ In Table ~\ref{tab:basic-dds}, we compare the results of fine-tuning a system in
     \% domain $d$ (final / total) & 59.7 / 49.5 & 6.5 / 18.3 & 14.9 / 24.5 & 6.4 / 12.8 & 67.2/47.4 & 67.2 / 45.3&\\ \hline
     \system{DDS($\vlambda_1, \vlambda_d$)} \hfill [BLEU]&36.4&56.3& 45.4& 32.6&44.5&43.1&43.1\\
     \% domain $d$& 89 / 86.6 & 50/18.4 & 1.4 / 1.6 & 3.0 / 2.5 & 7.5 / 9.2 & 1.0 / 1.0 \\ \hline
-    \system{CL($d$)} \hfill [BLEU]&37.2&55.4&53.0&31.3&45.3&90.8&52.2\\ \hline\hline
+    \system{CL($d$)} \hfill [BLEU]&  \\ 
+    \% domain $d$& \\ \hline\hline
     % Multidomain
     \system{Mixed-0}      & 35.3 & 54.1 & 52.5 & 31.9 & 44.9 & 89.5& 51.4 \\
     \system{Mixed-0.25} & 35.9 & 54.9 & 52.6 & 32.6 & 45 & 90.3& 51.9 \\
@@ -453,19 +444,16 @@ Experiments with these revised versions are for various settings in Table~\ref{t
     \multicolumn{9}{|c|}{\sl Supervised domain adaptation} \\ \hline
     domain \hfill $d=$ & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{mean} & \multicolumn{1}{|c|}{\domain{news}} \\ \hline \hline
     \multicolumn{9}{|c|}{\sl Unsupervised domain adaptation} \\ \hline
-    \system{DDS-v1($\vlambda_0, \vlambda_{news}$)} &-&-&-&-&-&-&23.1 \\  \hline\hline 
+    \system{DDS-v1($\vlambda_0, \vlambda_{news}$)} & \\  \hline\hline 
     \multicolumn{9}{|c|}{\sl 30 clusters} \\ \hline
-    \system{DDS-v1($\vlambda^*, \vlambda_d$)}&36.3&56.9&51.3&33.2&43.4&89.4&51.8&-
+    \system{DDS-v1($\vlambda^*, \vlambda_d$)}& &56.9&51.3&33.2&43.4&&&
     \\  \hline\hline 
     \multicolumn{9}{|c|}{\sl Multi-domain training} \\ \hline
     \\
-    \system{DDS-v1($\vlambda_0, \vlambda_d$)} &36.7&58.2&55&33.3&46.6&91.9&53.6& -\\
-    \system{DDS-v1($\vlambda_1, \vlambda_d$)} &37.2&55.1&51.8&32.8&44.9&85.4&51.2&-\\
+    \system{DDS-v1($\vlambda_0, \vlambda_d$)} &36.7&58.2&55&33.3&46.6&91.9&53.6& 23.1 \\
+    \system{DDS-v1($\vlambda_1, \vlambda_d$)} & \\
     \system{DDS-v1($\vlambda_0, \vlambda_0$)}&35.5&55.5&53.7&32.3&45.6&91.1&52.3& - \\
-    \system{DDS-v1($\vlambda_1, \vlambda_0$)}&37.4&54.4&50.3&32.0&42.7&80.2&49.5&- \\
-    \system{DDS-v1($\vlambda_1, \vlambda_2$)}&36.2&-&-&-&46.1&-&-&- \\
-    \system{DDS-v1($\vlambda_1, \vlambda_2$)}&-&57.2&53.8&-&-&-&-&- \\
-    \system{DDS-v1($\vlambda_1, \vlambda_2$)}&-&-&-&32&-&90&-&- \\ \hline
+    \system{DDS-v1($\vlambda_1, \vlambda_0$)}&37.4&54.4&50.3&32.0&42.7&80.2&49.5 \\ \hline
   \end{tabular}
   \caption{Improved results for DDS in fine-tuning and various multi-domain adaptation settings.}
   \label{tab:basic-dds}
