@@ -306,9 +306,10 @@ In Table ~\ref{tab:basic-dds}, we compare the results of fine-tuning a system in
 %    $ \mathcal{H}(\vlambda_*^{l})$ &  \\
     \system{DDS($\vlambda_0, \vlambda_0$)} &37.3&55.1&51&33.5&43.4&90.8&51.8\\ \hline
   \end{tabular}
-  \caption{Baseline results for DDS in fine-tuning and multi-domain adaptation. In the top part, we report scores with DDS and each target domain, and compare with full-fine-tuning: each column corresponds to a different system. We also report the proportion of in-domain data in the final mixture. In the bottom part, we run multi-domain experiments: for a given line, all the columns \emph{correspond to the same system}. We also report the KL divergence between the optimal and the target mixtures.}
+  \caption{Baseline results for DDS in fine-tuning and multi-domain adaptation. In the top part, we report scores with DDS and each target domain, and compare with full fine-tuning: each column corresponds to a distinct system. We also report the proportion of in-domain data in the final mixture. In the bottom part, we run multi-domain experiments: for a given line, all the columns \emph{correspond to the same system}. We also report the KL divergence between the optimal and the target mixtures.}
   \label{tab:basic-dds}
 \end{table*}
+\fyTodo{Report CL results / explain in legend}
 
 A first observation (top part of Table~\ref{tab:basic-dds}) is that DDS is only better than FT for \domain{rel}, and worse for \domain{med} and \domain{law}. For the three other domains, we do not see any marked difference, which we view as a positive result. There seem to be a connection with the domain size, as \domain{rel} is small and benefits from data from other domains, while the opposite effect is observed for the larger \domain{med} and \domain{law}. Averaged over the 6 domains, we see a small (0.5 BLEU) difference between the two approaches for the domain of interest. Note however that DDS also mitigates the catastrophic forgetting effect observed with full fine-tuning (see supplemental material).\fyTodo{Supplementary}
 
@@ -349,7 +350,7 @@ It is notably striking to see that the distribution at the end of training ($\vl
 \subsection{Analysis and improvements}
 
 \subsection{Unsupervised DDS}
-To better analyze the behavior of DDS, we study a scenario where $\vlambda^s$ and $\vlambda^t$ have different dimensions designed as follows. All training data is automatically clustered into $K=30$ of varying sizes using the k-means algorithm based on generic sentence representations obtained via mean pooling. The resulting classes contain from a tenths of thousands to several hundreds of thousand training samples. Most classes contain a dominant domain, which accounts for more of 90\% of the samples.\footnote{See detail in supplementary material} Using the same DA setting as before, we study (a) whether DDS is able to identify the classes that correspond to the domain of interest (b) whether having additional degrees of freedom can yield an improved training performance (c) how DDS scales when a large number of  domains is considered.\fyTodo{TBC - with what experiments?}
+To better analyze the behavior of DDS, we study a scenario where $\vlambda^s$ and $\vlambda^t$ have different dimensions designed as follows. All training data is automatically clustered into $K=30$ of varying sizes using the k-means algorithm based on generic sentence representations obtained via mean pooling. The resulting classes contain from a tenths of thousands to several hundreds of thousand training samples. Most classes contain a dominant domain which accounts for more of 90\% of the samples.\footnote{See detail in supplementary material} Using the same DA setting as before, we study (a) whether DDS is able to identify the classes that correspond to the domain of interest (b) whether having additional degrees of freedom\fyTodo{explain better} can yield an improved training performance (c) how DDS scales when a large number of  domains is considered.\fyTodo{TBC - with what experiments?}
 
 \subsubsection{Winner-takes-all}
 
@@ -443,7 +444,7 @@ x^i_j, y^i_j &\sim& \widehat{D^l_d}(x)
 \end{array}
 \end{equation}
 
-This idea is reminiscent of the work of \citet{alex17automated} and  \citet{Kumar19reinforcement}, who also design their curriculum trainng strategy based on the development loss.
+This idea is reminiscent of the work of \citet{Graves17automated} and \citet{Kumar19reinforcement}, who also design their curriculum trainng strategy based on the development loss.
 
 \subsection{Improving dynamic data selection}
 Experiments with these revised versions are for various settings in Table~\ref{tab:improved-dds}. Results for DA directly compare with Table~{tab:basic-dds}; results for unsupervised DA used our 6 domains for training, but test on the \domain{News}, unseen in traning.
