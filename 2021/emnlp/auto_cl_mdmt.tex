@@ -203,9 +203,9 @@ We randomly select in each corpus a development and a test set of 1,000 lines an
     \multicolumn{1}{c|}{} & \multicolumn{1}{c}{\domain{med}} & \multicolumn{1}{c}{\domain{law}} & \multicolumn{1}{c}{\domain{bank}} & \multicolumn{1}{c}{\domain{it}} & \multicolumn{1}{c}{\domain{talk}} & \multicolumn{1}{c}{\domain{rel}} & \multicolumn{1}{c|}{\domain{news}} \\
     \hline 
     \# lines & 2609 (0.68) & 501 (0.13) & 190 (0.05) & 270 (0.07) & 160 (0.04) & 130 (0.03) & 260 (0) \\
-    \# \revision{tokens}  &  133 / 154  &  17.1 / 19.6 &  6.3 / 7.3 &  3.6 / 4.6 &  3.6 / 4.0 &  3.2 / 3.4 & 7.8 / 9.2   \\
-    \# \revision{types}  & 771 / 720 & 52.7 / 63.1 & 92.3 / 94.7 & 75.8 / 91.4 & 61.5 / 73.3 & 22.4 / 10.5 & - \\
-    \# \revision{uniq} & 700 / 640 & 20.2 / 23.7 & 42.9 / 40.1 & 44.7 / 55.7 & 20.7 / 25.6 & 7.1 / 2.1 & - \\
+    \# tokens &  133 / 154  &  17.1 / 19.6 &  6.3 / 7.3 &  3.6 / 4.6 &  3.6 / 4.0 &  3.2 / 3.4 & 7.8 / 9.2   \\
+    \# types & 771 / 720 & 52.7 / 63.1 & 92.3 / 94.7 & 75.8 / 91.4 & 61.5 / 73.3 & 22.4 / 10.5 & - \\
+    \# uniq & 700 / 640 & 20.2 / 23.7 & 42.9 / 40.1 & 44.7 / 55.7 & 20.7 / 25.6 & 7.1 / 2.1 & - \\
     \hline
   \end{tabular}
   \caption{Corpora statistics: number of parallel lines ($\times 10^3$) and proportion in the training domain mixture (which does not contain \domain{news}), number English and French tokens ($\times 10^6$), number English and French types ($\times 10^3$), number of types that only appear in a given domain ($\times 10^3$). \domain{med} is the largest domain, containing almost 70\% of the sentences, while \domain{rel} is the smallest, with only 3\% of the data.
@@ -250,13 +250,18 @@ We re-implement DDS in Tensorflow without any change in the choices of parameter
 
 We re-implement the work of \citet{Zhang19curriculum} by following exactly the description of the algorithm. For each experiment of adapting the NMT system to one domain, we combine the training data of other domains into one corpus, then compute the cross-entropy difference score of each sentence of this corpus (we only compute the score for the source side). We sort and split the corpus into 9 shards and execute curriculum learning with 10 shards in which the first shard is the in-domain corpus.
 \subsection{Experimental tasks}
-We evaluate the efficacy of our methods compared to several aforementioned baselines via 3 tasks including domain adaptation; multi-domain adaptation and unsupervised domain adaptation.
+We evaluate the efficacy of our methods compared to several aforementioned baselines via 5 tasks including domain adaptation; multi-domain adaptation, bi-domain adaptation, unseen domain adaptation, and unsupervised domain adaptation.
 
 In the domain adaptation task, given the data of 6 domains including \domain{med}, \domain{bank}, \domain{law}, \domain{it}, \domain{talk}, \domain{rel}, we aim to build expert NMT models for each domain respectively.
 
-In the Multi-domain adaptation task, given the data of 6 domains, we aim to build an NMT model which gives the best performance regarding a predefined test set compromising equivalently 6 domains.
+In the multi-domain adaptation task, given the data of 6 domains, we aim to build an NMT model which gives the best performance regarding a predefined test set compromising equivalently 6 domains.
 
-In the unsupervised domain adaptation task, we design 2 experiments. In the first experiment, given the data of 6 domains, we aim to build an NMT model which is robust to an unseen domain, which is News in this case. In the second experiment, we cluster the training data of 6 domains into 30 clusters using the KNN algorithm in the same way as in the work of \citet{Tars18multidomain}, then adapt these clusters to one of 6 domains given the corresponding in-domain dev set. We compare MDAC to the contrast DDS over 6 domains.
+In the bi-domain adaptation task, given the data of 6 domains, we only focus on 2 domains of them.
+
+In the fourth experiment, given the data of 6 domains and a small dev set of an unseen domain, which is News, in this case, we aim to build an NMT model which is robust to the unseen domain.
+
+In the unsupervised domain adaptation task, we cluster the training data of 6 domains into 30 clusters using the KNN algorithm in the same way as in the work of \citet{Tars18multidomain}, then adapt these clusters to one of 6 domains given the corresponding in-domain dev set. We compare MDAC to the contrast DDS over 6 domains.
+
 
 
 \section{Results and discussion \label{sec:results}}
@@ -317,7 +322,7 @@ We show in the below graphic \ref{fig:sampling}, the evolution of the training m
     \system{MDAC($\vlambda_1, \vlambda_0$)}&37.4&54.4&50.3&32.0&42.7&80.2&49.5\\
     \hline
   \end{tabular}
-  \caption{We report the performance of our method MDAC and the work of \citet{Wang20balancing} DDS in multi-domain adaptation task. For a given line, all the columns \emph{correspond to the same system}}
+  \caption{We report the performance of our method MDAC and the work of \citet{Wang20balancing} DDS in multi-domain adaptation task. For a given line, all the columns \emph{correspond to the same multi-domain system}}
   \label{tab:multi-da}
 \end{table*}
 
@@ -340,8 +345,28 @@ We show in the below graphic \ref{fig:sampling}, the evolution of the training m
 \label{fig:sampling}
 \end{figure*}
 
+\subsection{Bi-domain adaptation}
+
+\begin{table*}[htbp]
+  \centering \small
+  \begin{tabular}{|l|*9{r|}} \hline
+    \multicolumn{9}{|c|}{\sl Supervised domain adaptation} \\ \hline
+    domain \hfill $d=$ & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{mean} & \multicolumn{1}{|c|}{\domain{news}} \\ \hline \hline
+    \system{MDAC($\vlambda_1, \vlambda_2$)}&36.2&-&-&-&46.1&-&-&- \\
+    \system{DDS($\vlambda_1, \vlambda_2$)}&36.5&-&-&-&44.4&-&-&- \\
+    \system{MDAC($\vlambda_1, \vlambda_2$)}&-&57.2&53.8&-&-&-&-&- \\
+    \system{DDS($\vlambda_1, \vlambda_2$)}&-&56.1&52.6&-&-&-&-&- \\
+    \system{MDAC($\vlambda_1, \vlambda_2$)}&-&-&-&32&-&90&-&- \\
+    \system{DDS($\vlambda_1, \vlambda_2$)}&-&-&-&32.9&-&91.1&-&- \\ \hline
+  \end{tabular}
+  \caption{Non empty columns correspond to the target domains. For a given line, all the non empty columns \emph{correspond to the same bi-domain system}}
+  \label{tab:bi-da}
+\end{table*}
+
 \subsection{Unsupervised domain adaptation}
-We
+
+According the table \ref{tab:bi-da}, MDAC outperforms DDS in 2 over 3 settings including adapting to \domain{med-it} and \domain{law-bank} while being surpassed in \domain{talk-rel}, showing that MDAC is capable to adapt to a variable set of target domains.
+
 \begin{table*}[htbp]
   \centering \small
   \begin{tabular}{|l|*9{r|}} \hline
@@ -355,23 +380,20 @@ We
     \system{Mixed-1} & - & - & - & - & - & - & - & 23.5\\
     \hline \hline
     \system{MDAC($\vlambda_0, \vlambda_{news}$)} &-&-&-&-&-&-&-&23.1 \\
-     \system{MDAC($\vlambda_0, \vlambda_{news}$)} &-&-&-&-&-&-&-&23.1 \\ \hline\hline 
+     \system{DDS($\vlambda_0, \vlambda_{news}$)} &-&-&-&-&-&-&-&23.3 \\ \hline\hline 
     \multicolumn{9}{|c|}{\sl 30 clusters} \\ \hline
     \system{MDAC($\vlambda^*, \vlambda_d$)}&36.3&56.9&51.3&33.2&43.4&89.4&51.8&-\\
-     \system{DDS($\vlambda^*, \vlambda_d$)}&35.3&55.2&&&43.3& & &-\\ \hline\hline 
-    \system{MDAC($\vlambda_1, \vlambda_2$)}&36.2&-&-&-&46.1&-&-&- \\
-    \system{DDS($\vlambda_1, \vlambda_2$)}&36.5&-&-&-&44.4&-&-&- \\
-    \system{MDAC($\vlambda_1, \vlambda_2$)}&-&57.2&53.8&-&-&-&-&- \\
-    \system{DDS($\vlambda_1, \vlambda_2$)}&-&56.1&52.6&-&-&-&-&- \\
-    \system{MDAC($\vlambda_1, \vlambda_2$)}&-&-&-&32&-&90&-&- \\
-    \system{DDS($\vlambda_1, \vlambda_2$)}&-&-&-&32.9&-&91.1&-&- \\ \hline
+     \system{DDS($\vlambda^*, \vlambda_d$)}&35.3&55.2&49.4&30.6&43.3&89.9&50.6&-\\ \hline
   \end{tabular}
-  \caption{Improved results for DDS in fine-tuning and various multi-domain adaptation settings.}
-  \label{tab:basic-dds}
+  \caption{Non empty columns correspond to the target domains. For a given line, each non empty column correspond to one expert system.}
+  \label{tab:unsupervised-da}
 \end{table*}
 
 \subsubsection{Unseen domain}
+The top of the table \ref{tab:unsupervised-da} demonstrates the performance on the unseen domain \domain{news} of the NMT systems trained with the mixtures $\lambda^l \in \big[ \lambda_0, \lambda_{0.25}, \lambda_{0.5}, \lambda_{0.75}, \lambda_{1.0}\big]$ and dynamic data selection MDAC and DDS. These systems have insignificant differences in BLEU, showing that dynamic mixture does not improve the robustness of the NMT system against unseen domains. However, the fact that the performance of MDAC and DDS is close to the best performance guarantees the harmlessness of these algorithms to the robustness of the NMT model.
+
 \subsubsection{Automatic clustering}
+The bottom of the table \ref{tab:unsupervised-da} shows the performance of NMT systems adapted to each domain in using 30 clusters instead of 6 domains. According to the table, MDAC outperforms DDS on every domain, proving the efficacy of the method in this situation where no information of the domain is given a priori.
 
 \section{Related Work \label{sec:related}}
 
