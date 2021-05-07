@@ -1,47 +1,46 @@
-%
-% File acl2021.tex
-%
-%% Based on the style files for EMNLP 2020, which were
-%% Based on the style files for ACL 2020, which were
-%% Based on the style files for ACL 2018, NAACL 2018/19, which were
-%% Based on the style files for ACL-2015, with some improvements
-%%  taken from the NAACL-2016 style
-%% Based on the style files for ACL-2014, which were, in turn,
-%% based on ACL-2013, ACL-2012, ACL-2011, ACL-2010, ACL-IJCNLP-2009,
-%% EACL-2009, IJCNLP-2008...
-%% Based on the style files for EACL 2006 by 
-%%e.agirre@ehu.es or Sergi.Balari@uab.es
-%% and that of ACL 08 by Joakim Nivre and Noah Smith
+% This must be in the first 5 lines to tell arXiv to use pdfLaTeX, which is strongly recommended.
+\pdfoutput=1
+% In particular, the hyperref package requires pdfLaTeX in order to break URLs across lines.
 
-\documentclass[11pt,a4paper]{article}
-\usepackage[hyperref]{acl2021}
+\documentclass[11pt]{article}
+
+% Remove the "review" option to generate the final version.
+\usepackage[review]{emnlp2021}
+
+% Standard package includes
 \usepackage{times}
 \usepackage{latexsym}
-%\renewcommand{\UrlFont}{\ttfamily\small}
 
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+\renewcommand{\UrlFont}{\ttfamily\small}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{multirow}
+\usepackage{xcolor,colortbl}
+\usepackage{amsmath}
+%\usepackage{fdsymbol}
+\usepackage{amssymb}
+\usepackage{makecell}
+\usepackage[super]{nth}
+\usepackage{arydshln}
+
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{regexpatch}
+\usepackage{subcaption}
 % This is not strictly necessary, and may be commented out,
 % but it will improve the layout of the manuscript,
 % and will typically save some space.
 \usepackage{microtype}
-\usepackage{graphicx}
 
-%\aclfinalcopy % Uncomment this line for the final submission
-%\def\aclpaperid{***} %  Enter the acl Paper ID here
-
-%\setlength\titlebox{5cm}
-% You can expand the titlebox if you need extra space
-% to show all the authors. Please do not make the titlebox
-% smaller than 5cm (the original size); we will check this
-% in the camera-ready version and ask you to change it back.
-
-\newcommand\BibTeX{B\textsc{ib}\TeX}
-
-% Standard package includes
-\usepackage{times}
 \usepackage{url}
-\usepackage{latexsym}
-\usepackage{graphicx}
-\usepackage{xcolor}
 \usepackage{longtable}
 \usepackage{tikz}
 \usetikzlibrary{calc}
@@ -49,10 +48,7 @@
 \usepackage[normalem]{ulem}
 \usepackage{xspace}
 \usepackage{float}
-\usepackage{amsmath,amsfonts,amssymb}
-\usepackage{algorithm, algorithmic}
 
-\usepackage{tikz}
 \usepackage{pgfplots}
 \usepackage{pgfplotstable}
 
@@ -97,7 +93,7 @@
 \usepackage{multirow}
 \usepackage{adjustbox}
 
-\title{Multi-Domain Adaptation in Neural Machine Translation with dynamic sampling strategy}
+\title{Multi-Domain Adaptation in Neural Machine Translation with Dynamic Sampling Strategies}
 
 \author{First Author \\
   Affiliation / Address line 1 \\
@@ -117,7 +113,7 @@
 \setlength{\abovedisplayskip}{2pt}
 \setlength{\belowdisplayskip}{2pt}
 \begin{abstract}
-  When building machine translation systems, one often needs to make the best out of heterogeneous sets of parallel data in training to achieve the best test performance in one or several domain(s) of interest. This multi-source / multi-domain adaptation problem is often approached with instance selection or reweighting strategies, most of which pre-suppose an ex-ante assessment of the relevance of training instances. In this paper, we propose a novel dynamic data selection algorithm that re-evaluates the data utility and adapts the data selection policy along with the training of the NMT model. We explore the ability of our method to serve as a generic framework for the previously mentioned situations.
+  Building effective Neural Machine Translation models often implies to accomodate diverse sets of heterogeneous data so as to optimize performance for the domain(s) of interest. Such multi-source / multi-domain adaptation problems are typically approached through instance selection or reweighting strategies, based on a static assessment of the relevance of training instances with respect to the task at hand. In this paper, we study dynamic data selection strategies that are able to automatically re-evaluate the usefulness of data samples and to evolve a data selection policy in the course of training. Based on the results of multiple experiments, we show that such methods constitute a generic framework to automatically and effectively cater for a variety of real-world situations, from supervised multi-source domain adaptation to multi-domain learning and unsupervised domain adaptation. 
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
