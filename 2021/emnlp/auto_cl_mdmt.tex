@@ -164,7 +164,7 @@ Where
 \begin{equation}
 \begin{array}{rcl}
 \theta_{t+i} &=& Update\big(\theta_{t+i-1},[x^i_j,y^i_j]_{j=1}^N\big) \\ \nonumber
-x^i_j, y^i_j &\sim& \widehat{D^l_d}(x) \\
+x^i_j, y^i_j &\sim& \widehat{D^l_d}(x) \; \; \forall j \in [1,\cdots,N] \\
 J^t(\theta,\lambda_t) &=& \displaystyle{\mathop{\sum}_{d=1}^{n_d}}\lambda^t(d)\displaystyle{\mathop{\sum}_{x^t_d,y^t_d \in \widehat{D^t_d}}} l(\theta,x^t_d,y^t_d)
 \end{array}
 \end{equation}
@@ -227,8 +227,7 @@ with $\alpha \in [0,0.25,0.5,0.75,1.0]$. These systems are denoted \system{Mixed
 \item Our comparison of multi-domain systems includes baselines with fixed data mixtures corresponding to $\lambda^l \in \big[ \lambda_0, \lambda_{0.25}, \lambda_{0.5}, \lambda_{0.75}, \lambda_{1.0}\big]$, and our reimplementations of recent proposals from the literature: Curriculum Learning of \cite{Zhang19curriculum} that we denote CL and Differential Data Selection of \cite{Wang20balancing} that we denote DDS.
 \end{itemize}
 
-All models use embeddings and hidden layers sizes of dimension~512. Transformer models contain 8~attention heads in each of the 6+6 layers; the inner feedforward layer contains 2048 cells. The adapter-based systems (see below) additionally use an adaptation block in each layer, composed of a 2-layer perceptron, with an inner $\operatorname{ReLU}$ activation function operating on normalized entries of dimension~1024. 
-Training uses batches of~12,288 tokens, Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$, Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ in all layers. We train all systems with 200~000 iterations.
+All models use embeddings and hidden layers sizes of dimension~512. Transformer models contain 8~attention heads in each of the 6+6 layers; the inner feedforward layer contains 2048 cells. Training uses batches of~12,288 tokens, Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$, Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ in all layers. We train all systems with 200~000 iterations.
 
 \subsection{MDAC systems} \label{ssec:dds-sys}
 The behavior of MDAC only depends on (a) the initial domain distribution at the start of training $\vlambda^{l}_{t=0}$, and (b) the targeted (dev/test) distribution $\vlambda^{t}$. We will thus report these systems as \system{MDAC($\vlambda^{l}_{t=0}$, $\vlambda^{t}$)}. We also compare our method with the method DDS under the same conditions.
@@ -240,7 +239,7 @@ In our work, we simply parameterize the distribution $\lambda^l$ as follows.
 \end{equation}
 We choose $\beta=2$ for our experiments.
 
-We also provide in this section our choices of the hyper-parameters of our algorithm including the number of simulation training steps $k=10$, and the learning rate $\mathbf{lr}_{data}=0.001$. We update the sampling distribution via 100 gradient descent iterations for almost the experimental settings except that for adaptation with automatic cluster \ref{ssec:clda}, we use 20 gradient descent iterations. We split the training into 100 short sessions that last 2000 training steps each. The choice of those hyper-parameters is mostly heuristic except for the learning rate $\mathbf{lr}_{data}$ which is optimized via grid search over a range of values $[0.001,0.0025,0.005]$
+We also provide in this section our choices of the hyper-parameters of our algorithm including the number of simulation training steps $k=10$, and the learning rate $\mathbf{lr}_{data}=0.001$. We update the sampling distribution via 100 gradient descent iterations for almost the experimental settings except that for adaptation with automatic clusters \ref{ssec:clda}, we use 20 gradient descent iterations. We split the training into 100 short sessions that last 2000 training steps each. The choice of those hyper-parameters is mostly heuristic except for the learning rate $\mathbf{lr}_{data}$ which is optimized via grid search over a range of values $[0.001,0.0025,0.005]$
 \subsection{CL and DDS's re-implementation}
 We re-implement DDS in Tensorflow without any change in the choices of parameterization and hyper-parameters compared to original code of \citet{Wang20balancing} \footnote{\url{https://github.com/cindyxinyiwang/multiDDS}}.
 
@@ -348,12 +347,12 @@ We show in the below figure \ref{fig:sampling}, the evolution of the training mi
   \centering \small
   \begin{tabular}{|l|*9{r|}} \hline
     domain \hfill $d=$ & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{mean} & \multicolumn{1}{|c|}{\domain{news}} \\ \hline \hline
-    \system{MDAC($\vlambda_1, \vlambda_2$)}&36.2&-&-&-&46.1$^*$&-&-&- \\
-    \system{DDS($\vlambda_1, \vlambda_2$)}&36.5&-&-&-&44.4&-&-&- \\
-    \system{MDAC($\vlambda_1, \vlambda_2$)}&-&57.2$^*$&53.8$^*$&-&-&-&-&- \\
-    \system{DDS($\vlambda_1, \vlambda_2$)}&-&56.1&52.6&-&-&-&-&- \\
-    \system{MDAC($\vlambda_1, \vlambda_2$)}&-&-&-&32&-&90&-&- \\
-    \system{DDS($\vlambda_1, \vlambda_2$)}&-&-&-&32.9&-&91.1&-&- \\ \hline
+    \system{MDAC($\vlambda_0, \vlambda_2$)}&36.2&-&-&-&46.1$^*$&-&-&- \\
+    \system{DDS($\vlambda_0, \vlambda_2$)}&36.5&-&-&-&44.4&-&-&- \\
+    \system{MDAC($\vlambda_0, \vlambda_2$)}&-&57.2$^*$&53.8$^*$&-&-&-&-&- \\
+    \system{DDS($\vlambda_0, \vlambda_2$)}&-&56.1&52.6&-&-&-&-&- \\
+    \system{MDAC($\vlambda_0, \vlambda_2$)}&-&-&-&32&-&90&-&- \\
+    \system{DDS($\vlambda_0, \vlambda_2$)}&-&-&-&32.9&-&91.1&-&- \\ \hline
   \end{tabular}
   \caption{Non empty columns correspond to the target domains. For a given line, all the non empty columns \emph{correspond to the same bi-domain system}. ($^*$) MDAC is significantly better than DDS with $p<0.05$.}
   \label{tab:bi-da}
@@ -385,18 +384,18 @@ According to Table \ref{tab:bi-da}, MDAC outperforms DDS in 2 over 3 settings in
 The top of Table \ref{tab:unsupervised-da} displays the performance on the unseen domain \domain{news} for NMT systems trained with the mixtures $\lambda^l \in \big[ \lambda_0, \lambda_{0.25}, \lambda_{0.5}, \lambda_{0.75}, \lambda_{1.0}\big]$ and dynamic data selection MDAC and DDS. These systems have insignificant differences in BLEU, showing that dynamic mixture does not improve the robustness of the NMT system against unseen domains. However, the fact that the performance of MDAC and DDS is close to the best performance guarantees the harmlessness of these algorithms to the robustness of the NMT model.
 
 \subsection{Automatic clustering}\label{ssec:clda}
-The bottom of Table \ref{tab:unsupervised-da} shows the performance of NMT systems adapted to each domain in using 30 clusters instead of 6 domains. According to Table \ref{tab:unsupervised-da}, MDAC underperforms the same version under the domain adaptation setting \ref{ssec:da}. However, automatic clustering could make the situations harder than the conventional settings where  
+The bottom of Table \ref{tab:unsupervised-da} shows the performance of NMT systems adapted to each domain in using 30 clusters instead of 6 domains. According to Table \ref{tab:unsupervised-da}, MDAC underperforms the same version under the domain adaptation setting \ref{ssec:da}. However, automatic clustering could make the situations harder than the conventional settings where 
 \section{Related Work \label{sec:related}}
 
-Domain adaptation is an ancient and vexing problem that has been studied from many angles both for SMT and NMT. A survey of supervised and unsupervised DA for NMT is in \citet{Chu18asurvey}, where they distinguish between data-centric and model-centric DA, a view also adapted in the more recent review of \citet{Saunders21domain}. Our approach to DA in this paper clearly falls under the former category. We refer interested readers to these refrences, and do not discuss review DA any further.
+Domain adaptation is an ancient and vexing problem that has been studied from many angles both for SMT and NMT. A survey of supervised and unsupervised DA for NMT is in \citet{Chu18asurvey}, where they distinguish between data-centric and model-centric DA, a view also adopted in the more recent review of \citet{Saunders21domain}. Our approach to DA in this paper clearly falls under the former category. We refer interested readers to these references and do not discuss review DA any further.
 
 Multi-domain adaptation (MDA) aims to develop systems that simultaneously bode well for several domains. Like for DA, techniques for supervised MDA typically combine one or several ingredients: (a) the specialization of data representations \citep{Kobus17domaincontrol} or of sub-networks \citep{Pham19generic} to differentiate the processing of each domain; (b) the use of adversarial techniques to neutralize differences between domains \cite{Britz17mixing,Zeng18multidomain}; (c) the use of automatic domain identification e.g.\ \citet{Jiang19multidomain}. Unsupervised MDA is considered in \citet{Farajian17multidomain} as an unsupervised DA problem.
 
-Most approaches to adaptive / dynamic data selection take inspiration from \citet{Bengio09curriculum}, where the notion of \emph{curriculum learning} (CL) is initially introduced. CL is relies on a notion of ``easyness'' of a sample to schedule the presentation of the training data so that the easiest examples  presented first and the hardest, last. CL has been showed to speed up learning. While the initial aim was to improve and speed up training, it has also proven useful for domain adaptive / multi-domain / multi-lingual MT, based on alternative definitons of ``easyness''.
+Most approaches to adaptive / dynamic data selection take inspiration from \citet{Bengio09curriculum}, where the notion of \emph{curriculum learning} (CL) is initially introduced. CL relies on the notion of ``easiness'' of a sample to schedule the presentation of the training data so that the easiest examples presented first and the hardest, last. CL has been shown to speed up learning. While the initial aim was to improve and speed up training, it has also proven useful for domain adaptive / multi-domain / multi-lingual MT, based on alternative definitions of ``easiness''.
 
-For instance, \citet{Zhang19curriculum} study supervised domain adaptation, and propose a curriculum approach which progressively extends the data used in training: in the early stages only in-data is used, while shards containing less relevant\footnote{Domain distance is computed with Lewis-Moore scores (based on the cross-entropy of in-domain LM).} data are introduced in later stages. This is somehow opposite to the recommendations of \citet{Vanderwees17dynamic}, whose \emph{gradual fine-tuning} progressively focuses on the in-domain data.\fyTodo{These have not been compared ? and also to what we do ?} 
+For instance, \citet{Zhang19curriculum} study supervised domain adaptation, and propose a curriculum approach which progressively extends the data used in training: in the early stages only in-data is used, while shards containing less relevant\footnote{Domain distance is computed with Lewis-Moore scores (based on the cross-entropy of in-domain LM).} data are introduced in later stages. This is somehow opposite to the recommendations of \citet{Vanderwees17dynamic}, whose \emph{gradual fine-tuning} progressively focuses on the in-domain data.\fyTodo{These have not been compared? and also to what we do ?} 
 
-\citet{Kumar19reinforcement} use reinforcement techniques (deep Q-learning) to learn the curriculum strategy: in this study, complexity corresponds to difficulty levels and which are binned based on contrastive data selection. The reward is based on the increase of the development set loss that results from the actual data selection strategy.\fyTodo{Alert: what do we do during warm up ?} The same technique is recently applied to the training of a multilingual NMT system \citep{Kumar21learning}. \citet{Zhou20uncertainty} propose another curriculum-based approach which instead relies on \emph{instance uncertainty} as a measure of their difficulty and presents the data sample starting with the easiest (more predictable) first. Another contribution of this paper is an alternative criterium for stopping the training. More related to our problems, \citet{Wang20learning-multi} adapt curriculum learning for multi-domain adaptation, where an optimal instance weighting scheme is found using Bayesian optimization (derivative-free) techniques. Each step consists in (a) weighting the instances based on relevance features, (b) fine tuning current model using the (weighted) training set, and is applied iteratively to generate a sequence of models. The one that maximizes the development set performance is finally retained.
+\citet{Kumar19reinforcement} use reinforcement techniques (deep Q-learning) to learn the curriculum strategy: in this study, complexity corresponds to difficulty levels and which are binned based on contrastive data selection. The reward is based on the increase of the development set loss that results from the actual data selection strategy.\fyTodo{Alert: what do we do during warm-up ?} The same technique is recently applied to the training of a multilingual NMT system \citep{Kumar21learning}. \citet{Zhou20uncertainty} propose another curriculum-based approach which instead relies on \emph{instance uncertainty} as a measure of their difficulty and presents the data sample starting with the easiest (more predictable) first. Another contribution of this paper is an alternative criterium for stopping the training. More related to our problems, \citet{Wang20learning-multi} adapt curriculum learning for multi-domain adaptation, where an optimal instance weighting scheme is found using Bayesian optimization (derivative-free) techniques. Each step consists of (a) weighting the instances based on relevance features, (b) fine-tuning a pretrained model using the (weighted) training set, and is applied iteratively to generate a sequence of models. The one that maximizes the development set performance is finally retained.
 
 \section*{Acknowledgments}
 \bibliographystyle{acl_natbib}
