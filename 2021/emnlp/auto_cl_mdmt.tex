@@ -234,20 +234,21 @@ All models use embeddings and hidden layers sizes of dimension~512. Transformer 
 Training uses batches of~12,288 tokens, Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$, Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ in all layers. We train all systems with 200~000 iterations.
 
 \subsection{MDAC systems} \label{ssec:dds-sys}
-The behavior of MDAC only depends on (a) the initial domain distribution at the start of training $\vlambda^{l}_{t=0}$, and (b) the targeted (dev/test) distribution $\vlambda^{t}$. We will thus report these systems as \system{MDAC($\vlambda^{l}_{t=0}$, $\vlambda^{t}$)}. We also compare our method with the DDS method under the same conditions.
+The behavior of MDAC only depends on (a) the initial domain distribution at the start of training $\vlambda^{l}_{t=0}$, and (b) the targeted (dev/test) distribution $\vlambda^{t}$. We will thus report these systems as \system{MDAC($\vlambda^{l}_{t=0}$, $\vlambda^{t}$)}. We also compare our method with DDS under the same settings.
 
-In our work, we simply parameterize the distribution $\lambda^l$ as follows.
+In our work, we simply parameterize the distribution $\lambda^l$ as follows (with $\beta=2$ in all our experiments):\fyTodo{Explain why}
 \begin{equation}
 \lambda
-^l(d;\vpsi) = \frac{\vpsi[d]^\beta}{\sum_i \vpsi[i]^\beta} \nonumber
+^l(d;\vpsi) = \frac{\vpsi[d]^\beta}{\sum_i \vpsi[i]^\beta}. \nonumber
 \end{equation}
-We choose $\beta=2$ for our experiments.
 
-We also provide in this section our choices of the hyper-parameters of our algorithm including the number of simulation training steps $k=10$, and the learning rate $\mathbf{lr}_{data}=0.001$. We update the sampling distribution via 100 gradient descent iterations for almost the experimental settings except that for adaptation with automatic cluster \ref{ssec:clda}, we use 20 gradient descent iterations. We split the training into 100 short sessions that last 2000 training steps each. The choice of those hyper-parameters is mostly heuristic except for the learning rate $\mathbf{lr}_{data}$ which is optimized via grid search over a range of values $[0.001,0.0025,0.005]$
-\subsection{CL and DDS's re-implementation}
-We re-implement DDS in Tensorflow without any change in the choices of parameterization and hyper-parameters compared to original code of \citet{Wang20balancing} \footnote{\url{https://github.com/cindyxinyiwang/multiDDS}}.
+Additional choices for the hyper-parameters of our method include the number of simulation steps $k=10$ and the learning rate $\mathbf{lr}_{data}=0.001$. We update the sampling distribution via 100 gradient descent iterations for almost all experimental settings except that for adaptation with automatic clusters (Section \ref{ssec:clda}), where we use 20 gradient descent iterations.\fyTodo{Why? computation?} We split the training into 100 short sessions that last 2000 training steps each. The choice of those hyper-parameters is mostly heuristic except for the learning rate $\mathbf{lr}_{data}$ which is optimized via grid search over a range of values $[0.001,0.0025,0.005]$.
 
-We re-implement the work of \citet{Zhang19curriculum} by following exactly the description of the algorithm. For each experiment of adapting the NMT system to one domain, we combine the training data of other domains into one corpus, then compute the cross-entropy difference score of each sentence of this corpus (we only compute the score for the source side). We sort and split the corpus into 9 shards and execute curriculum learning with 10 shards in which the first shard is the in-domain corpus.
+\subsection{CL and DDS's re-implementation}\fyTodo{Right place for this ?}
+We re-implement DDS in Tensorflow without any change in the choices of parameterization and hyper-parameters compared to original code of \citet{Wang20balancing}.\footnote{\url{https://github.com/cindyxinyiwang/multiDDS}}
+
+We also re-implement the work of \citet{Zhang19curriculum} according to the authors' description of the algorithm. For each domain adaptation experiment, we combine the training data of all other domains into one corpus, then compute the cross-entropy difference score of each source sentence of this combined dataset. We then sort and split the corpus into 9 shards and execute curriculum learning with 10 shards, using the in-domain corpus as the first shard.
+
 \subsection{Experimental tasks}
 We evaluate the efficacy of our methods compared to several aforementioned baselines via 5 tasks including domain adaptation; multi-domain adaptation, bi-domain adaptation, unseen domain adaptation, and unsupervised domain adaptation.
 
