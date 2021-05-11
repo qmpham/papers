@@ -250,17 +250,17 @@ We re-implement DDS in Tensorflow without any change in the choices of parameter
 We also re-implement the work of \citet{Zhang19curriculum} according to the authors' description of the algorithm. For each domain adaptation experiment, we combine the training data of all other domains into one corpus, then compute the cross-entropy difference score of each source sentence of this combined dataset. We then sort and split the corpus into 9 shards and execute curriculum learning with 10 shards, using the in-domain corpus as the first shard.
 
 \subsection{Experimental tasks}
-We evaluate the efficacy of our methods compared to several aforementioned baselines via 5 tasks including domain adaptation; multi-domain adaptation, bi-domain adaptation, unseen domain adaptation, and unsupervised domain adaptation.
+We evaluate and compare our method with multiple baselines in 5~tasks including: domain adaptation; multi-domain adaptation, bi-domain adaptation, unseen domain adaptation, and unsupervised domain adaptation.
 
-In the domain adaptation task, given the data of 6 domains including \domain{med}, \domain{bank}, \domain{law}, \domain{it}, \domain{talk}, \domain{rel}, we aim to build expert NMT models for each domain respectively.
+In the domain adaptation task, given the data from 6 domains (\domain{med}, \domain{bank}, \domain{law}, \domain{it}, \domain{talk}, \domain{rel}), we aim to build distinct expert NMT models for each domain.
 
-In the multi-domain adaptation task, given the data of 6 domains, we aim to build an NMT model which gives the best performance regarding a predefined test set containing equivalently 6 domains.
+In the multi-domain adaptation task, given the same 6 domains, we aim to build one single NMT model that would perform optimally assuming a uniform distribution of domains during the test.
 
-In the bi-domain adaptation task, given the data of 6 domains, we only focus on 2 domains of them.
+In the bi-domain adaptation task, given again same 6 domains, we only focus on adapating only to 2 domains.
 
-In the fourth experiment, given the data of 6 domains and a small dev set of an unseen domain, which is News, in this case, we aim to build an NMT model which is robust to the unseen domain.
+In the fourth experiment, given training data in 6 domains and a small development set of an new domain, (\domain{News} in our case) we aim to build an NMT model which will perform well on test data from the unseen domain.
 
-In the unsupervised domain adaptation task, we cluster the training data of 6 domains into 30 clusters using the KNN algorithm in the same way as in the work of \citet{Tars18multidomain}, then adapt these clusters to one of 6 domains given the corresponding in-domain dev set. We compare MDAC to DDS over 6 domains.
+Finally, in the unsupervised domain adaptation task, we cluster all available training data into 30 clusters using the KNN algorithm in the same way as in the work of \citet{Tars18multidomain}, then adapt these clusters to one of 6 domains given the corresponding in-domain dev set. We compare MDAC to DDS over 6 domains.
 
 \section{Results and discussion \label{sec:results}}
 
