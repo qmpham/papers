@@ -225,16 +225,16 @@ q_d = \frac{\mid N^{s}_d \mid}{\displaystyle{N^{s}}} % \mathop{\sum}_{i=1}^K\mid
 \end{align} \setlength{\abovedisplayskip}{2pt}
 \setlength{\belowdisplayskip}{2pt} 
 with $\alpha \in [0,0.25,0.5,0.75,1.0]$. These systems are denoted \system{Mixed-$\alpha$} below. \system{Mixed-$0$} uses a uniform domain distribution, \system{Mixed-$1.0$} uses the observed domain distribution.
-\item fine-tuned models \cite{Luong15stanford,Freitag16fast}, based on the \system{Mixed-$1.0$} system, further trained on each domain for at most 50~000 iterations, with early stopping when the dev BLEU stops increasing. The full fine-tuning (\system{FT-Full}) procedure may update all the parameters of the initial generic model, resulting in six systems each adapted for one domain, with no parameter sharing across domains.
+\item finetuned models \citep{Luong15stanford,Freitag16fast}, based on the \system{Mixed-$1.0$} system, further trained on each domain for at most 50~000 iterations, with early stopping when the dev BLEU stops increasing.\fyTodo{for ?? iterations} The full finetuning (\system{FT-Full}) procedure may update all the parameters of the initial generic model, resulting in six systems each adapted for one domain, with no parameter sharing across domains.
  
-\item Our comparison of multi-domain systems includes baselines with fixed data mixtures corresponding to $\lambda^l \in \big[ \lambda_0, \lambda_{0.25}, \lambda_{0.5}, \lambda_{0.75}, \lambda_{1.0}\big]$, and our reimplementations of recent proposals from the literature: Curriculum Learning of \cite{Zhang19curriculum} that we denote CL and Differential Data Selection of \cite{Wang20balancing} that we denote DDS.
+\item Our comparison of multi-domain systems\fyTodo{CL is only dynamic ?} includes baselines with fixed data mixtures corresponding to $\lambda^l \in \big[ \lambda_0, \lambda_{0.25}, \lambda_{0.5}, \lambda_{0.75}, \lambda_{1.0}\big]$, and our reimplementations of recent proposals from the literature: Curriculum Learning (CL) of \citet{Zhang19curriculum} and Differential Data Selection (DDS) of \citet{Wang20balancing}.
 \end{itemize}
 
 All models use embeddings and hidden layers sizes of dimension~512. Transformer models contain 8~attention heads in each of the 6+6 layers; the inner feedforward layer contains 2048 cells. The adapter-based systems (see below) additionally use an adaptation block in each layer, composed of a 2-layer perceptron, with an inner $\operatorname{ReLU}$ activation function operating on normalized entries of dimension~1024. 
 Training uses batches of~12,288 tokens, Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$, Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ in all layers. We train all systems with 200~000 iterations.
 
 \subsection{MDAC systems} \label{ssec:dds-sys}
-The behavior of MDAC only depends on (a) the initial domain distribution at the start of training $\vlambda^{l}_{t=0}$, and (b) the targeted (dev/test) distribution $\vlambda^{t}$. We will thus report these systems as \system{MDAC($\vlambda^{l}_{t=0}$, $\vlambda^{t}$)}. We also compare our method with the method DDS under the same conditions.
+The behavior of MDAC only depends on (a) the initial domain distribution at the start of training $\vlambda^{l}_{t=0}$, and (b) the targeted (dev/test) distribution $\vlambda^{t}$. We will thus report these systems as \system{MDAC($\vlambda^{l}_{t=0}$, $\vlambda^{t}$)}. We also compare our method with the DDS method under the same conditions.
 
 In our work, we simply parameterize the distribution $\lambda^l$ as follows.
 \begin{equation}
