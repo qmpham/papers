@@ -1,0 +1,207 @@
+% This must be in the first 5 lines to tell arXiv to use pdfLaTeX, which is strongly recommended.
+\pdfoutput=1
+% In particular, the hyperref package requires pdfLaTeX in order to break URLs across lines.
+
+\documentclass[11pt]{article}
+
+% Remove the "review" option to generate the final version.
+\usepackage[review]{emnlp2021}
+
+% Standard package includes
+\usepackage{times}
+\usepackage{latexsym}
+
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+\renewcommand{\UrlFont}{\ttfamily\small}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{multirow}
+\usepackage{xcolor,colortbl}
+\usepackage{amsmath}
+%\usepackage{fdsymbol}
+\usepackage{amssymb}
+\usepackage{makecell}
+\usepackage[super]{nth}
+\usepackage{arydshln}
+\usepackage{algorithm,algorithmic}
+%\usepackage[noend]{algpseudocode}
+\usepackage{regexpatch}
+\usepackage{subcaption}
+% This is not strictly necessary, and may be commented out,
+% but it will improve the layout of the manuscript,
+% and will typically save some space.
+\usepackage{microtype}
+
+\usepackage{url}
+\usepackage{longtable}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage[draft]{todo}
+\usepackage[normalem]{ulem}
+\usepackage{xspace}
+\usepackage{float}
+
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+
+\let\oldbibitem\bibitem
+\def\bibitem{\vfill\oldbibitem}
+
+\usepackage{soulutf8}
+\usepackage{tabularx}
+
+\usepackage{multirow}
+\usepackage{adjustbox}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyTodostar}[1]{\Todo*[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyFuture}[1]{\done[FY]\Todo[FY:]{\textcolor{red}{#1}}}
+\newcommand{\fyDonestar}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+
+\newcommand{\revision}[1]{\textcolor{red}{#1}}
+\newcommand{\revisiondel}[1]{}
+\newcommand{\src}{\ensuremath{\mathbf{f}}} % source sentence
+\newcommand{\trg}{\ensuremath{\mathbf{e}}} % target sentence
+\newcommand{\domain}[1]{\texttt{\textsc{#1}}}
+\newcommand{\system}[1]{\texttt{{#1}}}
+
+\newcommand{\vlambda}{\ensuremath{\boldsymbol\lambda}\xspace} % parameters vector for a distribution
+\newcommand{\vtheta}{\ensuremath{\boldsymbol\theta}\xspace} % parameters vector for a distribution
+\newcommand{\vpsi}{\ensuremath{\boldsymbol\psi}\xspace} % parameters vector for a distribution
+\newcommand{\indic}[1]{\ensuremath{\mathbb{I}(#1)}}
+% \newcommand{\SB}[1]{\textcolor{green}{#1}}
+% \newcommand{\SW}[1]{\textcolor{red}{#1}}
+\newcommand{\SB}[1]{\textbf{#1}}
+\newcommand{\SW}[1]{\underline{#1}}
+% limits underneath
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\renewcommand\textfraction{.1}
+\renewcommand\floatpagefraction{.95}
+\newcommand{\sbcl}[2]{{\scriptsize #1 \hfill $|$ \hfill  #2}}
+\usepackage{multirow}
+\usepackage{adjustbox}
+
+\title{Supplementary materials}
+
+\author{First Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\\And
+  Second Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\}
+
+\date{}
+
+\begin{document}
+\maketitle
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
+
+\section*{A - Generalized Multi-Domain Adaptation Dynamic Sampling Algorithm}
+We provide below in the pseudo algorithm \ref{alg:mdmt}  the generalized Multi-Domain Adaptation Dynamic Sampling Algorithm.
+\begin{algorithm}[htbp]
+\caption{Multi-Domain Adaptation Dynamic Sampling} \label{alg:mdmt}
+\begin{algorithmic}[1]
+\REQUIRE {
+\begin{itemize}
+	\item K corpora $C^d, d\in [1,..,K]$ for $K$ domains equipped by an empirical distribution $D_d(x)$
+	\item K dev sets $Dev^d, d\in [1,..,K]$ for $K$ domains.
+	\item Domain testing distribution $\lambda^t \in \mathbb{R}^K$
+	\item Batch size $B$
+	\item Domain Dynamic Sampling Distribution $\lambda^l(i) \in \mathbb{R}^K$ where $i$ is the enumeration of the iteration.
+	\item $Eval\_scores = []$
+	\item $Early\_stopping$ criterion
+	\item Total training iterations $iter\_num$
+	\item Updating rule of the sampling distribution $\lambda^l(i)$
+\end{itemize}}
+\REPEAT 
+\STATE{Iteration i.}
+\STATE{Randomly pick $d \in [1,..,K]$ from sampling distribution $\lambda^l(i)$}
+\STATE{Sample $B$ sentences from $C^d$ with empirical distribution $D_d(x)$}
+\STATE{Update model by applying SGD computed from $B$ sampled sentences}
+\IF{$i \equiv 0 \mod{eval\_step}$}
+	\STATE{Evaluate current model with $K$ dev sets. $S^i_d$ is the performance at iteration $i-th$ on domain $d$}
+	\STATE{Report weighted score using the domain testing distribution $\lambda^t$. $$eval(i) = \displaystyle{\mathop{\sum}_d^K \lambda^t(d) S^i_d}$$}
+	\STATE{$Eval\_scores.append(eval(i))$.}
+\ENDIF
+\IF{$i \equiv 0 \mod{sampler\_updating\_step}$}
+	\STATE Update $\lambda^l(i)$.
+\ENDIF
+\IF{$Early\_stopping(Eval\_scores)$}
+	\STATE{Break.}
+\ENDIF
+\UNTIL{$i> iter\_num$}
+\end{algorithmic}
+\end{algorithm}
+
+\section*{B - Experiments with automatic domains}
+\begin{table*}[htbp]
+  \centering
+  \footnotesize
+  \begin{tabular}{|p{1.3cm}|*{11}{c|}} \hline
+   Model  & size&\system{Mixed}&\system{FT}&\system{FT}&\system{MDL}&\system{DC}&\system{DC}&\multirow{2}{*}{\system{TTM}}&\multirow{2}{*}{\system{ADM}}&\multirow{2}{*}{\system{DM}}&\multirow{2}{*}{\system{LDR}}  \\ 
+   Cluster & train / test & \system{Nat} & \system{Full} & \system{Res} &\system{Res} & \system{Feat}& \system{Tag}& & & & \\ \hline
+24 \hfill [med]&8.1k / 3 &90.4&90.4&90.4&90.4&100.0&65.6&100.0&90.4&100.0&100.0 \\
+13 \hfill [-]&17.3k / 52&67.6&75.4&74.3&74.3&75.0&54.7&74.7&75.9&65.9&76.9 \\
+28 \hfill [-]&25.6k / 54&71.6&68.7&68.1&70.2&71.0&42.5&72.0&71.3&65.6&72.6 \\
+19 \hfill [IT]&27.2k / 88&58.5&63.0&60.9&63.9&63.7&57.2&59.4&61.1&60.5&60.3 \\
+0   \hfill [-]&27.4k / 72&43.9&33.3&45.4&45.4&49.9&15.4&46.8&49.2&46.6&47.8 \\
+22 \hfill [-]&27.5k / 103&91.5&93.7&93.4&93.9&92.5&72.8&92.3&93.2&91.4&93.4 \\
+25 \hfill [-]&28.2k / 56&57.0&44.8&48.2&49.1&54.6&47.2&49.8&54.2&45.1&52.4 \\
+16 \hfill [med]&30.4k / 18&57.2&70.4&77.4&73.5&61.8&54.2&58.4&58.1&52.5&58.3 \\
+23 \hfill [med]&47.0k / 23&24.5&27.2&26.5&28.5&30.5&27.3&32.0&24.4&29.0&29.8 \\
+17 \hfill [med]&54.4k / 26&39.9&40.3&41.6&38.0&37.1&36.6&35.2&35.4&31.3&33.7 \\
+8  \hfill [IT]&61.4k / 214&46.9&53.1&55.8&53.6&48.9&45.1&48.8&50.9&43.0&46.7 \\
+1 \hfill [-]&68.1k / 122&47.2&47.5&48.7&45.1&46.8&39.1&45.4&44.2&40.7&44.9 \\
+7 \hfill [med]&91.5k / 30&41.3&35.5&41.4&39.9&41.4&36.5&37.3&37.1&40.7&41.8 \\
+11 \hfill [med]&93.0k / 38&31.6&42.6&31.8&35.4&36.0&29.6&36.7&32.7&26.5&36.6 \\
+29 \hfill [law]&109.2k / 242&65.9&69.2&67.6&67.7&66.0&63.8&65.1&64.7&62.4&65.9 \\
+27 \hfill [med]&109.3k / 49&11.0&9.6&8.7&9.2&10.0&19.4&9.4&7.9&10.7&10.6 \\
+5 \hfill [-]&109.9k / 267&46.3&47.4&46.9&45.4&44.0&42.9&43.7&44.3&40.9&45.7 \\
+6 \hfill [med]&133.4k / 73&37.2&38.9&38.7&36.8&37.5&27.5&38.0&37.2&31.3&35.9 \\
+26 \hfill [-]&134.8k / 428&31.8&30.8&31.8&31.2&31.9&32.6&32.2&30.5&29.6&31.2 \\
+15 \hfill [bank]&136.9k / 674&46.5&51.5&47.9&48.0&46.6&46.0&45.8&45.7&42.9&46.0 \\
+4 \hfill [rel]&137.4k / 1016&77.1&85.3&83.5&83.3&75.8&46.1&74.2&73.3&63.2&75.9 \\
+2 \hfill [med]&182.6k / 85&70.6&75.8&71.7&69.4&68.2&67.3&67.3&68.6&65.6&68.2 \\
+20 \hfill [med]&183.0k / 71&47.4&47.2&46.8&47.2&48.4&47.5&48.8&47.3&47.1&46.8 \\
+21 \hfill [-]&222.8k / 868&38.7&38.8&39.0&37.2&37.5&35.9&36.9&37.1&33.4&37.0 \\
+10 \hfill [med]&225.4k / 115&40.0&42.6&40.0&38.2&39.9&35.8&39.5&39.1&36.3&40.7 \\
+18 \hfill [med]&245.0k / 106&57.7&60.3&58.7&58.6&58.4&56.3&57.3&56.1&54.9&55.9 \\
+9 \hfill [med]&301.6k / 145&37.2&37.3&36.5&36.1&36.4&37.7&36.4&35.2&34.2&37.0 \\
+3 \hfill [law]&323.5k / 680&50.1&52.0&50.8&50.1&49.1&48.3&49.0&48.2&44.4&49.1 \\
+14 \hfill [med]&334.0 / 146&31.6&31.4&31.9&33.0&32.5&34.1&31.4&32.1&30.5&31.8 \\
+12 \hfill [med]&356.4k / 148&36.3&36.6&35.9&35.9&35.8&37.0&36.4&35.4&34.2&36.3 \\ \hline
+  \end{tabular}
+  \caption{Complete results for the experiments with automatic domains. For each cluster, we report: the majority domain when one domain accounts for more than 75\% of the class; training and test sizes; and BLEU scores obtained with the various systems used in this study. Most test sets are too small to report significance tests.}
+  \label{tab:automatic_domains}
+\end{table*}
+
+This experiment aims to simulate with automatic domains a scenario where the number of ``domains'' is large and where some ``domains'' are close and can effectively share information. Full results in Table~\ref{tab:automatic_domains}. Cluster size vary from approximately 8k sentences (cluster~24) up to more than 350k sentences. More than 2/3 of these clusters mostly comprise texts from one single domain, as for cluster 12 which is predominantly \domain{med}, the remaining clusters typically mix 2 domains.
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
