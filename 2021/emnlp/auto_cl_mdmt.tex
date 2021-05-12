@@ -395,11 +395,20 @@ Domain adaptation is an ancient and vexing problem that has been studied from ma
 
 Multi-domain adaptation (MDA) aims to develop systems that simultaneously bode well for several domains. Like for DA, techniques for supervised MDA typically combine one or several ingredients: (a) the specialization of data representations \citep{Kobus17domaincontrol} or of sub-networks \citep{Pham19generic} to differentiate the processing of each domain; (b) the use of adversarial techniques to neutralize differences between domains \cite{Britz17mixing,Zeng18multidomain}; (c) the use of automatic domain identification e.g.\ \citet{Jiang19multidomain}. Unsupervised MDA is considered in \citet{Farajian17multidomain} as an unsupervised DA problem.
 
-Most approaches to adaptive / dynamic data selection take inspiration from \citet{Bengio09curriculum}, where the notion of \emph{curriculum learning} (CL) is initially introduced. CL relies on the notion of ``easiness'' of a sample to schedule the presentation of the training data so that the easiest examples presented first and the hardest, last. CL has been shown to speed up learning. While the initial aim was to improve and speed up training, it has also proven useful for domain adaptive / multi-domain / multi-lingual MT, based on alternative definitions of ``easiness''.
+Most approaches to adaptive / dynamic data selection take inspiration from \citet{Bengio09curriculum}, where the notion of \emph{curriculum learning} (CL) is initially introduced. CL relies on the notion of ``easyness'' of a sample to schedule the presentation of the training data so that the easiest examples presented first and the hardest, last. CL has been shown to speed up learning. While the initial aim was to improve and speed up training, it has also proven useful for domain adaptive / multi-domain / multi-lingual MT, based on alternative definitions of ``easiness''.\fyTodo{Ajouter Grave}
 
 For instance, \citet{Zhang19curriculum} study supervised domain adaptation, and propose a curriculum approach which progressively extends the data used in training: in the early stages only in-data is used, while shards containing less relevant\footnote{Domain distance is computed with Lewis-Moore scores (based on the cross-entropy of in-domain LM).} data are introduced in later stages. This is somehow opposite to the recommendations of \citet{Vanderwees17dynamic}, whose \emph{gradual fine-tuning} progressively focuses on the in-domain data.\fyTodo{These have not been compared? and also to what we do ?} 
 
 \citet{Kumar19reinforcement} use reinforcement techniques (deep Q-learning) to learn the curriculum strategy: in this study, complexity corresponds to difficulty levels and which are binned based on contrastive data selection. The reward is based on the increase of the development set loss that results from the actual data selection strategy.\fyTodo{Alert: what do we do during warm-up ?} The same technique is recently applied to the training of a multilingual NMT system \citep{Kumar21learning}. \citet{Zhou20uncertainty} propose another curriculum-based approach which instead relies on \emph{instance uncertainty} as a measure of their difficulty and presents the data sample starting with the easiest (more predictable) first. Another contribution of this paper is an alternative criterium for stopping the training. More related to our problems, \citet{Wang20learning-multi} adapt curriculum learning for multi-domain adaptation, where an optimal instance weighting scheme is found using Bayesian optimization (derivative-free) techniques. Each step consists of (a) weighting the instances based on relevance features, (b) fine-tuning a pretrained model using the (weighted) training set, and is applied iteratively to generate a sequence of models. The one that maximizes the development set performance is finally retained.
+
+\section{Conclusion and future work}
+\fyTodo{Write conclusion}
+
+Contribution : generic framework for several settings. // comparison of several dynamic strategies.
+
+Future work:
+slow down learning during warm up or normalize reward; handle large number of classes;} 
+too much importance to the dev ? randomize ?
 
 \section*{Acknowledgments}
 \bibliographystyle{acl_natbib}
