@@ -301,7 +301,7 @@ We initialize MDAC and DDS by 2 different distribution $\lambda_0$ and $\lambda_
 
 MDAC outperforms static training distributions including $\big[ \lambda_0, \lambda_{0.75}, \lambda_{1.0}\big]$ with significant margin while performs slightly better than $\big[ \lambda_{0.25}, \lambda_{0.5} \big]$. This observation indicates that MDAC allows us to skip the heuristic choice for the training mixture of different domains or tasks.
 
-The second observation is that DDS is again outperformed by MDAC with a significant margin of 0.5 BLEU on average. However, MDAC is surpassed by far with 1.8 BLEU in the domain \domain{med} by DDS. 
+The second observation is that DDS is again outperformed by MDAC with a significant margin of 1.5 BLEU on average. However, MDAC is surpassed by far with 1.6 BLEU in the domain \domain{med} by DDS. 
 
 We show in the below figure \ref{fig:sampling}, the evolution of the training mixture through training sessions. According to the figure \ref{fig:DDS} of DDS, the proportion of 6 domains converges rapidly to bi-domain mode in which only \domain{med} and \domain{rel} have significant probability. In contrast, the proportion of 6 domains computed by MDAC evolves smoothly; small domains including \domain{bank}, \domain{it}, \domain{talk} and \domain{rel} take larger proportion in the beginning then decrease their proportions while larger domains as \domain{med} and \domain{law} increase their proportions in the end where the NMT model might have been already close to the optimal performance in the smaller domains.
 
@@ -382,7 +382,7 @@ According to Table \ref{tab:bi-da}, MDAC outperforms DDS in 2 over 3 settings in
      \system{MDAC($\vlambda_0, \vlambda_{news}$)} &26.3 \\
      \cline{1-2}
   \end{tabular}
-  \caption{Non empty columns correspond to the target domains. For a given line, each non empty column correspond to one expert system. ($^*$)MDAC is significantly better than DDS.}
+  \caption{For a given line, each column correspond to one expert system. ($^*$)MDAC is significantly better than DDS.}
   \label{tab:unsupervised-da}
 \end{table*}
 
@@ -390,7 +390,7 @@ According to Table \ref{tab:bi-da}, MDAC outperforms DDS in 2 over 3 settings in
 The top of Table \ref{tab:unsupervised-da} displays the performance on the unseen domain \domain{news} for NMT systems trained with the mixtures $\lambda^l \in \big[ \lambda_0, \lambda_{0.25}, \lambda_{0.5}, \lambda_{0.75}, \lambda_{1.0}\big]$ and dynamic data selection MDAC and DDS. These systems have insignificant differences in BLEU, showing that dynamic mixture does not improve the robustness of the NMT system against unseen domains. However, the fact that the performance of MDAC and DDS is close to the best performance guarantees the harmlessness of these algorithms to the robustness of the NMT model.
 
 \subsection{Automatic clustering}\label{ssec:clda}
-The bottom of Table \ref{tab:unsupervised-da} shows the performance of NMT systems adapted to each domain in using 30 clusters instead of 6 domains. According to Table \ref{tab:unsupervised-da}, MDAC underperforms the same version under the domain adaptation setting \ref{ssec:da}. However, automatic clustering could make the situations harder than the conventional settings where 
+The bottom of Table \ref{tab:unsupervised-da} shows the performance of NMT systems adapted to each domain in using 30 clusters instead of 6 domains. According to Table \ref{tab:unsupervised-da}, MDAC underperforms the same version under the domain adaptation setting \ref{ssec:da}. However, automatic clustering could make the situations harder than the conventional settings where \fyTodo{more discussion here}.
 
 \section{Related Work \label{sec:related}}
 
@@ -398,7 +398,7 @@ Domain adaptation is an ancient and vexing problem that has been studied from ma
 
 Multi-domain adaptation (MDA) aims to develop systems that simultaneously bode well for several domains. Like for DA, techniques for supervised MDA typically combine one or several ingredients: (a) the specialization of data representations \citep{Kobus17domaincontrol} or of sub-networks \citep{Pham19generic} to differentiate the processing of each domain; (b) the use of adversarial techniques to neutralize differences between domains \citep{Britz17mixing,Zeng18multidomain}; (c) the use of automatic domain identification e.g.\ \citet{Jiang19multidomain}. Unsupervised MDA is considered in \citet{Farajian17multidomain} as an instance of unsupervised DA.
 
-Most approaches to adaptive / dynamic data selection take inspiration from \citet{Bengio09curriculum}, where the notion of curriculum learning is initially introduced. CL relies on the notion of ``easyness'' of a sample to schedule the presentation of the training data so that the easiest examples presented first and the hardest, last. Various ways to automate CL using the framework of multi-armed bandits are notably explored in \citep{Graves17automated}, which has been an inspiration for our implementation. While the initial aim was primarily to improve and speed up training, CL has also proven useful for domain adaptive / multi-domain / multi-lingual MT, based on alternative definitions of ``easiness''.\fyDone{Ajouter Grave}
+Most approaches to adaptive / dynamic data selection take inspiration from \citet{Bengio09curriculum}, where the notion of curriculum learning is initially introduced. CL relies on the notion of ``easiness'' of a sample to schedule the presentation of the training data so that the easiest examples presented first and the hardest, last. Various ways to automate CL using the framework of multi-armed bandits are notably explored in \citep{Graves17automated}, which has been an inspiration for our implementation. While the initial aim was primarily to improve and speed up training, CL has also proven useful for domain adaptive / multi-domain / multi-lingual MT, based on alternative definitions of ``easiness''.\fyDone{Ajouter Grave}
 
 For instance, \citet{Zhang19curriculum} study supervised domain adaptation, and propose a curriculum approach which progressively extends the data used in training: in the early stages only in-data is used, while shards containing less relevant\footnote{Domain distance is computed with Lewis-Moore scores (based on the cross-entropy of in-domain LM).} data are introduced in later stages. This is somehow opposite to the recommendations of \citet{Vanderwees17dynamic}, whose \emph{gradual fine-tuning} progressively focuses on the in-domain data.\fyTodo{These have not been compared? and also to what we do ?} 
 
