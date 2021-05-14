@@ -92,6 +92,7 @@
 \newcommand{\sbcl}[2]{{\scriptsize #1 \hfill $|$ \hfill  #2}}
 \usepackage{multirow}
 \usepackage{adjustbox}
+\renewcommand{\floatpagefraction}{.9}
 
 \title{Multi-Domain Adaptation in Neural Machine Translation with Dynamic Sampling Strategies}
 
@@ -227,27 +228,28 @@ q_d = \frac{\mid N^{s}_d \mid}{\displaystyle{N^{s}}} % \mathop{\sum}_{i=1}^K\mid
 \end{align} \setlength{\abovedisplayskip}{2pt}
 \setlength{\belowdisplayskip}{2pt} 
 with $\alpha \in [0,0.25,0.5,0.75,1.0]$. These systems are denoted \system{Mixed-$\alpha$} below. \system{Mixed-$0$} uses a uniform domain distribution, \system{Mixed-$1.0$} uses the observed domain distribution.
-\item finetuned models \citep{Luong15stanford,Freitag16fast}, based on the \system{Mixed-$1.0$} system, further trained on each domain for at most 50~000 iterations, with early stopping when the dev BLEU stops increasing for 5 successive iterations.\fyDone{for ?? iterations} The full fine-tuning (\system{FT-Full}) procedure may update all the parameters of the initial generic model, resulting in six systems, each adapted for one domain, with no parameter sharing across domains.
-\item Our comparison of multi-domain systems\fyTodo{CL is only dynamic ?} includes baselines with fixed data mixtures corresponding to $\lambda^l \in \big[ \lambda_0, \lambda_{0.25}, \lambda_{0.5}, \lambda_{0.75}, \lambda_{1.0}\big]$, and our reimplementations of recent proposals from the literature: Curriculum Learning (CL) of \citet{Zhang19curriculum} and Differential Data Selection (DDS) of \citet{Wang20balancing}.
+\item fine-tuned models \citep{Luong15stanford,Freitag16fast}, based on the \system{Mixed-$1.0$} system, further trained on each domain for at most 50~000 iterations, with early stopping when the dev BLEU stops increasing for 5 successive iterations.\fyDone{for ?? iterations} The full fine-tuning (\system{FT-Full}) procedure may update all the parameters of the initial generic model, resulting in six systems, each adapted for one domain, with no parameter sharing across domains.
+\item systems trained with fixed data mixtures corresponding to $\lambda^l \in \big[ \lambda_0, \lambda_{0.25}, \lambda_{0.5}, \lambda_{0.75}, \lambda_{1.0}\big]$; these are used in the multi-domain experiments of Section~\ref{ssec:mda};
+\item  our own implementations of recent dynamic sampling proposals from the literature: Curriculum Learning (CL) of \citet{Zhang19curriculum} and Differential Data Selection (DDS) of \citet{Wang20balancing} (see details below);
 \end{itemize}
 
-All models use embeddings and hidden layers sizes of dimension~512. Transformer models contain 8~attention heads in each of the 6+6 layers; the inner feedforward layer contains 2048 cells. Training uses batches of~12,288 tokens, Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$, Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ in all layers. We train all systems with 200~000 iterations.
+All models use embeddings and hidden layers of dimension~512. Transformer models contain 8~attention heads in each of the 6+6 layers; the inner feedforward layer contains 2048 cells. Training uses batches of~12,288 tokens, Adam with parameters $\beta_1=0.9$, $\beta_2= 0.98$, Noam decay ($warmup\_steps=4000$), and a dropout rate of $0.1$ in all layers. We train all systems with 200k iterations.
+
+\subsection{CL and DDS's re-implementation}\fyDone{Right place for this ?}
+We re-implement DDS in Tensorflow without any change in the choices of parameterization and hyper-parameters compared to original code of \citet{Wang20balancing}.\footnote{\url{https://github.com/cindyxinyiwang/multiDDS}}
+
+We also re-implement the approach of \citet{Zhang19curriculum} according to the authors' description of the algorithm. For each domain adaptation experiment, we combine the training data of all other domains into one corpus, then compute the cross-entropy difference score of each source sentence of this combined dataset. We then sort and split the corpus into 9 shards and execute curriculum learning with 10 shards, using the in-domain corpus as the first shard.
 
 \subsection{MDAC systems} \label{ssec:dds-sys}
-The behavior of MDAC only depends on (a) the initial domain distribution at the start of training $\vlambda^{l}_{t=0}$, and (b) the targeted (dev/test) distribution $\vlambda^{t}$. We will thus report these systems as \system{MDAC($\vlambda^{l}_{t=0}$, $\vlambda^{t}$)}. We also compare our method with DDS under the same settings.
+The behavior of MDAC only depends on (a) the initial domain distribution at the start of training $\vlambda^{l}_{t=0}$, and (b) the targeted (dev/test) distribution $\vlambda^{t}$. We thus report these systems as \system{MDAC($\vlambda^{l}_{t=0}$, $\vlambda^{t}$)} and compare with DDS using the same settings.
 
-In our work, we simply parameterize the distribution $\lambda^l$ as follows (with $\beta=2$ in all our experiments):\fyTodo{Explain why}
+In our work, we parameterize the distribution $\lambda^l$ as follows (with $\beta=2$ in all experiments):\fyFuture{Explain why}
 \begin{equation}
 \lambda
 ^l(d;\vpsi) = \frac{\vpsi[d]^\beta}{\sum_i \vpsi[i]^\beta}. \nonumber
 \end{equation}
 
-Additional choices for the hyper-parameters of our method include the number of simulation steps $k=10$ and the learning rate $\mathbf{lr}_{data}=0.001$. We update the sampling distribution via 100 gradient descent iterations for almost all experimental settings except that for adaptation with automatic clusters (Section~\ref{ssec:clda}), where we use 20~gradient descent iterations to slow down convergence.\fyTodo{Why? computation?} We split the training into 100 short sessions that last 2000 training steps each. The choice of those hyper-parameters is mostly heuristic except for the learning rate $\mathbf{lr}_{data}$ which is optimized via grid search over a range of values $[0.001,0.0025,0.005]$.
-
-\subsection{CL and DDS's re-implementation}\fyTodo{Right place for this ?}
-We re-implement DDS in Tensorflow without any change in the choices of parameterization and hyper-parameters compared to original code of \citet{Wang20balancing}.\footnote{\url{https://github.com/cindyxinyiwang/multiDDS}}
-
-We also re-implement the work of \citet{Zhang19curriculum} according to the authors' description of the algorithm. For each domain adaptation experiment, we combine the training data of all other domains into one corpus, then compute the cross-entropy difference score of each source sentence of this combined dataset. We then sort and split the corpus into 9 shards and execute curriculum learning with 10 shards, using the in-domain corpus as the first shard.
+Additional choices for the hyper-parameters of our method include the number of simulation steps $k=10$ and the learning rate $\mathbf{lr}_{data}=0.001$. We update the sampling distribution via 100 gradient descent iterations for almost all experimental settings except that for adaptation with automatic clusters (Section~\ref{ssec:clda}), where we use 20~gradient descent iterations to slow down convergence.\fyFuture{Why? computation?} We split the training into 100 short sessions that last 2000 training steps each. The choice of those hyper-parameters is mostly heuristic except for the learning rate $\mathbf{lr}_{data}$ which is optimized via grid search over a range of values $[0.001,0.0025,0.005]$.
 
 \subsection{Experimental tasks}
 We evaluate and compare our method with multiple baselines in the 5 following conditions.
@@ -263,7 +265,7 @@ Finally, in the \emph{unsupervised domain adaptation task}, we cluster all avail
 \section{Results and discussion \label{sec:results}}
 
 \subsection{Domain Adaptation}\label{ssec:da}
-In this setting, we aim to build an expert NMT model in only one domain. This corresponds to setting $\vlambda^t$ to a deterministic distribution, in which the probability of all domains is $0$ except for one domain. We denote this distribution $\vlambda_d$, with $d$ the domain of interest.
+In this setting, we aim to build an NMT model for one single domain: we accordingly set $\vlambda^t$ to a deterministic distribution $\vlambda_d$, where the target domain $d$ has probability~1.
 
 We consider three initializations for MDAC and DDS, using $\vlambda_0$, $\vlambda_1$ and $\vlambda_d$. According to Table~\ref{tab:da}, MDAC achieves the overall best performance when $\vlambda_{t=0} = \vlambda_0$.  Doing so proves much better than initializing with $\vlambda_d$ for small domains: \domain{talk}, \domain{bank} and\domain{it}. Conversely, initializing with $\vlambda_d$ is beneficial when targeting large domains such as \domain{med} and \domain{law}. The same conclusion holds for DDS. 
 
@@ -291,6 +293,17 @@ We now compare the best MDAC system (using $\vlambda_{t=0} = \vlambda_0$) to ful
 
 \subsection{Bi-domain adaptation}\label{ssec:bida}
 
+In these control experiments, we showcase the flexibility of dynamic sampling and try to adapt to (arbitrary) pairs of target domains with equal weight and contrast our results with those of DDS. Results are in Table~\ref{tab:bi-da}. Here, MDAC significantly outperforms DDS in two settings (\domain{med+it} and \domain{law+bank}) while being surpassed in \domain{talk+rel}.
+% Allthough we showing that MDAC is capable to adapt to a variable set of target domains.
+
+\subsection{Multi-domain adaptation}\label{ssec:mda}
+
+We now turn to a more realistic scenario and consider multi-domain adaptation, which aims to train one single system with optimal performance averaged over 6 domains. This setting targets a uniform test distribution $\lambda^t = \lambda_0$. In this situation, CL \citep{Zhang19curriculum} does not apply. We therefore only contrast the performance of MDAC, DDS and several fixed training data distribution $\vlambda^l \in \big[ \vlambda_0, \vlambda_{0.25}, \vlambda_{0.5}, \vlambda_{0.75}, \vlambda_{1.0}\big]$, where $\vlambda_{\alpha}$ is defined according to equation~\eqref{mixture:trn}.
+
+We again initialize MDAC and DDS with two distribution $\lambda_0$ and $\lambda_1$. According to Table~\ref{tab:multi-da}, MDAC achieves the best performance with initial (uniform) $\lambda_0$. The same conclusion holds for DDS. For this configuration, MDAC outperforms static training distributions including $\big[ \lambda_0, \lambda_{0.75}, \lambda_{1.0}\big]$ by a significant margin, and performs slightly better than $\big[ \lambda_{0.25}, \lambda_{0.5} \big]$. This indicates that MDAC allows us to skip the somewhat heuristic choice of the optimal training mixture.
+
+A second observation is that DDS is again outperformed by MDAC by a significant margin of 1.5 BLEU on average; the only domain where DDS does (much) better is \domain{med}. Figure~\ref{fig:sampling}, where we plot the evolution of the training mixture in the course of training sessions, helps understand the difference between the two methods. For DDS (Figure~\ref{fig:DDS}), the proportion of 6 domains quicly converges towards a bi-domain mode in which only \domain{med} and \domain{rel} have significant probability -- hence the good performance on the former domain. In contrast, the proportion of 6~domains computed by MDAC evolves more smoothly; small domains such as \domain{bank}, \domain{it}, \domain{talk} and \domain{rel} receive a larger proportion of training data in the early stages; their weights then slowly decrease as larger domains such as \domain{med} and \domain{law} increase their share. This however only happends at the end of training, when the NMT models might have been already close to their optimal performance for the small domains.
+
 \begin{table*}[htbp]
   \centering \small
   \begin{tabular}{|l|*7{r|}} \hline
@@ -303,20 +316,9 @@ We now compare the best MDAC system (using $\vlambda_{t=0} = \vlambda_0$) to ful
     \system{MDAC($\vlambda_0, \vlambda_2$)}&-&-&-&36.9&-&90.4 \\
     \hline
   \end{tabular}
-  \caption{Adpating to two domains. For a given line, non empty columns correspond to the pair of target domains. ($^*$) MDAC is significantly better than DDS with $p<0.05$.}
+  \caption{Adapting to two domains. For a given line, non empty columns correspond to the pair of target domains. ($^*$) MDAC is significantly better than DDS with $p<0.05$.}
   \label{tab:bi-da}
 \end{table*}
-
-In these control experiments, we showcase the flexibility of dynamic sampling and try to adapt to (arbitrary) pairs of target domains with equal weight and contrast our results with those of DDS. Results are in Table~\ref{tab:bi-da}. Here, MDAC significantly outperforms DDS in two settings (\domain{med+it} and \domain{law+bank}) while being surpassed in \domain{talk+rel}.
-% Allthough we showing that MDAC is capable to adapt to a variable set of target domains.
-
-\subsection{Multi-domain adaptation}\label{ssec:mda}
-
-We now turn to a more realistic scenario and consider multi-domain adaptation, which aims to train one single system with optimal performance averaged over 6 domains. This setting targets a uniform test distribution $\lambda^t = \lambda_0$. In this situation, CL \citep{Zhang19curriculum} does not apply. We therefore only contrast the performance of MDAC, DDS and several fixed training data distribution $\vlambda^l \in \big[ \vlambda_0, \vlambda_{0.25}, \vlambda_{0.5}, \vlambda_{0.75}, \vlambda_{1.0}\big]$, where $\vlambda_{\alpha}$ is defined according to equation~\eqref{mixture:trn}.
-
-We again initialize MDAC and DDS with two distribution $\lambda_0$ and $\lambda_1$. According to Table~\ref{tab:multi-da}, MDAC achieves the best performance with initial (uniform) $\lambda_0$. The same conclusion holds for DDS. For this configuration, MDAC outperforms static training distributions including $\big[ \lambda_0, \lambda_{0.75}, \lambda_{1.0}\big]$ by a significant margin, and performs slightly better than $\big[ \lambda_{0.25}, \lambda_{0.5} \big]$. This indicates that MDAC allows us to skip the somewhat heuristic choice of the optimal training mixture.
-
-A second observation is that DDS is again outperformed by MDAC by a significant margin of 1.5 BLEU on average; the only domain where DDS does (much) better is \domain{med}. Figure~\ref{fig:sampling}, where we plot the evolution of the training mixture in the course of training sessions, helps understand the difference between the two methods. For DDS (Figure~\ref{fig:DDS}), the proportion of 6 domains quicly converges towards a bi-domain mode in which only \domain{med} and \domain{rel} have significant probability -- hence the good performance on the former domain. In contrast, the proportion of 6~domains computed by MDAC evolves more smoothly; small domains such as \domain{bank}, \domain{it}, \domain{talk} and \domain{rel} receive a larger proportion of training data in the early stages; their weights then slowly decrease as larger domains such as \domain{med} and \domain{law} increase their share. This however only happends at the end of training, when the NMT models might have been already close to their optimal performance for the small domains.
 
 \begin{table*}[htbp]
   \centering \small
@@ -384,7 +386,7 @@ A second observation is that DDS is again outperformed by MDAC by a significant 
 The left part of Table~\ref{tab:unsupervised-da} displays the performance on the unseen domain \domain{news} for NMT systems trained with the mixtures $\lambda^l \in \big[ \lambda_0, \lambda_{0.25}, \lambda_{0.5}, \lambda_{0.75}, \lambda_{1.0}\big]$ and wiht dynamic data selection (MDAC and DDS). These systems have insignificant differences in BLEU, showing that dynamic mixture does not improve the robustness of the NMT system against unseen domains. However, the fact that the performance of MDAC and DDS is close to the best performance is a sign that they can also apply in such challengin situation. % the robustness of the NMT model.
 
 \subsection{Automatic clustering}\label{ssec:clda}
-The right part of Table~\ref{tab:unsupervised-da} reports the performance of NMT systems adapted to each domain. In comparison to section~\ref{ssec:da}, the training data is distributed in 30~clusters instead of the 6 original domains. Using a finer-grain spliting of data provides the learner with extra degrees of freedom when selecting the best distribution. However, as these clusters are built automatically, they do not necessarily contain data from just one domain, and are more noisy in nature. According to the results in Table~\ref{tab:unsupervised-da}, this scenario is hard both for DDS and MDAC which perform much worse than for the supervised DA setting. This again signals the importance of initialization: analyzing the clustering, we find that the data for \domain{rel} mostly correspond to one single cluster. Using a uniform initialization, this cluster starts with a very small weight, and never succeeds to yield the (good) performance observed in the DA settting.
+The right part of Table~\ref{tab:unsupervised-da} reports the performance of NMT systems adapted to each domain. In comparison to section~\ref{ssec:da}, the training data is distributed in 30~clusters instead of the 6 original domains. Spliting the train data in small groups provides the learner with extra degrees of freedom when selecting the best distribution. However, as these clusters are built automatically, they are more noisy in nature. According to the results in Table~\ref{tab:unsupervised-da}, this scenario is hard both for DDS and MDAC which perform much worse than for the supervised DA setting. This again signals the importance of initialization: analyzing the clustering, we find that the data for \domain{rel} mostly correspond to one single cluster. Using a uniform initialization, this cluster starts with a very small weight, and never succeeds to yield the (good) performance observed in the DA settting.
 
 \section{Related Work \label{sec:related}}
 
