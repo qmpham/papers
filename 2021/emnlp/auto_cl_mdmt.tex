@@ -268,7 +268,7 @@ In this setting, we aim to build an expert NMT model in only one domain. This se
 
 We initialize MDAC and DDS by 3 different distributions $\lambda_0$, $\lambda_1$ and $\lambda_d$. According to Table \ref{tab:da}, MDAC achieves the best performance with $\lambda_0$ initial where all domains have the same probability to be chosen, though $\lambda_0$  initialization only improve significantly $\lambda_d$ initialization in small domains including \domain{talk},\domain{bank}and\domain{it}. $\lambda_d$ initialization is beneficial for adapting the NMT system to large domains such as \domain{med} and \domain{law}. The same conclusion is also true for DDS. 
 
-We now compare the best MDAC (initialized by $\lambda_0$) to fine-tuning. According to Table \ref{tab:da}, MDAC is outperformed by fine-tuning method in large domains including \domain{med} and \domain{law}. However, MDAC improves fine-tuning by approximately 0.5 BLEU in \domain{bank} and 1.0 BLEU in \domain{rel}. This indicates that for small domains, out-of-domain data can improve the generalization of the NMT model and MDAC is capable to exploit this advantage by balancing the in-domain and the out-of-domain training data instead of edging out the out-of-domain training data as in fine-tuning.
+We now compare the best MDAC (initialized by $\lambda_0$) to fine-tuning. According to Table \ref{tab:da}, MDAC is outperformed by fine-tuning method in large domains including \domain{med} and \domain{law}. However, MDAC improves fine-tuning by approximately 1.2 BLEU in \domain{bank} and 1.0 BLEU in \domain{rel}. This indicates that for small domains, out-of-domain data can improve the generalization of the NMT model and MDAC is capable to exploit this advantage by balancing the in-domain and the out-of-domain training data instead of edging out the out-of-domain training data as in fine-tuning.
 
 DDS also demonstrates promising results in this task but is always outperformed by MDAC overall. The same conclusion is also applied to the CL method.
 
@@ -276,16 +276,16 @@ DDS also demonstrates promising results in this task but is always outperformed 
   \centering \small
   \begin{tabular}{|l|*8{r|}} \hline
     domain \hfill $d=$ & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{mean} \\ \hline
-    FT-Full($d$) \hfill [BLEU] &37.7&59.2&54.5&34&46.8&90.8&53.8\\ \hline
+    FT-Full($d$) \hfill [BLEU] &40.3&63.8&54.4&38.5&52.0&91.0&56.7\\ \hline
     \hline
-    \system{CL($d$)} &37.2&55.4&53.0&31.3&45.3&90.8&52.2\\ \hline
-    \system{DDS($\vlambda_0, \vlambda_d$)} &36.7&56.2&54.3&33.5&46.8&91.8&53.2\\
-    \system{MDAC($\vlambda_0, \vlambda_d$)} &36.7&58.2$^{**}$&55$^{*}$&33.3&46.6&91.9$^{***}$&53.6\\
+    \system{CL($d$)} &40.2&60.2&53.7&36.5&51.1&91.1&55.5\\ \hline
+    \system{DDS($\vlambda_0, \vlambda_d$)} &39.6&60.1&55.0&38.5&52.5&92.0&56.3\\
+    \system{MDAC($\vlambda_0, \vlambda_d$)} &39.6&62.5$^{**}$&55.6$^{*}$&38.5&52.4&92$^{***}$&56.8\\
      \hline
-    \system{DDS($\vlambda_1, \vlambda_d$)} &36.4&56.3& 45.4& 32.6&44.5&43.1&43.1\\
-    \system{MDAC($\vlambda_1, \vlambda_d$)} &37.2&55.1&51.8&32.8&44.9&85.4&51.2 \\ \hline
-    \system{DDS($\vlambda_d, \vlambda_d$)} &37.0&59.6&53.7&30.2&45.7&91.6&53.0 \\
-    \system{MDAC($\vlambda_d, \vlambda_d$)}&37.9&59.6&53.9&30.4&45.8&92.1&53.3 \\
+    \system{DDS($\vlambda_1, \vlambda_d$)} &39.7&53.9&49.6&37.9&43.1&64.3&48.1\\
+    \system{MDAC($\vlambda_1, \vlambda_d$)} &40.2&59.9&52.6&38.5&50.7&79.8&53.6\\ \hline
+    \system{DDS($\vlambda_d, \vlambda_d$)} &39.9&63.9&54.5&35.4&51.2&91.8&56.1\\
+    \system{MDAC($\vlambda_d, \vlambda_d$)}&40.6&63.9&54.5&35.6&51.3&92.3&56.4\\
     \hline
   \end{tabular}
   \caption{We report scores of each method with 6 target domains, and compare with full fine-tuning: each column corresponds to a distinct system. ($^{*}$) MDAC is significantly better than CL, fine-tuning and DDS with $p<0.05$. ($^{**}$) MDAC is significantly better than CL and DDS with $p<0.05$. ($^{***}$) MDAC is significantly better than CL, fine-tuning with $p<0.05$}
@@ -309,20 +309,20 @@ We show in the below figure \ref{fig:sampling}, the evolution of the training mi
   \begin{tabular}{|l|*8{r|}} \hline
     domain \hfill $d=$ & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{mean} \\ \hline \hline
     % Multidomain
-    \system{Mixed-0}      & 35.3 & 54.1 & 52.5 & 31.9 & 44.9 & 89.5& 51.4 \\
-    \system{Mixed-0.25} & 35.9 & 54.9 & 52.6 & 32.6 & 45 & 90.3& 51.9 \\
-    \system{Mixed-0.5}   & 36.1 & 55.4 & 51.8 & 33.5 & 46.2 & 90 & 52.2 \\
-    \system{Mixed-0.75} & 36.5 & 55 & 51.2 & 34 & 44.3 & 87.2& 51.7 \\
-    \system{Mixed-1}     & 37.3  & 54.6 & 50.1 & 33.5 & 43.2 & 77.5& 49.4 \\
+    \system{Mixed-0} &38.6&59.3&53.7&37.3&51.0&90.4&55.1\\
+    \system{Mixed-0.25}&38.9&59.6&53.3&37.6&50.5&90.6&55.1\\
+    \system{Mixed-0.5}&39.0&60.2&52.5&38.5&51.9&90.3&55.4\\
+    \system{Mixed-0.75}&39.4&59.9&51.9&38.8&50.0&87.6&54.6\\
+    \system{Mixed-1}&40.3&59.5&49.8&36.4&49.0&80.0&52.5\\
     \hline \hline
-    \system{DDS($\vlambda_0, \vlambda_0$)} &37.3&55.1&51&33.5&43.4&90.8&51.8\\ 
-    \system{MDAC($\vlambda_0, \vlambda_0$)}&35.5&55.5&53.7$^*$&32.3&45.6&91.1$^*$&52.3$^{**}$\\ 
+    \system{DDS($\vlambda_0, \vlambda_0$)} &40.1&56.9&50.7&37.4&46.8&92.0&54.0\\ 
+    \system{MDAC($\vlambda_0, \vlambda_0$)}&38.5&60.3$^{**}$&54.4$^*$&37.3&51.3$^{**}$&91.4$^*$&55.5$^{**}$\\ 
     \hline \hline
-    \system{DDS($\vlambda_1, \vlambda_0$)} &37.9&50.2&47.2&31.2&40.8&58.6&44.3\\
-    \system{MDAC($\vlambda_1, \vlambda_0$)}&37.4&54.4&50.3&32.0&42.7&80.2&49.5\\
+    \system{DDS($\vlambda_1, \vlambda_0$)} &40.6&55.5&48.0&36.2&46.9&60.1&47.9\\
+    \system{MDAC($\vlambda_1, \vlambda_0$)}&40.2&59.3$^{**}$&51.0$^{**}$&36.9$^{**}$&48.6$^{**}$&80.7$^{**}$&52.8$^{**}$\\
     \hline
   \end{tabular}
-  \caption{We report the performance of our method MDAC and the work of \citet{Wang20balancing} DDS in multi-domain adaptation task. For a given line, all the columns \emph{correspond to the same multi-domain system}. ($^*$) MDAC is significantly better than \system{Mixed-$\alpha$} with $p<0.05$ and DDS. ($^{**}$) MDAC is significantly better than DDS with $p<0.05$.}
+  \caption{We report the performance of our method MDAC and the work of \citet{Wang20balancing} DDS in multi-domain adaptation task. For a given line, all the columns \emph{correspond to the same multi-domain system}. ($^*$) MDAC is significantly better than \system{Mixed-$\alpha$} with $p<0.05$. ($^{**}$) MDAC is significantly better than DDS with $p<0.05$.}
   \label{tab:multi-da}
 \end{table*}
 
@@ -351,12 +351,13 @@ We show in the below figure \ref{fig:sampling}, the evolution of the training mi
   \centering \small
   \begin{tabular}{|l|*9{r|}} \hline
     domain \hfill $d=$ & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{mean} & \multicolumn{1}{|c|}{\domain{news}} \\ \hline \hline
-    \system{MDAC($\vlambda_0, \vlambda_2$)}&36.2&-&-&-&46.1$^*$&-&-&- \\
-    \system{DDS($\vlambda_0, \vlambda_2$)}&36.5&-&-&-&44.4&-&-&- \\
-    \system{MDAC($\vlambda_0, \vlambda_2$)}&-&57.2$^*$&53.8$^*$&-&-&-&-&- \\
-    \system{DDS($\vlambda_0, \vlambda_2$)}&-&56.1&52.6&-&-&-&-&- \\
-    \system{MDAC($\vlambda_0, \vlambda_2$)}&-&-&-&32&-&90&-&- \\
-    \system{DDS($\vlambda_0, \vlambda_2$)}&-&-&-&32.9&-&91.1&-&- \\ \hline
+    \system{DDS($\vlambda_0, \vlambda_2$)}&39.5&-&-&-&50.1&-&-&- \\
+    \system{MDAC($\vlambda_0, \vlambda_2$)}&39.1&-&-&-&51.8$^*$&-&-&- \\
+    \system{DDS($\vlambda_0, \vlambda_2$)}&-&60.8&53.3&-&-&-&-&- \\
+    \system{MDAC($\vlambda_0, \vlambda_2$)}&-&61.9$^*$&54.5$^*$&-&-&-&-&- \\
+    \system{DDS($\vlambda_0, \vlambda_2$)}&-&-&-&37.9&-&91.3&-&- \\ 
+    \system{MDAC($\vlambda_0, \vlambda_2$)}&-&-&-&36.9&-&90.4&-&- \\
+    \hline
   \end{tabular}
   \caption{Non empty columns correspond to the target domains. For a given line, all the non empty columns \emph{correspond to the same bi-domain system}. ($^*$) MDAC is significantly better than DDS with $p<0.05$.}
   \label{tab:bi-da}
@@ -365,20 +366,20 @@ According to Table \ref{tab:bi-da}, MDAC outperforms DDS in 2 over 3 settings in
 
 \begin{table*}[htbp]
   \centering \small
-  \begin{tabular}{|l|*9{r|}} \hline
-    domain \hfill $d=$ & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{mean} & \multicolumn{1}{|c|}{\domain{news}} \\ \hline \hline
-    \multicolumn{9}{|c|}{\sl Unsupervised domain adaptation} \\ \hline
-    \system{Mixed-0}      & - & - & - & - & - & - & - & 22.4 \\
-    \system{Mixed-0.25} & - & - & - & - & - & - & - & 22.7\\
-    \system{Mixed-0.5}   & - & - & - & - & - & - & - & 23.6\\
-    \system{Mixed-0.75} & - & - & - & - & - & - & - & 23.7\\
-    \system{Mixed-1} & - & - & - & - & - & - & - & 23.5\\
-    \hline \hline
-    \system{MDAC($\vlambda_0, \vlambda_{news}$)} &-&-&-&-&-&-&-&23.1 \\
-     \system{DDS($\vlambda_0, \vlambda_{news}$)} &-&-&-&-&-&-&-&23.3 \\ \hline\hline 
-    \multicolumn{9}{|c|}{\sl 30 clusters} \\ \hline
-    \system{MDAC($\vlambda^*, \vlambda_d$)}&36.3$^*$&56.9$^*$&51.3$^*$&33.2$^*$&43.4&89.4&51.8$^*$&-\\
-     \system{DDS($\vlambda^*, \vlambda_d$)}&35.3&55.2&49.4&30.6&43.3&89.9&50.6&-\\ \hline
+  \begin{tabular}{|l|*{10}{r|}} \cline{1-2} \cline{4-11}
+    domain \hfill $d=$ & \multicolumn{1}{c|}{\domain{news}}& \hfill &domain \hfill $d=$ & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{mean}  \\ 
+\cline{1-2} \cline{4-11}
+    \multicolumn{2}{|c|}{\sl unseen domains} & &\multicolumn{8}{c|}{\sl 30 clusters} \\ 
+\cline{1-2} \cline{4-11}
+    \system{Mixed-0}      & 25.7 & &\system{DDS($\vlambda^*, \vlambda_d$)}&38.3&60.1&50.3&35.8&49.1&90.1&53.9\\
+    \system{Mixed-0.25} & 25.8 & &\system{MDAC($\vlambda^*, \vlambda_d$)}&39.2$^*$&61.6$^*$&52.0$^*$&38.2$^*$&49.1&89.7&55.0$^*$\\ \cline{4-11}
+    \system{Mixed-0.5}   &26.5\\
+    \system{Mixed-0.75} &26.8\\
+    \system{Mixed-1} &26.9 \\
+    \cline{1-2}
+     \system{DDS($\vlambda_0, \vlambda_{news}$)} &26.3 \\
+     \system{MDAC($\vlambda_0, \vlambda_{news}$)} &26.3 \\
+     \cline{1-2}
   \end{tabular}
   \caption{Non empty columns correspond to the target domains. For a given line, each non empty column correspond to one expert system. ($^*$)MDAC is significantly better than DDS.}
   \label{tab:unsupervised-da}
@@ -395,20 +396,11 @@ Domain adaptation is an ancient and vexing problem that has been studied from ma
 
 Multi-domain adaptation (MDA) aims to develop systems that simultaneously bode well for several domains. Like for DA, techniques for supervised MDA typically combine one or several ingredients: (a) the specialization of data representations \citep{Kobus17domaincontrol} or of sub-networks \citep{Pham19generic} to differentiate the processing of each domain; (b) the use of adversarial techniques to neutralize differences between domains \cite{Britz17mixing,Zeng18multidomain}; (c) the use of automatic domain identification e.g.\ \citet{Jiang19multidomain}. Unsupervised MDA is considered in \citet{Farajian17multidomain} as an unsupervised DA problem.
 
-Most approaches to adaptive / dynamic data selection take inspiration from \citet{Bengio09curriculum}, where the notion of \emph{curriculum learning} (CL) is initially introduced. CL relies on the notion of ``easyness'' of a sample to schedule the presentation of the training data so that the easiest examples presented first and the hardest, last. CL has been shown to speed up learning. While the initial aim was to improve and speed up training, it has also proven useful for domain adaptive / multi-domain / multi-lingual MT, based on alternative definitions of ``easiness''.\fyTodo{Ajouter Grave}
+Most approaches to adaptive / dynamic data selection take inspiration from \citet{Bengio09curriculum}, where the notion of \emph{curriculum learning} (CL) is initially introduced. CL relies on the notion of ``easiness'' of a sample to schedule the presentation of the training data so that the easiest examples presented first and the hardest, last. CL has been shown to speed up learning. While the initial aim was to improve and speed up training, it has also proven useful for domain adaptive / multi-domain / multi-lingual MT, based on alternative definitions of ``easiness''.
 
 For instance, \citet{Zhang19curriculum} study supervised domain adaptation, and propose a curriculum approach which progressively extends the data used in training: in the early stages only in-data is used, while shards containing less relevant\footnote{Domain distance is computed with Lewis-Moore scores (based on the cross-entropy of in-domain LM).} data are introduced in later stages. This is somehow opposite to the recommendations of \citet{Vanderwees17dynamic}, whose \emph{gradual fine-tuning} progressively focuses on the in-domain data.\fyTodo{These have not been compared? and also to what we do ?} 
 
 \citet{Kumar19reinforcement} use reinforcement techniques (deep Q-learning) to learn the curriculum strategy: in this study, complexity corresponds to difficulty levels and which are binned based on contrastive data selection. The reward is based on the increase of the development set loss that results from the actual data selection strategy.\fyTodo{Alert: what do we do during warm-up ?} The same technique is recently applied to the training of a multilingual NMT system \citep{Kumar21learning}. \citet{Zhou20uncertainty} propose another curriculum-based approach which instead relies on \emph{instance uncertainty} as a measure of their difficulty and presents the data sample starting with the easiest (more predictable) first. Another contribution of this paper is an alternative criterium for stopping the training. More related to our problems, \citet{Wang20learning-multi} adapt curriculum learning for multi-domain adaptation, where an optimal instance weighting scheme is found using Bayesian optimization (derivative-free) techniques. Each step consists of (a) weighting the instances based on relevance features, (b) fine-tuning a pretrained model using the (weighted) training set, and is applied iteratively to generate a sequence of models. The one that maximizes the development set performance is finally retained.
-
-\section{Conclusion and future work}
-\fyTodo{Write conclusion}
-
-Contribution : generic framework for several settings. // comparison of several dynamic strategies.
-
-Future work:
-slow down learning during warm up or normalize reward; handle large number of classes;} 
-too much importance to the dev ? randomize ?
 
 \section*{Acknowledgments}
 \bibliographystyle{acl_natbib}
