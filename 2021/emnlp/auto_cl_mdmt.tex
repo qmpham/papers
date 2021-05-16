@@ -384,7 +384,7 @@ The left part of Table~\ref{tab:unsupervised-da} displays the performance on the
 
 \subsection{Automatic clustering}\label{ssec:clda}
 The right part of Table~\ref{tab:unsupervised-da} reports the performance of NMT systems adapted to each domain. In comparison to Section~\ref{ssec:da}, the training data is distributed in 30 automatic clusters instead of the 6 original domains. Splitting the train data into small groups provides the learner with extra degrees of freedom when selecting the best distribution. However, as these clusters are built automatically, they are noisier in nature. According to the results in Table~\ref{tab:unsupervised-da}, this scenario is hard both for DDS and MDAC, which perform much worse than for the supervised DA setting. This again signals the importance of initialization: analyzing the clustering, we find that the data for \domain{rel} mostly correspond to one single cluster. When using a uniform initialization, this cluster starts with a very small weight and never succeeds in yielding the (good) performance observed in the DA setting.
-s
+
 \section{Related Work \label{sec:related}}
 
 Domain adaptation is an old problem that has been studied from many angles, both for SMT and NMT. A survey of supervised and unsupervised DA for NMT is in \citet{Chu18asurvey}, where the authors distinguish between data-centric and model-centric DA, a view also adopted in the more recent review of \citet{Saunders21domain}. Our approach to DA in this paper falls under the former category. We refer interested readers to these references and do not discuss DA any further.
