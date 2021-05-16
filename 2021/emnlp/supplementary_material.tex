@@ -92,18 +92,7 @@
 \usepackage{multirow}
 \usepackage{adjustbox}
 
-\title{Supplementary materials}
-
-\author{First Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  \texttt{email@domain} \\\And
-  Second Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  \texttt{email@domain} \\}
+\title{Supplementary material for paper ``Multi-Domain Adaptation in Neural Machine Translation with Dynamic Sampling Strategies''}
 
 \date{}
 
@@ -113,42 +102,44 @@
 \setlength{\belowdisplayskip}{2pt}
 
 \section*{A - Generalized Multi-Domain Dynamic Adaptation Curriculum Algorithm}
-We provide below in the pseudo algorithm \ref{alg:mdmt}  the generalized Multi-Domain Adaptation Dynamic Sampling Algorithm.
-\begin{algorithm}[htbp]
-\caption{Multi-Domain Adaptation Dynamic Sampling} \label{alg:mdmt}
+The pseudo-code for the generalized Multi-Domain Adaptation Dynamic Sampling Algorithm  is in algorithm~\ref{alg:mdmt}.
+
+\begin{algorithm}[h!]
+ \caption{Multi-Domain Adaptation Dynamic Sampling} \label{alg:mdmt}
 \begin{algorithmic}[1]
 \REQUIRE {
-\begin{itemize}
-	\item K corpora $C^d, d\in [1,..,K]$ for $K$ domains equipped by an empirical distribution $D_d(x)$
-	\item K dev sets $Dev^d, d\in [1,..,K]$ for $K$ domains.
-	\item Domain testing distribution $\lambda^t \in \mathbb{R}^K$
-	\item Batch size $B$
-	\item Domain Dynamic Sampling Distribution $\lambda^l(i) \in \mathbb{R}^K$ where $i$ is the enumeration of the iteration.
-	\item $Eval\_scores = []$
-	\item $Early\_stopping$ criterion
-	\item Total training iterations $iter\_num$
-	\item Updating rule of the sampling distribution $\lambda^l(i)$
-\end{itemize}}
+  \begin{itemize}
+    \setlength{\itemsep}{-1pt}    \setlength{\parsep}{0pt}
+  \item K corpora $C^d, d \in [1, \dots,n_d]$ for $n_d$ domains equipped by an empirical distribution $D_d(x)$
+  \item K dev sets $Dev^d, d\in [1, \dots,n_d]$ for $n_d$ domains.
+  \item Domain testing distribution $\vlambda^t \in \mathbb{R}^K$
+  \item Batch size $B$
+  \item Domain Dynamic Sampling Distribution $\lambda^l_i \in \mathbb{R}^K$ where $i$ indexes iterations.
+  \item $Eval\_scores = []$
+  \item $Early\_stopping$ criterion
+  \item Total training iterations $iter\_num$
+  \item Update rule for sampling distribution $\vlambda^l_i$
+ \end{itemize}}
 \REPEAT 
 \STATE{Iteration i.}
-\STATE{Randomly pick $d \in [1,..,K]$ from sampling distribution $\lambda^l(i)$}
+\STATE{Randomly pick $d \in [1,\dots,n_d]$ from sampling distribution $\lambda^l(i)$}
 \STATE{Sample $B$ sentences from $C^d$ with empirical distribution $D_d(x)$}
 \STATE{Update model by applying SGD computed from $B$ sampled sentences}
 \IF{$i \equiv 0 \mod{eval\_step}$}
-	\STATE{Evaluate current model with $K$ dev sets. $S^i_d$ is the performance at iteration $i-th$ on domain $d$}
-	\STATE{Report weighted score using the domain testing distribution $\lambda^t$. $$eval(i) = \displaystyle{\mathop{\sum}_d^K \lambda^t(d) S^i_d}$$}
+	\STATE{Evaluate current model with $K$ dev sets. $S^d_i$ is the performance at iteration $i^{th}$ on domain $d$}
+	\STATE{Report weighted score using test distribution $\vlambda^t$. $$eval(i) = \displaystyle{\mathop{\sum}_d^K \lambda^t(d) S^d_i}$$}
 	\STATE{$Eval\_scores.append(eval(i))$.}
 \ENDIF
 \IF{$i \equiv 0 \mod{sampler\_updating\_step}$}
-	\STATE Update $\lambda^l(i)$.
+	\STATE Update $\vlambda^l_i$.
 \ENDIF
 \IF{$Early\_stopping(Eval\_scores)$}
 	\STATE{Break.}
 \ENDIF
 \UNTIL{$i> iter\_num$}
 \end{algorithmic}
-\end{algorithm}
-
+ \end{algorithm}
+ 
 \section*{B - Experiments with automatic domains}
 \begin{table*}[htbp]
   \centering
@@ -192,7 +183,7 @@ Cluster&MED&ECB&IT&LAW&REL&TALK \\
 \label{tab:automatic_domains}
 \end{table*}
 
-This experiment aims to simulate with automatic domains a scenario where the number of ``domains'' is large and where some ``domains'' are close and can effectively share information. Full results in Table~\ref{tab:automatic_domains}. Cluster size vary from approximately 8k sentences (cluster~24) up to more than 350k sentences. More than 2/3 of these clusters mostly comprise texts from one single domain, as for cluster 12 which is predominantly \domain{med}, the remaining clusters typically mix 2 domains.
+This experiment aims to simulate with automatic domains a scenario where the number of ``domains'' is large and where some ``domains'' are close and can effectively share information. Full results are in Table~\ref{tab:automatic_domains}. Cluster sizes vary from approximately 8k sentences (cluster~24) up to more than 350k sentences. More than 2/3 of these clusters mostly comprise texts from one single domain, as for cluster 12 which is predominantly \domain{med}, the remaining clusters typically mix 2 domains.
 
 \end{document}
 
