@@ -1,6 +1,19 @@
 % -*- mode:bibtex -*-
 % encoding:utf-8
 
+@inproceedings{Post18call,
+    title = "A Call for Clarity in Reporting {BLEU} Scores",
+    author = "Post, Matt",
+    booktitle = "Proceedings of the Third Conference on Machine Translation: Research Papers",
+    month = oct,
+    year = "2018",
+    address = "Brussels, Belgium",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/W18-6319",
+    doi = "10.18653/v1/W18-6319",
+    pages = "186--191",
+    abstract = "The field of machine translation faces an under-recognized problem because of inconsistency in the reporting of scores from its dominant metric. Although people refer to {``}the{''} BLEU score, BLEU is in fact a parameterized metric whose values can vary wildly with changes to these parameters. These parameters are often not reported or are hard to find, and consequently, BLEU scores between papers cannot be directly compared. I quantify this variation, finding differences as high as 1.8 between commonly used configurations. The main culprit is different tokenization and normalization schemes applied to the reference. Pointing to the success of the parsing community, I suggest machine translation researchers settle upon the BLEU scheme used by the annual Conference on Machine Translation (WMT), which does not allow for user-supplied reference processing, and provide a new tool, SACREBLEU, to facilitate this.",
+}
 
 @inproceedings{Aharoni19massively,
     title = "Massively Multilingual Neural Machine Translation",
@@ -873,9 +886,13 @@ abstract = { We develop two techniques for analyzing the effect of porting a mac
     url = "https://www.aclweb.org/anthology/P07-1034",
     pages = "264--271",
 }
+
 @inproceedings{Jiang19multidomain,
     title = "Multi-Domain Neural Machine Translation with Word-Level Adaptive Layer-wise Domain Mixing",
-    author = "Jiang, Haoming and Liang, Chen and Wang, Chong and Zhao, Tuo",
+    author = "Jiang, Haoming  and
+      Liang, Chen  and
+      Wang, Chong  and
+      Zhao, Tuo",
     booktitle = "Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics",
     month = jul,
     year = "2020",
@@ -897,6 +914,7 @@ abstract = { We develop two techniques for analyzing the effect of porting a mac
 	Volume = {5},
 	Year = {2017},
 	Bdsk-Url-1 = {https://transacl.org/ojs/index.php/tacl/article/view/1081}}
+	
 @inproceedings{Joshi12multidomain,
         Abstract = {We present a systematic analysis of existing multi-domain learning approaches with respect to two questions. First, many multi-domain learning algorithms resemble ensemble learning algorithms. (1) Are multi-domain learning improvements the result of ensemble learning effects? Second, these algorithms are traditionally evaluated in a balanced label setting, although in practice many multi-domain settings have domain-specific label biases. When multi-domain learning is applied to these settings, (2) are multi-domain methods improving because they capture domain-specific class biases? An understanding of these two issues presents a clearer idea about where the field has had success in multi-domain learning, and it suggests some important open questions for improving beyond the current state of the art.},
         Author = {Mahesh Joshi and Mark Dredze and William W Cohen and Carolyn P Rose},
