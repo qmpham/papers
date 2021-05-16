@@ -1,6 +1,19 @@
 % -*- mode:bibtex -*-
 % encoding:utf-8
 
+@inproceedings{Post18call,
+    title = "A Call for Clarity in Reporting {BLEU} Scores",
+    author = "Post, Matt",
+    booktitle = "Proceedings of the Third Conference on Machine Translation: Research Papers",
+    month = oct,
+    year = "2018",
+    address = "Brussels, Belgium",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/W18-6319",
+    doi = "10.18653/v1/W18-6319",
+    pages = "186--191",
+    abstract = "The field of machine translation faces an under-recognized problem because of inconsistency in the reporting of scores from its dominant metric. Although people refer to {``}the{''} BLEU score, BLEU is in fact a parameterized metric whose values can vary wildly with changes to these parameters. These parameters are often not reported or are hard to find, and consequently, BLEU scores between papers cannot be directly compared. I quantify this variation, finding differences as high as 1.8 between commonly used configurations. The main culprit is different tokenization and normalization schemes applied to the reference. Pointing to the success of the parsing community, I suggest machine translation researchers settle upon the BLEU scheme used by the annual Conference on Machine Translation (WMT), which does not allow for user-supplied reference processing, and provide a new tool, SACREBLEU, to facilitate this.",
+}
 
 @inproceedings{Aharoni19massively,
     title = "Massively Multilingual Neural Machine Translation",
@@ -873,16 +886,24 @@ abstract = { We develop two techniques for analyzing the effect of porting a mac
     url = "https://www.aclweb.org/anthology/P07-1034",
     pages = "264--271",
 }
-@article{Jiang19multidomain,
-    title={Multi-Domain Neural Machine Translation with Word-Level Adaptive Layer-wise Domain Mixing},
-    author={Haoming Jiang and Chen Liang and Chong Wang and Tuo Zhao},
-    year={2019},
-    journal={CoRR},
-    volume = {abs/1911.02692},
-    archivePrefix={arXiv},
-    primaryClass={cs.CL},
-    url= {http://arxiv.org/abs/1911.02692},
+
+@inproceedings{Jiang19multidomain,
+    title = "Multi-Domain Neural Machine Translation with Word-Level Adaptive Layer-wise Domain Mixing",
+    author = "Jiang, Haoming  and
+      Liang, Chen  and
+      Wang, Chong  and
+      Zhao, Tuo",
+    booktitle = "Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/2020.acl-main.165",
+    doi = "10.18653/v1/2020.acl-main.165",
+    pages = "1823--1834",
+    abstract = "Many multi-domain neural machine translation (NMT) models achieve knowledge transfer by enforcing one encoder to learn shared embedding across domains. However, this design lacks adaptation to individual domains. To overcome this limitation, we propose a novel multi-domain NMT model using individual modules for each domain, on which we apply word-level, adaptive and layer-wise domain mixing. We first observe that words in a sentence are often related to multiple domains. Hence, we assume each word has a domain proportion, which indicates its domain preference. Then word representations are obtained by mixing their embedding in individual domains based on their domain proportions. We show this can be achieved by carefully designing multi-head dot-product attention modules for different domains, and eventually taking weighted averages of their parameters by word-level layer-wise domain proportions. Through this, we can achieve effective domain knowledge sharing and capture fine-grained domain-specific knowledge as well. Our experiments show that our proposed model outperforms existing ones in several NMT tasks.",
 }
+
 @article{Johnson17google,
 	Author = {Johnson, Melvin and Schuster, Mike and Le, Quoc and Krikun, Maxim and Wu, Yonghui and Chen, Zhifeng and Thorat, Nikhil and Vi{\'e}gas, Fernand a and Wattenberg, Martin and Corrado, Greg and Hughes, Macduff and Dean, Jeffrey},
 	Issn = {2307-387X},
