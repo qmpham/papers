@@ -128,9 +128,9 @@ The pseudo-code for the generalized Multi-Domain Adaptation Dynamic Sampling Alg
 \begin{table*}[htbp]
   \centering
   \footnotesize
-  \begin{tabular}{|p{1.3cm}|*{13}{c|}} 
+  \begin{tabular}{|p{0.5cm}|*{7}{c|}|*{6}{c|}} 
   \hline
-\multirow{2}*{Cluster}&\multirow{2}*{size}&\multicolumn{6}{c|}{Domain content}&\multicolumn{6}{c|}{MDAC systems}\\
+\multirow{2}*{Cl. }&\multirow{2}*{size}&\multicolumn{6}{c||}{Domain content}&\multicolumn{6}{c|}{MDAC systems}\\
   \cline{3-14}
 &&MED&ECB&IT&LAW&REL&TALK&MED&ECB&IT&LAW&REL&TALK \\
 \hline
@@ -166,11 +166,11 @@ The pseudo-code for the generalized Multi-Domain Adaptation Dynamic Sampling Alg
 30&109260&0.01&0.06&0.00&0.92&0.00&0.00&0.03&0.03&0.03&0.06&0.04&0.04 \\
 \hline
 \end{tabular}
-\caption{Automatic clustering experiment. We report the size of 30 clusters. In the 6 left columns, each line provides the proportions of the domains in each cluster. In the 6 right columns, each column corresponds to a system; each line provides the proportion of the corresponding cluster in the total sampled training data from the beginning to the end of the training. For each system, we underline the most sampled clusters.}
+\caption{Automatic clustering experiments. We report the size of each cluster. In the 6 left columns, each line gives the proportions of the domains in each cluster. In the 6 right columns, each column corresponds to a MDAC experiment; each line gives the cumulated proportion of the corresponding cluster in the training data. For instance, when targeting the domain \domain{ecb}, cluster~4 (mostly \domain{law}) is sampled with a probability of $0.07$, and cluster~16 (mostly \domain{ecb}) is sampled with probability $0.08$. For each system, we underline the most often sampled clusters.}
 \label{tab:automatic_domains}
 \end{table*}
 
-This experiment aims to simulate with automatic domains a scenario where the number of ``domains'' is large and where some ``domains'' are close and can effectively share information. Full results are in Table~\ref{tab:automatic_domains}. Cluster sizes vary from approximately 8k sentences (cluster~24) up to more than 350k sentences. More than 2/3 of these clusters mostly comprise texts from one single domain, as for cluster 12, which is predominantly \domain{med}, the remaining clusters typically mix 2 domains. According to the table, for each system, the clusters most sampled by MDAC contain most of the data of the corresponding domain. This demonstrates that MDAC is able to find related data to the task automatically. However, MDAC performance is still far behind compared to that of the standard situation. 
+This experiment aims to simulate with automatic domains a scenario where the number of ``domains'' is large and where some ``domains'' are close and can effectively share information. Full results are in Table~\ref{tab:automatic_domains}. Cluster sizes vary from approximately 8k sentences (cluster~24) up to more than 350k sentences. More than 2/3 of these clusters mostly comprise texts from one single domain, as for cluster 12, which is predominantly \domain{med}, the remaining clusters typically mix 2 domains. According to the table, for each system, the clusters most sampled by MDAC contain most of the data of the corresponding domain. This demonstrates that MDAC is able to find related data to the task automatically. However, MDAC performance is still far behind that of the supervised scenario, as we explain in the paper. 
 \\
 \\
 \\
@@ -182,31 +182,32 @@ This experiment aims to simulate with automatic domains a scenario where the num
 \REQUIRE {
   \begin{itemize}
     \setlength{\itemsep}{-1pt}    \setlength{\parsep}{0pt}
-  \item K corpora $C^d, d \in [1, \dots,n_d]$ for $n_d$ domains equipped by an empirical distribution $D_d(x)$
-  \item K dev sets $Dev^d, d\in [1, \dots,n_d]$ for $n_d$ domains.
-  \item Domain testing distribution $\vlambda^t \in \mathbb{R}^K$
+  \item[] 
+  \item $n_d$ corpora $C^d, d \in [1, \dots,n_d]$ for $n_d$ domains equipped by an empirical distribution $D_d(x)$
+  \item $n_d$  dev sets $Dev^d, d\in [1, \dots,n_d]$ for $n_d$ domains.
+  \item Domain testing distribution $\vlambda^t \in \mathbb{R}^{n_d}$
   \item Batch size $B$
-  \item Domain Dynamic Sampling Distribution $\lambda^l_i \in \mathbb{R}^K$ where $i$ indexes iterations.
+  \item Domain Dynamic Sampling Distribution $\lambda^l_i \in \mathbb{R}^{n_d}$ where $i$ indexes iterations.
   \item $Eval\_scores = []$
   \item $Early\_stopping$ criterion
   \item Total training iterations $iter\_num$
   \item Update rule for sampling distribution $\vlambda^l_i$
  \end{itemize}}
 \REPEAT 
-\STATE{Iteration i.}
-\STATE{Randomly pick $d \in [1,\dots,n_d]$ from sampling distribution $\lambda^l(i)$}
+\STATE{// Start of iteration i}
+\STATE{Randomly pick $d \in [1,\dots,n_d]$ from sampling distribution $\lambda^l_i$}
 \STATE{Sample $B$ sentences from $C^d$ with empirical distribution $D_d(x)$}
 \STATE{Update model by applying SGD computed from $B$ sampled sentences}
 \IF{$i \equiv 0 \mod{eval\_step}$}
 	\STATE{Evaluate current model with $K$ dev sets. $S^d_i$ is the performance at iteration $i^{th}$ on domain $d$}
-	\STATE{Report weighted score using test distribution $\vlambda^t$. $$eval(i) = \displaystyle{\mathop{\sum}_d^K \lambda^t(d) S^d_i}$$}
-	\STATE{$Eval\_scores.append(eval(i))$.}
+	\STATE{Report weighted score using test distribution $\vlambda^t$. $$eval(i) = \displaystyle{\mathop{\sum}_d^{n_d} \lambda^t(d) S^d_i}$$}
+	\STATE{$Eval\_scores.append(eval(i))$}
 \ENDIF
 \IF{$i \equiv 0 \mod{sampler\_updating\_step}$}
-	\STATE Update $\vlambda^l_i$.
+	\STATE Update $\vlambda^l_i$
 \ENDIF
 \IF{$Early\_stopping(Eval\_scores)$}
-	\STATE{Break.}
+	\STATE{break}
 \ENDIF
 \UNTIL{$i> iter\_num$}
 \end{algorithmic}
