@@ -199,7 +199,7 @@ This experiment aims to simulate with automatic domains a scenario where the num
 \STATE{Sample $B$ sentences from $C^d$ with empirical distribution $D_d(x)$}
 \STATE{Update model by applying SGD computed from $B$ sampled sentences}
 \IF{$i \equiv 0 \mod{eval\_step}$}
-	\STATE{Evaluate current model with $K$ dev sets. $S^d_i$ is the performance at iteration $i^{th}$ on domain $d$}
+	\STATE{Evaluate current model with $n_d$ dev sets. $S^d_i$ is the performance at iteration $i^{th}$ on domain $d$}
 	\STATE{Report weighted score using test distribution $\vlambda^t$. $$eval(i) = \displaystyle{\mathop{\sum}_d^{n_d} \lambda^t(d) S^d_i}$$}
 	\STATE{$Eval\_scores.append(eval(i))$}
 \ENDIF
@@ -209,16 +209,12 @@ This experiment aims to simulate with automatic domains a scenario where the num
 \IF{$Early\_stopping(Eval\_scores)$}
 	\STATE{break}
 \ENDIF
+\STATE{$i=i+1$}
 \UNTIL{$i> iter\_num$}
 \end{algorithmic}
 \end{breakablealgorithm}
 
 \end{document}
-
-
-
-
-
 
 
 
