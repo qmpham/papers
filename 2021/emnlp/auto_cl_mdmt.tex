@@ -118,7 +118,7 @@
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
-A typical setting in machine translation (MT) is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for the task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen and fixed; a key component in training is then to mitigate the detrimental effects of a possible mismatch between these distributions. Single-source and multi-source\footnote{In this paper, multi-source DA means having multiple domains to adapt from and should not be confused with multi-source translation, where several \emph{source languages} are considered.} domain adaptation (DA) is a well-studied instance of this setting (see \citet{Chu2017comparison,Saunders21domain} for a review), and so is multi-domain (MD) learning \citep{Chu18multilingual,Zeng18multidomain,Jiang19multidomain,Pham21revisiting}. A related situation is multilingual machine translation \citep{Firat16multiway,Ha16towards,Johnson17google,Aharoni19massively},\fyDone{Fix ref}
+A typical setting in machine translation (MT) is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for the task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen and fixed; a key component in training is then to mitigate the detrimental effects of a possible mismatch between these distributions. Single-source and multi-source\footnote{In this paper, multi-source DA means having multiple domains to adapt from and should not be confused with multi-source translation, where several \emph{source languages} are considered.} domain adaptation (DA) is a well-studied instance of this setting (see \citet{Chu2017comparison,Saunders21asurvey} for a review), and so is multi-domain (MD) learning \citep{Chu18multilingual,Zeng18multidomain,Jiang19multidomain,Pham21revisiting}. A related situation is multilingual machine translation \citep{Firat16multiway,Ha16towards,Johnson17google,Aharoni19massively},\fyDone{Fix ref}
 % \revision{cite also \citep{Shen21source}} -> I think this is not so appropriate here
 where the heterogeneity of training data not only corresponds to variations in the topic, genre, or register but also in language.
 
@@ -242,11 +242,11 @@ We also re-implement the approach of \citet{Zhang19curriculum} according to the 
 \subsection{MDAC systems} \label{ssec:dds-sys}
 The behavior of MDAC only depends on (a) the initial domain distribution at the start of training $\vlambda^{l}_{t=0}$, and (b) the targeted (dev/test) distribution $\vlambda^{t}$. We thus report these systems as \system{MDAC($\vlambda^{l}_{t=0}$, $\vlambda^{t}$)} and compare with DDS using the same settings.
 
-In our work, we parameterize the distribution $\vlambda^l$ as follows (with $\beta=2$ in all experiments):\fyDone{Explain why}
+In our work, we parameterize the distribution $\vlambda^l$ as follows (with $\beta=2$\footnote{This setting corresponds to the \emph{spherical softmax} of \cite{Brebisson16anexploration}.} in all experiments):\fyDone{Explain why}
 \begin{equation}
 \lambda^l(d;\vpsi) = \frac{\vpsi[d]^\beta}{\sum_i \vpsi[i]^\beta}. \nonumber
 \end{equation}
-This parameterization avoids the ``rich-get-richer'' effect that we observe when using $\vlambda(\vpsi) = \operatorname{softmax}(\vpsi)$, which yields gradients wrt. $\lambda_d$ to be proportional to $\lambda_d$ (see also Figure~\ref{fig:sampling}). Additional settings for the hyper-parameters of our method include the number of simulation steps $k=10$ and the learning rate $\mathbf{lr}_{data}=0.001$. We update the sampling distribution via 100 gradient descent iterations for almost all experimental settings except that for adaptation with automatic clusters (Section~\ref{ssec:clda}), where we use 20~gradient descent iterations to avoid converging to degenerate distributions.\fyFuture{Why? computation?} We split the training into 100 short sessions that last 2000 training steps each. The choice of those hyper-parameters is mostly heuristic except for the learning rate $\mathbf{lr}_{data}$ which is optimized via grid search over a set of values $\{0.001,0.0025,0.005\}$.
+This parameterization avoids the ``rich-get-richer'' effect that we observe when using $\vlambda(\vpsi) = \operatorname{softmax}(\vpsi)$, which yields gradients wrt. $\psi[d]$ that are proportional to $\exp(\psi[d])$ (see also Figure~\ref{fig:sampling}). Additional settings for the hyper-parameters of our method include the number of simulation steps $k=10$ and the learning rate $\mathbf{lr}_{data}=0.001$. We update the sampling distribution via 100 gradient descent iterations for almost all experimental settings except that for adaptation with automatic clusters (Section~\ref{ssec:clda}), where we use 20~gradient descent iterations to avoid converging to degenerate distributions.\fyFuture{Why? computation?} We split the training into 100 short sessions that last 2000 training steps each. The choice of those hyper-parameters is mostly heuristic except for the learning rate $\mathbf{lr}_{data}$ which is optimized via grid search over a set of values $\{0.001,0.0025,0.005\}$.
 
 \subsection{Experimental tasks}
 We evaluate and compare our method with multiple baselines in the 5 following conditions.
@@ -257,7 +257,7 @@ In the \emph{multi-domain adaptation task}, given the same 6 domains, we aim to 
 
 In a fourth experiment (\emph{few-shot adaptation}), given training data in 6 domains and a small development set of a new domain (\domain{News} in our case), we aim to build an NMT model which performs well for the unseen domain.
 
-Finally, in the \emph{unsupervised domain adaptation task}, we cluster all available training data into 30 clusters using the KNN algorithm in the same way as in \citep{Tars18multidomain}, then adapt these clusters to one of 6 domains using the corresponding in-domain dev set. We compare MDAC to DDS for each of our 6 test sets.
+Finally, in the \emph{unsupervised domain adaptation task}, we cluster all available training data into 30~clusters using the KNN algorithm in the same way as in \citep{Tars18multidomain}, then adapt these clusters to one of 6 domains using the corresponding in-domain dev set. We compare MDAC to DDS for each of our 6 test sets.
 
 \section{Results and discussion \label{sec:results}}
 
@@ -343,14 +343,14 @@ A second observation is that DDS is again outperformed by MDAC by a significant 
 \begin{subfigure}{.5\textwidth}
   \centering
   % include first image
-  \includegraphics[width=.8\linewidth]{DDS.png}  
+  \includegraphics[width=0.97\textwidth]{DDS.png}  
   \caption{DDS}
   \label{fig:DDS}
 \end{subfigure}
 \begin{subfigure}{.5\textwidth}
   \centering
   % include second image
-  \includegraphics[width=.8\linewidth]{MDAC.png}  
+  \includegraphics[width=0.97\textwidth]{MDAC.png}  
   \caption{MDAC}
   \label{fig:MDAC}
 \end{subfigure}
@@ -383,11 +383,11 @@ A second observation is that DDS is again outperformed by MDAC by a significant 
 The left part of Table~\ref{tab:unsupervised-da} displays the performance on the unseen domain \domain{news} for NMT systems trained with the mixtures $\lambda^l \in \big[ \lambda_0, \lambda_{0.25}, \lambda_{0.5}, \lambda_{0.75}, \lambda_{1.0}\big]$ and with dynamic data selection (MDAC and DDS). These systems have insignificant differences in BLEU, showing that dynamic mixture does not improve the robustness of the NMT system against unseen domains. However, the fact that the performance of MDAC and DDS is close to the best performance is a sign that they can also apply in such challenging situations. % the robustness of the NMT model.
 
 \subsection{Automatic clustering}\label{ssec:clda}
-The right part of Table~\ref{tab:unsupervised-da} reports the performance of NMT systems adapted to each domain. In comparison to Section~\ref{ssec:da}, the training data is distributed in 30 automatic clusters instead of the 6 original domains. Splitting the train data into small groups provides the learner with extra degrees of freedom when selecting the best distribution. However, as these clusters are built automatically, they are noisier in nature. According to the results in Table~\ref{tab:unsupervised-da}, this scenario is hard both for DDS and MDAC, which perform much worse than for the supervised DA setting. This again signals the importance of initialization: analyzing the clustering, we find that the data for \domain{rel} mostly correspond to one single cluster. When using a uniform initialization, this cluster starts with a very small weight and never succeeds in yielding the (good) performance observed in the DA setting.
+The right part of Table~\ref{tab:unsupervised-da} reports the performance of NMT systems adapted to each domain.\footnote{A more detailed analysis is in the supplementary material.} In comparison to Section~\ref{ssec:da}, the training data is distributed in 30 automatic clusters instead of the 6 original domains. Splitting the train data into small groups provides the learner with extra degrees of freedom when selecting the best distribution. However, as these clusters are built automatically, they are noisier in nature. According to the results in Table~\ref{tab:unsupervised-da}, this scenario is hard both for DDS and MDAC, which perform much worse than for the supervised DA setting. This again signals the importance of initialization: analyzing the clustering, we find that the data for \domain{rel} mostly correspond to one single cluster. When using a uniform initialization, this cluster starts with a very small weight and never succeeds in yielding the (good) performance observed in the DA setting.
 
 \section{Related Work \label{sec:related}}
 
-Domain adaptation is an old problem that has been studied from many angles, both for SMT and NMT. A survey of supervised and unsupervised DA for NMT is in \citet{Chu18asurvey}, where the authors distinguish between data-centric and model-centric DA, a view also adopted in the more recent review of \citet{Saunders21domain}. Our approach to DA in this paper falls under the former category. We refer interested readers to these references and do not discuss DA any further.
+Domain adaptation is an old problem that has been studied from many angles, both for SMT and NMT. A survey of supervised and unsupervised DA for NMT is in \citet{Chu18asurvey}, where the authors distinguish between data-centric and model-centric DA, a view also adopted in the more recent survey of \citet{Saunders21asurvey}. Our approach to DA in this paper falls under the former category. We refer interested readers to these references and do not discuss DA any further.
 
 Multi-domain adaptation (MDA) aims to develop systems that simultaneously bode well for several domains. Like for DA, techniques for supervised MDA combine one or several ingredients: (a) the specialization of data representations \citep{Kobus17domaincontrol} or of sub-networks \citep{Pham19generic} to differentiate the processing of each domain; (b) the use of adversarial techniques to neutralize differences between domains \citep{Britz17mixing,Zeng18multidomain}; (c) the use of automatic domain identification e.g.\ \citet{Jiang19multidomain}. Unsupervised MDA is studied in \citet{Farajian17multidomain}, as an instance of unsupervised DA.
 
