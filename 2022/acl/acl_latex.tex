@@ -1,0 +1,245 @@
+% This must be in the first 5 lines to tell arXiv to use pdfLaTeX, which is strongly recommended.
+\pdfoutput=1
+% In particular, the hyperref package requires pdfLaTeX in order to break URLs across lines.
+
+\documentclass[11pt]{article}
+
+% Remove the "review" option to generate the final version.
+\usepackage[review]{acl}
+
+% Standard package includes
+\usepackage{times}
+\usepackage{latexsym}
+
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+
+% This is not strictly necessary, and may be commented out,
+% but it will improve the layout of the manuscript,
+% and will typically save some space.
+\usepackage{microtype}
+
+% If the title and author information does not fit in the area allocated, uncomment the following
+%
+%\setlength\titlebox{<dim>}
+%
+% and set <dim> to something 5cm or larger.
+
+%algo packages
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+%color packages
+\usepackage{xcolor}
+\colorlet{shadecolor}{orange!15}
+\usepackage{color,soul}
+\usepackage{soulutf8}
+\definecolor{bordeau}{rgb}{0.3515625,0,0.234375}
+
+% position of figure
+\usepackage[absolute,overlay]{textpos}
+
+%graphic packages
+\usepackage{graphicx}
+\graphicspath{ {figures/} }
+\usepackage{wrapfig}
+\usepackage{float} 
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+
+% table packages
+\usepackage{array}
+\usepackage{multirow,booktabs}
+\usepackage{multicol}
+\usepackage{tabularx}
+
+% font package
+\usepackage[utf8]{inputenc}	% Para caracteres en español
+\usepackage{textcomp}
+%\usepackage{times}
+%\usepackage{lmodern}
+\usepackage{mathptmx}
+
+% equation packages
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{mathrsfs}
+
+\title{Frustratingly easy multi-domain, multilingual translation with latent multi-task group dropout}
+
+% Author information can be set in various styles:
+% For several authors from the same institution:
+% \author{Author 1 \and ... \and Author n \\
+%         Address line \\ ... \\ Address line}
+% if the names do not fit well on one line use
+%         Author 1 \\ {\bf Author 2} \\ ... \\ {\bf Author n} \\
+% For authors from different institutions:
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \And  ... \And
+%         Author n \\ Address line \\ ... \\ Address line}
+% To start a seperate ``row'' of authors use \AND, as in
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \AND
+%         Author 2 \\ Address line \\ ... \\ Address line \And
+%         Author 3 \\ Address line \\ ... \\ Address line}
+
+\author{First Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\\And
+  Second Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Multi-domain and multilingual translation can be cast under multi-task learning in which each domain, each language pair are considered as a task. Sharing most of the parameters of the model causes a catastrophic interference between unrelated tasks. In this work, we propose equivalently grouping the nodes of each layer and dropping a portion of these groups assigning different sparse sub-networks to different task. We demonstrate a significant improvement in multi-domain and multilingual translation. Furthermore, through an ablation study, we show that the learned dropping patterns are similar in related tasks allowing the knowledge transferring between these task.
+\end{abstract}
+
+\section{Introduction}
+Multi-domain translation and multilingual translation develop one model for translations in multi-domain and multiple language pairs respectively. These paradigms are motivated by the compactness of the translation model and the hypothetical positive knowledge transfer between similar domains \citep{Pham21revisiting} and between languages in the same family \citep{Tan19multilingual}. 
+
+The method we developed here mitigate the catastrophic interference occurring in training a neural machine translation (NMT) model for multiple domains or multiple language pairs. 
+
+\section{Multi-task group dropout}
+We define a group dropout for a domain $d$ as follow
+\begin{equation}
+\begin{array}{rcl}
+\tilde{h}^l &=& h^l \odot r_l^d ,\\
+h^{l+1} &=& \text{LAYER}^{l+1}(h^l) ,\\
+l & \in & [0,\cdots,L] ,\\
+\end{array}
+\end{equation}
+where $L$ is number of Transformer layers of our NMT model.
+
+The dropping mask $r_l^d$ of $l^{th}$ layer and domain $d$ is defined as follow
+\begin{equation}
+\begin{array}{rcl}
+r_l^d(i) &=& \begin{cases}
+      1, & \text{if}\ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p} \\
+      & \text{AND} \  m_l^d(p) == 1 \\
+      0, & \text{otherwise}
+    \end{cases} \\
+p & \in & \{0,\dots,n_p-1 \} \\
+d & \in & \{0,\dots,n_d-1 \} \\
+i & \in & \{0,\dots,d_k-1 \} \\
+m_l^d & \in & \{0,1\}^{n_p} \ \forall d,l \\
+\mid m_l^d \mid_{L_1} & = & k  \\
+\Delta^{n_p}_k & = & \{ m \in \{0,1\}^{n_p} | \mid m \mid_{L_1} = k \}
+\end{array}
+\end{equation}
+where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. The group $p$ is retained for domain $d$ if $m_l^d(p)==1$ and is dropped if $m_l^d(p)==0$. We also denote $\Delta^{n_p}_k$ the set of all admissible dropping masks. 
+
+We incorporate the latent variables $m_{l\in[0,\cdots,L]}^d$ into the log-likelihood of our model as below. For the sake of brevity, we denote $m_l^d$ the set of latent variables $m_{l\in[0,\cdots,L]}^d$
+\begin{equation}
+\hspace{-1.5em}
+\begin{array}{rcl}
+\text{log} P(y|x,\theta,d) & \text{=} & \text{log} P(y, m_l^d |x,\theta,d) \text{-} \text{log} P(m_l^d|y, x,\theta,d) \\
+& \text{=} & \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y, m_l^d | x,\theta,d) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big] \\
+& \text{+} & KL(P(m_l^d | \Phi_l^d) \parallel P(m_l^d|y, x,\theta,d)) \\
+& \geq & \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y, m_l^d | x,\theta,d) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big]  \\
+& \text{=} & \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y | x,\theta,m_l^d, d) \big] \\
+& \text{-} & KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \\
+& \text{=} & \mathcal{L}(\theta, \Phi_l^d, x , y) \label{eq:lower-bound}
+\end{array}
+\end{equation}
+our training objective will be the lowerbound, which is called the evidence lower bound (ELBO) in variational statistic \citep{Diederick14auto}, $\mathcal{L}(\theta, \Phi_l^d, x , y)$. The variational distribution of $m_l^d$, $P(m_l^d|\Phi_l^d)$, is defined as follows
+\begin{align*}
+\Phi_d & \in \mathbb{R}^{n_p} \\
+Ind^d & \text{=} \{ i_1, \cdots, i_k \} \ | \ \Phi_l^d \\
+& \sim \ \text{\small Sampling\_without\_replacement} \big(\text{softmax}(\Phi_l^d) \big) \\
+m_l^d(i) &\text{=} \mathbb{I}(i \in Ind^d) \\
+\end{align*}
+
+The choice of the modeling of the latent vector $m_l^d$ is motivated by the Gumbel Top-K trick \citep{Kool19stochastic}. In addition, we suppose the prior distribution of $m_l^d$ is uniform over the admissible set $\Delta^{n_p}_k$, $P(m_l^d | x, \theta, d) \ \text{=} \ U(\Delta^{n_p}_k)$.
+
+With our assumption over the prior distribution and our choice of the variational distribution, we express the two terms of the lowerbound \eqref{eq:lower-bound} as follows
+
+\begin{equation}
+\begin{array}{rcl}
+T_1 &=& \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y | x,\theta,m_l^d, d)  \big] \\
+&=& \mathbb{E}_{g_l^d \sim Gumbel(0,1) \ \text{i.i.d}} \big[ \text{log} P(y | x,\theta,\tilde{m}_l^d,d) \big] \\
+\end{array}
+\end{equation}
+where
+\begin{equation}
+\begin{array}{rcl}
+g_l^d & \in & \mathbb{R}^{n_p} \\
+g_l^d(p) & \sim & Gumbel(0,1) \ \text{i.i.d} \\
+&& \forall p \in \{ 0,\cdots,n_p-1 \} \\
+i_1, \cdots, i_k &=& Top_{k} \{ g_l^d(0) + \Phi_l^d(0), \cdots,\\ &&g_l^d(n_d-1) + \Phi_l^d(n_d-1) \} \\
+\tilde{m}_l^d(p) &=& \mathbb{I}(p \in Ind^d). \\
+\end{array}
+\end{equation}
+
+\begin{equation}
+\begin{array}{rcl}
+T_2 &=& - KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \\
+	&=& \mathbb{H} \big[ P(m_l^d | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \\ \label{eq:entropy}
+\end{array}
+\end{equation}
+we will prove this inequality in Appendix \ref{appendix:b}.
+Our loss function, which is the negative of the lowerbound \eqref{eq:lower-bound}, consists of 2 terms $-T_1$ and $-T_2$. The inequality \eqref{eq:entropy} show that the upperbound of $-T_2$ is the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ with 
+
+%\begin{equation}
+%\begin{array}{rcl}
+%L(\theta, \Phi_0, \cdots, \Phi_{n_d\text{-1}}) &=& \sum_{d=0}^{n_d-1} \mathbb{E}_{x \sim \mathcal{D}_s^d, y \sim g^d(x)} \big[ \mathcal{L}(\theta,\Phi_d,x,y) \big]
+%\end{array}
+%\end{equation}
+
+
+%
+%\begin{equation}
+%\begin{array}{rcl}
+% \tilde{m}^d &=&\displaystyle{\mathop{argmin}_{\substack{
+%       0 \leq m_i \leq 1 \ \forall 0 \leq i \leq n_d\text{-}1 \\
+%        1^{T}.m = k
+%      }}} -(g+\Phi_l^d)^{T} . m - \tau H_b(m) \\
+%& & \\
+%H_b(m) &=& - \sum_i m_i \text{log}(m_i) + (1-m_i)\text{log}(1-m_i)
+%\end{array}
+%\end{equation}
+%
+%\begin{equation}
+%\begin{array}{rcl} 
+%
+%Ind^d &=& Top_k(\Phi_l^d) \\
+%m_l^d &=& \mathbb{I}(i\in Ind^d)\\
+%
+%y &\sim& P(.|x,\theta,m_l^d)
+%
+%\end{array}
+%\end{equation}
+\section{Experimental settings}
+\section{Results and ablation studies}
+\section{Related work}
+\section{Conclusions and outlook}
+\bibliography{bibliography}
+\bibliographystyle{acl_natbib}
+
+\appendix
+\section{Appendix A}
+\label{appendix:a}
+Theorem of implicit differentiation
+
+\section{Appendix B}
+\label{appendix:b}
+Entropy inequality
+\section{Appendix C}
+\label{appendix:c}
+Data size
+
+
+%\label{sec:appendix}
+
+\end{document}
