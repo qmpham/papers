@@ -130,7 +130,8 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Multi-domain and multilingual translation can be cast under multi-task learning in which each domain, each language pair are considered as a task. Sharing most of the parameters of the model causes a catastrophic interference between unrelated tasks. In this work, we propose equivalently grouping the nodes of each layer and dropping a portion of these groups assigning different sparse sub-networks to different task. We demonstrate a significant improvement in multi-domain and multilingual translation. Furthermore, through an ablation study, we show that the learned dropping patterns are similar in related tasks allowing the knowledge transferring between these task.
+Multi-domain and multilingual translation can be cast under multi-task learning in which each domain or language pair is considered a task. Sharing most of the parameters of the model causes a catastrophic interference between unrelated tasks. In this work, we propose equivalently grouping the nodes of each layer and dropping a portion of these groups. Via the task-dependent dropout mechanism, we assign different sparse sub-networks to different tasks. We demonstrate a significant improvement in multi-domain and multilingual translation. Furthermore, through an ablation study, we show that the learned dropping patterns are similar in related tasks allowing the knowledge transferring between these tasks.
+
 \end{abstract}
 
 \section{Introduction}
@@ -164,7 +165,7 @@ m_l^d & \in & \{0,1\}^{n_p} \ \forall d,l \, \\
 \Delta^{n_p}_k & = & \{ m \in \{0,1\}^{n_p} | \mid m \mid_{L_1} = k \},
 \end{array}
 \end{equation}
-where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. The group $p$ is retained for domain $d$ if $m_l^d(p)\text{small ==}1$ and is dropped if $m_l^d(p)\text{small ==}0$. We also denote $\Delta^{n_p}_k$ the set of all admissible dropping masks. 
+where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. The group $p$ is retained for domain $d$ if $m_l^d(p)\text{\small ==}1$ and is dropped if $m_l^d(p)\text{\small ==}0$. We also denote $\Delta^{n_p}_k$ the set of all admissible dropping masks. 
 
 We incorporate the latent variables $m_{l\in[0,\cdots,L]}^d$ into the log-likelihood of our model as below. For the sake of brevity, we denote $m_l^d$ the set of latent variables $m_{l\in[0,\cdots,L]}^d$
 \begin{equation}
@@ -241,9 +242,9 @@ The gradient $\frac{\partial T_1}{\hat{m}_l^d(\tau)}$ is computed via autograd a
 \subsubsection{Multi-domain, multilingual translation}
 In both cases, we examinate the performance of three following MT systems.
 \begin{itemize}
-	\item Transformer trained with .
-	\item Adapter based Transformer.
-	\item Transformer with multi-task group dropout.
+	\item Transformer
+	\item Adapter based Transformer
+	\item Transformer with multi-task group dropout
 \end{itemize}
 For the sake of brevity, we put the detailed descriptions of these systems in Appendix \ref{appendix:c}.
 \subsection{Datasets}
@@ -259,8 +260,8 @@ translation tasks. We evaluate models on widely used multilingual translation da
 The detailed description of the datasets is provided in Appendix \ref{appendix:c}.
 \section{Results and ablation studies}
 \subsection{Multi-domain translation}
-According to Table \ref{tab:mdmt}, \system{LaMGD} shows a significant improvement over the generic system \system{Transformer} with zero extra parameters. Moreover, \system{LaMGD} achieve equivalent performance in average compared to \system{Adapter}, which is carrefully finetuned with a approximately 12.4M additional parameters.
-\begin{table*}
+According to Table \ref{tab:mdmt}, \system{LaMGD} shows a significant improvement (+2.78) over the generic system \system{Transformer} with zero extra parameters. Moreover, \system{LaMGD} achieve equivalent performance in average compared to \system{Adapter}, which is carrefully finetuned with a approximately 12.4M additional parameters.
+\begin{table*}[h!]
   \centering
   \begin{tabular}{|p{4cm}|*{7}{r|}} \hline
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
@@ -273,8 +274,39 @@ According to Table \ref{tab:mdmt}, \system{LaMGD} shows a significant improvemen
   \label{tab:mdmt}
 \end{table*}
 \subsection{Multilingual translation}
-
+According to Table \ref{tab:multilingual}, \system{LAMGD} shows a boost of 0.42, 0.33, ,0.32 in average over the multilingual \system{Transformer} in O2M-related, M2O-related, O2M-diverse, M2O-diverse respectively. Significant gains are observed in \domain{bel}, \domain{glg} (both direction), \domain{hin} and \domain{bos} (O2M direction).
+\begin{table*}[ht]
+  \centering
+  \begin{tabular}{|p{4cm}|*{9}{r|}} \hline
+    O2M-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
+    \system{Transformer}  \hfill{\footnotesize[91.6m]} & 4.80 &7.30&20.80&21.10&39.70&19.80&22.60&15.20&18.91 \\
+    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]} & & & & & & & & & \\ 
+    \system{LaMGD}  \hfill{\footnotesize[+0m]}  & 5.20&9.40&20.60&22.80&39.60&19.60&22.40&15.00&19.33 \\ 
+	\hline
+    \hline
+    M2O-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
+    \system{Transformer}  \hfill{\footnotesize[67.8m]} &11.40&16.60&28.50&	27.10&43.70&24.60&30.30&25.60&25.98 \\
+    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]} & & & & & & & & & \\ 
+    \system{LaMGD}   \hfill{\footnotesize[+0m]}  &11.30&17.40&28.60&28.70&	43.70&24.50&30.70&25.60&26.31 \\ 
+    \hline
+    \hline
+    O2M-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
+    \system{Transformer}  \hfill{\footnotesize[96.9m]} & 10.20&4.0&12.70&22.20&31.80&34.00&38.30&8.30&20.19 \\
+    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  & & & & & & & & & \\ 
+    \system{LaMGD}   \hfill{\footnotesize[+0m]} & & & & & & & & & \\
+    \hline 
+    \hline
+    O2M-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
+    \system{Transformer}  \hfill{\footnotesize[70.4m]} &22.40&9.70&20.50&31.80&37.50&38.70&39.80&19.00&27.43 \\
+    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  & & & & & & & & & \\ 
+    \system{LaMGD}   \hfill{\footnotesize[+0m]} &23.50&9.60&21.50&32.20&37.70&38.60&40.00&18.90&27.75 \\
+    \hline
+  \end{tabular}
+  \caption{Multilingual translation}
+  \label{tab:multilingual}
+\end{table*}
 \subsection{Similarity between dropping masks}
+
 \section{Related work}
 \section{Conclusions and outlook}
 \bibliography{bibliography}
@@ -294,7 +326,7 @@ In this section, we give a simple proof of Inequality \ref{eq:entropy}. In fact,
 \end{align*}
 \section{Appendix C}
 \label{appendix:c}
-\subsection{Multi-domain translation}
+\subsection{Multi-domain datasets}
 
 \begin{table*}[h!]
   \centering
@@ -314,6 +346,10 @@ In this section, we give a simple proof of Inequality \ref{eq:entropy}. In fact,
 \label{tab:Corpora-chap4}
 \end{table*}
 
-\subsection{Multilingual translation}
+\subsection{Multilingual datasets}
+
+\subsection{Multi-domain systems}
+
+\subsection{Multilingual systems}
 
 \end{document}
