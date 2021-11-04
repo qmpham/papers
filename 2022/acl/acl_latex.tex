@@ -71,6 +71,29 @@
 \usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
 \usepackage{mathrsfs}
 
+%new commands
+\def\-{\raisebox{.75pt}{-}}
+\usepackage{mathtools,xparse}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\NewDocumentCommand{\normL}{ s O{} m }{%
+  \IfBooleanTF{#1}{\norm*{#3}}{\norm[#2]{#3}}_{2}%
+}
+\newcommand{\domain}[1]{\texttt{\textsc{#1}}}
+%\newcommand{\system}[1]{\texttt{{#1}}}
+%\renewcommand{\UrlFont}{\ttfamily\small}
+%\renewcommand{\S}{\scriptsize}
+%\newcommand{\R}{\mathbb{R}}
+%\newcommand{\vect}[1]{\boldsymbol{#1}}
+%\DeclareMathOperator*{\argmax}{argmax}
+%\DeclareMathOperator*{\argmin}{argmin}
+%\usepackage[draft]{todo}
+%\newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
+%\newcommand{\fyTodostar}[1]{\Todo*[FY:]{\textcolor{orange}{#1}}}
+%\newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+%\newcommand{\fyDonestar}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+%\newcommand{\fyFuture}[1]{\done[FY]\Todo[FY:]{\textcolor{red}{#1}}}
+
 \title{Frustratingly easy multi-domain, multilingual translation with latent multi-task group dropout}
 
 % Author information can be set in various styles:
@@ -116,29 +139,29 @@ We define a group dropout for a domain $d$ as follow
 \begin{equation}
 \begin{array}{rcl}
 \tilde{h}^l &=& h^l \odot r_l^d ,\\
+r_l^d \in \{ 0,1 \}^{d_k}, \\
 h^{l+1} &=& \text{LAYER}^{l+1}(h^l) ,\\
 l & \in & [0,\cdots,L] ,\\
 \end{array}
 \end{equation}
-where $L$ is number of Transformer layers of our NMT model.
-
-The dropping mask $r_l^d$ of $l^{th}$ layer and domain $d$ is defined as follow
+where $L$ is number of Transformer layers of our NMT model, the binary vector $r_l^d$ is a dropping mask. The dropping mask $r_l^d$ of $l^{th}$ layer and domain $d$ is defined as follow
 \begin{equation}
 \begin{array}{rcl}
-r_l^d(i) &=& \begin{cases}
+r_l^d(i) &=& \begin{cases\newcommand{\domain}[1]{\texttt{\textsc{#1}}}
+\newcommand{\system}[1]{\texttt{{#1}}}}
       1, & \text{if}\ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p} \\
-      & \text{AND} \  m_l^d(p) == 1 \\
-      0, & \text{otherwise}
+      & \text{AND} \  m_l^d(p) \text{\small ==} 1 \\
+      0, & \text{otherwise},
     \end{cases} \\
-p & \in & \{0,\dots,n_p-1 \} \\
-d & \in & \{0,\dots,n_d-1 \} \\
-i & \in & \{0,\dots,d_k-1 \} \\
-m_l^d & \in & \{0,1\}^{n_p} \ \forall d,l \\
-\mid m_l^d \mid_{L_1} & = & k  \\
-\Delta^{n_p}_k & = & \{ m \in \{0,1\}^{n_p} | \mid m \mid_{L_1} = k \}
+p & \in & \{0,\dots,n_p\text{-}1 \}, \\
+d & \in & \{0,\dots,n_d\text{-}1 \}, \\
+i & \in & \{0,\dots,d_k\text{-}1 \}, \\
+m_l^d & \in & \{0,1\}^{n_p} \ \forall d,l \, \\
+\mid m_l^d \mid_{L_1} & = & k , \\
+\Delta^{n_p}_k & = & \{ m \in \{0,1\}^{n_p} | \mid m \mid_{L_1} = k \},
 \end{array}
 \end{equation}
-where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. The group $p$ is retained for domain $d$ if $m_l^d(p)==1$ and is dropped if $m_l^d(p)==0$. We also denote $\Delta^{n_p}_k$ the set of all admissible dropping masks. 
+where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. The group $p$ is retained for domain $d$ if $m_l^d(p)\text{small ==}1$ and is dropped if $m_l^d(p)\text{small ==}0$. We also denote $\Delta^{n_p}_k$ the set of all admissible dropping masks. 
 
 We incorporate the latent variables $m_{l\in[0,\cdots,L]}^d$ into the log-likelihood of our model as below. For the sake of brevity, we denote $m_l^d$ the set of latent variables $m_{l\in[0,\cdots,L]}^d$
 \begin{equation}
@@ -154,21 +177,24 @@ We incorporate the latent variables $m_{l\in[0,\cdots,L]}^d$ into the log-likeli
 \end{array}
 \end{equation}
 our training objective will be the lowerbound, which is called the evidence lower bound (ELBO) in variational statistic \citep{Diederick14auto}, $\mathcal{L}(\theta, \Phi_l^d, x , y)$. The variational distribution of $m_l^d$, $P(m_l^d|\Phi_l^d)$, is defined as follows
-\begin{align*}
-\Phi_d & \in \mathbb{R}^{n_p} \\
-Ind^d & \text{=} \{ i_1, \cdots, i_k \} \ | \ \Phi_l^d \\
-& \sim \ \text{\small Sampling\_without\_replacement} \big(\text{softmax}(\Phi_l^d) \big) \\
-m_l^d(i) &\text{=} \mathbb{I}(i \in Ind^d) \\
-\end{align*}
+\begin{equation}
+\hspace{-2.em}
+\begin{array}{rcl}
+\Phi_d & \in & \mathbb{R}^{n_p} , \\
+Ind^d & \text{=} & \{ i_1, \cdots, i_k \} \ | \ \Phi_l^d \\
+& \sim & \ \text{\small Sampling\_without\_replacement} \big(\text{softmax}(\Phi_l^d) \big) , \\
+m_l^d(i) &\text{=}& \mathbb{I}(i \in Ind^d) .\\
+\end{array}
+\end{equation}
 
 The choice of the modeling of the latent vector $m_l^d$ is motivated by the Gumbel Top-K trick \citep{Kool19stochastic}. In addition, we suppose the prior distribution of $m_l^d$ is uniform over the admissible set $\Delta^{n_p}_k$, $P(m_l^d | x, \theta, d) \ \text{=} \ U(\Delta^{n_p}_k)$.
 
-With our assumption over the prior distribution and our choice of the variational distribution, we express the two terms of the lowerbound \eqref{eq:lower-bound} as follows
+With our assumption over the prior distribution and our choice of the variational distribution, we express the two terms of the lower-bound \eqref{eq:lower-bound} as follows
 
 \begin{equation}
 \begin{array}{rcl}
 T_1 &=& \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y | x,\theta,m_l^d, d)  \big] \\
-&=& \mathbb{E}_{g_l^d \sim Gumbel(0,1) \ \text{i.i.d}} \big[ \text{log} P(y | x,\theta,\tilde{m}_l^d,d) \big] \\
+&=& \mathbb{E}_{g_l^d(p) \sim Gumbel(0,1) \ \text{i.i.d}} \big[ \text{log} P(y | x,\theta,\tilde{m}_l^d,d) \big] \\
 \end{array}
 \end{equation}
 where
@@ -176,70 +202,106 @@ where
 \begin{array}{rcl}
 g_l^d & \in & \mathbb{R}^{n_p} \\
 g_l^d(p) & \sim & Gumbel(0,1) \ \text{i.i.d} \\
-&& \forall p \in \{ 0,\cdots,n_p-1 \} \\
-i_1, \cdots, i_k &=& Top_{k} \{ g_l^d(0) + \Phi_l^d(0), \cdots,\\ &&g_l^d(n_d-1) + \Phi_l^d(n_d-1) \} \\
+&& \forall p \in \{ 0,\cdots,n_p\text{-}1 \} \\
+i_1, \cdots, i_k &=& Top\_k \ \{ \ g_l^d(0) + \Phi_l^d(0), \cdots,\\ &&g_l^d(n_p\text{-}1) + \Phi_l^d(n_p\text{-}1) \ \} \\
 \tilde{m}_l^d(p) &=& \mathbb{I}(p \in Ind^d). \\
-\end{array}
+\end{array} \label{eq:top-k}
 \end{equation}
+
+\begin{align}
+T_2 &= - KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \\ 
+	&= \mathbb{H} \big[ P(m_l^d | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \\ 
+	&= \mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \\ \
+	&\geqslant \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \label{eq:entropy}
+\end{align}
+
+we will prove Inequality \eqref{eq:entropy} in Appendix \ref{appendix:b}.
+
+Now we go back to our loss function, which is the negative of the lower-bound \eqref{eq:lower-bound}, consisting of 2 terms $-T_1$ and $-T_2$. The inequality \eqref{eq:entropy} shows that the upperbound of $-T_2$ is $\text{log}(\#\Delta^{n_p}_k) - \mathbb{H}(\text{softmax}(\Phi_l^d))$. In the training, we will maximize the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ as a regularization over the parameters $\Phi_l^d$ of the variational distribution.
+
+Thanks to the Gumbel Top-K trick, we can move the parameters $\Phi_l^d$ into log-likelihood function and get rid of policy gradients, which have been reported to be very unstable \citep{Diederick14auto}. However, the operator Top-K, which defines $\tilde{m}_l^d$ in Equation \eqref{eq:top-k}, is not differentiable. Therefore, we approximate this function by the Soft-Top-K function defined as follows
 
 \begin{equation}
 \begin{array}{rcl}
-T_2 &=& - KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \\
-	&=& \mathbb{H} \big[ P(m_l^d | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \\ \label{eq:entropy}
+ \hat{m}_l^d(\tau) &=&\displaystyle{\mathop{argmin}_{\substack{
+       0 \leqslant m_i \leqslant 1 \ \forall 0 \leqslant i \leqslant n_d\text{-}1 \\
+        1^{T}.m = k
+      }}} -(g_l^d+\Phi_l^d)^{T} . m - \tau H_b(m) \\
+& \text{in which} & \\
+H_b(m) &=& - \sum_i m_i \text{log}(m_i) + (1-m_i)\text{log}(1-m_i)
 \end{array}
+\label{eq:soft-top-k}
 \end{equation}
-we will prove this inequality in Appendix \ref{appendix:b}.
-Our loss function, which is the negative of the lowerbound \eqref{eq:lower-bound}, consists of 2 terms $-T_1$ and $-T_2$. The inequality \eqref{eq:entropy} show that the upperbound of $-T_2$ is the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ with 
 
-%\begin{equation}
-%\begin{array}{rcl}
-%L(\theta, \Phi_0, \cdots, \Phi_{n_d\text{-1}}) &=& \sum_{d=0}^{n_d-1} \mathbb{E}_{x \sim \mathcal{D}_s^d, y \sim g^d(x)} \big[ \mathcal{L}(\theta,\Phi_d,x,y) \big]
-%\end{array}
-%\end{equation}
-
-
-%
-%\begin{equation}
-%\begin{array}{rcl}
-% \tilde{m}^d &=&\displaystyle{\mathop{argmin}_{\substack{
-%       0 \leq m_i \leq 1 \ \forall 0 \leq i \leq n_d\text{-}1 \\
-%        1^{T}.m = k
-%      }}} -(g+\Phi_l^d)^{T} . m - \tau H_b(m) \\
-%& & \\
-%H_b(m) &=& - \sum_i m_i \text{log}(m_i) + (1-m_i)\text{log}(1-m_i)
-%\end{array}
-%\end{equation}
-%
-%\begin{equation}
-%\begin{array}{rcl} 
-%
-%Ind^d &=& Top_k(\Phi_l^d) \\
-%m_l^d &=& \mathbb{I}(i\in Ind^d)\\
-%
-%y &\sim& P(.|x,\theta,m_l^d)
-%
-%\end{array}
-%\end{equation}
+In Appendix \ref{appendix:a}, we will prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. Furthermore, we will also provide the computation of $\hat{m}_l^d(\tau)$ and prove that $\hat{m}_l^d(\tau)$ is a differentiable function w.r.t $\Phi_l^d$ and its differentiation is computed via implicit differentiation theorem. During the training, we approximate $\tilde{m}_l^d$ by $\hat{m}_l^d(\tau)$ by gradually decaying the hyperparameter $\tau$ to $0$. The gradient of the term $T_1$ w.r.t $\Phi_l^d$ is computed via the chain rule as follows
+\begin{equation}
+\frac{\partial T_1}{\Phi_l^d} = \frac{\partial T_1}{\hat{m}_l^d(\tau)} \times \frac{\hat{m}_l^d(\tau)}{\Phi_l^d}
+\end{equation}
+The gradient $\frac{\partial T_1}{\hat{m}_l^d(\tau)}$ is computed via autograd algorithm while $\frac{\hat{m}_l^d(\tau)}{\Phi_l^d}$ is computed via implicit differentiation, that we will explain carefully in Appendix \ref{appendix:a}.
 \section{Experimental settings}
+\subsection{Baselines}
+\subsubsection{Multi-domain, multilingual translation}
+In both cases, we examinate the performance of three following MT systems.
+\begin{itemize}
+	\item Transformer trained with .
+	\item Adapter based Transformer.
+	\item Transformer with multi-task group dropout.
+\end{itemize}
+For the sake of brevity, we put the detailed descriptions of these systems in Appendix \ref{appendix:c}.
+\subsection{Datasets}
+\subsubsection{Multi-domain translation}
+We reuse the same data of a recent work of \citet{Pham21revisiting} in multi-domain translation. For the sake of brevity, we leave most of the details of data in Appendix \ref{appendix:c}.
+\subsubsection{Multilingual translation}
+We evaluate our model on both one-to-many (O2M) and many-to-one (M2O)
+translation tasks. We evaluate models on widely used multilingual translation datasets.
+\begin{itemize}
+	\item TED8-Related. Following the setting of \citep{Wang20balancing}, we use a subset of translations between English and eight related languages.
+	\item TED8-Diverse. The dataset consists of parallel sentences between English and eight diverse languages \citep{Wang20balancing}.
+\end{itemize}
+The detailed description of the datasets is provided in Appendix \ref{appendix:c}.
 \section{Results and ablation studies}
+\subsection{Multi-domain translation}
+\subsection{Multilingual translation}
+\subsection{Similarity between dropping masks}
 \section{Related work}
 \section{Conclusions and outlook}
 \bibliography{bibliography}
 \bibliographystyle{acl_natbib}
-
 \appendix
 \section{Appendix A}
 \label{appendix:a}
-Theorem of implicit differentiation
-
+Proof of limit. Computation of $\hat{m}_l^d(\tau)$. Theorem of implicit differentiation and Proof of differentiability.
 \section{Appendix B}
 \label{appendix:b}
-Entropy inequality
+In this section, we give a simple proof of Inequality \ref{eq:entropy}. In fact, we only need to prove $\mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] \geqslant \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big]$. The proof is as follows
+\begin{align*}
+&\mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] = - \mathbb{E}_{i_1,\cdots,i_k | \Phi_l^d} \big[ \text{log}P(i_1,\cdots,i_k | \Phi_l^d) \big] \\
+&= -\mathbb{E}_{i_1,\cdots,i_k | \Phi_l^d} \big[ \displaystyle{\sum_{j=2}^k}\text{log}P(i_j | i_1,\cdots,j_{j-1},\Phi_l^d) +  \text{log} P(i_1 | \Phi_l^d) \big] \\
+&\geqslant -\mathbb{E}_{i_1,\cdots,i_k | \Phi_l^d} \big[ \text{log} P(i_1 | \Phi_l^d) \big] \\
+&= -\mathbb{E}_{i_1 | \Phi_l^d} \big[ \text{log} P(i_1 | \Phi_l^d) \big] = \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big]
+\end{align*}
 \section{Appendix C}
 \label{appendix:c}
-Data size
+\subsection{Multi-domain translation}
 
+\begin{table*}[h!]
+  \centering
+  \begin{tabular}{|l|ccccccc|} %*{4}{|r|}}
+    \cline{2-8} 
+    %\multicolumn{4}{|l|}{Vocab size - En: 30,165, Fr: 30,398}\\
+    \multicolumn{1}{c|}{} & \multicolumn{1}{c}{\domain{med}} & \multicolumn{1}{c}{\domain{law}} & \multicolumn{1}{c}{\domain{bank}} & \multicolumn{1}{c}{\domain{it}} & \multicolumn{1}{c}{\domain{talk}} & \multicolumn{1}{c}{\domain{rel}} & \multicolumn{1}{c|}{\domain{news}} \\
+    \hline 
+    \# lines & 2609 (0.68) & 501 (0.13) & 190 (0.05) & 270 (0.07) & 160 (0.04) & 130 (0.03) & 260 (0) \\
+    \# \revisiondone{tokens}  &  133 / 154  &  17.1 / 19.6 &  6.3 / 7.3 &  3.6 / 4.6 &  3.6 / 4.0 &  3.2 / 3.4 & 7.8 / 9.2   \\
+    \# \revisiondone{types}  & 771 / 720 & 52.7 / 63.1 & 92.3 / 94.7 & 75.8 / 91.4 & 61.5 / 73.3 & 22.4 / 10.5 & 77.8 / 80.4 \\
+    \# \revisiondone{uniq} & 700 / 640 & 20.2 / 23.7 & 42.9 / 40.1 & 44.7 / 55.7 & 20.7 / 25.6 & 7.1 / 2.1 & 31.5 / 23.1 \\
+    \hline
+  \end{tabular}
+  \caption{Corpora statistics: number of parallel lines ($\times 10^3$) and proportion in the basic domain mixture (which does not include the \domain{news} domain), number of tokens in English and French ($\times 10^6$), number of types in English and French ($\times 10^3$), number of types that only appear in a given domain ($\times 10^3$). \domain{med} is the largest domain, containing almost 70\% of the sentences, while \domain{rel} is the smallest, with only 3\% of the data.
+  }
+\label{tab:Corpora-chap4}
+\end{table*}
 
-%\label{sec:appendix}
+\subsection{Multilingual translation}
 
 \end{document}
