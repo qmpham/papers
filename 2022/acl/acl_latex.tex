@@ -71,32 +71,28 @@
 \usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
 \usepackage{mathrsfs}
 
-
-\usepackage{latexsym}
-\usepackage{graphicx}
-\usepackage{xcolor}
-\usepackage{longtable}
-\usepackage{tikz}
-\usetikzlibrary{calc}
-\usepackage[draft]{todo}
-\usepackage[normalem]{ulem}
-\usepackage{xspace}
-\usepackage{amsmath,amsfonts,amssymb}
-
-\newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
-\newcommand{\fyTodostar}[1]{\Todo*[FY:]{\textcolor{orange}{#1}}}
-\newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
-\newcommand{\fyFuture}[1]{\done[FY]\Todo[FY:]{\textcolor{red}{#1}}}
-\newcommand{\fyDonestar}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
-\newcommand{\jcTodo}[1]{\Todo[JC:]{\textcolor{red}{#1}}}
-\newcommand{\jcDone}[1]{\done[JC]\Todo[JC:]{\textcolor{red}{#1}}}
-\newcommand{\revision}[1]{\textcolor{black}{#1}}
-\newcommand{\revisiondone}[1]{\textcolor{black}{#1}}
-\newcommand{\revisiondel}[1]{}
-\newcommand{\src}{\ensuremath{\mathbf{f}}} % source sentence
-\newcommand{\trg}{\ensuremath{\mathbf{e}}} % target sentence
+%new commands
+\def\-{\raisebox{.75pt}{-}}
+\usepackage{mathtools,xparse}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\NewDocumentCommand{\normL}{ s O{} m }{%
+  \IfBooleanTF{#1}{\norm*{#3}}{\norm[#2]{#3}}_{2}%
+}
 \newcommand{\domain}[1]{\texttt{\textsc{#1}}}
-\newcommand{\system}[1]{\texttt{{#1}}}
+%\newcommand{\system}[1]{\texttt{{#1}}}
+%\renewcommand{\UrlFont}{\ttfamily\small}
+%\renewcommand{\S}{\scriptsize}
+%\newcommand{\R}{\mathbb{R}}
+%\newcommand{\vect}[1]{\boldsymbol{#1}}
+%\DeclareMathOperator*{\argmax}{argmax}
+%\DeclareMathOperator*{\argmin}{argmin}
+%\usepackage[draft]{todo}
+%\newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
+%\newcommand{\fyTodostar}[1]{\Todo*[FY:]{\textcolor{orange}{#1}}}
+%\newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+%\newcommand{\fyDonestar}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+%\newcommand{\fyFuture}[1]{\done[FY]\Todo[FY:]{\textcolor{red}{#1}}}
 
 \title{Frustratingly easy multi-domain, multilingual translation with latent multi-task group dropout}
 
@@ -130,8 +126,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Multi-domain and multilingual translation can be cast under multi-task learning in which each domain or language pair is considered a task. Sharing most of the parameters of the model causes a catastrophic interference between unrelated tasks. In this work, we propose equivalently grouping the nodes of each layer and dropping a portion of these groups. Via the task-dependent dropout mechanism, we assign different sparse sub-networks to different tasks. We demonstrate a significant improvement in multi-domain and multilingual translation. Furthermore, through an ablation study, we show that the learned dropping patterns are similar in related tasks allowing the knowledge transferring between these tasks.
-
+Multi-domain and multilingual translation can be cast under multi-task learning in which each domain, each language pair are considered as a task. Sharing most of the parameters of the model causes a catastrophic interference between unrelated tasks. In this work, we propose equivalently grouping the nodes of each layer and dropping a portion of these groups assigning different sparse sub-networks to different task. We demonstrate a significant improvement in multi-domain and multilingual translation. Furthermore, through an ablation study, we show that the learned dropping patterns are similar in related tasks allowing the knowledge transferring between these task.
 \end{abstract}
 
 \section{Introduction}
@@ -152,7 +147,8 @@ l & \in & [0,\cdots,L] ,\\
 where $L$ is number of Transformer layers of our NMT model, the binary vector $r_l^d$ is a dropping mask. The dropping mask $r_l^d$ of $l^{th}$ layer and domain $d$ is defined as follow
 \begin{equation}
 \begin{array}{rcl}
-r_l^d(i) &=& \begin{cases}
+r_l^d(i) &=& \begin{cases\newcommand{\domain}[1]{\texttt{\textsc{#1}}}
+\newcommand{\system}[1]{\texttt{{#1}}}}
       1, & \text{if}\ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p} \\
       & \text{AND} \  m_l^d(p) \text{\small ==} 1 \\
       0, & \text{otherwise},
@@ -165,7 +161,7 @@ m_l^d & \in & \{0,1\}^{n_p} \ \forall d,l \, \\
 \Delta^{n_p}_k & = & \{ m \in \{0,1\}^{n_p} | \mid m \mid_{L_1} = k \},
 \end{array}
 \end{equation}
-where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. The group $p$ is retained for domain $d$ if $m_l^d(p)\text{\small ==}1$ and is dropped if $m_l^d(p)\text{\small ==}0$. We also denote $\Delta^{n_p}_k$ the set of all admissible dropping masks. 
+where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. The group $p$ is retained for domain $d$ if $m_l^d(p)\text{small ==}1$ and is dropped if $m_l^d(p)\text{small ==}0$. We also denote $\Delta^{n_p}_k$ the set of all admissible dropping masks. 
 
 We incorporate the latent variables $m_{l\in[0,\cdots,L]}^d$ into the log-likelihood of our model as below. For the sake of brevity, we denote $m_l^d$ the set of latent variables $m_{l\in[0,\cdots,L]}^d$
 \begin{equation}
@@ -181,39 +177,41 @@ We incorporate the latent variables $m_{l\in[0,\cdots,L]}^d$ into the log-likeli
 \end{array}
 \end{equation}
 our training objective will be the lowerbound, which is called the evidence lower bound (ELBO) in variational statistic \citep{Diederick14auto}, $\mathcal{L}(\theta, \Phi_l^d, x , y)$. The variational distribution of $m_l^d$, $P(m_l^d|\Phi_l^d)$, is defined as follows
-
-\begin{align}
+\begin{equation}
 \hspace{-2.em}
-&\Phi_d \in \mathbb{R}^{n_p} , \nonumber \\
-&Ind^d \text{=}  \{ i_1, \cdots, i_k \} \nonumber \\
-&\sim \text{\small Sampling\_without\_replacement} \big(\text{softmax}(\Phi_l^d) \big) , \nonumber \\
-&m_l^d(i) \text{=} \mathbb{I}(i \in Ind^d) .\nonumber
-\end{align}
+\begin{array}{rcl}
+\Phi_d & \in & \mathbb{R}^{n_p} , \\
+Ind^d & \text{=} & \{ i_1, \cdots, i_k \} \ | \ \Phi_l^d \\
+& \sim & \ \text{\small Sampling\_without\_replacement} \big(\text{softmax}(\Phi_l^d) \big) , \\
+m_l^d(i) &\text{=}& \mathbb{I}(i \in Ind^d) .\\
+\end{array}
+\end{equation}
 
 The choice of the modeling of the latent vector $m_l^d$ is motivated by the Gumbel Top-K trick \citep{Kool19stochastic}. In addition, we suppose the prior distribution of $m_l^d$ is uniform over the admissible set $\Delta^{n_p}_k$, $P(m_l^d | x, \theta, d) \ \text{=} \ U(\Delta^{n_p}_k)$.
 
 With our assumption over the prior distribution and our choice of the variational distribution, we express the two terms of the lower-bound \eqref{eq:lower-bound} as follows
 
-\begin{align}
-\hspace{-2.em}
-T_1 &= \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y | x,\theta,m_l^d, d)  \big] \nonumber \\
-&= \mathbb{E}_{g_l^d(p) \displaystyle{\mathop{\sim}^{\text{i.i.d}}} Gumbel(0,1) \ } \big[ \text{log} P(y | x,\theta,\tilde{m}_l^d,d) \big] \nonumber
-\end{align}
+\begin{equation}
+\begin{array}{rcl}
+T_1 &=& \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y | x,\theta,m_l^d, d)  \big] \\
+&=& \mathbb{E}_{g_l^d(p) \sim Gumbel(0,1) \ \text{i.i.d}} \big[ \text{log} P(y | x,\theta,\tilde{m}_l^d,d) \big] \\
+\end{array}
+\end{equation}
 where
+\begin{equation}
+\begin{array}{rcl}
+g_l^d & \in & \mathbb{R}^{n_p} \\
+g_l^d(p) & \sim & Gumbel(0,1) \ \text{i.i.d} \\
+&& \forall p \in \{ 0,\cdots,n_p\text{-}1 \} \\
+i_1, \cdots, i_k &=& Top\_k \ \{ \ g_l^d(0) + \Phi_l^d(0), \cdots,\\ &&g_l^d(n_p\text{-}1) + \Phi_l^d(n_p\text{-}1) \ \} \\
+\tilde{m}_l^d(p) &=& \mathbb{I}(p \in Ind^d). \\
+\end{array} \label{eq:top-k}
+\end{equation}
+
 \begin{align}
-\hspace{-2.em}
-g_l^d & \in \mathbb{R}^{n_p} \nonumber \\
-g_l^d(p) & \displaystyle{\mathop{\sim}^{\text{i.i.d}}} Gumbel(0,1) \nonumber \\
-& \forall p \in \{ 0,\cdots,n_p\text{-}1 \} \nonumber \\
-i_1, \cdots, i_k &= Top\_k \ \{ \ g_l^d(0) + \Phi_l^d(0), \cdots, \label{eq:top-k} \\ 
-&g_l^d(n_p\text{-}1) + \Phi_l^d(n_p\text{-}1) \ \} \nonumber \\
-\tilde{m}_l^d(p) &= \mathbb{I}(p \in Ind^d). \nonumber 
-\end{align}
-%
-\begin{align}
-T_2 &= - KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \nonumber \\ 
-	&= \mathbb{H} \big[ P(m_l^d | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \nonumber \\ 
-	&= \mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \nonumber \\ \
+T_2 &= - KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \\ 
+	&= \mathbb{H} \big[ P(m_l^d | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \\ 
+	&= \mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \\ \
 	&\geqslant \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \label{eq:entropy}
 \end{align}
 
@@ -223,14 +221,17 @@ Now we go back to our loss function, which is the negative of the lower-bound \e
 
 Thanks to the Gumbel Top-K trick, we can move the parameters $\Phi_l^d$ into log-likelihood function and get rid of policy gradients, which have been reported to be very unstable \citep{Diederick14auto}. However, the operator Top-K, which defines $\tilde{m}_l^d$ in Equation \eqref{eq:top-k}, is not differentiable. Therefore, we approximate this function by the Soft-Top-K function defined as follows
 
-\begin{align}
-\hat{m}_l^d(\tau) &= \displaystyle{\mathop{argmin}_{\substack{
-       0 \leqslant m_i \leqslant 1 \ \forall 0 \leqslant i \leqslant n_d\text{-}1 \label{eq:soft-top-k}\\
+\begin{equation}
+\begin{array}{rcl}
+ \hat{m}_l^d(\tau) &=&\displaystyle{\mathop{argmin}_{\substack{
+       0 \leqslant m_i \leqslant 1 \ \forall 0 \leqslant i \leqslant n_d\text{-}1 \\
         1^{T}.m = k
       }}} -(g_l^d+\Phi_l^d)^{T} . m - \tau H_b(m) \\
-& \text{in which} \nonumber \\
-H_b(m) &= - \sum_i m_i \text{log}(m_i) + (1-m_i)\text{log}(1-m_i) \nonumber 
-\end{align}
+& \text{in which} & \\
+H_b(m) &=& - \sum_i m_i \text{log}(m_i) + (1-m_i)\text{log}(1-m_i)
+\end{array}
+\label{eq:soft-top-k}
+\end{equation}
 
 In Appendix \ref{appendix:a}, we will prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. Furthermore, we will also provide the computation of $\hat{m}_l^d(\tau)$ and prove that $\hat{m}_l^d(\tau)$ is a differentiable function w.r.t $\Phi_l^d$ and its differentiation is computed via implicit differentiation theorem. During the training, we approximate $\tilde{m}_l^d$ by $\hat{m}_l^d(\tau)$ by gradually decaying the hyperparameter $\tau$ to $0$. The gradient of the term $T_1$ w.r.t $\Phi_l^d$ is computed via the chain rule as follows
 \begin{equation}
@@ -242,9 +243,9 @@ The gradient $\frac{\partial T_1}{\hat{m}_l^d(\tau)}$ is computed via autograd a
 \subsubsection{Multi-domain, multilingual translation}
 In both cases, we examinate the performance of three following MT systems.
 \begin{itemize}
-	\item Transformer
-	\item Adapter based Transformer
-	\item Transformer with multi-task group dropout
+	\item Transformer trained with .
+	\item Adapter based Transformer.
+	\item Transformer with multi-task group dropout.
 \end{itemize}
 For the sake of brevity, we put the detailed descriptions of these systems in Appendix \ref{appendix:c}.
 \subsection{Datasets}
@@ -254,59 +255,14 @@ We reuse the same data of a recent work of \citet{Pham21revisiting} in multi-dom
 We evaluate our model on both one-to-many (O2M) and many-to-one (M2O)
 translation tasks. We evaluate models on widely used multilingual translation datasets.
 \begin{itemize}
-	\item TED8-Related. Following the setting of \citet{Wang20balancing}, we use a subset of translations of \citet{qi18when} between English and eight related languages.
-	\item TED8-Diverse. The dataset consists of parallel sentences between English and eight diverse languages as in \citet{Wang20balancing}.
+	\item TED8-Related. Following the setting of \citep{Wang20balancing}, we use a subset of translations between English and eight related languages.
+	\item TED8-Diverse. The dataset consists of parallel sentences between English and eight diverse languages \citep{Wang20balancing}.
 \end{itemize}
 The detailed description of the datasets is provided in Appendix \ref{appendix:c}.
 \section{Results and ablation studies}
 \subsection{Multi-domain translation}
-According to Table \ref{tab:mdmt}, \system{LaMGD} shows a significant improvement (+2.78) over the generic system \system{Transformer} with zero extra parameters. Moreover, \system{LaMGD} achieve equivalent performance in average compared to \system{Adapter}, which is carrefully finetuned with a approximately 12.4M additional parameters.
-\begin{table*}[h!]
-  \centering
-  \begin{tabular}{|p{4cm}|*{7}{r|}} \hline
-    Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
-    \system{Transformer}  \hfill{\footnotesize[65m]} & 40.3 & 59.5 & 49.8 & 36.4 & 49.0 & 80.0  & 52.5\\
-    \revision{\system{Adapter}}   \hfill{\footnotesize[+12.4m]}  & 39.5 & 61.0 & 53.1 & 37.5 & 49.6 & 91.0 & 55.28 \\ 
-    \system{LaMGD}   \hfill{\footnotesize[+0m]}  & 40.3 & 60.4 & 52.4 & 39.0 & 52.4 & 87.5 & 55.33 \\ 
-    \hline
-  \end{tabular}
-  \caption{Multi-domain translation}
-  \label{tab:mdmt}
-\end{table*}
 \subsection{Multilingual translation}
-According to Table \ref{tab:multilingual}, \system{LAMGD} shows a boost of 0.42, 0.33, ,0.32 in average over the multilingual \system{Transformer} in O2M-related, M2O-related, O2M-diverse, M2O-diverse respectively. Significant gains are observed in \domain{bel}, \domain{glg} (both direction), \domain{hin} and \domain{bos} (O2M direction).
-\begin{table*}[ht]
-  \centering
-  \begin{tabular}{|p{4cm}|*{9}{r|}} \hline
-    O2M-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
-    \system{Transformer}  \hfill{\footnotesize[91.6m]} & 4.80 &7.30&20.80&21.10&39.70&19.80&22.60&15.20&18.91 \\
-    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]} & & & & & & & & & \\ 
-    \system{LaMGD}  \hfill{\footnotesize[+0m]}  & 5.20&9.40&20.60&22.80&39.60&19.60&22.40&15.00&19.33 \\ 
-	\hline
-    \hline
-    M2O-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
-    \system{Transformer}  \hfill{\footnotesize[67.8m]} &11.40&16.60&28.50&	27.10&43.70&24.60&30.30&25.60&25.98 \\
-    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]} & & & & & & & & & \\ 
-    \system{LaMGD}   \hfill{\footnotesize[+0m]}  &11.30&17.40&28.60&28.70&	43.70&24.50&30.70&25.60&26.31 \\ 
-    \hline
-    \hline
-    O2M-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
-    \system{Transformer}  \hfill{\footnotesize[96.9m]} & 10.20&4.0&12.70&22.20&31.80&34.00&38.30&8.30&20.19 \\
-    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  & & & & & & & & & \\ 
-    \system{LaMGD}   \hfill{\footnotesize[+0m]} & & & & & & & & & \\
-    \hline 
-    \hline
-    O2M-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
-    \system{Transformer}  \hfill{\footnotesize[70.4m]} &22.40&9.70&20.50&31.80&37.50&38.70&39.80&19.00&27.43 \\
-    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  & & & & & & & & & \\ 
-    \system{LaMGD}   \hfill{\footnotesize[+0m]} &23.50&9.60&21.50&32.20&37.70&38.60&40.00&18.90&27.75 \\
-    \hline
-  \end{tabular}
-  \caption{Multilingual translation}
-  \label{tab:multilingual}
-\end{table*}
 \subsection{Similarity between dropping masks}
-
 \section{Related work}
 \section{Conclusions and outlook}
 \bibliography{bibliography}
@@ -326,7 +282,7 @@ In this section, we give a simple proof of Inequality \ref{eq:entropy}. In fact,
 \end{align*}
 \section{Appendix C}
 \label{appendix:c}
-\subsection{Multi-domain datasets}
+\subsection{Multi-domain translation}
 
 \begin{table*}[h!]
   \centering
@@ -346,10 +302,6 @@ In this section, we give a simple proof of Inequality \ref{eq:entropy}. In fact,
 \label{tab:Corpora-chap4}
 \end{table*}
 
-\subsection{Multilingual datasets}
-
-\subsection{Multi-domain systems}
-
-\subsection{Multilingual systems}
+\subsection{Multilingual translation}
 
 \end{document}
