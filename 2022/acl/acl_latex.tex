@@ -97,6 +97,9 @@
 \newcommand{\trg}{\ensuremath{\mathbf{e}}} % target sentence
 \newcommand{\domain}[1]{\texttt{\textsc{#1}}}
 \newcommand{\system}[1]{\texttt{{#1}}}
+\newcommand{\SB}[1]{\textbf{#1}}
+\newcommand{\SW}[1]{\underline{#1}}
+
 
 \title{Frustratingly easy multi-domain, multilingual translation with latent multi-task group dropout}
 
@@ -170,19 +173,19 @@ m_l^d & \in & \{0,1\}^{n_p} \ \forall d,l \, \\
 where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. The group $p$ is retained for domain $d$ if $m_l^d(p)\text{\small ==}1$ and is dropped if $m_l^d(p)\text{\small ==}0$. We also denote $\Delta^{n_p}_k$ the set of all admissible dropping masks. 
 
 We incorporate the latent variables $m_{l\in[0,\cdots,L]}^d$ into the log-likelihood of our model as below. For the sake of brevity, we denote $m_l^d$ the set of latent variables $m_{l\in[0,\cdots,L]}^d$
-\begin{equation}
-\hspace{-1.5em}
-\begin{array}{rcl}
-\text{log} P(y|x,\theta,d) & \text{=} & \text{log} P(y, m_l^d |x,\theta,d) \text{-} \text{log} P(m_l^d|y, x,\theta,d) \\
-& \text{=} & \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y, m_l^d | x,\theta,d) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big] \\
-& \text{+} & KL(P(m_l^d | \Phi_l^d) \parallel P(m_l^d|y, x,\theta,d)) \\
-& \geq & \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y, m_l^d | x,\theta,d) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big]  \\
-& \text{=} & \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y | x,\theta,m_l^d, d) \big] \\
-& \text{-} & KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \\
-& \text{=} & \mathcal{L}(\theta, \Phi_l^d, x , y) \label{eq:lower-bound}
-\end{array}
-\end{equation}
-our training objective will be the lowerbound, which is called the evidence lower bound (ELBO) in variational statistic \citep{Diederick14auto}, $\mathcal{L}(\theta, \Phi_l^d, x , y)$. The variational distribution of $m_l^d$, $P(m_l^d|\Phi_l^d)$, is defined as follows
+\begin{align}
+\hspace{-1.em}
+\text{log} P(y|x,\theta,d) & \text{=} \text{log} P(y, m_l^d |x,\theta,d) \text{-} \text{log} P(m_l^d|y, x,\theta,d) \nonumber \\
+& \text{=} \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y, m_l^d | x,\theta,d) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big] \nonumber \\
+& \text{+} KL(P(m_l^d | \Phi_l^d) \parallel P(m_l^d|y, x,\theta,d)) \nonumber \\
+& \geqslant \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y, m_l^d | x,\theta,d) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big] \nonumber \\
+& \text{=} \mathbb{E}_{P(m_l^d | \Phi_l^d)} \big[ \text{log} P(y | x,\theta,m_l^d, d) \big] \label{eq:lower-bound} \\
+& \text{-} KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \nonumber \\
+& \text{=} \mathcal{L}_{\text{ELBO}}(\theta, \Phi_l^d, x , y). \nonumber
+\end{align}
+$\mathcal{L}_{\text{ELBO}}(\theta, \Phi_l^d, x , y)$ is the lowerbound, which is called the evidence lower bound (ELBO) in variational statistic \citep{Diederick14auto}, of our log-likelihood. Our training loss will be $-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)$.
+
+The variational distribution of $m_l^d$, $P(m_l^d|\Phi_l^d)$, is defined as follows
 
 \begin{align}
 \hspace{-2.em}
@@ -213,6 +216,7 @@ i_1, \cdots, i_k &= Top\_k \ \{ \ g_l^d(0) + \Phi_l^d(0), \cdots, \label{eq:top-
 \end{align}
 %
 \begin{align}
+\hspace{-2.em}
 T_2 &= - KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \nonumber \\ 
 	&= \mathbb{H} \big[ P(m_l^d | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \nonumber \\ 
 	&= \mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \nonumber \\ \
@@ -239,10 +243,17 @@ In Appendix \ref{appendix:a}, we will prove that $\lim_{\tau \rightarrow 0}\hat{
 \frac{\partial T_1}{\Phi_l^d} = \frac{\partial T_1}{\hat{m}_l^d(\tau)} \times \frac{\hat{m}_l^d(\tau)}{\Phi_l^d}
 \end{equation}
 The gradient $\frac{\partial T_1}{\hat{m}_l^d(\tau)}$ is computed via autograd algorithm while $\frac{\hat{m}_l^d(\tau)}{\Phi_l^d}$ is computed via implicit differentiation, that we will explain carefully in Appendix \ref{appendix:a}.
+
+We jointly train the Transformer parameters $\theta$ and the parameters of the latent dropping masks $\Phi_l^d$ using the following multi-task loss.
+
+\begin{equation}
+\mathcal{L}(\theta,\Phi_l^1,\cdots,\Phi_l^k) = \displaystyle{\mathop{\sum}_{d=1}^{k}} \mathbb{E}_{x \sim \mathcal{D}_s^d,y \sim g^d(x)} \big[-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)\big]
+\end{equation}
+in which $\mathcal{D}_s^d$ is distribution of the task $d$ over the input space $\Omega^d_s$; $g^d: \Omega^d_s \rightarrow \Omega^d_t$ is the mapping function, which our multi-task modern needs to learn, of the task $d$; $-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)$ is the ELBO loss, which we defined in Equation \ref{eq:lower-bound}.
 \section{Experimental settings}
 \subsection{Baselines}
 \subsubsection{Multi-domain, multilingual translation}
-In both cases, we examinate the performance of three following MT systems.
+In both cases, we examine the performance of three following MT systems.
 \begin{itemize}
 	\item Transformer
 	\item Adapter based Transformer
@@ -251,7 +262,7 @@ In both cases, we examinate the performance of three following MT systems.
 For the sake of brevity, we put the detailed descriptions of these systems in Appendix \ref{appendix:c}.
 \subsection{Datasets}
 \subsubsection{Multi-domain translation}
-We reuse the same data of a recent work of \citet{Pham21revisiting} in multi-domain translation. For the sake of brevity, we leave most of the details of data in Appendix \ref{appendix:c}.
+We reuse the same data as the recent work of \citet{Pham21revisiting} in multi-domain translation. For the sake of brevity, we leave most of the details of data in Appendix \ref{appendix:c}.
 \subsubsection{Multilingual translation}
 We evaluate our model on both one-to-many (O2M) and many-to-one (M2O)
 translation tasks. We evaluate models on widely used multilingual translation datasets.
@@ -276,20 +287,20 @@ According to Table \ref{tab:mdmt}, \system{LaMGD} shows a significant improvemen
   \label{tab:mdmt}
 \end{table*}
 \subsection{Multilingual translation}
-According to Table \ref{tab:multilingual}, \system{LAMGD} shows a boost of 0.42, 0.33, ,0.32 in average over the multilingual \system{Transformer} in O2M-related, M2O-related, O2M-diverse, M2O-diverse respectively. Significant gains are observed in \domain{bel}, \domain{glg} (both direction), \domain{hin} and \domain{bos} (O2M direction).
+According to Table \ref{tab:multilingual}, \system{LaMGD} shows a boost of 0.42, 0.33, ,0.32 in average over the multilingual \system{Transformer} in O2M-related, M2O-related, M2O-diverse respectively. Significant gains are observed in \domain{bel}, \domain{glg} (both direction), \domain{hin} and \domain{bos} (O2M direction). However, \system{LaMGD} lags behind multilingual \system{Transformer} in O2M-diverse. 
 \begin{table*}[ht]
   \centering
   \begin{tabular}{|p{4cm}|*{9}{r|}} \hline
     O2M-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[91.6m]} & 4.80 &7.30&20.80&21.10&39.70&19.80&22.60&15.20&18.91 \\
     \revision{\system{Adapter}}   \hfill{\footnotesize[13m]} & & & & & & & & & \\ 
-    \system{LaMGD}  \hfill{\footnotesize[+0m]}  & 5.20&9.40&20.60&22.80&39.60&19.60&22.40&15.00&19.33 \\ 
+    \system{LaMGD}  \hfill{\footnotesize[+0m]}  & 5.20&\SB{9.40}&20.60&\SB{22.80}&39.60&19.60&22.40&15.00&19.33 \\ 
 	\hline
     \hline
     M2O-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[67.8m]} &11.40&16.60&28.50&	27.10&43.70&24.60&30.30&25.60&25.98 \\
     \revision{\system{Adapter}}   \hfill{\footnotesize[13m]} & & & & & & & & & \\ 
-    \system{LaMGD}   \hfill{\footnotesize[+0m]}  &11.30&17.40&28.60&28.70&	43.70&24.50&30.70&25.60&26.31 \\ 
+    \system{LaMGD}   \hfill{\footnotesize[+0m]}  &11.30&\SB{17.40}&28.60&\SB{28.70}&43.70&24.50&30.70&25.60&26.31 \\ 
     \hline
     \hline
     O2M-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
@@ -301,7 +312,7 @@ According to Table \ref{tab:multilingual}, \system{LAMGD} shows a boost of 0.42,
     O2M-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[70.4m]} &22.40&9.70&20.50&31.80&37.50&38.70&39.80&19.00&27.43 \\
     \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  & & & & & & & & & \\ 
-    \system{LaMGD}   \hfill{\footnotesize[+0m]} &23.50&9.60&21.50&32.20&37.70&38.60&40.00&18.90&27.75 \\
+    \system{LaMGD}   \hfill{\footnotesize[+0m]} &\SB{23.50}&9.60&\SB{21.50}&32.20&37.70&38.60&40.00&18.90&27.75 \\
     \hline
   \end{tabular}
   \caption{Multilingual translation}
