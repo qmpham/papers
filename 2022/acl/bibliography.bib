@@ -4057,6 +4057,22 @@ archivePrefix = {arXiv},
     year = {2019}
 }
 
+@article{amos19lml,
+  author    = {Brandon Amos and
+               Vladlen Koltun and
+               J. Zico Kolter},
+  title     = {The Limited Multi-Label Projection Layer},
+  journal   = {CoRR},
+  volume    = {abs/1906.08707},
+  year      = {2019},
+  url       = {http://arxiv.org/abs/1906.08707},
+  eprinttype = {arXiv},
+  eprint    = {1906.08707},
+  timestamp = {Mon, 24 Jun 2019 17:28:45 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-1906-08707.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
 @ARTICLE{Li19semisupervised,
        author = {{Li}, Yitong and {Baldwin}, Timothy and {Cohn}, Trevor},
         title = "{Semi-supervised Stochastic Multi-Domain Learning using Variational Inference}",
@@ -4241,6 +4257,23 @@ month={},}
     doi = "10.18653/v1/D19-1432",
     pages = "4227--4237",
     abstract = "Language models are generally trained on data spanning a wide range of topics (e.g., news, reviews, fiction), but they might be applied to an a priori unknown target distribution (e.g., restaurant reviews). In this paper, we first show that training on text outside the test distribution can degrade test performance when using standard maximum likelihood (MLE) training. To remedy this without the knowledge of the test distribution, we propose an approach which trains a model that performs well over a wide range of potential test distributions. In particular, we derive a new distributionally robust optimization (DRO) procedure which minimizes the loss of the model over the worst-case mixture of topics with sufficient overlap with the training distribution. Our approach, called topic conditional value at risk (topic CVaR), obtains a 5.5 point perplexity reduction over MLE when the language models are trained on a mixture of Yelp reviews and news and tested only on reviews.",
+}
+
+@inproceedings{sen19multilingual,
+    title = "Multilingual Unsupervised {NMT} using Shared Encoder and Language-Specific Decoders",
+    author = "Sen, Sukanta  and
+      Gupta, Kamal Kumar  and
+      Ekbal, Asif  and
+      Bhattacharyya, Pushpak",
+    booktitle = "Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2019",
+    address = "Florence, Italy",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/P19-1297",
+    doi = "10.18653/v1/P19-1297",
+    pages = "3083--3089",
+    abstract = "In this paper, we propose a multilingual unsupervised NMT scheme which jointly trains multiple languages with a shared encoder and multiple decoders. Our approach is based on denoising autoencoding of each language and back-translating between English and multiple non-English languages. This results in a universal encoder which can encode any language participating in training into an inter-lingual representation, and language-specific decoders. Our experiments using only monolingual corpora show that multilingual unsupervised model performs better than the separately trained bilingual models achieving improvement of up to 1.48 BLEU points on WMT test sets. We also observe that even if we do not train the network for all possible translation directions, the network is still able to translate in a many-to-many fashion leveraging encoder{'}s ability to generate interlingual representation.",
 }
 
 @inproceedings{santy19inmt,
@@ -4678,6 +4711,25 @@ archivePrefix = {arXiv},
     pages = "7701--7710",
     abstract = "Transfer learning improves quality for low-resource machine translation, but it is unclear what exactly it transfers. We perform several ablation studies that limit information transfer, then measure the quality impact across three language pairs to gain a black-box understanding of transfer learning. Word embeddings play an important role in transfer learning, particularly if they are properly aligned. Although transfer learning can be performed without embeddings, results are sub-optimal. In contrast, transferring only the embeddings but nothing else yields catastrophic results. We then investigate diagonal alignments with auto-encoders over real languages and randomly generated sequences, finding even randomly generated sequences as parents yield noticeable but smaller gains. Finally, transfer learning can eliminate the need for a warm-up phase when training transformer models in high resource language pairs.",
 }
+
+
+@InProceedings{amos20differential,
+  title = 	 {The Differentiable Cross-Entropy Method},
+  author =       {Amos, Brandon and Yarats, Denis},
+  booktitle = 	 {Proceedings of the 37th International Conference on Machine Learning},
+  pages = 	 {291--302},
+  year = 	 {2020},
+  editor = 	 {III, Hal Daumé and Singh, Aarti},
+  volume = 	 {119},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {13--18 Jul},
+  publisher =    {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v119/amos20a/amos20a.pdf},
+  url = 	 {https://proceedings.mlr.press/v119/amos20a.html},
+  abstract = 	 {We study the Cross-Entropy Method (CEM) for the non-convex optimization of a continuous and parameterized objective function and introduce a differentiable variant that enables us to differentiate the output of CEM with respect to the objective function’s parameters. In the machine learning setting this brings CEM inside of the end-to-end learning pipeline where this has otherwise been impossible. We show applications in a synthetic energy-based structured prediction task and in non-convex continuous control. In the control setting we show how to embed optimal action sequences into a lower-dimensional space. This enables us to use policy optimization to fine-tune modeling components by differentiating through the CEM-based controller.}
+}
+
+
 @inproceedings{xu20boosting,
     title = "Boosting Neural Machine Translation with Similar Translations",
     author = "Xu, Jitao  and
@@ -4843,6 +4895,77 @@ archivePrefix = {arXiv},
     pages = "4500--4511",
     abstract = "Neural machine translation achieves impressive results in high-resource conditions, but performance often suffers when the input domain is low-resource. The standard practice of adapting a separate model for each domain of interest does not scale well in practice from both a quality perspective (brittleness under domain shift) as well as a cost perspective (added maintenance and inference complexity). In this paper, we propose a framework for training a single multi-domain neural machine translation model that is able to translate several domains without increasing inference time or memory usage. We show that this model can improve translation on both high- and low-resource domains over strong multi-domain baselines. In addition, our proposed model is effective when domain labels are unknown during training, as well as robust under noisy data conditions.",
 }
+
+@article{dabre20survey,
+author = {Dabre, Raj and Chu, Chenhui and Kunchukuttan, Anoop},
+title = {A Survey of Multilingual Neural Machine Translation},
+year = {2020},
+issue_date = {October 2020},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {53},
+number = {5},
+issn = {0360-0300},
+url = {https://doi.org/10.1145/3406095},
+doi = {10.1145/3406095},
+abstract = {We present a survey on multilingual neural machine translation (MNMT), which has gained
+a lot of traction in recent years. MNMT has been useful in improving translation quality
+as a result of translation knowledge transfer (transfer learning). MNMT is more promising
+and interesting than its statistical machine translation counterpart, because end-to-end
+modeling and distributed representations open new avenues for research on machine
+translation. Many approaches have been proposed to exploit multilingual parallel corpora
+for improving translation quality. However, the lack of a comprehensive survey makes
+it difficult to determine which approaches are promising and, hence, deserve further
+exploration. In this article, we present an in-depth survey of existing literature
+on MNMT. We first categorize various approaches based on their central use-case and
+then further categorize them based on resource scenarios, underlying modeling principles,
+core-issues, and challenges. Wherever possible, we address the strengths and weaknesses
+of several techniques by comparing them with each other. We also discuss the future
+directions for MNMT. This article is aimed towards both beginners and experts in NMT.
+We hope this article will serve as a starting point as well as a source of new ideas
+for researchers and engineers interested in MNMT.},
+journal = {ACM Comput. Surv.},
+month = sep,
+articleno = {99},
+numpages = {38},
+keywords = {zero-shot, multi-source, Neural machine translation, multilingualism, low-resource, survey}
+}
+
+@inproceedings{conneau20unsupervised,
+    title = "Unsupervised Cross-lingual Representation Learning at Scale",
+    author = "Conneau, Alexis  and
+      Khandelwal, Kartikay  and
+      Goyal, Naman  and
+      Chaudhary, Vishrav  and
+      Wenzek, Guillaume  and
+      Guzm{\'a}n, Francisco  and
+      Grave, Edouard  and
+      Ott, Myle  and
+      Zettlemoyer, Luke  and
+      Stoyanov, Veselin",
+    booktitle = "Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics",
+    month = jul,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2020.acl-main.747",
+    doi = "10.18653/v1/2020.acl-main.747",
+    pages = "8440--8451",
+    abstract = "This paper shows that pretraining multilingual language models at scale leads to significant performance gains for a wide range of cross-lingual transfer tasks. We train a Transformer-based masked language model on one hundred languages, using more than two terabytes of filtered CommonCrawl data. Our model, dubbed XLM-R, significantly outperforms multilingual BERT (mBERT) on a variety of cross-lingual benchmarks, including +14.6{\%} average accuracy on XNLI, +13{\%} average F1 score on MLQA, and +2.4{\%} F1 score on NER. XLM-R performs particularly well on low-resource languages, improving 15.7{\%} in XNLI accuracy for Swahili and 11.4{\%} for Urdu over previous XLM models. We also present a detailed empirical analysis of the key factors that are required to achieve these gains, including the trade-offs between (1) positive transfer and capacity dilution and (2) the performance of high and low resource languages at scale. Finally, we show, for the first time, the possibility of multilingual modeling without sacrificing per-language performance; XLM-R is very competitive with strong monolingual models on the GLUE and XNLI benchmarks. We will make our code and models publicly available.",
+}
+
+@inproceedings{xian20deep,
+ author = {Li, Xian and Cooper Stickland, Asa and Tang, Yuqing and Kong, Xiang},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {H. Larochelle and M. Ranzato and R. Hadsell and M. F. Balcan and H. Lin},
+ pages = {1736--1746},
+ publisher = {Curran Associates, Inc.},
+ title = {Deep Transformers with Latent Depth},
+ url = {https://proceedings.neurips.cc/paper/2020/file/1325cdae3b6f0f91a1b629307bf2d498-Paper.pdf},
+ volume = {33},
+ year = {2020}
+}
+
 
 @inproceedings{Sharaf20metalearning,
     title = "Meta-Learning for Few-Shot {NMT} Adaptation",
@@ -5100,6 +5223,51 @@ http://proceedings.mlr.press/v119/zhang20ae.html
   year={2021},
   volume={abs/2104.07358}
 }
+
+@article{william21switch,
+  author    = {William Fedus and
+               Barret Zoph and
+               Noam Shazeer},
+  title     = {Switch Transformers: Scaling to Trillion Parameter Models with Simple
+               and Efficient Sparsity},
+  journal   = {CoRR},
+  volume    = {abs/2101.03961},
+  year      = {2021},
+  url       = {https://arxiv.org/abs/2101.03961},
+  eprinttype = {arXiv},
+  eprint    = {2101.03961},
+  timestamp = {Thu, 21 Jan 2021 14:42:30 +0100},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-2101-03961.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@inproceedings{lepikhin21gshard,
+title={{\{}GS{\}}hard: Scaling Giant Models with Conditional Computation and Automatic Sharding},
+author={Dmitry Lepikhin and HyoukJoong Lee and Yuanzhong Xu and Dehao Chen and Orhan Firat and Yanping Huang and Maxim Krikun and Noam Shazeer and Zhifeng Chen},
+booktitle={International Conference on Learning Representations},
+year={2021},
+url={https://openreview.net/forum?id=qrwe7XHTmYb}
+}
+
+@inproceedings{kong21multilingual,
+    title = "Multilingual Neural Machine Translation with Deep Encoder and Multiple Shallow Decoders",
+    author = "Kong, Xiang  and
+      Renduchintala, Adithya  and
+      Cross, James  and
+      Tang, Yuqing  and
+      Gu, Jiatao  and
+      Li, Xian",
+    booktitle = "Proceedings of the 16th Conference of the European Chapter of the Association for Computational Linguistics: Main Volume",
+    month = apr,
+    year = "2021",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.eacl-main.138",
+    doi = "10.18653/v1/2021.eacl-main.138",
+    pages = "1613--1624",
+    abstract = "Recent work in multilingual translation advances translation quality surpassing bilingual baselines using deep transformer models with increased capacity. However, the extra latency and memory costs introduced by this approach may make it unacceptable for efficiency-constrained applications. It has recently been shown for bilingual translation that using a deep encoder and shallow decoder (DESD) can reduce inference latency while maintaining translation quality, so we study similar speed-accuracy trade-offs for multilingual translation. We find that for many-to-one translation we can indeed increase decoder speed without sacrificing quality using this approach, but for one-to-many translation, shallow decoders cause a clear quality drop. To ameliorate this drop, we propose a deep encoder with multiple shallow decoders (DEMSD) where each shallow decoder is responsible for a disjoint subset of target languages. Specifically, the DEMSD model with 2-layer decoders is able to obtain a 1.8x speedup on average compared to a standard transformer model with no drop in translation quality.",
+}
+
 
 @inproceedings{xie21importance,
     title = "Importance-based Neuron Allocation for Multilingual Neural Machine Translation",
