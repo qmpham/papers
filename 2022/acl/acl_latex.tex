@@ -132,17 +132,20 @@
   \texttt{email@domain} \\}
 
 \begin{document}
-\setlength{\abovedisplayskip}{3pt}
-\setlength{\belowdisplayskip}{3pt}
+\setlength{\parskip}{0pt}
+\setlength{\abovedisplayskip}{0pt}
+\setlength{\belowdisplayskip}{0pt}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{0pt}
 \maketitle
 \begin{abstract}
-Multi-domain and multilingual translation can be cast under multi-task learning in which each domain or language pair is considered a task. Sharing most of the parameters of the model causes a catastrophic interference between unrelated tasks. Most of the proposed multi-task architectures propose sharing the parameters of an underlying generic model and using different output layers to predict different tasks. However, these paradigms do not explicitly exploit the proximity between tasks. In this work, we aim to express the task proximity in the multi-task network. Instead of using a predefined multi-task network, we jointly learn routing task-dependent sub-networks and the parameters of the whole network. More precisely, we propose clustering the nodes of each layer into equal-sized groups. For each layer and each domain, a number of groups will be dropped. By consequence, we assign different sparse sub-networks to different tasks. Our method learns the task-dependent dropping selections and the parameters of the underlying network. Our approach allows the proximity between tasks to express in their dropping selections. Through an extensive set of experiments, we demonstrate the advantages of our method over strong baselines in multi-domain and multilingual translation. Furthermore, through an ablation study, we illustrate a significant correlation between the similarity between learned task-dependent dropping selections and the proximity between tasks.
+Multi-domain and multilingual translation can be cast under multi-task learning in which each domain or language pair is considered a task. Sharing most of the parameters of the model causes a catastrophic interference between unrelated tasks. Most of the proposed multi-task architectures propose sharing the parameters of an underlying generic model and using different output layers to predict different tasks. However, these methods do not explicitly exploit the proximity between tasks. In this work, we aim to express the task proximity in the multi-task network. Instead of using a predefined multi-task network, we jointly learn routing task-dependent sub-networks and the parameters of the whole network. More precisely, we propose clustering the nodes of each layer into equal-sized groups. For each layer and each domain, a number of groups will be dropped. By consequence, we assign different sparse sub-networks to different tasks. Our method learns the task-dependent dropping selections and the parameters of the underlying network. Our approach allows the proximity between tasks to express in their dropping selections. Through an extensive set of experiments, we demonstrate the advantages of our method over strong baselines in multi-domain and multilingual translation. Furthermore, through an ablation study, we illustrate a significant correlation between the similarity between learned task-dependent dropping selections and the proximity between tasks.
 \end{abstract}
 
 \section{Introduction}
 Multi-domain translation and multilingual translation develop one model for translations in multi-domain and multiple language pairs, respectively. These paradigms are motivated by the compactness of the translation model \cite{dabre20survey,Chu18multilingual} and the hypothetical positive knowledge transfer between similar domains \citep{Pham21revisiting} or between languages in the same family \citep{Tan19multilingual}. However, sharing parameters of the model can cause the catastrophic interference between unrelated tasks \citep{conneau20unsupervised,wang20negative}.
 
-In multi-domain setting, \citet{Pham21revisiting} pointed out a challenge in how multi-domain systems fully exploit the similarity between domains. The authors demonstrated the weakness of these systems in handling the proximity between domains through a simple setting using a pseudo domain separation. Domain adapters, which are strong baselines for multi-domain translation \cite{Pham20Study}, failed this test. Such predefined allocations of parameters to domains do not take into account the proximity of domains in their choice.
+In multi-domain setting, \citet{Pham21revisiting} pointed out a challenge in how multi-domain systems fully exploit the similarity between domains. The authors demonstrated the weakness of these systems in handling the proximity between domains through a simple setting using a pseudo domain separation. Domain Adapters, which are strong baselines for multi-domain translation \cite{Pham20Study}, failed this test. Such predefined allocations of parameters to domains do not take into account the proximity of domains in their choice.
 
 The method we developed here mitigates the catastrophic interference in training a neural machine translation (NMT) model for multiple domains or multiple language pairs. Our main contribution are summarized below:
 \begin{itemize}
@@ -156,7 +159,7 @@ The method we developed here mitigates the catastrophic interference in training
 \end{itemize}
 
 \section{Multi-task group dropout}
-We define a group dropout for a domain $d$ as follow
+We define a group dropout for a domain $d$ as follows
 \begin{align*}
 \tilde{h}^l &= h^l \odot r_l^d ,\\
 r_l^d &\in \{ 0,1 \}^{d_k}, \\
@@ -169,7 +172,7 @@ where $L$ is number of Transformer layers of our NMT model, the binary vector $r
 \caption{Latent group dropout. The set of nodes in one layer is divided into equal-sized groups. For a domain, we drop a fixed number of groups. Our method learns which groups will be dropped for a domain.}
 \label{fig:group_dropout}
 \end{figure}
- The dropping mask $r_l^d$ of $l^{th}$ layer and domain $d$ is defined as follow
+ The dropping mask $r_l^d$ of $l^{th}$ layer and domain $d$ is defined as follows
 \begin{align*}
 r_l^d(i) &= \begin{cases}
       1, & \text{if}\ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p} \\
@@ -260,13 +263,13 @@ The gradient $\frac{\partial T_1}{\hat{m}_l^d(\tau)}$ is computed via autograd a
 We jointly train the Transformer parameters $\theta$ and the parameters of the latent dropping masks $\Phi_l^d$ using the following multi-task loss.
 
 \begin{align}
-\hspace{-3.em}
+\hspace{-0.em}
 \mathcal{L}(\theta,\Phi_l^1,\cdots,\Phi_l^k) = \displaystyle{\mathop{\sum}_{d=1}^{k}} \displaystyle{\mathop{\mathbb{E}}_{x \sim \mathcal{D}_s^d,y \sim g^d(x)}} \big[-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)\big]
 \end{align}
 
 in which $\mathcal{D}_s^d$ is distribution of the task $d$ over the input space $\Omega^d_s$; $g^d: \Omega^d_s \rightarrow \Omega^d_t$ is the mapping function, which our multi-task modern needs to learn, of the task $d$; $-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)$ is the ELBO loss, which we defined in Equation \ref{eq:lower-bound}.
 
-Finally, in the inference, we define the dropping mask for $l^{th}$ layer and domain $d$ as follow
+Finally, in the inference, we define the dropping mask for $l^{th}$ layer and domain $d$ as follows
 
 \begin{align*}
 Ind_l^d &= Top_k(\Phi_l^d) \\
@@ -280,7 +283,7 @@ In both cases, we examine the performance of three following MT systems.
 \begin{itemize}
 	\item Transformer
 	\item Adapter based Transformer
-	\item Transformer with multi-task group dropout
+	\item \system{LaMGD} Tranformer
 \end{itemize}
 For the sake of brevity, we put the detailed descriptions of these systems in Appendix \ref{appendix:c}.
 \subsection{Datasets}
@@ -296,74 +299,126 @@ translation tasks. We evaluate models on widely used multilingual translation da
 The detailed description of the datasets is provided in Appendix \ref{appendix:c}.
 \section{Results and ablation studies}
 \subsection{Multi-domain translation}
-According to Table \ref{tab:mdmt}, \system{LaMGD} shows a significant improvement (+2.78) over the generic system \system{Transformer} with zero extra parameters. Moreover, \system{LaMGD} achieve equivalent performance in average compared to \system{Adapter}, which is carrefully finetuned with a approximately 12.4M additional parameters.
+According to Table \ref{tab:mdmt}, \system{LaMGD} Tranformer shows a significant improvement (+2.78) over the generic system \system{Transformer} with zero extra parameters. Moreover, \system{LaMGD} Tranformer achieves equivalent performance in average compared to \system{Adapter}, which is carrefully finetuned with a approximately 12.4M additional parameters.
 \begin{table*}[h!]
   \centering
   \begin{tabular}{|p{4cm}|*{7}{r|}} \hline
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[65m]} & 40.3 & 59.5 & 49.8 & 36.4 & 49.0 & 80.0  & 52.5\\
     \revision{\system{Adapter}}   \hfill{\footnotesize[+12.4m]}  & 39.5 & 61.0 & 53.1 & 37.5 & 49.6 & 91.0 & 55.28 \\ 
-    \system{LaMGD}   \hfill{\footnotesize[+0m]}  & 40.3 & 60.4 & 52.4 & 39.0 & 52.4 & 87.5 & 55.33 \\ 
+    \system{LaMGD} Tranformer   \hfill{\footnotesize[+0m]}  & 40.3 & 60.4 & 52.4 & 39.0 & 52.4 & 87.5 & 55.33 \\ 
     \hline
   \end{tabular}
   \caption{Multi-domain translation}
   \label{tab:mdmt}
 \end{table*}
 \subsubsection{Fuzzy domain separation}
-In this experiment, we reuse an experiment proposed by \citet{Pham21revisiting} which measures the efficiency of a multi-domain NMT system exploit the proximity between domains. The experiment use the same data as the previous experiment. However, the domain \domain{LAW} is now randomly split into two pseudo domains \domain{law$_1$} and \domain{law$_2$}. If the multi-domain system made full use of the proximity between \domain{law$_1$} and \domain{law$_2$}, there should be no significant difference between the performance of the system trained with six original domains and with seven domains replacing \domain{law} by \domain{law$_1$} and \domain{law$_2$}. \citet{Pham21revisiting} showed a large gap between two training settings when using residual adapters. We report below the gap between two settings when using \system{LaMGD}. 
+\label{ssec:fuzzy}
+In this experiment, we reuse an experiment proposed by \citet{Pham21revisiting} which measures the efficiency of a multi-domain NMT system exploit the proximity between domains. The experiment use the same data as the previous experiment. However, the domain \domain{LAW} is now randomly split into two pseudo domains \domain{law$_1$} and \domain{law$_2$}. If the multi-domain system made full use of the proximity between \domain{law$_1$} and \domain{law$_2$}, there should be no significant difference between the performance of the system trained with six original domains and with seven domains replacing \domain{law} by \domain{law$_1$} and \domain{law$_2$}. \citet{Pham21revisiting} showed a large gap between two training settings when using residual adapters. We report below the gap between two settings when using \system{LaMGD} Tranformer. 
+\begin{table*}[h!]
+  \centering
+  \begin{tabular}{|p{4cm}|*{2}{r|}} \hline
+    Model / Domain & \multicolumn{1}{c|}{\domain{law$_1$}} & \multicolumn{1}{c|}{\domain{law$_2$}} \\ \hline 
+    \system{Adapter}   \hfill{\footnotesize[+25m]}  & -0.6 & -0.8 \\ 
+    \system{LaMGD} Tranformer   \hfill{\footnotesize[+0m]}  & 0.0 & 0.0 \\ 
+    \hline
+  \end{tabular}
+  \caption{Fuzzy domain separation}
+  \label{tab:fuzzy}
+\end{table*}
+
+Table \ref{tab:fuzzy} demonstrates a significant loss when training with two pseudo domain \domain{law$_1$} and \domain{law$_2$} compared to training with the real domain \domain{law}. Our system does not have this loss between two situation. In section \ref{ssec:abalation}, we show that our algorithm outputs the same sub-network for \domain{law$_1$} and \domain{law$_2$}, that allows a full transfer between two domain.
 
 \subsection{Multilingual translation}
-According to Table \ref{tab:multilingual}, \system{LaMGD} shows a boost of 0.42, 0.33, 0.32 in average over the multilingual \system{Transformer} in O2M-related, M2O-related, M2O-diverse respectively. Significant gains are observed in \domain{bel}, \domain{glg} (both direction), \domain{hin} and \domain{bos} (O2M direction). However, \system{LaMGD} lags behind multilingual \system{Transformer} in O2M-diverse. 
+According to Table \ref{tab:multilingual}, \system{LaMGD} Tranformer shows a boost of 0.42, 0.33, 0.32 in average over the multilingual \system{Transformer} in O2M-related, M2O-related, M2O-diverse respectively. Significant gains are observed in \domain{bel}, \domain{glg} (both direction), \domain{hin} and \domain{bos} (O2M direction) which are very low-resourced languages in the list. However, \system{LaMGD} Tranformer lags behind multilingual \system{Transformer} in O2M-diverse. 
 \begin{table*}[h!]
   \centering
   \begin{tabular}{|p{4cm}|*{9}{r|}} \hline
     O2M-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[91.6m]} & 4.80 &7.30&20.80&21.10&39.70&19.80&22.60&15.20&18.91 \\
     \revision{\system{Adapter}}   \hfill{\footnotesize[13m]} &4.30&6.80&21.10&22.00&39.70&20.00&23.00&15.20&19.01 \\ 
-    \system{LaMGD}  \hfill{\footnotesize[+0m]}  & 5.20&\SB{9.40}&20.60&\SB{22.80}&39.60&19.60&22.40&15.00&19.33 \\ 
+    \system{LaMGD} Tranformer  \hfill{\footnotesize[+0m]}  & 5.20&\SB{9.40}&20.60&\SB{22.80}&39.60&19.60&22.40&15.00&19.33 \\ 
 	\hline
     \hline
     M2O-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[67.8m]} &11.40&16.60&28.50&	27.10&43.70&24.60&30.30&25.60&25.98 \\
     \revision{\system{Adapter}}   \hfill{\footnotesize[13m]} &10.10&15.80&28.40&26.80&43.70&24.50&30.20&25.60&25.64\\ 
-    \system{LaMGD}   \hfill{\footnotesize[+0m]}  &11.30&\SB{17.40}&28.60&\SB{28.70}&43.70&24.50&30.70&25.60&26.31 \\ 
+    \system{LaMGD} Tranformer   \hfill{\footnotesize[+0m]}  &11.30&\SB{17.40}&28.60&\SB{28.70}&43.70&24.50&30.70&25.60&26.31 \\ 
     \hline
     \hline
     O2M-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
-    \system{Transformer}  \hfill{\footnotesize[96.9m]} & 10.20&4.0&12.70&22.20&31.80&34.00&38.30&8.30&20.19 \\
-    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  & & & & & & & & & \\ 
-    \system{LaMGD}   \hfill{\footnotesize[+0m]} & & & & & & & & & \\
+    \system{Transformer}  \hfill{\footnotesize[96.9m]} & 10.20&4.0&12.70&22.20&31.80&\SB{34.00}&38.30&8.30&20.19 \\
+    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  &10.20&4.00&\SB{13.30}&21.90&32.20&\SB{34.10}&38.50&8.30&20.31 \\ 
+    \system{LaMGD} Tranformer   \hfill{\footnotesize[+0m]}&10.10&3.80&12.60&\SB{22.80}&31.80&33.40&38.10&8.10&20.09\\
     \hline 
     \hline
     M2O-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[70.4m]} &22.40&9.70&20.50&31.80&37.50&38.70&39.80&19.00&27.43 \\
-    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  & & & & & & & & & \\ 
-    \system{LaMGD}   \hfill{\footnotesize[+0m]} &\SB{23.50}&9.60&\SB{21.50}&32.20&37.70&38.60&40.00&18.90&27.75 \\
+    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  &22.50&9.40&20.00&30.60&37.20&38.20&39.30&19.00&27.03\\ 
+    \system{LaMGD} Tranformer   \hfill{\footnotesize[+0m]} &\SB{23.50}&9.60&\SB{21.50}&32.20&37.70&38.60&40.00&18.90&27.75 \\
     \hline
   \end{tabular}
   \caption{Multilingual translation}
   \label{tab:multilingual}
 \end{table*}
+
+
 \subsection{Similarity between dropping masks}
-In this section, we illustrate the similarity between dropping masks.
+\label{ssec:abalation}
+In this section, we compare the sub-networks of the domains or of the language pairs by computing the average of the similarities between the corresponding dropping mask in each layer.
+
+For the multi-domain experiment, we analyze the case of fuzzy domain separation in Section \ref{ssec:fuzzy}. Table \ref{tab:fuzzy-sim} shows that the sub-networks of \domain{law$_1$} and \domain{law$_2$} are identical, which is one of the goals of our method.
+\begin{table*}[h!]
+  \centering
+  \begin{tabular}{|p{1cm}|*{7}{r|}} \hline
+    & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{bank}}& \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{law$_1$}} & \multicolumn{1}{c|}{\domain{law$_2$}} & \multicolumn{1}{c|}{\domain{rel}} &\multicolumn{1}{c|}{\domain{talk}} \\ \hline 
+    \domain{med} &1.0&0.80&0.85&0.83&0.83&0.78&0.89\\
+    \domain{bank} &0.80&1.0&0.80&0.90&0.90&0.73&0.82\\
+    \domain{it} &0.85&0.80&1.0&0.80&0.80&0.78&0.85\\
+    \domain{law$_1$} &0.83&0.90&0.80&1.0&\SB{1.0}&0.75&0.82\\ 
+    \domain{law$_2$} &0.83&0.90&0.80&\SB{1.0}&1.0&0.75&0.82\\ 
+    \domain{rel} &0.78&0.73&0.78&0.75&0.75&1.0&0.77\\
+    \domain{talk} &0.89&0.82&0.85&0.82&0.82&0.77&1.0\\
+    \hline
+  \end{tabular}
+  \caption{Multi-domain sub-networks' similarities}
+  \label{tab:fuzzy-sim}
+\end{table*}      
+
+For multilingual case TED-related, we have four language families including (1) Turkic family with Azerbaijani and Turkish(\domain{aze},\domain{tur}); (2) Slavic family with Belarusian and Russian (\domain{bel},\domain{rus}); (3) Romance family with Glacian and Portuguese (\domain{glg},\domain{por}); and (4) Czech-Slovak family with Slovak and Czech (\domain{ces},\domain{slk}). The similarities between the sub-networks of each pair are 0.95, 0.94, 0.99 and 0.96 which are the maximum in each row except the diagonal, which stands for the self-similarity.
+\begin{table*}[h!]
+  \centering
+  \begin{tabular}{|p{1cm}|*{8}{r|}} \hline
+    & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{bel}}& \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} &\multicolumn{1}{c|}{\domain{slk}}&\multicolumn{1}{c|}{\domain{tur}} \\ \hline 
+    \domain{aze} &1.0&0.90&0.89&0.86&0.85&0.91&0.89&\SB{0.95}\\
+    \domain{bel} &0.90&1.0&0.94&0.91&0.91&\SB{0.94}&0.94&0.88\\
+    \domain{ces} &0.89&0.94&1.0&0.92&0.94&0.98&\SB{0.99}&0.91\\
+    \domain{glg} &0.86&0.91&0.92&1.0&\SB{0.96}&0.92&0.93&0.86\\ 
+    \domain{por} &0.85&0.91&0.94&\SB{0.96}&1.0&0.93&0.94&0.87\\ 
+    \domain{rus} &0.91&\SB{0.94}&0.98&0.92&0.93&1.0&0.98&0.93\\
+    \domain{slk} &0.89&0.94&\SB{0.99}&0.93&0.94&0.98&1.0&0.91\\
+    \domain{tur} &\SB{0.95}&0.88&0.91&0.86&0.87&0.93&0.91&1.0\\
+    \hline
+  \end{tabular}
+  \caption{Multilingual sub-networks' similarities (M2O Ted-related)}
+  \label{tab:related-sim}
+\end{table*}
 
 \section{Related work}
 The most adopted paradigm is to have two groups of parameters including task-agnostic parameters and task-specific parameters. Domain adapters and language adapters are strong baselines of this paradigm. However, adapters does not take into account the proximity of the task in their designed architectures. 
 
 \citep{sen19multilingual,kong21multilingual} used the similar idea of language proximity based parameter sharing. The authors proposed a multi-decoder model sharing the same encoder among languages and routed languages in different families to different decoders.
 
-\citet{xian20deep} proposed using different depths for different tasks. The authors aimed to match the depth of the sub-network to the complexity of the task. \citet{Gong21pay,Gong21adaptive} also take interest in the adaptive sparse Transformers which differ the selection of heads in multi-head attention, of layers and of blocks in feed-forward matrices between different tasks. \citet{Christopher21efficiently}.
-Mixture-of-experts (MoE) is another effective approach of sparse modeling. Within the transformer model, GShard model replaces a single feedforward (FFN) sub-layer with an MoE module consisting of multiple FFN sub-layers \citep{lepikhin21gshard}. 
-
-
-
-%\citet{william21switch}
+\citet{xian20deep} proposed using different depths for different tasks. The authors aimed to match the depth of the sub-network to the complexity of the task. \citet{Gong21pay,Gong21adaptive} also take interest in the adaptive sparse Transformers which differ the selection of heads in multi-head attention, of layers and of blocks in feed-forward matrices between different tasks. Mixture-of-experts (MoE) is another effective approach of sparse modeling. Within the transformer model, GShard model replaces a single feedforward (FFN) sub-layer with an MoE module consisting of multiple FFN sub-layers \citep{lepikhin21gshard}. \citet{william21switch}
 
 %Adapters
 %
 %With the similar idea of language proximity based parameter sharing, recent works propose multi-decoder model. Sharing the same encoder among languages, they route languages in different families to different decoders
 
 \section{Conclusions and outlook}
+In this work, we present a novel method allows jointly searching optimal sub-networks for multiple tasks and the parameters of the underlying network. Our method proposed a rigorous mathematical modeling and an end-to-end optimization with very little extra computational cost. We demonstrate an improvement of our model with large margin over multi-domain Transformer without zero additional parameters and an equivalent performance compared to a strong baseline such as Domain Adapters consisting of large number of extra parameters. In multilingual translation, our model outperforms multilingual Transformer and Language Adapters in 3/4 cases. Besides, we provided an thorough ablation study on the similarities between learned sub-networks and demonstrated a strong correlation between the sub-networks' similarity and the proximity of their tasks (domain or language).
+
+Despite several advantages, our method has several weaknesses including the heuristically predefined number of retained groups, $k$ , and the need of domain label in the inference. In future work, we would like to provide an extensive variational framework to model both the number of retained groups, $k$ and the dropping selections. Secondly, to get rid of the requirement of domain information in the inference, we could condition the dropping selection directly on the input $x$ instead of the domain $d$. These two open question are both very interesting and promising.
 \bibliography{bibliography}
 \bibliographystyle{acl_natbib}
 \appendix
@@ -388,7 +443,7 @@ Because sigmoid is monotonic, the equation \eqref{eq:nu} has unique solution. Fu
 & \Rightarrow \frac{\partial \nu}{\partial \Phi_l^d} = - \big(\frac{\partial g}{\partial \nu}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d}
 \end{align*}
 
-Because the differentiation of sigmoid has exact forms, $\frac{\partial g}{\partial \nu}$ and $\frac{\partial g}{\partial \Phi_l^d}$ also have exact form. Therefore, we do not need autograd to compute the implicit gradient $\frac{\partial \nu}{\partial \Phi_l^d}$. The gradient of $\hat{m}_l^d(\tau)$ w.r.t $\Phi_l^d$ is deduced as follow
+Because the differentiation of sigmoid has exact forms, $\frac{\partial g}{\partial \nu}$ and $\frac{\partial g}{\partial \Phi_l^d}$ also have exact form. Therefore, we do not need autograd to compute the implicit gradient $\frac{\partial \nu}{\partial \Phi_l^d}$. The gradient of $\hat{m}_l^d(\tau)$ w.r.t $\Phi_l^d$ is deduced as follows
 \begin{align}
 \frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} = \frac{\partial \hat{m}_l^d(\tau)}{\partial \nu} \times \frac{\partial \nu}{\partial \Phi_l^d}
 \end{align}
@@ -400,6 +455,7 @@ Finally, we need prove the limit $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \
 Because
 
 \begin{align*}
+\hspace{-3.em}
 \lim_{\tau \rightarrow 0} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) = \begin{cases}
       1, & \text{if}\ \tau > - (g_l^d(i) + \Phi_l^d(i)), \\
       0, & \text{if}\ \tau < - (g_l^d(i) + \Phi_l^d(i)), \\
@@ -433,8 +489,8 @@ And, because $ \displaystyle{\mathop{\sum}_{u=1}^{n_p}}\hat{m}_l^d(\tau)(i_u) = 
 
 \begin{align*}
 \lim_{\tau \rightarrow 0} \hat{m}_l^d(\tau)(i_u) = \begin{cases}
-      1, & \text{if} u \geqslant k \\
-      0, & \text{if} u < k \\
+      1, & \text{if}\ u \geqslant k \\
+      0, & \text{if}\ u < k \\
     \end{cases}
 \end{align*}
 
@@ -452,8 +508,8 @@ In this section, we give a simple proof of Inequality \ref{eq:entropy}. In fact,
 \section{Appendix C}
 \label{appendix:c}
 \subsection{Multi-domain datasets}
-
-\begin{table*}[h!]
+We describe our datasets for multi-domain translation experiment in Table \ref{tab:Corpora-chap4}
+\begin{table*}
   \centering
   \begin{tabular}{|l|cccccc|} %*{4}{|r|}}
     \cline{2-7} 
@@ -469,11 +525,62 @@ In this section, we give a simple proof of Inequality \ref{eq:entropy}. In fact,
   }
 \label{tab:Corpora-chap4}
 \end{table*}
-
 \subsection{Multilingual datasets}
+We clarify the notation of the languages in multilingual experiments as follows
+\begin{itemize}
+	\item Diverse: bos (bosnia), mar(marathi),
+         hin(hindi), mkd(macedonia), ell(greek),
+         bulgaria(bul), french(fra), korean(kor) 
+	\item Related: azerbajiani (aze), belarusian(bel),
+          glacian(glg), slovak (slk), turkisk (tur),
+		  russian(rus), portugese(por),czech(ces)
+\end{itemize}
+Table \ref{tab:Corpora-multilingual} describes the subset of TED8 that we used in our experiments.
+\begin{table*}
+  \centering
+  \begin{tabular}{l|cccc} 
+  \hline
+    \multicolumn{1}{c|}{} & \multicolumn{1}{c}{\domain{lang}} & \multicolumn{1}{c}{\domain{train}} & \multicolumn{1}{c}{\domain{dev}} & \multicolumn{1}{c}{\domain{test}} \\
+    \hline 
+    \multirow{8}{*}{Related} & Azerbaijani & 5.94k & 671 & 903 \\
+							 & Belarusian & 4.51k & 248 & 664 \\
+							 & Glacian & 10.0k & 682 & 1007 \\
+							 & Slovak & 61.5k & 2271 & 2445 \\
+							 & Turkish & 182k & 4045 & 5029 \\
+                             & Russian & 208k & 4814 & 5483 \\
+                             & Portuguese & 185k & 4035 & 4855 \\
+                             & Czech & 103k & 3462 & 3831 \\
+    \hline
+    \multirow{8}{*}{Related} & Bosnian & 5.64k & 474 & 463 \\
+                             & Marathi & 9.84k & 767 & 1090 \\
+                             & Hindi & 18.79k & 854 & 1243 \\
+                             & Macedonian & 25.33k & 640 & 438 \\
+                             & Greek & 134k & 3344 & 4433 \\
+                             & Bulgarian & 174k & 4082 & 5060 \\
+                             & French & 192k & 4320 & 4866 \\
+                             & Korean & 205k & 4441 & 5637 \\
+  \end{tabular}
+  \caption{Data Statistics of TED8 Datasets}
+\label{tab:Corpora-multilingual}
+\end{table*}
 
 \subsection{Multi-domain systems}
+We describe the choice of our systems in multi-domain experiments as follows
+\begin{itemize}
+	\item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 2048, the multi-head attentions contain with 8 heads.
+	\item Adapter based Transformer: The intermediate feeforward dimension is set as 2048 as in \citet{Pham21Revisiting}.
+	\item \system{LaMGD} Tranformer: There is no change in the architecture. We group 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 groups are selected. The number of parameters of variational distributions are $k \times L \times n_d$ which is tiny compared to the size of Transformer.
+\end{itemize}
 
+We set the dropout probability as 0.1. We train the multi-domain Transformer model in 200~K iterations with a batchsize of 12~K tokens. We train \system{LaMGD} Tranformer in 300~K iterations with a batchsize of 12~K tokens since \system{LaMGD} Tranformer has to learn both the sub-networks and the parameters of the underlying Transformer. Finally, we plug Domain Adapters to the multi-domain Transformer model and finetune them with 25~K iterations using the same batchsize as the former.
 \subsection{Multilingual systems}
+We describe the choice of our systems in multilingual experiments as follows
+\begin{itemize}
+	\item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 1024, the multi-head attentions contain with 8 heads as in \citet{Wang20balancing}.
+	\item Adapter based Transformer: The intermediate feeforward dimension is set as 128 as in \citet{Gong21adaptive}.
+	\item \system{LaMGD} Tranformer: There is no change in the architecture. We group 512 nodes in each layer into 16 groups We group 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 groups are selectedof 32 consecutive nodes. For each domain, only 12 groups are selected. 
+\end{itemize}
+
+We set the dropout probability as 0.3. We train the multilingual Transformer model in 40~K iterations with a batchsize of 9600 tokens on 16 GPUs as in \citet{Gong21adaptive}. We train \system{LaMGD} Tranformer in 50~K iterations with the same batchsize. Finally, we finetune the Language Adapters in 5~K iterations.
 
 \end{document}
