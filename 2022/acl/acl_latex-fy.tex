@@ -160,7 +160,7 @@ In this paper, we try to develop techniques that can take the similarity between
 \fyTodo{Can you do distillation ? That is only keep the parameter for one domain and still get good results (better than DA ?)}
 
 \section{Multi-task group dropout}
-We define a group dropout for a domain $d$ as follow
+We define a group dropout for a domain $d$ as follows
 \begin{align*}
 \tilde{h}^l &= h^l \odot r_l^d ,\\
 r_l^d &\in \{ 0,1 \}^{d_k}, \\
@@ -173,7 +173,7 @@ where $L$ is number of Transformer layers of our NMT model, the binary vector $r
 \caption{Latent group dropout. The set of nodes in one layer is divided into equal-sized groups. For a domain, we drop a fixed number of groups. Our method learns which groups will be dropped for a domain.}
 \label{fig:group_dropout}
 \end{figure}
- The dropping mask $r_l^d$ of $l^{th}$ layer and domain $d$ is defined as follow
+ The dropping mask $r_l^d$ of $l^{th}$ layer and domain $d$ is defined as follows
 \begin{align*}
 r_l^d(i) &= \begin{cases}
       1, & \text{if}\ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p} \\
@@ -264,13 +264,13 @@ The gradient $\frac{\partial T_1}{\hat{m}_l^d(\tau)}$ is computed via autograd a
 We jointly train the Transformer parameters $\theta$ and the parameters of the latent dropping masks $\Phi_l^d$ using the following multi-task loss.
 
 \begin{align}
-\hspace{-3.em}
+\hspace{-0.em}
 \mathcal{L}(\theta,\Phi_l^1,\cdots,\Phi_l^k) = \displaystyle{\mathop{\sum}_{d=1}^{k}} \displaystyle{\mathop{\mathbb{E}}_{x \sim \mathcal{D}_s^d,y \sim g^d(x)}} \big[-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)\big]
 \end{align}
 
 in which $\mathcal{D}_s^d$ is distribution of the task $d$ over the input space $\Omega^d_s$; $g^d: \Omega^d_s \rightarrow \Omega^d_t$ is the mapping function, which our multi-task modern needs to learn, of the task $d$; $-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)$ is the ELBO loss, which we defined in Equation \ref{eq:lower-bound}.
 
-Finally, in the inference, we define the dropping mask for $l^{th}$ layer and domain $d$ as follow
+Finally, in the inference, we define the dropping mask for $l^{th}$ layer and domain $d$ as follows
 
 \begin{align*}
 Ind_l^d &= Top_k(\Phi_l^d) \\
