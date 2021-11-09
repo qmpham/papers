@@ -135,9 +135,6 @@
 \setlength{\abovedisplayskip}{3pt}
 \setlength{\belowdisplayskip}{3pt}
 \maketitle
-\begin{abstract}
-Multidomain and multilingual translation can be cast under multi-task learning in which each domain or language pair is considered a task. Sharing most of the parameters of the model causes a catastrophic interference between unrelated tasks. Most of the proposed multi-task architectures propose sharing the parameters of an underlying generic model and using different output layers to predict different tasks. However, these paradigms do not explicitly exploit the proximity between tasks. In this work, we aim to express the task proximity in the multi-task network. Instead of using a predefined multi-task network, we jointly learn routing task-dependent sub-networks and the parameters of the whole network. More precisely, we propose clustering the nodes of each layer into equal-sized groups. For each layer and each domain, a number of groups will be dropped. By consequence, we assign different sparse sub-networks to different tasks. Our method learns the task-dependent dropping selections and the parameters of the underlying network. Our approach allows the proximity between tasks to express in their dropping selections. Through an extensive set of experiments, we demonstrate the advantages of our method over strong baselines in multi-domain and multilingual translation. Furthermore, through an ablation study, we illustrate a significant correlation between the similarity between learned task-dependent dropping selections and the proximity between tasks.
-\end{abstract}
 
 \begin{abstract}
   [FY] Multidomain and multilingual machine translation often rely on parameter sharing strategies, where large portions of the network are meant to capture the commonalties of the task at hand, while smaller parts are reserved to model the peculariaties of a language or a domain. In adapter-based approaches, these strategies are hard coded in the network architecture. In this work, we propose a new method aimed at learning the parameter sharing pattern, using a latent-variable model. We show how this model can be trained end to end, and report experimental results which show that the learned pattern are both meaningful, and yield improved translation performance without any increase of the model size. 
@@ -159,21 +156,24 @@ In this paper, we try to develop techniques that can take the similarity between
 
 \fyTodo{Can you do distillation ? That is only keep the parameter for one domain and still get good results (better than DA ?)}
 
-\section{Multi-task group dropout}
-We define a group dropout for a domain $d$ as follows
-\begin{align*}
-\tilde{h}^l &= h^l \odot r_l^d ,\\
-r_l^d &\in \{ 0,1 \}^{d_k}, \\
-h^{l+1} &= \text{LAYER}^{l+1}(h^l) ,\\
-l & \in [0,\cdots,L] ,\\
-\end{align*}
-where $L$ is number of Transformer layers of our NMT model, the binary vector $r_l^d$ is a dropping mask. We illustrate the group dropout in Figure \ref{fig:group_dropout}
+\section{Multi-task group dropout \label{sec:architecture}}
+\subsection{Network architecture, groups and layers}
+Most architectures for multitask learning are based on the assignment of model parameters with tasks. While our model also needs to know the task $d \in [1 \dots n_d$ for each training and test instance, the structure of our Transformer networks \citep{Vaswani17attention} is based on the notion of \emph{groups of parameters}. In each Transformer layer $l \in [1 \dots L]$, we identify $n_p$ groups of parameters.\fyTodo{In the attention heads only? In the FF?} The assignment of tasks to groups will be learned from the data, under the constraint that each task has only access to exactly $k$ groups of \emph{active parameters}, while the all the other parameter values are deemed to be \emph{dropped} (see Figure~\ref{fig:group_dropout}).
 \begin{figure}
 \includegraphics[width=0.4\textwidth]{group_dropout}
-\caption{Latent group dropout. The set of nodes in one layer is divided into equal-sized groups. For a domain, we drop a fixed number of groups. Our method learns which groups will be dropped for a domain.}
+\caption{Latent group dropout. The set of nodes\fyTodo{parameters ?} in each layer is divided into equal-sized groups. For a task, we only keep a fixed number of groups. Our method learns which groups will be kept / dropped for each task.}
 \label{fig:group_dropout}
 \end{figure}
- The dropping mask $r_l^d$ of $l^{th}$ layer and domain $d$ is defined as follows
+Formally, we define the group dropout mask $m_d^l$ a $n_p$ dimensional binary vector containing exactly $k$ ones: the group $p$ is retained for task $d$ if $m_l^d(p)\text{\small =}1$ and is dropped if $m_l^d(p)\text{\small =}0$. We denote $\Delta^{n_p}_k = \{ m \in \{0,1\}^{n_p} \text{such that} \}$ the set of all admissible dropping masks.
+
+$r_l^d$ for a task $d$ in layer $l$ as follows:
+\begin{align*}
+  r_l^d &\in \{ 0,1 \}^{d_k}, \\
+  \tilde{h}^l &= h^l \odot r_l^d ,\\
+  h^{l+1} &= \text{LAYER}^{l+1}(h^l) ,\\
+  l & \in [0,\cdots, L-1] ,\\
+\end{align*}
+where $\text{LAYER}^l()$ represents all the computations in transformer layer $l$. The dropping mask $r_l^d$ is computed as follows
 \begin{align*}
 r_l^d(i) &= \begin{cases}
       1, & \text{if}\ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p} \\
@@ -187,7 +187,7 @@ m_l^d & \in  \{0,1\}^{n_p} \ \forall d,l \, \\
 \mid m_l^d \mid_{L_1} & =  k , \\
 \Delta^{n_p}_k & =  \{ m \in \{0,1\}^{n_p} | \mid m \mid_{L_1} = k \},
 \end{align*}
-where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. The group $p$ is retained for domain $d$ if $m_l^d(p)\text{\small ==}1$ and is dropped if $m_l^d(p)\text{\small ==}0$. We also denote $\Delta^{n_p}_k$ the set of all admissible dropping masks. 
+where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. 
 
 We incorporate the latent variables $m_{l\in[0,\cdots,L]}^d$ into the log-likelihood of our model as below. For the sake of brevity, we denote $m_l^d$ the set of latent variables $m_{l\in[0,\cdots,L]}^d$
 \begin{align}
