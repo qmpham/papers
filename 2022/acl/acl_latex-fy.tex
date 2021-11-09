@@ -158,63 +158,63 @@ In this paper, we try to develop techniques that can take the similarity between
 
 \section{Multi-task group dropout \label{sec:architecture}}
 \subsection{Network architecture, groups and layers}
-Most architectures for multitask learning are based on the assignment of model parameters with tasks. While our model also needs to know the task $d \in [1 \dots n_d$ for each training and test instance, the structure of our Transformer networks \citep{Vaswani17attention} is based on the notion of \emph{groups of parameters}. In each Transformer layer $l \in [1 \dots L]$, we identify $n_p$ groups of parameters.\fyTodo{In the attention heads only? In the FF?} The assignment of tasks to groups will be learned from the data, under the constraint that each task has only access to exactly $k$ groups of \emph{active parameters}, while the all the other parameter values are deemed to be \emph{dropped} (see Figure~\ref{fig:group_dropout}).
+Most architectures for multitask learning are based on a matching of subset of model parameters with tasks. While our model also needs to know the task $d \in [0 \dots n_d-1$ for each training and test instance, the structure of our Transformer networks \citep{Vaswani17attention} is emphbased on the notion of \emph{groups of parameters}. In each Transformer layer $l \in [1 \dots L]$, we identify $n_p$ groups of parameters.\fyTodo{In the attention heads only? In the FF?} The assignment of tasks to groups will be learned from the data, under the constraint that each task has only access to exactly $k$ groups of \emph{active parameters}, while the all the other parameter values are deemed to be \emph{dropped} (see Figure~\ref{fig:group_dropout}).
 \begin{figure}
+  \centering
 \includegraphics[width=0.4\textwidth]{group_dropout}
 \caption{Latent group dropout. The set of nodes\fyTodo{parameters ?} in each layer is divided into equal-sized groups. For a task, we only keep a fixed number of groups. Our method learns which groups will be kept / dropped for each task.}
 \label{fig:group_dropout}
 \end{figure}
-Formally, we define the group dropout mask $m_d^l$ a $n_p$ dimensional binary vector containing exactly $k$ ones: the group $p$ is retained for task $d$ if $m_l^d(p)\text{\small =}1$ and is dropped if $m_l^d(p)\text{\small =}0$. We denote $\Delta^{n_p}_k = \{ m \in \{0,1\}^{n_p} \text{such that} \}$ the set of all admissible dropping masks.
+Formally, we define the \emph{group dropout mask} $m_d^l$ as a $n_p$-dimensional binary vector containing exactly $k$ ones: the group $p$ ($\in  [0,\dots,n_p\text{-}1]$) is retained for task $d$ if $m_l^d(p)\text{\small =}1$ and is dropped if $m_l^d(p)\text{\small =} 0$. We denote $\Delta^{n_p}_k = \{ m \in \{0,1\}^{n_p} \text{such that} \mid{} m \mid_{L_1} = k \}$, where $\mid{} m \mid_{L_1}$ is the $L_1$ norm, the set of all admissible dropping masks.
 
-$r_l^d$ for a task $d$ in layer $l$ as follows:
+Given $m_l^d$, the parameter mask $r_l^d$ for task $d$ in layer $l$ is then derived as follows:
+\begin{align*}
+  r_l^d(i) &= \begin{cases}
+    1, & \text{if}\ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p} \\
+    & \text{AND} \  m_l^d(p) \text{\small =} 1 \\
+    0, & \text{otherwise},
+  \end{cases} 
+  % p & \in  \{0,\dots,n_p\text{-}1 \}, \\
+  % d & \in  \{0,\dots,n_d\text{-}1 \}, \\
+  % i & \in  \{0,\dots,d_k\text{-}1 \}, \\
+  % m_l^d & \in  \{0,1\}^{n_p} \ \forall d,l \, \\
+  % \mid m_l^d \mid_{L_1} & =  k , \\
+  % \Delta^{n_p}_k & =  \{ m \in \{0,1\}^{n_p} | \mid m \mid_{L_1} = k \},
+\end{align*}
+where $d_k$ is the dimension of the hidden state.\fyTodo{Check this} The propagation of information within the network then depends on the current task value and can be formalized as:
 \begin{align*}
   r_l^d &\in \{ 0,1 \}^{d_k}, \\
   \tilde{h}^l &= h^l \odot r_l^d ,\\
   h^{l+1} &= \text{LAYER}^{l+1}(h^l) ,\\
-  l & \in [0,\cdots, L-1] ,\\
+  l & \in [0,\cdots, L-1] ,
 \end{align*}
-where $\text{LAYER}^l()$ represents all the computations in transformer layer $l$. The dropping mask $r_l^d$ is computed as follows
-\begin{align*}
-r_l^d(i) &= \begin{cases}
-      1, & \text{if}\ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p} \\
-      & \text{AND} \  m_l^d(p) \text{\small ==} 1 \\
-      0, & \text{otherwise},
-    \end{cases} \\
-p & \in  \{0,\dots,n_p\text{-}1 \}, \\
-d & \in  \{0,\dots,n_d\text{-}1 \}, \\
-i & \in  \{0,\dots,d_k\text{-}1 \}, \\
-m_l^d & \in  \{0,1\}^{n_p} \ \forall d,l \, \\
-\mid m_l^d \mid_{L_1} & =  k , \\
-\Delta^{n_p}_k & =  \{ m \in \{0,1\}^{n_p} | \mid m \mid_{L_1} = k \},
-\end{align*}
-where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. 
-
-We incorporate the latent variables $m_{l\in[0,\cdots,L]}^d$ into the log-likelihood of our model as below. For the sake of brevity, we denote $m_l^d$ the set of latent variables $m_{l\in[0,\cdots,L]}^d$
+where $\text{LAYER}^l()$ represents all the computations in Transformer layer $l$.
+% The dropping mask $r_l^d$ is computed as follows
+% where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. 
+\subsection{Training with latent dropout masks}
+We incorporate the latent variables  $m_{l}^d, l \in[0,\dots,L]$ into the log-likelihood as follows. For the sake of brevity, we denote $m_l^d$ the set of latent variables, \fyTodo{what do you mean here - this is all there is?} and use $x$, $y$, and $\theta$ to refer to the input, output, and parameter vectors, respectively; finally $\Phi^d_i \in \mathbb{R}^{n_p}$ denotes the set of variational parameters in the model:\fyTodo{Again this is complicated.}
 \begin{align}
 \hspace{-3.em}
-\text{log} P(y|x,\theta,d) & \text{=} \text{log} P(y, m_l^d |x,\theta,d) \text{-} \text{log} P(m_l^d|y, x,\theta,d) \nonumber \\
-& \text{=} \displaystyle{\mathop{\mathbb{E}}_{P(m_l^d | \Phi_l^d)}} \big[ \text{log} P(y, m_l^d | x,\theta,d) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big] \nonumber \\
-& \text{+} KL(P(m_l^d | \Phi_l^d) \parallel P(m_l^d|y, x,\theta,d)) \nonumber \\
-& \geqslant \displaystyle{\mathop{\mathbb{E}}_{P(m_l^d | \Phi_l^d)}} \big[ \text{log} P(y, m_l^d | x,\theta,d) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big] \nonumber \\
-& \text{=} \displaystyle{\mathop{\mathbb{E}}_{P(m_l^d | \Phi_l^d)}} \big[ \text{log} P(y | x,\theta,m_l^d, d) \big] \label{eq:lower-bound} \\
-& \text{-} KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \nonumber \\
-& \text{=} \mathcal{L}_{\text{ELBO}}(\theta, \Phi_l^d, x , y). \nonumber
+\text{log} P(y|x,\theta,d) \text{=} &\text{log} P(y, m_l^d |x,d;\theta) \text{-} \text{log} P(m_l^d|y, x, d ;\theta) \nonumber \\
+\text{=} & \displaystyle{\mathop{\mathbb{E}}_{P(m_l^d | \Phi_l^d)}} \big[ \text{log} P(y, m_l^d | x,d;\theta) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big] \nonumber \\
+& \quad + KL(P(m_l^d | \Phi_l^d) \parallel P(m_l^d|y, x,\theta,d)) \nonumber \\
+\geqslant & \displaystyle{\mathop{\mathbb{E}}_{P(m_l^d | \Phi_l^d)}} \big[ \text{log} P(y, m_l^d | x,\theta,d) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big] \nonumber \\
+ = & \displaystyle{\mathop{\mathbb{E}}_{P(m_l^d | \Phi_l^d)}} \big[ \text{log} P(y | x,\theta,m_l^d, d) \big] \label{eq:lower-bound} \\
+& \quad - KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \nonumber \\
+ = & \mathcal{L}_{\text{ELBO}}(\theta, \Phi_l^d, x , y). \nonumber
 \end{align}
-$\mathcal{L}_{\text{ELBO}}(\theta, \Phi_l^d, x , y)$ is the lowerbound, which is called the evidence lower bound (ELBO) in variational statistic \citep{Diederick14auto}, of our log-likelihood. Our training loss will be $-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)$.
+$\mathcal{L}_{\text{ELBO}}(\theta, \Phi_l^d, x , y)$ is a lowerbound of the log-likelihood, known as the evidence lower bound (ELBO) in variational statistics \citep{Diederick14auto}, of our log-likelihood. Our training loss will be $-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)$.
 
-The variational distribution of $m_l^d$, $P(m_l^d|\Phi_l^d)$, is defined as follows
-
+The variational distribution of $m_l^d$, $P(m_l^d|\Phi_l^d)$, is defined as follows:
 \begin{align}
 \hspace{-2.em}
-&\Phi_d \in \mathbb{R}^{n_p} , \nonumber \\
-&Ind^d \text{=}  \{ i_1, \cdots, i_k \} \nonumber \\
-&\sim \text{\small Sampling\_without\_replacement} \big(\text{softmax}(\Phi_l^d) \big) , \nonumber \\
-&m_l^d(i) \text{=} \mathbb{I}(i \in Ind^d) .\nonumber
+% &\Phi_d \in \mathbb{R}^{n_p} , \nonumber \\
+  Ind^d =& \{ i_1, \cdots, i_k \} \sim \text{SRS}(\operatorname{softmax}(\Phi_l^d)) , \nonumber \\
+  m_l^d(i) =& \mathbb{I}(i \in Ind^d) ,\nonumber
 \end{align}
+with $\text{SRS}(\pi)$ denoting the process of sampling without replacement from the distribution $\pi$, and $\mathbb{I}$ the indicator function. This choice for the modeling of the latent vector $m_l^d$ is motivated by the Gumbel Top-K trick of \citet{Kool19stochastic}. In addition, we assume that the prior distribution of $m_l^d$ is uniform over the admissible set $\Delta^{n_p}_k$, $P(m_l^d | x, \theta, d) \ \text{=} \ U(\Delta^{n_p}_k)$.
 
-The choice of the modeling of the latent vector $m_l^d$ is motivated by the Gumbel Top-K trick \citep{Kool19stochastic}. In addition, we suppose the prior distribution of $m_l^d$ is uniform over the admissible set $\Delta^{n_p}_k$, $P(m_l^d | x, \theta, d) \ \text{=} \ U(\Delta^{n_p}_k)$.
-
-With our assumption over the prior distribution and our choice of the variational distribution, we express the two terms of the lower-bound \eqref{eq:lower-bound} as follows
+Given these assumptions for the prior distribution and our choice for the variational distribution, the two terms in Eq.~\eqref{eq:lower-bound} can be reformulated as:
 
 \begin{align}
 \hspace{-2.em}
@@ -242,7 +242,7 @@ T_2 &= - KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \non
 
 we will prove Inequality \eqref{eq:entropy} in Appendix \ref{appendix:b}.
 
-Now we go back to our loss function, which is the negative of the lower-bound \eqref{eq:lower-bound}, consisting of 2 terms $-T_1$ and $-T_2$. The inequality \eqref{eq:entropy} shows that the upperbound of $-T_2$ is $\text{log}(\#\Delta^{n_p}_k) - \mathbb{H}(\text{softmax}(\Phi_l^d))$. In the training, we will maximize the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ as a regularization over the parameters $\Phi_l^d$ of the variational distribution.
+Now we go back to our loss function, which is the negative of the lower-bound \eqref{eq:lower-bound}, consisting of 2 terms $-T_1$ and $-T_2$. The inequality \eqref{eq:entropy} shows that an upperbound of $-T_2$ is $\text{log}(\#\Delta^{n_p}_k) - \mathbb{H}(\text{softmax}(\Phi_l^d))$. During training, we maximize the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ as a regularization over the parameters $\Phi_l^d$ of the variational distribution.
 
 Thanks to the Gumbel Top-K trick, we can move the parameters $\Phi_l^d$ into log-likelihood function and get rid of policy gradients, which have been reported to be very unstable \citep{Diederick14auto}. However, the operator Top-K, which defines $\tilde{m}_l^d$ in Equation \eqref{eq:top-k}, is not differentiable. Therefore, we approximate this function by the Soft-Top-K function defined as follows
 
@@ -255,27 +255,26 @@ Thanks to the Gumbel Top-K trick, we can move the parameters $\Phi_l^d$ into log
 H_b(m) &= - \sum_i m_i \text{log}(m_i) + (1-m_i)\text{log}(1-m_i) \nonumber 
 \end{align}
 
-In Appendix \ref{appendix:a}, we will prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. Furthermore, we will also provide the computation of $\hat{m}_l^d(\tau)$ and prove that $\hat{m}_l^d(\tau)$ is a differentiable function w.r.t $\Phi_l^d$ and its differentiation is computed via implicit differentiation theorem. During the training, we approximate $\tilde{m}_l^d$ by $\hat{m}_l^d(\tau)$ by gradually decaying the hyperparameter $\tau$ to $0$. The gradient of the term $T_1$ w.r.t $\Phi_l^d$ is computed via the chain rule as follows
+In Appendix \ref{appendix:a}, we prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. Furthermore, we also provide the computation of $\hat{m}_l^d(\tau)$ and prove that $\hat{m}_l^d(\tau)$ is a differentiable function w.r.t $\Phi_l^d$ and that its differentiation can be computed using the implicit differentiation theorem. During training, we approximate $\tilde{m}_l^d$ by $\hat{m}_l^d(\tau)$ by gradually decaying the hyperparameter $\tau$ to $0$. The gradient of the term $T_1$ w.r.t $\Phi_l^d$ is computed via the chain rule as follows:
 \begin{equation}
 \frac{\partial T_1}{\Phi_l^d} = \frac{\partial T_1}{\hat{m}_l^d(\tau)} \times \frac{\hat{m}_l^d(\tau)}{\Phi_l^d}
 \end{equation}
-The gradient $\frac{\partial T_1}{\hat{m}_l^d(\tau)}$ is computed via autograd algorithm while $\frac{\hat{m}_l^d(\tau)}{\Phi_l^d}$ is computed via implicit differentiation, that we will explain carefully in Appendix \ref{appendix:a}.
+The gradient $\frac{\partial T_1}{\hat{m}_l^d(\tau)}$ is computed via autograd algorithm while $\frac{\hat{m}_l^d(\tau)}{\Phi_l^d}$ is computed via implicit differentiation, as explained in Appendix~\ref{appendix:a}.
 
-We jointly train the Transformer parameters $\theta$ and the parameters of the latent dropping masks $\Phi_l^d$ using the following multi-task loss.
-
+We jointly train the Transformer parameters $\theta$ and the parameters of the latent dropping masks $\Phi_l^d$ using the following multi-task loss.\fyTodo{This is repeated}
 \begin{align}
 \hspace{-0.em}
 \mathcal{L}(\theta,\Phi_l^1,\cdots,\Phi_l^k) = \displaystyle{\mathop{\sum}_{d=1}^{k}} \displaystyle{\mathop{\mathbb{E}}_{x \sim \mathcal{D}_s^d,y \sim g^d(x)}} \big[-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)\big]
 \end{align}
 
-in which $\mathcal{D}_s^d$ is distribution of the task $d$ over the input space $\Omega^d_s$; $g^d: \Omega^d_s \rightarrow \Omega^d_t$ is the mapping function, which our multi-task modern needs to learn, of the task $d$; $-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)$ is the ELBO loss, which we defined in Equation \ref{eq:lower-bound}.
+in which $\mathcal{D}_s^d$ is distribution of the task $d$ over the input space $\Omega^d_s$; $g^d: \Omega^d_s \rightarrow \Omega^d_t$ is the mapping function, which our multi-task modern needs to learn, of the task $d$; $-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)$ is the ELBO loss, defined in Equation~\ref{eq:lower-bound}.
 
-Finally, in the inference, we define the dropping mask for $l^{th}$ layer and domain $d$ as follows
-
+Finally, during inference, we define the dropping mask for $l^{th}$ layer and task $d$ as follows:
 \begin{align*}
-Ind_l^d &= Top_k(\Phi_l^d) \\
-m_l^d &= \mathbb{I}(i\in Ind_l^d)\\
+  Ind_l^d &= Top_k(\Phi_l^d) \\
+  m_l^d &= \mathbb{I}(i\in Ind_l^d),\\
 \end{align*}
+meaning that we simply pick the $k$ most likely parameter groups for the task at hand, and define the dropout mask accordingly.
 
 \section{Experimental settings}
 \subsection{Baselines}
