@@ -158,14 +158,14 @@ In this paper, we try to develop techniques that can take the similarity between
 
 \section{Multi-task group dropout \label{sec:architecture}}
 \subsection{Network architecture, groups and layers}
-Most architectures for multitask learning are based on a matching of subset of model parameters with tasks. While our model also needs to know the task $d \in [0 \dots n_d-1$ for each training and test instance, the structure of our Transformer networks \citep{Vaswani17attention} is emphbased on the notion of \emph{groups of parameters}. In each Transformer layer $l \in [1 \dots L]$, we identify $n_p$ groups of parameters.\fyTodo{In the attention heads only? In the FF?} The assignment of tasks to groups will be learned from the data, under the constraint that each task has only access to exactly $k$ groups of \emph{active parameters}, while the all the other parameter values are deemed to be \emph{dropped} (see Figure~\ref{fig:group_dropout}).
+Most architectures for multitask learning are based on a matching of subset of model parameters with tasks. While our model also needs to know the task $d \in [0 \dots n_d-1]$ for each training and test instance, the structure of our Transformer networks \citep{Vaswani17attention} is emphbased on the notion of \emph{groups of parameters}. In each Transformer layer $l \in [1 \dots L]$, we identify $n_p$ groups of parameters.\fyTodo{In the attention heads only? In the FF?} The assignment of tasks to groups will be learned from the data, under the constraint that each task has only access to exactly $k$ groups of \emph{active parameters}, while the all the other parameter values are deemed to be \emph{dropped} (see Figure~\ref{fig:group_dropout}).
 \begin{figure}
   \centering
 \includegraphics[width=0.4\textwidth]{group_dropout}
 \caption{Latent group dropout. The set of nodes\fyTodo{parameters ?} in each layer is divided into equal-sized groups. For a task, we only keep a fixed number of groups. Our method learns which groups will be kept / dropped for each task.}
 \label{fig:group_dropout}
 \end{figure}
-Formally, we define the \emph{group dropout mask} $m_d^l$ as a $n_p$-dimensional binary vector containing exactly $k$ ones: the group $p$ ($\in  [0,\dots,n_p\text{-}1]$) is retained for task $d$ if $m_l^d(p)\text{\small =}1$ and is dropped if $m_l^d(p)\text{\small =} 0$. We denote $\Delta^{n_p}_k = \{ m \in \{0,1\}^{n_p} \text{such that} \mid{} m \mid_{L_1} = k \}$, where $\mid{} m \mid_{L_1}$ is the $L_1$ norm, the set of all admissible dropping masks.
+Formally, we define the \emph{group dropout mask} $m_d^l$ as a $n_p$-dimensional binary vector containing exactly $k$ ones: the group $p$ ($\in  [0,\dots,n_p\text{-}1]$) is retained for task $d$ if $m_l^d(p)\text{\small =}1$ and is dropped if $m_l^d(p)\text{\small =} 0$. We denote $\Delta^{n_p}_k = \{ m \in \{0,1\}^{n_p} \text{such that}  \mid{} m \mid_{L_1} = k \}$, where $\mid{} m \mid_{L_1}$ is the $L_1$ norm, the set of all admissible dropout masks.
 
 Given $m_l^d$, the parameter mask $r_l^d$ for task $d$ in layer $l$ is then derived as follows:
 \begin{align*}
@@ -191,12 +191,14 @@ where $d_k$ is the dimension of the hidden state.\fyTodo{Check this} The propaga
 where $\text{LAYER}^l()$ represents all the computations in Transformer layer $l$.
 % The dropping mask $r_l^d$ is computed as follows
 % where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. 
+
 \subsection{Training with latent dropout masks}
-We incorporate the latent variables  $m_{l}^d, l \in[0,\dots,L]$ into the log-likelihood as follows. For the sake of brevity, we denote $m_l^d$ the set of latent variables, \fyTodo{what do you mean here - this is all there is?} and use $x$, $y$, and $\theta$ to refer to the input, output, and parameter vectors, respectively; finally $\Phi^d_i \in \mathbb{R}^{n_p}$ denotes the set of variational parameters in the model:\fyTodo{Again this is complicated.}
+We incorporate the latent variables $m_{l}^d, l \in[0,\dots,L]$ into the log-likelihood as follows. For the sake of brevity, we denote $m_l^d$ the set of latent variables, \fyTodo{what do you mean here - this is all there is?} and use $x$, $y$, and $\theta$ to refer to the input, output, and parameter vectors, respectively; finally $\Phi^d_i \in \mathbb{R}^{n_p}$ denotes the set of variational parameters in the model:\fyTodo{Again this is too complicated. How about the notations ? Why no $y$ ?}
+Use $\phi$ for all the variational parameters.
 \begin{align}
 \hspace{-3.em}
-\text{log} P(y|x,\theta,d) \text{=} &\text{log} P(y, m_l^d |x,d;\theta) \text{-} \text{log} P(m_l^d|y, x, d ;\theta) \nonumber \\
-\text{=} & \displaystyle{\mathop{\mathbb{E}}_{P(m_l^d | \Phi_l^d)}} \big[ \text{log} P(y, m_l^d | x,d;\theta) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big] \nonumber \\
+\text{log} P(y|x,d;\theta) = &\text{log} P(y, m_l^d |x,d;\theta) \text{-} \text{log} P(m_l^d|y, x, d ;\theta) \nonumber \\
+= & \displaystyle{\mathop{\mathbb{E}}_{P(m_l^d | \Phi_l^d)}} \big[ \text{log} P(y, m_l^d | x,d;\theta) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big] \nonumber \\
 & \quad + KL(P(m_l^d | \Phi_l^d) \parallel P(m_l^d|y, x,\theta,d)) \nonumber \\
 \geqslant & \displaystyle{\mathop{\mathbb{E}}_{P(m_l^d | \Phi_l^d)}} \big[ \text{log} P(y, m_l^d | x,\theta,d) \text{-} \text{log} P(m_l^d | \Phi_l^d) \big] \nonumber \\
  = & \displaystyle{\mathop{\mathbb{E}}_{P(m_l^d | \Phi_l^d)}} \big[ \text{log} P(y | x,\theta,m_l^d, d) \big] \label{eq:lower-bound} \\
@@ -209,10 +211,10 @@ The variational distribution of $m_l^d$, $P(m_l^d|\Phi_l^d)$, is defined as foll
 \begin{align}
 \hspace{-2.em}
 % &\Phi_d \in \mathbb{R}^{n_p} , \nonumber \\
-  Ind^d =& \{ i_1, \cdots, i_k \} \sim \text{SRS}(\operatorname{softmax}(\Phi_l^d)) , \nonumber \\
+  Ind^d =& \{ i_1, \cdots, i_k \} \sim \text{SRS}(\operatorname{softmax}(\Phi_l^d),k) , \nonumber \\
   m_l^d(i) =& \mathbb{I}(i \in Ind^d) ,\nonumber
 \end{align}
-with $\text{SRS}(\pi)$ denoting the process of sampling without replacement from the distribution $\pi$, and $\mathbb{I}$ the indicator function. This choice for the modeling of the latent vector $m_l^d$ is motivated by the Gumbel Top-K trick of \citet{Kool19stochastic}. In addition, we assume that the prior distribution of $m_l^d$ is uniform over the admissible set $\Delta^{n_p}_k$, $P(m_l^d | x, \theta, d) \ \text{=} \ U(\Delta^{n_p}_k)$.
+with $\text{SRS}(\pi,k)$ denoting the process of sampling $k$ times without replacement from the distribution $\pi$, and $\mathbb{I}$ the indicator function. This choice for the modeling of the latent vector $m_l^d$ is motivated by the Gumbel Top-K trick of \citet{Kool19stochastic}. In addition, we assume that the prior distribution of $m_l^d$ is uniform over the admissible set $\Delta^{n_p}_k$, $P(m_l^d | x, \theta, d) \ \text{=} \ \operatorname{Unif}(\Delta^{n_p}_k)$.
 
 Given these assumptions for the prior distribution and our choice for the variational distribution, the two terms in Eq.~\eqref{eq:lower-bound} can be reformulated as:
 
@@ -240,7 +242,7 @@ T_2 &= - KL \big( P(m_l^d | \Phi_l^d) \parallel P(m_l^d | x,\theta,d) \big) \non
 	&\geqslant \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \label{eq:entropy}
 \end{align}
 
-we will prove Inequality \eqref{eq:entropy} in Appendix \ref{appendix:b}.
+we prove inequality~\eqref{eq:entropy} in Appendix~\ref{appendix:b}.
 
 Now we go back to our loss function, which is the negative of the lower-bound \eqref{eq:lower-bound}, consisting of 2 terms $-T_1$ and $-T_2$. The inequality \eqref{eq:entropy} shows that an upperbound of $-T_2$ is $\text{log}(\#\Delta^{n_p}_k) - \mathbb{H}(\text{softmax}(\Phi_l^d))$. During training, we maximize the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ as a regularization over the parameters $\Phi_l^d$ of the variational distribution.
 
