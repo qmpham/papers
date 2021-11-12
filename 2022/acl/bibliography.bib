@@ -4597,6 +4597,27 @@ archivePrefix = {arXiv},
     abstract = "Deep neural networks excel at learning from labeled data and achieve state-of-the-art results on a wide array of Natural Language Processing tasks. In contrast, learning from unlabeled data, especially under domain shift, remains a challenge. Motivated by the latest advances, in this survey we review neural unsupervised domain adaptation techniques which do not require labeled target domain data. This is a more challenging yet a more widely applicable setup. We outline methods, from early traditional non-neural methods to pre-trained model transfer. We also revisit the notion of domain, and we uncover a bias in the type of Natural Language Processing tasks which received most attention. Lastly, we outline future directions, particularly the broader need for out-of-distribution generalization of future NLP.",
 }
 
+@inproceedings{pfeiffer20adapterhub,
+    title = "{A}dapter{H}ub: A Framework for Adapting Transformers",
+    author = {Pfeiffer, Jonas  and
+      R{\"u}ckl{\'e}, Andreas  and
+      Poth, Clifton  and
+      Kamath, Aishwarya  and
+      Vuli{\'c}, Ivan  and
+      Ruder, Sebastian  and
+      Cho, Kyunghyun  and
+      Gurevych, Iryna},
+    booktitle = "Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing: System Demonstrations",
+    month = oct,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2020.emnlp-demos.7",
+    doi = "10.18653/v1/2020.emnlp-demos.7",
+    pages = "46--54",
+    abstract = "The current modus operandi in NLP involves downloading and fine-tuning pre-trained models consisting of millions or billions of parameters. Storing and sharing such large trained models is expensive, slow, and time-consuming, which impedes progress towards more general and versatile NLP methods that learn from and for many tasks. Adapters{---}small learnt bottleneck layers inserted within each layer of a pre-trained model{---} ameliorate this issue by avoiding full fine-tuning of the entire model. However, sharing and integrating adapter layers is not straightforward. We propose AdapterHub, a framework that allows dynamic {``}stiching-in{''} of pre-trained adapters for different tasks and languages. The framework, built on top of the popular HuggingFace Transformers library, enables extremely easy and quick adaptations of state-of-the-art pre-trained models (e.g., BERT, RoBERTa, XLM-R) across tasks and languages. Downloading, sharing, and training adapters is as seamless as possible using minimal changes to the training scripts and a specialized infrastructure. Our framework enables scalable and easy access to sharing of task-specific models, particularly in low-resource scenarios. AdapterHub includes all recent adapter architectures and can be found at AdapterHub.ml",
+}
+
 @ARTICLE{Gu20domain,
        author = {{Gu}, Yu and {Tinn}, Robert and {Cheng}, Hao and {Lucas}, Michael and
          {Usuyama}, Naoto and {Liu}, Xiaodong and {Naumann}, Tristan and
@@ -5176,6 +5197,41 @@ http://proceedings.mlr.press/v119/zhang20ae.html
   journal={ArXiv},
   year={2021},
   volume={abs/2102.10160}
+}
+
+@inproceedings{pfeiffer21adapterfusion,
+    title = "{A}dapter{F}usion: Non-Destructive Task Composition for Transfer Learning",
+    author = {Pfeiffer, Jonas  and
+      Kamath, Aishwarya  and
+      R{\"u}ckl{\'e}, Andreas  and
+      Cho, Kyunghyun  and
+      Gurevych, Iryna},
+    booktitle = "Proceedings of the 16th Conference of the European Chapter of the Association for Computational Linguistics: Main Volume",
+    month = apr,
+    year = "2021",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.eacl-main.39",
+    doi = "10.18653/v1/2021.eacl-main.39",
+    pages = "487--503",
+    abstract = "Sequential fine-tuning and multi-task learning are methods aiming to incorporate knowledge from multiple tasks; however, they suffer from catastrophic forgetting and difficulties in dataset balancing. To address these shortcomings, we propose AdapterFusion, a new two stage learning algorithm that leverages knowledge from multiple tasks. First, in the knowledge extraction stage we learn task specific parameters called adapters, that encapsulate the task-specific information. We then combine the adapters in a separate knowledge composition step. We show that by separating the two stages, i.e., knowledge extraction and knowledge composition, the classifier can effectively exploit the representations learned from multiple tasks in a non-destructive manner. We empirically evaluate AdapterFusion on 16 diverse NLU tasks, and find that it effectively combines various types of knowledge at different layers of the model. We show that our approach outperforms traditional strategies such as full fine-tuning as well as multi-task learning. Our code and adapters are available at AdapterHub.ml.",
+}
+
+@inproceedings{biao21share,
+  author    = {Biao Zhang and
+               Ankur Bapna and
+               Rico Sennrich and
+               Orhan Firat},
+  title     = {Share or Not? Learning to Schedule Language-Specific Capacity for
+               Multilingual Translation},
+  booktitle = {9th International Conference on Learning Representations, {ICLR} 2021,
+               Virtual Event, Austria, May 3-7, 2021},
+  publisher = {OpenReview.net},
+  year      = {2021},
+  url       = {https://openreview.net/forum?id=Wj4ODo0uyCF},
+  timestamp = {Sun, 25 Jul 2021 11:45:53 +0200},
+  biburl    = {https://dblp.org/rec/conf/iclr/ZhangBSF21.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 
 @article{Kumar21learning,
