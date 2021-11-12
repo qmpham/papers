@@ -184,23 +184,23 @@ Given $m_l^d$, the mask $r_l^d$ for task $d$ in layer $l$ is then derived as fol
 where $d_k$ is the dimension of the hidden state.\fyDone{Check this} The propagation of information within the network then depends on the current task value and can be formalized as:
 \begin{align*}
   \forall l \in [0,\cdots, L-1]: \tilde{h}^l &= h^l \odot r_l^d ,\\
-  h^{l+1} &= \operatorname{LAYER}^{l+1}(h^l) ,\\
+  h^{l+1} &= \operatorname{LAYER}^{l+1}(\tilde{h}^l) ,
 \end{align*}
 where $\operatorname{LAYER}^l()$ represents all the computations in Transformer layer $l$.
 % The dropping mask $r_l^d$ is computed as follows
 % where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. 
 
 \subsection{Training with latent dropout masks}
-Assuming standard notation for our translation model  $P(y|x,d;\theta)$ where $x$, $y$ and $\theta$ respectively refer to the input, output, and parameter vector, the latent variables $m_{l}^d, l \in[0,\dots,L], d \in [0, \dots, n_d-1]$ are introduced as follows. We also assume a prior distribution for $m_{l}^d$ chosen to be the uniform distribution over $\Delta^{n_p}_k$: $P(m_l^d | x, d; \theta) = \operatorname{Unif}(\Delta^{n_p}_k)$; variables for each layer are independent and collectively refered to as $m^d$. For any (variational) distribution $Q(m^1 \dots m^{n_d}; \Phi)$ with parameters $\Phi$, it is well-known that the log-likelihood is lower-bounded by the so-called $\operatorname{ELBO}$ function, made of a summation of two terms: the \emph{distortion} $D$ and the \emph{rate} $R$ defined as follows:\footnote{We drop the dependency in $x$ to avoid notational clutter.}
+Assuming standard notation for our translation model  $P(y|x,d;\theta)$ where $x$, $y$ and $\theta$ respectively refer to the input, output, and parameter vector, the latent variables $m_{l}^d, l \in[0,\dots,L], d \in [0, \dots, n_d-1]$ are introduced as follows. We also assume a prior distribution for $m_{l}^d$ chosen to be the uniform distribution over $\Delta^{n_p}_k$: $P(m_l^d | x, d; \theta) = \operatorname{Unif}(\Delta^{n_p}_k)$; variables for each layer are independent and collectively refered to as $m^d$. For any (variational) distribution $Q(m^1 \dots m^{n_d}; \Phi)$ with parameters $\Phi=\{\phi_l^1, ..., \phi_L^{n_d}\}$, it is well-known that the log-likelihood is lower-bounded by the so-called $\operatorname{ELBO}$ function, made of a summation of two terms: the \emph{distortion} $D$ and the \emph{rate} $R$ defined as follows:%\footnote{We drop the dependency in $x$ to avoid notational clutter.}
 \begin{align}
-  \log P(y|d;\theta) \ge & \operatorname{ELBO}(y,d; \theta, \Phi) \nonumber \\
-  \operatorname{ELBO}(y,d; \theta, \Phi) =&  D(y,d; \theta, \Phi) - R(y,d; \theta, \Phi) \label{eq:lower-bound}\\
-  D(y,d; \theta, \phi) = & \mathbb{E}_{m^d \sim Q(m^d |d,\Phi)} \log P(y | m^d, d; \theta) \nonumber\\
-  R(y,d; \theta, \phi) = & \operatorname{KL}(Q(m^d | d, \Phi)||P(m^d | d; \theta)), \nonumber
+  \log P(y|x,d;\theta) \ge & \operatorname{ELBO}(x,y,d; \theta, \Phi) \nonumber \\
+  \operatorname{ELBO}(x,y,d; \theta, \Phi) =&  D(x,y,d; \theta, \Phi) - R(x,y,d; \theta, \Phi) \label{eq:lower-bound}\\
+  D(x,y,d; \theta, \phi) = & \mathbb{E}_{m^d \sim Q(m^d |d,\Phi)} \log P(y | m^d, x, d; \theta) \nonumber\\
+  R(x,y,d; \theta, \phi) = & \operatorname{KL}(Q(m^d | x,d, \Phi)||P(m^d | x,d; \theta)), \nonumber
 \end{align}
-where $\operatorname{KL}$ is the Kullback-Leibler divergence. We use $-\operatorname{ELBO}(x, y\theta,\Phi_l)$ as our surrogate training objective, as a tractable approximation of the untractable likelihood, and try to minimize this function in $\theta$ and $\Phi$.
+where $\operatorname{KL}$ is the Kullback-Leibler divergence. We use $-\operatorname{ELBO}(x,y,d; \theta,\Phi)$ as our surrogate training objective, as a tractable approximation of the untractable likelihood, and try to minimize this function in $\theta$ and $\Phi$.
 
-The variational distribution $Q$ of $m^d$ is defined on layerwise basis, each layer $l$ involving only a subset $\Phi_l^d$ of parameters:
+The variational distribution $Q$ of $m^d$ is defined independently on a layerwise basis, each layer $l$ involving only a subset $\Phi_l^d$ of parameters:
 \begin{align}
   \operatorname{Ind}^d = \{ i_1, \cdots, i_k \} & \sim \text{SRS}(\operatorname{softmax}(\Phi_l^d), k) \nonumber \\
   m_l^d(i) & =  \text{$\mathbb{I}$}(i \in \operatorname{Ind}^d), \nonumber
@@ -208,58 +208,59 @@ The variational distribution $Q$ of $m^d$ is defined on layerwise basis, each la
 where $\text{SRS}(\pi,k)$ denotes the process of sampling $k$ times without replacement from the distribution $\pi$, and $\mathbb{I}$ is the indicator function. This particular choice the modeling of the latent vector $m_l^d$ is motivated by the Gumbel Top-K trick of \citet{Kool19stochastic} that we use below.  Given our assumptions for the prior distribution and our choice for the variational distribution, the two terms in Eq.~\eqref{eq:lower-bound} can be computed as:
 \begin{align}
 \hspace{-2.em}
-D &= \mathbb{E}_{m^d \sim Q(m^d | d | \Phi)} \text{log} P(y | m^d, d, \theta) \nonumber \\
-&= \mathbb{E}_{g^d \sim^{\text{i.i.d}} G(0,1)} \big[ \log P(y |\tilde{m}^d,d, \theta,) \big] \nonumber
+D(\dots) &= \mathbb{E}_{m^d \sim Q(m^d | d; \Phi)} \text{log} P(y | m^d, x, d, \theta) \nonumber \\
+&= \mathbb{E}_{g^d \sim^{\text{i.i.d}} G(0,1)} \big[ \log P(y |\tilde{m}^d, x, d, \theta,) \big] \nonumber
 \end{align}
 where the generation process $G(0,1)$ is a product of independent Gumbel distributions, yielding:
 \begin{align}
   \hspace{-2.em}
-  \forall d,  g^d & =  [g_0^d, \dots, g_L^d],  \text{ with } g_l^d \in \mathbb{R}^{n_p} \nonumber \\
+  \forall d,  g^d & =  [g_1^d, \dots, g_L^d],  \text{ with } g_l^d \in \mathbb{R}^{n_p} \nonumber \\
   \forall p,  g_l^d(p) & \displaystyle{\mathop{\sim}^{\text{i.i.d}}} \operatorname{Gumbel}(0,1) \nonumber \\
-  \{ i_1, \cdots, i_k \} &= \operatorname{Top-k} \ \{ \ g_l^d(0) + \Phi_l^d(0), \cdots, \label{eq:top-k} \\ 
-       & \quad \quad g_l^d(n_p\text{-}1) + \Phi_l^d(n_p\text{-}1) \ \} \nonumber \\
+  \operatorname{Ind}^d = \{ i_1, \cdots, i_k \} &= \operatorname{Top-k} \ \{ \ g_l^d(0) + \Phi_l^d(0), \cdots, \nonumber \\ 
+       & \quad \quad g_l^d(n_p\text{-}1) + \Phi_l^d(n_p\text{-}1) \ \}\label{eq:top-k} \\
 \tilde{m}_l^d(p) &= \mathbb{I}(p \in Ind^d). \nonumber 
 \end{align}
-For the second term, the derivation is the following:\fyTodo{Check this: we have a sum over layers ?Also: R or -R ?} 
+For the second term, the derivation is the following:\fyDone{Check this: we have a sum over layers ?Also: R or -R ?} 
 \begin{align}
 \hspace{-2.em}
   R    &= \operatorname{KL}(Q(m^d | d, \Phi)||P(m^d | d; \theta)), \nonumber \\ 
-	&= \mathbb{H} \big[ Q(m_l^d | d, \Phi) \big] - \text{log}(\#\Delta^{n_p}_k) \nonumber \\ 
-	&= \mathbb{H} \big[ Q(i_1,\cdots,i_k | d, \Phi) \big] - \text{log}(\#\Delta^{n_p}_k) \nonumber \\
-	&  \geqslant \mathbb{H} \big[ Q(i_1 | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \label{eq:entropy}
+	&= -\sum_{l=1}^L \big(\mathbb{H} \big[ Q(m_l^d | d, \Phi) \big] - \text{log}(\#\Delta^{n_p}_k) \big) \nonumber \\ 
+	&= -\sum_{l=1}^L \big(\mathbb{H} \big[ Q(i_1,\cdots,i_k | d, \Phi) \big] - \text{log}(\#\Delta^{n_p}_k) \big)\nonumber \\
+	&\leqslant  -\sum_{l=1}^L \big(\mathbb{H} \big[ Q(i_1 | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \big)\label{eq:entropy}
 \end{align}
 We prove inequality~\eqref{eq:entropy} in Appendix~\ref{appendix:b}.
 
-Inequality~\eqref{eq:entropy} shows that an upperbound of $R$ is $\text{log}(\#\Delta^{n_p}_k) - \mathbb{H}(\text{softmax}(\Phi_l^d))$. During training, we maximize the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$\fyTodo{Check sum} as a regularization over the parameters $\Phi_l^d$ of the variational distribution.
+Inequality~\eqref{eq:entropy} shows that an upperbound of $R$ is $\sum_{l=1}(\text{log}(\#\Delta^{n_p}_k) - \mathbb{H}(\text{softmax}(\Phi_l^d)))$. During training, we maximize a sum over layers of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$\fyDone{Check sum} which performs a regularization over the parameters $\Phi^d$ of the variational distribution.
 
-Thanks to the Gumbel Top-K trick, we can move the parameters $\Phi$ into log-likelihood function\fyTodo{into the objective function?} and get rid of policy gradients, which have been reported to be very unstable \citep{Diederick14auto}. However, the operator $\operatorname{Top-k}$, which serves to define $\tilde{m}_l^d$ in Equation~\eqref{eq:top-k}, is not differentiable. Therefore, we approximate this function by the $\operatorname{Soft-Top-K}$ function defined as follows:
+Thanks to the Gumbel Top-K trick, we can move the parameters $\Phi$ into the objective function and get rid of policy gradients, which have been reported to be very unstable \citep{Diederick14auto}. However, the operator $\operatorname{Top-k}$, which serves to define $\tilde{m}_l^d$ in Equation~\eqref{eq:top-k}, is not differentiable. Therefore, we approximate this function by the $\operatorname{Soft-Top-K}$ function defined as follows:
 \begin{align}
 \hat{m}_l^d(\tau) &= \displaystyle{\mathop{argmin}_{\substack{
-       0 \leqslant m_i \leqslant 1 \ \forall 0 \leqslant i \leqslant n_d\text{-}1 \label{eq:soft-top-k}\\
+                    0 \leqslant m_i \leqslant 1 \\
+  \forall 0 \leqslant i \leqslant n_d\text{-}1 \label{eq:soft-top-k}\\
         1^{T}.m = k
-      }}} -(g_l^d+\Phi_l^d)^{T} . m - \tau H_b(m) \\
+      }}} -(g_l^d+\Phi_l^d)^{T} . m - \tau H_b(m) \\ \nonumber
 & \text{in which} \nonumber \\
 H_b(m) &= - \sum_i m_i \text{log}(m_i) + (1-m_i)\text{log}(1-m_i) \nonumber 
 \end{align}
 
-In Appendix \ref{appendix:a}, we prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. Furthermore, we also provide the computation of $\hat{m}_l^d(\tau)$ and prove that $\hat{m}_l^d(\tau)$ is a differentiable function w.r.t $\Phi_l^d$ and that its differentiation can be computed using the implicit differentiation theorem. During training, we approximate $\tilde{m}_l^d$ by $\hat{m}_l^d(\tau)$ by gradually decaying the hyperparameter $\tau$ to $0$. The gradient of the term $D$ w.r.t $\Phi_l^d$ is computed via the chain rule as follows:
+In Appendix \ref{appendix:a}, we prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. Furthermore, we also provide the computation of $\hat{m}_l^d(\tau)$ and prove that $\hat{m}_l^d(\tau)$ is a differentiable function w.r.t $\Phi_l^d$ and that its gradients can be computed using the implicit differentiation theorem. During training, we approximate $\tilde{m}_l^d$ by $\hat{m}_l^d(\tau)$ by gradually decaying the hyperparameter $\tau$ to $0$. The gradient of $D$ w.r.t $\Phi_l^d$ is computed using the chain rule as follows:
 \begin{equation}
-\frac{\partial D}{\partial \Phi_l^d} = \frac{\partial T_1}{\partial \hat{m}_l^d(\tau)} \times \frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d}
+\frac{\partial D}{\partial \Phi_l^d} = \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d}
 \end{equation}
-The gradient $\frac{\partial T_1}{\partial \hat{m}_l^d(\tau)}$ is computed via autograd algorithm while $\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d}$ is computed via implicit differentiation, as explained in Appendix~\ref{appendix:a}.
+The gradient $\frac{\partial D}{\partial \hat{m}_l^d(\tau)}$ is computed via autograd algorithm while $\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d}$ is computed via implicit differentiation, as explained in Appendix~\ref{appendix:a}.
 
 We jointly train the Transformer parameters $\theta$ and the parameters of the variational distribution $\Phi$ using the following multi-task loss.\fyDone{This is repeated}
 \begin{align}
 \hspace{-0.em}
-\ell(\theta,\Phi_l^1,\cdots,\Phi_l^k) = \displaystyle{\mathop{\sum}_{d=1}^{k}} \displaystyle{\mathop{\mathbb{E}}_{x \sim \mathcal{D}_s^d,y \sim g^d(x)}} \big[-\operatorname{ELBO}(\theta,\Phi_l^d,x,y)\big]
+\ell(\theta,\Phi) = \sum_{d=1}^{n_d} \mathbb{E}_{x \sim \mathcal{D}_s^d,y \sim g^d(x)} \big[-\operatorname{ELBO}(x,y,d; \theta,\Phi)\big]
 \end{align}
 
-in which $\mathcal{D}_s^d$ is distribution of task $d$ over the input space $\Omega^d_s$; $g^d: \Omega^d_s \rightarrow \Omega^d_t$\fyTodo{allready defined} is the mapping function for the task $d$, which our multi-task model needs to learn; $-\mathcal{L}_{\text{ELBO}}(\theta,\Phi_l^d,x,y)$ is the ELBO loss, defined in Equation~\ref{eq:lower-bound}.
+in which $\mathcal{D}_s^d$ is distribution of task $d$ over the input space $\Omega^d_s$; $\operatorname{MT}^d: \Omega^d_s \rightarrow \Omega^d_t$\fyDone{already defined} is the translation function for task $d$, which our multi-task model needs to learn; $-\mathcal{L}_{\text{ELBO}}(x,y, d, \theta,\Phi)$ is the ELBO loss, defined in Equation~\ref{eq:lower-bound}.
 
 Finally, during inference, we define the dropout mask for layer $l$ and task $d$ as follows:
 \begin{align*}
   Ind_l^d &= \operatorname{Top-k}(\Phi_l^d) \\
-  m_l^d &= \mathbb{I}(i\in Ind_l^d),\\
+  m_l^d &= \mathbb{I}(i\in Ind_l^d)
 \end{align*}
 meaning that we simply pick the $k$ most likely parameter groups for the task at hand, and define the dropout mask accordingly.
 
