@@ -5,6 +5,7 @@
 \documentclass[11pt]{article}
 
 % Remove the "review" option to generate the final version.
+%\usepackage[review,nohyperref]{acl}
 \usepackage[review]{acl}
 
 % Standard package includes
@@ -102,11 +103,32 @@
 \newcommand{\SW}[1]{\underline{#1}}
 \newcommand{\mtsquare}[0]{MT$^2$}
 
+\makeatletter
+\newenvironment{breakablealgorithm}
+  {% \begin{breakablealgorithm}
+   \begin{center}
+     \refstepcounter{algorithm}% New algorithm
+     \hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+     \renewcommand{\caption}[2][\relax]{% Make a new \caption
+       {\raggedright\textbf{\fname@algorithm~\thealgorithm} ##2\par}%
+       \ifx\relax##1\relax % #1 is \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+       \else % #1 is not \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+       \fi
+       \kern2pt\hrule\kern2pt
+     }
+  }{% \end{breakablealgorithm}
+     \kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+   \end{center}
+  }
+\makeatother
+
 %subfigure
 \usepackage{caption}
 \usepackage{subcaption}
 
-\title{Multi-domain, multilingual translation with latent multi-task group dropout}
+\title{Latent Group Dropout for Multilingual and Multidomain Machine Translation}
 
 % Author information can be set in various styles:
 % For several authors from the same institution:
@@ -425,6 +447,15 @@ translation tasks. We evaluate models on widely used multilingual translation da
 	\item TED8-Related. Following the setting of \citet{Wang20balancing}, we use a subset of translations of \citet{qi18when} between English and eight related languages.
 	\item TED8-Diverse. The dataset consists of parallel sentences between English and eight diverse languages as in \citet{Wang20balancing}.
 \end{itemize}
+We clarify the notation of the languages in multilingual experiments as follows
+\begin{itemize}
+	\item Diverse: bos (bosnia), mar(marathi),
+         hin(hindi), mkd(macedonia), ell(greek),
+         bulgaria(bul), french(fra), korean(kor) 
+	\item Related: azerbajiani (aze), belarusian(bel),
+          glacian(glg), slovak (slk), turkisk (tur),
+		  russian(rus), portugese(por),czech(ces)
+\end{itemize}
 The detailed description of the datasets is provided in Appendix \ref{appendix:c}.
 \section{Results and ablation studies}
 \subsection{Multi-domain translation}
@@ -443,7 +474,8 @@ According to Table \ref{tab:mdmt}, \system{LaMGD} Tranformer shows a significant
 \end{table*}
 \subsubsection{Fuzzy domain separation}
 \label{ssec:fuzzy}
-In this experiment, we reuse an experiment proposed by \citet{Pham21revisiting} which measures the efficiency of a multi-domain NMT system exploit the proximity between domains. The experiment use the same data as the previous experiment. However, the domain \domain{LAW} is now randomly split into two pseudo domains \domain{law$_1$} and \domain{law$_2$}. If the multi-domain system made full use of the proximity between \domain{law$_1$} and \domain{law$_2$}, there should be no significant difference between the performance of the system trained with six original domains and with seven domains replacing \domain{law} by \domain{law$_1$} and \domain{law$_2$}. \citet{Pham21revisiting} showed a large gap between two training settings when using residual adapters. We report below the gap between two settings when using \system{LaMGD} Tranformer. 
+In this experiment, we reuse an experiment proposed by \citet{Pham21revisiting} which measures the efficiency of a multi-domain NMT system exploiting the proximity between domains. The experiment uses the same data as the previous experiment. However, the domain \domain{law} is now randomly split into two pseudo domains \domain{law$_1$} and \domain{law$_2$}. If the multi-domain system made full use of the proximity between \domain{law$_1$} and \domain{law$_2$}, there should be no significant difference between the performance of the system trained with six original domains and with seven domains replacing \domain{law} by \domain{law$_1$} and \domain{law$_2$}. \citet{Pham21revisiting} showed a large gap between two training settings when using residual adapters. We report below the gap between two settings when using \system{LaMGD} Tranformer. 
+
 \begin{table*}[h!]
   \centering
   \begin{tabular}{|p{4cm}|*{2}{r|}} \hline
@@ -456,10 +488,10 @@ In this experiment, we reuse an experiment proposed by \citet{Pham21revisiting} 
   \label{tab:fuzzy}
 \end{table*}
 
-Table \ref{tab:fuzzy} demonstrates a significant loss when training with two pseudo domain \domain{law$_1$} and \domain{law$_2$} compared to training with the real domain \domain{law}. Our system does not have this loss between two situation. In section \ref{ssec:abalation}, we show that our algorithm outputs the same sub-network for \domain{law$_1$} and \domain{law$_2$}, that allows a full transfer between two domain.
+Table \ref{tab:fuzzy} demonstrates a significant loss when training with two pseudo domains \domain{law$_1$} and \domain{law$_2$} compared to training with the real domain \domain{law}. Our system does not have this loss between two situations. In Section \ref{ssec:abalation}, we show that our algorithm outputs the same sub-network for \domain{law$_1$} and \domain{law$_2$}, that allows a full transfer between two domains.
 
 \subsection{Multilingual translation}
-According to Table \ref{tab:multilingual}, \system{LaMGD} Tranformer shows a boost of 0.42, 0.33, 0.32 in average over the multilingual \system{Transformer} in O2M-related, M2O-related, M2O-diverse respectively. Significant gains are observed in \domain{bel}, \domain{glg} (both direction), \domain{hin} and \domain{bos} (O2M direction) which are very low-resourced languages in the list. However, \system{LaMGD} Tranformer lags behind multilingual \system{Transformer} in O2M-diverse. 
+According to Table \ref{tab:multilingual}, \system{LaMGD} Tranformer shows a boost of 0.42, 0.33, 0.32 in average over the multilingual \system{Transformer} in O2M-related, M2O-related, M2O-diverse respectively. Significant gains are observed in \domain{bel}, \domain{glg} (both direction), \domain{hin} and \domain{bos} (O2M direction) which are very low-resourced languages in the list. However, \system{LaMGD} Tranformer lags behind multilingual \system{Transformer} and Language Adapters in O2M-diverse. 
 \begin{table*}[h!]
   \centering
   \begin{tabular}{|p{4cm}|*{9}{r|}} \hline
@@ -491,12 +523,12 @@ According to Table \ref{tab:multilingual}, \system{LaMGD} Tranformer shows a boo
   \label{tab:multilingual}
 \end{table*}
 
-
 \subsection{Similarity between dropping masks}
 \label{ssec:abalation}
-In this section, we compare the sub-networks of the domains or of the language pairs by computing the average of the similarities between the corresponding dropping mask in each layer.
+This section compares the sub-networks of the domains or the language pairs by computing the average of the similarities between the corresponding dropping masks concatenated through all the layers of the underlying model.
 
-For the multi-domain experiment, we analyze the case of fuzzy domain separation in Section \ref{ssec:fuzzy}. Table \ref{tab:fuzzy-sim} shows that the sub-networks of \domain{law$_1$} and \domain{law$_2$} are identical, which is one of the goals of our method.
+For the multi-domain experiment, we analyze the case of fuzzy domain separation in Section \ref{ssec:fuzzy}. Table \ref{tab:fuzzy-sim} shows that the sub-networks of \domain{law$_1$} and \domain{law$_2$} are identical, which is one of the goals of our method. Furthermore, we remark a large distance between \domain{rel} and the rest of the domains, which correlates to the fact that \domain{rel} has the most distant topic to other domains. In Figure ~\ref{fig:domain}, we visualize the domains using their dropping masks concatenated and mapped to 2D space by PCA.
+
 \begin{table*}[h!]
   \centering
   \begin{tabular}{|p{1cm}|*{7}{r|}} \hline
@@ -533,19 +565,20 @@ For multilingual case TED-related, we have four language families including (1) 
   \label{tab:related-sim}
 \end{table*}
 
-We also plot the languages based on their dropouts in \ref{fig:visual}
+We also plot the languages based on their dropouts in Figure\ref{fig:visual}.
 \begin{figure*}[htbp]
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{\textwidth}
   \centering
   % include first image
-  \includegraphics[width=0.97\textwidth]{ted_related}  
+  \includegraphics[width=0.7\textwidth]{ted_related}  
   \caption{TED-Related}
   \label{fig:visual-related}
 \end{subfigure}
-\begin{subfigure}{.5\textwidth}
+\\
+\begin{subfigure}{\textwidth}
   \centering
   % include second image
-  \includegraphics[width=0.97\textwidth]{ted_diverse}  
+  \includegraphics[width=0.7\textwidth]{ted_diverse}  
   \caption{TED-Diverse}
   \label{fig:visual-diverse}
 \end{subfigure}
@@ -553,17 +586,22 @@ We also plot the languages based on their dropouts in \ref{fig:visual}
 \label{fig:visual}
 \end{figure*}
 
+\begin{figure*}[htbp]
+\includegraphics[width=0.7\textwidth]{multi_domain}
+\caption{Visualization of domains according to their dropouts (a large vector concatenating the dropping masks of all the layers of the model) constructed by PCA.}
+\label{fig:domain}
+\end{figure*}
+
 \section{Related work}
-The most adopted paradigm is to have two groups of parameters including task-agnostic parameters and task-specific parameters. Domain adapters and language adapters are strong baselines of this paradigm. However, adapters does not take into account the proximity of the task in their designed architectures. 
+Multidomain, multilingual translation 
 
-\citep{sen19multilingual,kong21multilingual} used the similar idea of language proximity based parameter sharing. The authors proposed a multi-decoder model sharing the same encoder among languages and routed languages in different families to different decoders.
+\citep{sen19multilingual,kong21multilingual} used the similar idea of language proximity-based parameter sharing. The authors proposed a multi-decoder model sharing the same encoder among languages and routed languages in different families to different decoders.
 
-\textbf{Sparse Transformer}\citet{xian20deep} proposed using different depths for different tasks. The authors aimed to match the depth of the sub-network to the complexity of the task. \citet{Gong21pay,Gong21adaptive} also take interest in the adaptive sparse Transformers which differ the selection of heads in multi-head attention, of layers and of blocks in feed-forward matrices between different tasks. Mixture-of-experts (MoE) is another effective approach of sparse modeling. Within the transformer model, GShard model replaces a single feedforward (FFN) sub-layer with an MoE module consisting of multiple FFN sub-layers \citep{lepikhin21gshard}. \citet{william21switch} 
+\textbf{Sparse Transformer}\citet{xian20deep} proposed using different depths for different tasks. The authors aimed to match the depth of the sub-network to the complexity of the task. \citet{Gong21pay,Gong21adaptive} also take an interest in the adaptive sparse Transformers, which differ the selection of heads in multi-head attention, layers, and blocks in feedforward matrices between different tasks. Mixture-of-experts (MoE) is another effective approach to sparse modeling. Within the transformer model, the GShard model replaces a single feedforward (FFN) sub-layer with an MoE module consisting of multiple FFN sub-layers \citep{lepikhin21gshard}. \citet{william21switch} 
 
-\textbf{Adapters} have proven to be very efficient for NLP multi-task modeling \citep{houlsby19parameter,Bapna19simple,Pham20Study,pfeiffer20adapterhub}. The method consists of plugging several adapters to the intermediate layers of a pretrained Transformer and finetuning these adapters on the downstream tasks. Adapters can also be trained unsurpervisedly in multilingual translation \citep{Philip20monolingual}. However, hard-coded separation between the domains of different tasks leads to a catastrophic forgetting \citep{pfeiffer21adapterfusion}, which is a common problem in multi-task modeling using neural networks \cite{Michael89catastrophic}. In multi-domain translation, recently \citet{Pham21revisiting} demonstrated the brittleness of domain adapters against fuzzy domain separations, out-of-domain distributions and erroneous domain tags. Recently, several works have been dedicated to mitigate this weakness through mixture of expert mechanisms, for example,\cite{pfeiffer21adapterfusion}.
+\textbf{Adapters} have proven to be very efficient for NLP multi-task modeling \citep{houlsby19parameter,Bapna19simple,Pham20Study,pfeiffer20adapterhub}. The method consists of plugging several adapters to the intermediate layers of a pretrained Transformer and finetuning these adapters on the downstream tasks. Adapters can also be trained unsupervised in multilingual translation \citep{Philip20monolingual}. However, the hard-coded separation between the domains of different tasks leads to a catastrophic forgetting \citep{pfeiffer21adapterfusion}, which is a common problem in multi-task modeling using neural networks \cite{Michael89catastrophic}. In multi-domain translation, recently \citet{Pham21revisiting} demonstrated the brittleness of domain adapters against fuzzy domain separations, out-of-domain distributions, and erroneous domain tags. Recently, several works have aimed to mitigate this weakness through a mixture of expert mechanisms, for example,\cite{pfeiffer21adapterfusion}.
 
-Recently, \citet{biao21share} proposed jointly learning how to route between shared representation and language-specific representation via a conditional language-specific routing and the parameters of the underlying Transformer. This method is very related to the FusionAdapters of \cite{pfeiffer21adapterfusion}. Both approaches assume the final representation is a combination or a choice between shared representation and task-specific representations. The proximity between task is not taken into account in the routing mechanism. Our method proposed a different point of view on the problem of multi-task routing in the underlying network.
-
+Recently, \citet{biao21share} proposed jointly learning how to route between shared representation and language-specific representation via a conditional language-specific routing and the parameters of the underlying Transformer. This method is very related to the FusionAdapters of \cite{pfeiffer21adapterfusion}. Both approaches assume the final representation is a combination or a choice between shared representation and task-specific representations. The proximity between tasks is not taken into account in the routing mechanism. Our method proposed a different point of view on the problem of multi-task routing in the underlying network.
 
 \section{Conclusions and outlook}
 In this work, we present a novel method allows jointly searching optimal sub-networks for multiple tasks and the parameters of the underlying network. Our method proposed a rigorous mathematical modeling and an end-to-end optimization with very little extra computational cost. We demonstrate an improvement of our model with large margin over multi-domain Transformer without zero additional parameters and an equivalent performance compared to a strong baseline such as Domain Adapters consisting of large number of extra parameters. In multilingual translation, our model outperforms multilingual Transformer and Language Adapters in 3/4 cases. Besides, we provided an thorough ablation study on the similarities between learned sub-networks and demonstrated a strong correlation between the sub-networks' similarity and the proximity of their tasks (domain or language).
@@ -676,15 +714,6 @@ We describe our datasets for multi-domain translation experiment in Table \ref{t
 \label{tab:Corpora-chap4}
 \end{table*}
 \subsection{Multilingual datasets}
-We clarify the notation of the languages in multilingual experiments as follows
-\begin{itemize}
-	\item Diverse: bos (bosnia), mar(marathi),
-         hin(hindi), mkd(macedonia), ell(greek),
-         bulgaria(bul), french(fra), korean(kor) 
-	\item Related: azerbajiani (aze), belarusian(bel),
-          glacian(glg), slovak (slk), turkisk (tur),
-		  russian(rus), portugese(por),czech(ces)
-\end{itemize}
 Table \ref{tab:Corpora-multilingual} describes the subset of TED8 that we used in our experiments.
 \begin{table*}
   \centering
@@ -732,5 +761,28 @@ We describe the choice of our systems in multilingual experiments as follows
 \end{itemize}
 
 We set the dropout probability as 0.3. We train the multilingual Transformer model in 40~K iterations with a batchsize of 9600 tokens on 16 GPUs as in \citet{Gong21adaptive}. We train \system{LaMGD} Tranformer in 50~K iterations with the same batchsize. Finally, we finetune the Language Adapters in 5~K iterations.
+
+\section{\system{LaMGD}'s training algorithm}
+
+\begin{breakablealgorithm}
+\caption{Training \system{LaMGD}} \label{alg:mdmt}
+\begin{algorithmic}[1]
+\REQUIRE {
+  \begin{itemize}
+    \setlength{\itemsep}{-1pt}    \setlength{\parsep}{0pt}
+  \item[] 
+  \item $n_d$ corpora $C^d, d \in [1, \dots,n_d]$ for $n_d$ domains equipped by an empirical distribution $D_d(x)$
+  \item number of retained groups: k, number of groups: $n_p$
+ \end{itemize}}
+\REPEAT 
+\STATE{Pick a batch from domain $d$}
+\STATE{Sampling $\forall p,  g_l^d(p) & \displaystyle{\mathop{\sim}^{\text{i.i.d}}} \operatorname{Gumbel}(0,1)$}
+\IF{$Early\_stopping(Eval\_scores)$}
+	\STATE{break}
+\ENDIF
+\STATE{$i=i+1$}
+\UNTIL{$i> iter\_num$}
+\end{algorithmic}
+\end{breakablealgorithm}
 
 \end{document}
