@@ -225,7 +225,7 @@ Assuming standard notation for our translation model  $P(y|x,d;\theta)$ where $x
   D(x,y,d; \theta, \phi) = & \mathbb{E}_{m^d \sim Q(m^d |d,\Phi)} \log P(y | m^d, x, d; \theta) \nonumber\\
   R(x,y,d; \theta, \phi) = & \operatorname{KL}(Q(m^d | x,d, \Phi)||P(m^d | x,d; \theta)), \nonumber
 \end{align}
-where $\operatorname{KL}$ is the Kullback-Leibler divergence. We use $-\ell{ELBO}(x,y,d; \theta,\Phi)$ as our surrogate training objective, as a tractable approximation of the untractable likelihood, and try to minimize this function in $\theta$ and $\Phi$.
+where $\operatorname{KL}$ is the Kullback-Leibler divergence. We use $-\ell(x,y,d; \theta,\Phi)$ as our surrogate training objective, as a tractable approximation of the untractable likelihood, and try to minimize this function in $\theta$ and $\Phi$.
 
 The variational distribution $Q$ of $m^d$ is defined independently on a layerwise basis; this means that each layer only involves a subset $\Phi_l^d$ of variational parameters. $Q$ is computed as follows:
 \begin{align}
@@ -280,7 +280,7 @@ The gradient $\frac{\partial D}{\partial \hat{m}_l^d(\tau)}$ is computed via aut
 We jointly train the Transformer parameters $\theta$ and the parameters of the variational distribution $\Phi$ using the following multi-task loss.\fyDone{This is repeated}
 \begin{align}
 \hspace{-0.em}
-\mathcal{L}(\theta,\Phi) = \sum_{d=1}^{n_d} \mathbb{E}_{x \sim \mathcal{D}_s^d,y \sim g^d(x)} \big[-\ell(x,y,d; \theta,\Phi)\big]
+\mathcal{L}(\theta,\Phi) = \sum_{d=1}^{n_d} \mathbb{E}_{x \sim \mathcal{D}_s^d,y \sim MT^d(x)} \big[-\ell(x,y,d; \theta,\Phi)\big]
 \end{align}
 
 in which $\mathcal{D}_s^d$ is distribution of task $d$ over the input space $\Omega^d_s$; $\operatorname{MT}^d: \Omega^d_s \rightarrow \Omega^d_t$\fyDone{already defined} is the translation function for task $d$, which our multi-task model needs to learn; $-\ell(x,y, d, \theta,\Phi)$ is the $\operatorname{ELBO}$ loss, defined in Equation~\ref{eq:lower-bound}.
