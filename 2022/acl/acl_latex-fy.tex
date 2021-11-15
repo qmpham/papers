@@ -137,37 +137,38 @@
 \maketitle
 
 \begin{abstract}
-  [FY] Multidomain and multilingual machine translation often rely on parameter sharing strategies, where large portions of the network are meant to capture the commonalties of the task at hand, while smaller parts are reserved to model the peculariaties of a language or a domain. In adapter-based approaches, these strategies are hard coded in the network architecture. In this work, we propose a new method aimed at learning the parameter sharing pattern, using a latent-variable model. We show how this model can be trained end to end, and report experimental results which show that the learned pattern are both meaningful, and yield improved translation performance without any increase of the model size. 
+  Multidomain and multilingual machine translation often rely on parameter sharing strategies, where large portions of the network are meant to capture the commonalties of the tasks at hand, while smaller parts are reserved to model the peculariaties of a language or a domain. In adapter-based approaches, these strategies are hard coded in the network architecture, independent of the similarities that exist between tasks. In this work, we propose a new method aimed at better taking advantage of these similarities, using a latent-variable model. We also develop new techniques to train this model end to end and report multiple experimental results that show the the learned patterns are both meaningful and yield improved translation performance, without any increase of the model size. 
 \end{abstract}
 
 \section{Introduction}
-Multidomain and multilingual machine translation aim to develop one single model to perform translations for multiple domains and multiple language pairs, respectively.\footnote{We will refer to these two situations as 'multi-task MT' (or \mtsquare{} for short), and refer to individual domains and languages as 'tasks'.} These paradigms are motivated by the compactness of the resulting translation system \citep{Chu18multilingual,dabre20survey}, the hypothetical positive knowledge transfer between similar domains \citep{Pham21revisiting} or between languages in the same family \citep{Tan19multilingual}. However, having all the tasks use exactly the same model parameters can cause negative interference between unrelated tasks \citep{conneau20unsupervised,wang20negative}. Hence the recent development of approaches relying on a partial sharing of the parameters, eg.\ using adapter layers as studied in \citep{houlsby19parameter,Bapna19simple,Pham20Study}. If these techniques have proven effective for building strong baselines, such fail to fully take advantage of the similarities that exist between domains and tasks, as documented eg.\ in \citep{Pham21revisiting}. This is because the partition of the parameter space between generic or task-specific sub-parts, and their allocation to each task is hard coded in the network, irrespective of the existing commonalties and differences in the data space.   
+Multidomain and multilingual machine translation aim to develop one single model to perform translations for multiple domains and multiple language pairs, respectively.\footnote{We will refer to these two situations as 'multi-task MT' (or \mtsquare{} for short), and refer to individual domains and languages as 'tasks'.} These paradigms are motivated by the compactness of the resulting translation system \citep{Chu18multilingual,dabre20survey}, the hypothetical positive knowledge transfer between similar domains \citep{Pham21revisiting} or between languages in the same family \citep{Tan19multilingual}. However, having all the tasks use exactly the same model parameters can cause negative interference between unrelated tasks \citep{conneau20unsupervised,wang20negative}. Hence the recent development of approaches relying on a partial sharing of the parameters, eg.\ using adapter layers as studied in \citep{houlsby19parameter,Bapna19simple,Pham20Study}. If these techniques have proven effective for building strong baselines, they fail to fully take advantage of the similarities that exist between domains and tasks, as documented eg.\ in \citep{Pham21revisiting}. This is because the partition of the parameter space between generic or task-specific subparts, and their allocation to each task is hard-coded in the network, irrespective of the actual commonalties and differences in the data space.   
 
-In this paper, we develop techniques that can take the similarity between tasks into account in a more effective way, by learning the network organization from the data. To this end, we introduce a set of latent variables in the model, to account for the unseen association between tasks and regions of the parameter space, and show how training can still be performed end-to-end using a variational surrogate of the standard loss function. Our experiments with multilingual and multidomain machine translation confirm that this method can automatically detect similarities in the data, and yield related tasks to share more parameters. They also show that this method is comparable to using adapter layers in a number of empirical comparisons; contrarily to adapters, these performance are obtained without any increase of the model size.  Our main contributions are summarized below:
+In this work, we develop techniques that can take the similarity between tasks into account in a more effective way, by learning the network organization from the data. To this end, we introduce a set of latent variables in the model, to account for the unseen association between tasks and regions of the parameter space, and show how training can still be performed end-to-end using a variational surrogate of the standard loss function. Our experiments with multilingual and multidomain machine translation confirm that this method can automatically detect similarities in the data, meaning that related tasks use the same subparts of the network. Our results also show that this method is comparable to using adapter layers in a number of empirical comparisons; however, contrarily to adapters, these performance are obtained without any increase of the model size. Our main contributions are summarized below:
 \begin{itemize}
   \setlength{\itemsep}{1pt}
   \setlength{\parskip}{0pt}
   \setlength{\parsep}{0pt}
-\item We provide a sound mathematical formulation to the problem of jointly learning routing task-dependent sub-networks and the parameters of the underlying models using variational probabilistic modeling;
-\item We introduce algorithms to train this model end to end with very little extra computational cost.
+\item We provide a sound mathematical formulation to the problem of jointly learning task-dependent sub-networks and the parameters of the underlying models using variational probabilistic modeling approach;
+\item We present algorithms to train this model end to end with very little extra computational cost.
 \item We report, using an extensive experimental setting, significant gains of this method with respect to strong baselines;
 \item We study how this method can actually exploit the similarities between tasks to learn interpretable sub-networks.
 \end{itemize}
-
-\fyTodo{Can you do distillation ? That is only keep the parameter for one domain and still get good results (better than DA ?)}
+\fyDone{Can you do distillation ? That is only keep the parameter for one domain and still get good results (better than DA ?)}
 
 \section{Multi-task group dropout \label{sec:architecture}}
 \subsection{Network architecture, groups and layers}
-Most architectures for multitask learning are based on a matching of subset of model parameters with tasks. While our model also needs to know the task $d \in [0 \dots n_d-1]$ for each training and test instance, the structure of our Transformer networks \citep{Vaswani17attention} is based on the notion of \emph{groups of nodes in the computation graph}. At the input of each Transformer layer $l \in [1 \dots L]$, we partition all input state vectors into $n_p$ groups of nodes, and zero-out a task-dependent subset of these groups.\fyDone{In the attention heads only? In the FF?} The assignment of tasks to groups will be learned from the data, under the constraint that each task only activates exactly $k$ groups of \emph{active nodes}, while the all the other values are nullified akin to a dropout process (see Figure~\ref{fig:group_dropout}).
+Many architectures for multitask learning are based on a matching of subset of model parameters with tasks. Given the task and the input instance, only a subpart of the network will be involved in the computation of the output value, based on a predefined association between subnetworks and tasks. The adapter architecture of \citep{Bapna19simple} illustrates this strategy, where a task-dependent set of layers is activated for each task. 
+
+In our approach, we also require to know the task $d \in [0 \dots n_d-1]$ for each training and test instance. The structure of our Transformer networks \citep{Vaswani17attention} is however based on the notion of \emph{groups of nodes in the computation graph}. At the input of each Transformer layer $l \in [1 \dots L]$, we partition all input state vectors into $n_p$ groups of nodes, and zero-out a task-dependent subset of these groups.\fyDone{In the attention heads only? In the FF?} The assignment of tasks to groups will be learned from the data, under the constraint that each task only activates exactly $k$ groups of \emph{active nodes}, while the all the other values are nullified, akin to a dropout process (see Figure~\ref{fig:group_dropout}).
 \begin{figure}
   \centering
 \includegraphics[width=0.4\textwidth]{group_dropout}
-\caption{Latent group dropout. The set of nodes\fyDone{parameters ?} in each layer is divided into equal-sized groups. For each task, we only keep a fixed number of groups and nullify all the other nodes. Our method learns which groups will be kept / dropped for each task.}
+\caption{Latent group dropout. The set of nodes\fyDone{parameters ?} in each layer is divided into equal-sized groups. For each task, we only keep a fixed number of active groups of nodes and nullify all the other nodes. Our method learns which groups will be kept / dropped for each task.}
 \label{fig:group_dropout}
 \end{figure}
-Formally, a \emph{group dropout mask} $m_l^d$ is a $n_p$-dimensional binary vector containing exactly $k$ ones: the group $p$ ($\in  [0,\dots,n_p\text{-}1]$) is retained for task $d$ if $m_l^d(p)\text{\small =}1$ and is dropped if $m_l^d(p)\text{\small =} 0$. We denote $\Delta^{n_p}_k = \{ m \in \{0,1\}^{n_p} \text{ such that }  \mid{} m \mid_{L_1} = k \}$ the set of all admissible dropout masks, with $\mid{} m \mid_{L_1}$ the $L_1$ norm of vector $m$.
+Formally, a \emph{group dropout mask} $m_l^d$ is a $n_p$-dimensional binary vector containing exactly $k$ ones: the group $p$ ($\in  [0,\dots,n_p\text{-}1]$) is retained for task $d$ if $m_l^d(p) =1$ and is dropped if $m_l^d(p) = 0$. We denote $\Delta^{n_p}_k = \{ m \in \{0,1\}^{n_p} \text{ such that }  \mid{} m \mid_{L_1} = k \}$ the set of all admissible dropout masks, with $\mid{} m \mid_{L_1}$ the $L_1$ norm of vector $m$; $\#\Delta^{n_p}_k$ is the cardinal of $\Delta^{n_p}$.
 
-Given $m_l^d$, the mask $r_l^d$ for task $d$ in layer $l$ is then derived as follows:
+Given $m_l^d$, the mask $r_l^d$ for task $d$ in layer $l$ is then derived as:
 \begin{align*}
   r_l^d(i) &= \begin{cases}
     1, & \text{if}\ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p} \\
@@ -186,26 +187,26 @@ where $d_k$ is the dimension of the hidden state.\fyDone{Check this} The propaga
   \forall l \in [0,\cdots, L-1]: \tilde{h}^l &= h^l \odot r_l^d ,\\
   h^{l+1} &= \operatorname{LAYER}^{l+1}(\tilde{h}^l) ,
 \end{align*}
-where $\operatorname{LAYER}^l()$ represents all the computations in Transformer layer $l$.
+where $\operatorname{LAYER}^l()$ represents all the computations in Transformer layer $l$. It is applied at all positions of each layer in the encoder and in the decoder.  
 % The dropping mask $r_l^d$ is computed as follows
 % where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. 
 
 \subsection{Training with latent dropout masks}
-Assuming standard notation for our translation model  $P(y|x,d;\theta)$ where $x$, $y$ and $\theta$ respectively refer to the input, output, and parameter vector, the latent variables $m_{l}^d, l \in[0,\dots,L], d \in [0, \dots, n_d-1]$ are introduced as follows. We also assume a prior distribution for $m_{l}^d$ chosen to be the uniform distribution over $\Delta^{n_p}_k$: $P(m_l^d | x, d; \theta) = \operatorname{Unif}(\Delta^{n_p}_k)$; variables for each layer are independent and collectively refered to as $m^d$. For any (variational) distribution $Q(m^1 \dots m^{n_d}; \Phi)$ with parameters $\Phi=\{\phi_l^1, ..., \phi_L^{n_d}\}$, it is well-known that the log-likelihood is lower-bounded by the so-called $\operatorname{ELBO}$ function, made of a summation of two terms: the \emph{distortion} $D$ and the \emph{rate} $R$ defined as follows:%\footnote{We drop the dependency in $x$ to avoid notational clutter.}
+Assuming standard notation for our translation model  $P(y|x,d;\theta)$ where $x$, $y$ and $\theta$ respectively refer to the input, output, and parameter vector, the latent variables $m_{l}^d, l \in[0,\dots,L], d \in [0, \dots, n_d-1]$ are introduced as follows. We chose the prior distribution for $m_{l}^d$ as the uniform distribution over $\Delta^{n_p}_k$: $P(m_l^d | x, d; \theta) = \operatorname{Unif}(\Delta^{n_p}_k)$; variables for each layer are independent and collectively refered to as $m^d$. For any (variational) distribution $Q(m^1 \dots m^{n_d}; \Phi)$ with parameters $\Phi=\{\phi_l^1, ..., \phi_L^{n_d}\}$, it is well-known that the log-likelihood is lower-bounded by the so-called $\operatorname{ELBO}$ function (hereafter denoted $\ell$), made of a summation of two terms: the \emph{distortion} $D$ and the \emph{rate} $R$ defined as follows:%\footnote{We drop the dependency in $x$ to avoid notational clutter.}
 \begin{align}
-  \log P(y|x,d;\theta) \ge & \operatorname{ELBO}(x,y,d; \theta, \Phi) \nonumber \\
-  \operatorname{ELBO}(x,y,d; \theta, \Phi) =&  D(x,y,d; \theta, \Phi) - R(x,y,d; \theta, \Phi) \label{eq:lower-bound}\\
+  \log P(y|x,d;\theta) \ge & \ell(x,y,d; \theta, \Phi) \nonumber \\
+  \ell(x,y,d; \theta, \Phi) =&  D(x,y,d; \theta, \Phi) - R(x,y,d; \theta, \Phi) \label{eq:lower-bound}\\
   D(x,y,d; \theta, \phi) = & \mathbb{E}_{m^d \sim Q(m^d |d,\Phi)} \log P(y | m^d, x, d; \theta) \nonumber\\
   R(x,y,d; \theta, \phi) = & \operatorname{KL}(Q(m^d | x,d, \Phi)||P(m^d | x,d; \theta)), \nonumber
 \end{align}
-where $\operatorname{KL}$ is the Kullback-Leibler divergence. We use $-\operatorname{ELBO}(x,y,d; \theta,\Phi)$ as our surrogate training objective, as a tractable approximation of the untractable likelihood, and try to minimize this function in $\theta$ and $\Phi$.
+where $\operatorname{KL}$ is the Kullback-Leibler divergence. We use $-\ell{ELBO}(x,y,d; \theta,\Phi)$ as our surrogate training objective, as a tractable approximation of the untractable likelihood, and try to minimize this function in $\theta$ and $\Phi$.
 
-The variational distribution $Q$ of $m^d$ is defined independently on a layerwise basis, each layer $l$ involving only a subset $\Phi_l^d$ of parameters:
+The variational distribution $Q$ of $m^d$ is defined independently on a layerwise basis; this means that each layer only involves a subset $\Phi_l^d$ of variational parameters. $Q$ is computed as follows:
 \begin{align}
   \operatorname{Ind}^d = \{ i_1, \cdots, i_k \} & \sim \text{SRS}(\operatorname{softmax}(\Phi_l^d), k) \nonumber \\
   m_l^d(i) & =  \text{$\mathbb{I}$}(i \in \operatorname{Ind}^d), \nonumber
 \end{align}
-where $\text{SRS}(\pi,k)$ denotes the process of sampling $k$ times without replacement from the distribution $\pi$, and $\mathbb{I}$ is the indicator function. This particular choice the modeling of the latent vector $m_l^d$ is motivated by the Gumbel Top-K trick of \citet{Kool19stochastic} that we use below.  Given our assumptions for the prior distribution and our choice for the variational distribution, the two terms in Eq.~\eqref{eq:lower-bound} can be computed as:
+where $\text{SRS}(\pi,k)$ denotes the process of sampling $k$ times without replacement from the distribution $\pi$, and $\mathbb{I}$ is the indicator function. This modeling choice for the latent vector $m_l^d$ is motivated by the Gumbel Top-K trick of \citet{Kool19stochastic} that we use below.  Given our assumptions for the prior distribution and our choice for the variational distribution, the two terms in Eq.~\eqref{eq:lower-bound} can be computed as:
 \begin{align}
 \hspace{-2.em}
 D(\dots) &= \mathbb{E}_{m^d \sim Q(m^d | d; \Phi)} \text{log} P(y | m^d, x, d, \theta) \nonumber \\
@@ -223,14 +224,13 @@ where the generation process $G(0,1)$ is a product of independent Gumbel distrib
 For the second term, the derivation is the following:\fyDone{Check this: we have a sum over layers ?Also: R or -R ?} 
 \begin{align}
 \hspace{-2.em}
-  R    &= \operatorname{KL}(Q(m^d | d, \Phi)||P(m^d | d; \theta)), \nonumber \\ 
-	&= -\sum_{l=1}^L \big(\mathbb{H} \big[ Q(m_l^d | d, \Phi) \big] - \text{log}(\#\Delta^{n_p}_k) \big) \nonumber \\ 
-	&= -\sum_{l=1}^L \big(\mathbb{H} \big[ Q(i_1,\cdots,i_k | d, \Phi) \big] - \text{log}(\#\Delta^{n_p}_k) \big)\nonumber \\
-	&\leqslant  -\sum_{l=1}^L \big(\mathbb{H} \big[ Q(i_1 | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \big)\label{eq:entropy}
+  R    &= \operatorname{KL}(Q(m^d | x, d, \Phi)||P(m^d | x, d; \theta)), \nonumber \\ 
+	&= -\sum_{l=1}^L \big(\mathbb{H} \big[ Q(m_l^d | x, d, \Phi) \big] - \text{log}(\#\Delta^{n_p}_k) \big) \nonumber \\ 
+	&= -\sum_{l=1}^L \big(\mathbb{H} \big[ Q(i_1,\cdots,i_k | x, d, \Phi) \big] - \text{log}(\#\Delta^{n_p}_k) \big)\nonumber \\
+	&\leqslant  -\sum_{l=1}^L \big(\mathbb{H} \big[ Q(i_1 | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \big). \label{eq:entropy}
 \end{align}
 We prove inequality~\eqref{eq:entropy} in Appendix~\ref{appendix:b}.
-
-Inequality~\eqref{eq:entropy} shows that an upperbound of $R$ is $\sum_{l=1}(\text{log}(\#\Delta^{n_p}_k) - \mathbb{H}(\text{softmax}(\Phi_l^d)))$. During training, we maximize a sum over layers of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$\fyDone{Check sum} which performs a regularization over the parameters $\Phi^d$ of the variational distribution.
+This inequality shows that an upperbound of $R$ is $\sum_{l=1}^L(\text{log}(\#\Delta^{n_p}_k) - \mathbb{H}(\text{softmax}(\Phi_l^d)))$. During training, we thus maximize a sum over layers of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$\fyDone{Check sum} which performs a regularization over the parameters $\Phi^d$ of the variational distribution.
 
 Thanks to the Gumbel Top-K trick, we can move the parameters $\Phi$ into the objective function and get rid of policy gradients, which have been reported to be very unstable \citep{Diederick14auto}. However, the operator $\operatorname{Top-k}$, which serves to define $\tilde{m}_l^d$ in Equation~\eqref{eq:top-k}, is not differentiable. Therefore, we approximate this function by the $\operatorname{Soft-Top-K}$ function defined as follows:
 \begin{align}
@@ -240,7 +240,7 @@ Thanks to the Gumbel Top-K trick, we can move the parameters $\Phi$ into the obj
         1^{T}.m = k
       }}} -(g_l^d+\Phi_l^d)^{T} . m - \tau H_b(m) \\ \nonumber
 & \text{in which} \nonumber \\
-H_b(m) &= - \sum_i m_i \text{log}(m_i) + (1-m_i)\text{log}(1-m_i) \nonumber 
+H_b(m) &= - \sum_i m_i \text{log}(m_i) + (1-m_i)\text{log}(1-m_i). \nonumber 
 \end{align}
 
 In Appendix \ref{appendix:a}, we prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. Furthermore, we also provide the computation of $\hat{m}_l^d(\tau)$ and prove that $\hat{m}_l^d(\tau)$ is a differentiable function w.r.t $\Phi_l^d$ and that its gradients can be computed using the implicit differentiation theorem. During training, we approximate $\tilde{m}_l^d$ by $\hat{m}_l^d(\tau)$ by gradually decaying the hyperparameter $\tau$ to $0$. The gradient of $D$ w.r.t $\Phi_l^d$ is computed using the chain rule as follows:
@@ -252,19 +252,19 @@ The gradient $\frac{\partial D}{\partial \hat{m}_l^d(\tau)}$ is computed via aut
 We jointly train the Transformer parameters $\theta$ and the parameters of the variational distribution $\Phi$ using the following multi-task loss.\fyDone{This is repeated}
 \begin{align}
 \hspace{-0.em}
-\ell(\theta,\Phi) = \sum_{d=1}^{n_d} \mathbb{E}_{x \sim \mathcal{D}_s^d,y \sim g^d(x)} \big[-\operatorname{ELBO}(x,y,d; \theta,\Phi)\big]
+\mathcal{L}(\theta,\Phi) = \sum_{d=1}^{n_d} \mathbb{E}_{x \sim \mathcal{D}_s^d,y \sim g^d(x)} \big[-\ell(x,y,d; \theta,\Phi)\big]
 \end{align}
 
-in which $\mathcal{D}_s^d$ is distribution of task $d$ over the input space $\Omega^d_s$; $\operatorname{MT}^d: \Omega^d_s \rightarrow \Omega^d_t$\fyDone{already defined} is the translation function for task $d$, which our multi-task model needs to learn; $-\mathcal{L}_{\text{ELBO}}(x,y, d, \theta,\Phi)$ is the ELBO loss, defined in Equation~\ref{eq:lower-bound}.
+in which $\mathcal{D}_s^d$ is distribution of task $d$ over the input space $\Omega^d_s$; $\operatorname{MT}^d: \Omega^d_s \rightarrow \Omega^d_t$\fyDone{already defined} is the translation function for task $d$, which our multi-task model needs to learn; $-\ell(x,y, d, \theta,\Phi)$ is the $\operatorname{ELBO}$ loss, defined in Equation~\ref{eq:lower-bound}.
 
 Finally, during inference, we define the dropout mask for layer $l$ and task $d$ as follows:
 \begin{align*}
   Ind_l^d &= \operatorname{Top-k}(\Phi_l^d) \\
   m_l^d &= \mathbb{I}(i\in Ind_l^d)
 \end{align*}
-meaning that we simply pick the $k$ most likely parameter groups for the task at hand, and define the dropout mask accordingly.
+meaning that we simply pick the $k$ most likely parameter groups for the task at hand, and define the state dropout mask accordingly.
 
-\section{Experimental settings}
+\section{Experimental settings \label{sec:experiments}}
 \subsection{Baselines}
 \subsubsection{Multi-domain, multilingual translation}
 In both cases, we examine the performance of three following MT systems.
