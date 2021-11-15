@@ -163,7 +163,7 @@
 \maketitle
 
 \begin{abstract}
-  Multidomain and multilingual machine translation often rely on parameter sharing strategies, where large portions of the network are meant to capture the commonalties of the tasks at hand, while smaller parts are reserved to model the peculariaties of a language or a domain. In adapter-based approaches, these strategies are hard coded in the network architecture, independent of the similarities that exist between tasks. In this work, we propose a new method aimed at better taking advantage of these similarities, using a latent-variable model. We also develop new techniques to train this model end to end and report multiple experimental results that show the the learned patterns are both meaningful and yield improved translation performance, without any increase of the model size. 
+  Multidomain and multilingual machine translation often rely on parameter sharing strategies, where large portions of the network are meant to capture the commonalities of the tasks at hand, while smaller parts are reserved to model the peculiarities of a language or a domain. In adapter-based approaches, these strategies are hardcoded in the network architecture, independent of the similarities between tasks. In this work, we propose a new method to better take advantage of these similarities, using a latent-variable model. We also develop new techniques to train this model end to end and report multiple experimental results that show the learned patterns are both meaningful and yield improved translation performance without any increase of the model size. 
 \end{abstract}
 
 \section{Introduction}
@@ -300,7 +300,7 @@ Our systems for the multidomain experiments are designed as follows:
 \begin{itemize}
 \item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 2048; the multi-head attention mechanism contains 8 heads;
 \item Adapter-based Transformer: The intermediate feedforward dimension is set to 2048;% as in \citet{Pham21revisiting}.
-\item \system{LaMGD} Transformer:\fyTodo{Explain acronym} There is no change in the architecture. We group the 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 out of the 16 groups are selected. The number of parameters of the variational distributions is $k \times L \times n_d$, which is negligible in comparison to the size of the Transformer model.
+\item Transformer using Latent multi-task group dropout (denoted \system{LaMGD} Transformer):\fyDone{Explain acronym} There is no change in the architecture. We group the 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 out of the 16 groups are selected. The number of parameters of the variational distributions is $k \times L \times n_d$, which is negligible in comparison to the size of the Transformer model.
 \end{itemize}
 
 We set the dropout probability to 0.1. We train the multi-domain Transformer model for 20k iterations with a batch size of 12k tokens. We train \system{LaMGD} Tranformer for 300k iterations with a batch size of 12k tokens: these extra iterations are justified by the need for the \system{LaMGD} Tranformer to learn both the sub-networks and the parameters of the underlying Transformer. Finally, we plug domain Adapters to the multidomain Transformer model and finetune them for 25k iterations using the same batch size as the baseline.
@@ -315,7 +315,7 @@ The systems used in our multilingual experiments are implemented as follows:
 
 We set the dropout probability to 0.3. We train the multilingual Transformer model for 40k iterations with a batch size of 9600 tokens on 16 V100 GPUs as in \citet{Gong21adaptive}. We train \system{LaMGD} Tranformer for 50k iterations with the same batch size. Finally, we finetune the language-specific Adapters for 5k iterations.
 
-All the translation systems are implemented OpenNMT\fyTodo{Fix this, add reference to framework if needed}.
+All the translation systems are implemented with OpenNMT-tf \footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}\fyDone{Fix this, add reference to framework if needed}.
 
 \subsubsection{Hyperparameters}
 \label{ssec:hyperparams}
@@ -329,11 +329,11 @@ in which $r=0.0001$.
 
 Finally, we fix the weight of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ to $0.0001$ in the training loss in every experiments. The choice of the values for our hyperparameters was not optimized and selected by suggestions from previous papers \citep{Jang17categorical,Gong21pay,Gong21adaptive}.
 
-For all experiments, we report the BLEU score of \citet{Papineni02bleu} computed with SacreBleu \cite{Post18call}.\fyTodo{Check this}
+For all experiments, we report the BLEU score of \citet{Papineni02bleu} computed with SacreBleu \cite{Post18call}.\fyDone{Check this}
 
 \subsection{Datasets}
 \subsubsection{Multidomain translation}
-We use the same data as in the recent work of \citet{Pham21revisiting} on multidomain translation.\fyTodo{Add public to the data link} The datasets for the multidomain translation experiments are detailled in Table~\ref{tab:Corpora-chap4}.
+We use the same data as in the recent work of \citet{Pham21revisiting} on multidomain translation.\fyDone{Add public to the data link} The datasets \footnote{The raw data can be downloaded from \url{https://github.com/qmpham/experiments/tree/main/tacl20}} for the multidomain translation experiments are detailed in Table~\ref{tab:Corpora-chap4}.
 \begin{table*}[h!]
   \centering
   \begin{tabular}{|l|cccccc|} %*{4}{|r|}}
@@ -358,7 +358,7 @@ translation tasks borrowing the multilingual translation datasets from past stud
 \item TED8-Diverse. The dataset consists of parallel sentences between English and eight \emph{diverse languages} as in \citet{Wang20balancing}.
 \end{itemize}
 
-The languages used in multilingual experiments are refered to by their ISO 639-1 code that we reproduce below for convenience:
+The languages used in multilingual experiments are referred to by their ISO 639-1 code that we reproduce below for convenience:
 \begin{itemize}
 \item \textbf{Diverse set}: bos (Bosnian), Bulgarian (bul), French (fra), ell (Greek),
   hin (Hindi), Korean (kor) mkd (Macedonian), mar (Marathi);
@@ -369,32 +369,23 @@ The languages used in multilingual experiments are refered to by their ISO 639-1
 Table~\ref{tab:Corpora-multilingual} describes the subsets of TED8 that were used in our experiments.
 \begin{table*}[h!]
   \centering
-  \begin{tabular}{l|cccc} 
+  \begin{tabular}{l|cccc|l|cccc} 
   \hline
-    \multicolumn{1}{c|}{} & \multicolumn{1}{c}{\domain{lang}} & \multicolumn{1}{c}{\domain{train}} & \multicolumn{1}{c}{\domain{dev}} & \multicolumn{1}{c}{\domain{test}} \\
+    \multicolumn{1}{c|}{} & \multicolumn{1}{c}{\domain{lang}} & \multicolumn{1}{c}{\domain{train}} & \multicolumn{1}{c}{\domain{dev}} & \multicolumn{1}{c}{\domain{test}} & \multicolumn{1}{|c|}{} & \multicolumn{1}{c}{\domain{lang}} & \multicolumn{1}{c}{\domain{train}} & \multicolumn{1}{c}{\domain{dev}} & \multicolumn{1}{c}{\domain{test}} \\
     \hline 
-    \multirow{8}{*}{Related} & Azerbaijani & 5.94k & 671 & 903 \\
-							 & Belarusian & 4.51k & 248 & 664 \\
-							 & Glacian & 10.0k & 682 & 1007 \\
-							 & Slovak & 61.5k & 2271 & 2445 \\
-							 & Turkish & 182k & 4045 & 5029 \\
-                             & Russian & 208k & 4814 & 5483 \\
-                             & Portuguese & 185k & 4035 & 4855 \\
-                             & Czech & 103k & 3462 & 3831 \\
+    \multirow{2}{*}{Related} & Azerbaijani & 5.94k & 671 & 903 & \multirow{2}{*}{Diverse} & Bosnian & 5.64k & 474 & 463 \\
+							 & Belarusian & 4.51k & 248 & 664 & & Marathi & 9.84k & 767 & 1090\\
+							 & Glacian & 10.0k & 682 & 1007 & & Hindi & 18.79k & 854 & 1243\\
+							 & Slovak & 61.5k & 2271 & 2445 & & Macedonian & 25.33k & 640 & 438 \\
+							 & Turkish & 182k & 4045 & 5029 & & Greek & 134k & 3344 & 4433\\
+                             & Russian & 208k & 4814 & 5483 & & Bulgarian & 174k & 4082 & 5060 \\
+                             & Portuguese & 185k & 4035 & 4855 & & French & 192k & 4320 & 4866\\
+                             & Czech & 103k & 3462 & 3831 & & Korean & 205k & 4441 & 5637 \\
     \hline
-    \multirow{8}{*}{Related} & Bosnian & 5.64k & 474 & 463 \\
-                             & Marathi & 9.84k & 767 & 1090 \\
-                             & Hindi & 18.79k & 854 & 1243 \\
-                             & Macedonian & 25.33k & 640 & 438 \\
-                             & Greek & 134k & 3344 & 4433 \\
-                             & Bulgarian & 174k & 4082 & 5060 \\
-                             & French & 192k & 4320 & 4866 \\
-                             & Korean & 205k & 4441 & 5637 \\
   \end{tabular}
   \caption{Data Statistics of TED8 Datasets}
 \label{tab:Corpora-multilingual}
 \end{table*}
-
 \section{Results and analyses}
 
 \subsection{Multidomain translation}
@@ -459,7 +450,7 @@ Results for the multilingual experiments are in Table~\ref{tab:multilingual}.  T
     \system{LaMGD} Tranformer  \hfill{\footnotesize[+0m]} &\SB{23.5}&9.6&\SB{21.5}&32.2&37.7&38.6&40.0&18.9&27.75 \\
     \hline
   \end{tabular}
-  \caption{Experiments with multilingual translation.\fyTodo{What is the bold for ?}}
+  \caption{Experiments with multilingual translation. Boldface denotes significant gains over \system{Transformer}\fyDone{What is the bold for ?}}
   \label{tab:multilingual}
 \end{table*}
 
@@ -508,7 +499,7 @@ We also plot the languages based on their dropout masks in Figure~\ref{fig:visua
 \begin{subfigure}{0.5\textwidth}
   \centering
   % include first image
-  \includegraphics[width=0.85\textwidth]{ted_related}  
+  \includegraphics[width=0.9\textwidth]{ted_related}  
   \caption{TED-Related}
   \label{fig:visual-related}
 \end{subfigure}
@@ -551,10 +542,10 @@ Multidomain and multilingual translation systems have received considerable atte
 
 \textbf{Adapter modules} Adapters have proven to be very efficient for multi-task NLP \citep{houlsby19parameter,Bapna19simple,Pham20Study,pfeiffer20adapterhub}. In a nutshell, this technique consists in plugging several so-called adapter modules to the intermediate layers of a pretrained Transformer and finetuning these adapters on the downstream tasks. Adapters can also be trained without supervision for multilingual translation \citep{Philip20monolingual}. However, the hard-coded separation between the domains of different tasks may lead to a catastrophic forgetting effect \citep{pfeiffer21adapterfusion}, which is a common problem in multi-task modeling using neural networks \citep{Michael89catastrophic}. In multidomain translation, \citet{Pham21revisiting} recently demonstrated the brittleness of adapters against fuzzy domain separations, out-of-domain distributions, and erroneous domain tags. Several subsequent studies have aimed to mitigate this weakness through a mixture of expert mechanism (e.g.\ \cite{pfeiffer21adapterfusion}).
 
-Recently, \citet{biao21share} proposed jointly learning how to route between shared representation and language-specific representation via a conditional language-specific routing and the parameters of the underlying Transformer. This method is closely related to the FusionAdapters of \citet{pfeiffer21adapterfusion}. Both approaches assume that the final representation\fyTodo{??} is a combination or a choice between shared representation and task-specific representations. The proximity between tasks is not taken into account in the routing mechanism. Our method proposed a different approach to the problem of multi-task routing in the underlying network.
+Recently, \citet{biao21share} proposed jointly learning how to route between shared representation and language-specific representation via a conditional language-specific routing and the parameters of the underlying Transformer. This method is closely related to the FusionAdapters of \citet{pfeiffer21adapterfusion}. Both approaches aimed to select between shared representation and task-specific representations. The proximity between tasks is not taken into account in the routing mechanism. Our method proposed a different approach to the problem of multi-task routing in the underlying network.
 
 \section{Conclusions and outlook}\label{sec:conclusion}
-In this work, we have presented a novel method for multdomain and multilingual translation. It allows us to jointly search for an optimal assignment of sub-networks to tasks and to learn the parameters of the underlying network. Our method relies on a sound mathematical framework and an end-to-end optimization procedure which implies very little extra parameters.\fyTodo{There is a computational cost = 100k iterations} Experimentally, we achieve a large improvement over Transformer baseline without zero additional parameters; our performance are also comparable to that of a strong a multi-task baseline using residual adapter modules which however includes a large number of extra parameters. For multilingual translation, our model outperforms multilingual Transformer and Language Adapters in 3 our of 4 cases. Besides, we provided an thorough analysis of the similarities between learned sub-networks and demonstrated a strong correlation between the sub-networks' similarity and the proximity of the corresponding tasks (domain or language).
+In this work, we have presented a novel method for multdomain and multilingual translation. It allows us to jointly search for an optimal assignment of sub-networks to tasks and to learn the parameters of the underlying network. Our method relies on a sound mathematical framework and an end-to-end optimization procedure which implies very little extra parameters. The training course is reasonably longer (100k iterations in multidomain translation) than training standard models while considering the gain in performance.\fyDone{There is a computational cost = 100k iterations} Experimentally, we achieve a large improvement over Transformer baseline without zero additional parameters; our performance are also comparable to that of a strong a multi-task baseline using residual adapter modules which however includes a large number of extra parameters. For multilingual translation, our model outperforms multilingual Transformer and Language Adapters in 3 our of 4 cases. Besides, we provided an thorough analysis of the similarities between learned sub-networks and demonstrated a strong correlation between the sub-networks' similarity and the proximity of the corresponding tasks (domain or language).
 
 There are several ways in which our methodology could be improved and generalized. In future work, we would first like to provide an complete variational framework to model both the number of groups, $k$ and the selection of the dropout masks. Second, we also intend to get rid of the requirement of knowing the domain information during inference: this would mean replacing the dependency on $d$ in the variational distribution by a dependency in the input $x$. These two questions seem both very interesting and promising; they would allow to us to dispense with heuristic choices in the architecture, and replace them with an increase dependency on the training data.
 
@@ -578,8 +569,8 @@ in which $\sigma(.)$ is sigmoid function and $\bar{\nu}$ is the solution of the 
 Because sigmoid is monotonic, the equation \eqref{eq:nu} has unique solution. Furthermore,  because of the smoothness of $g(\nu,\Phi_l^d) = \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})$ w.r.t $\nu$ and $\Phi_l^d$, we could deduce the implicit differentiation of its solution $\bar{\nu}$ w.r.t $\Phi_l^d$ as below although the solution of \eqref{eq:nu} does not have explicit form.
 
 \begin{align*}
-&\frac{\partial g}{\partial \nu} \times \frac{\partial \nu}{\partial \Phi_l^d} + \frac{\partial g}{\partial \Phi_l^d} = 0 \\
-& \Rightarrow \frac{\partial \nu}{\partial \Phi_l^d} = - \big(\frac{\partial g}{\partial \nu}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d}
+&\frac{\partial g}{\partial \bar{\nu}} \times \frac{\partial \bar{\nu}}{\partial \Phi_l^d} + \frac{\partial g}{\partial \Phi_l^d} = 0 \\
+& \Rightarrow \frac{\partial \bar{\nu}}{\partial \Phi_l^d} = - \big(\frac{\partial g}{\partial \bar{\nu}}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d}
 \end{align*}
 
 Because the differentiation of sigmoid has exact forms, $\frac{\partial g}{\partial \nu}$ and $\frac{\partial g}{\partial \Phi_l^d}$ also have exact form. Therefore, we do not need autograd to compute the implicit gradient $\frac{\partial \nu}{\partial \Phi_l^d}$. The gradient of $\hat{m}_l^d(\tau)$ w.r.t $\Phi_l^d$ is deduced as follows
@@ -645,32 +636,51 @@ In this section, we give a simple proof of Inequality \ref{eq:entropy}. In fact,
 &= -\displaystyle{\mathop{\mathbb{E}}_{i_1 | \Phi_l^d}} \big[ \text{log} P(i_1 | \Phi_l^d) \big] = \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big]
 \end{align*}
 \section{Appendix C}
-\begin{figure*}
-\includegraphics[width=0.7\textwidth]{multi_domain}
-\caption{Visualization of domains according to their dropouts (a large vector concatenating the dropping masks of all the layers of the model) constructed by PCA.}
-\label{fig:domain}
-\end{figure*}
-
-\section{Appendix D}
 \begin{breakablealgorithm}
 \caption{Training \system{LaMGD}} \label{alg:mdmt}
 \begin{algorithmic}[1]
 \REQUIRE {
   \begin{itemize}
     \setlength{\itemsep}{-1pt}    \setlength{\parsep}{0pt}
-  \item[] 
   \item $n_d$ corpora $C^d, d \in [1, \dots,n_d]$ for $n_d$ domains equipped by an empirical distribution $D_d(x)$
   \item number of retained groups: k, number of groups: $n_p$
+  \item $i=0$
  \end{itemize}}
 \REPEAT 
 \STATE{Pick a batch from domain $d$}
 \STATE{Sampling $\forall p,  g_l^d(p) \displaystyle{\mathop{\sim}^{\text{i.i.d}}} \operatorname{Gumbel}(0,1)$}
-\IF{$Early\_stopping(Eval\_scores)$}
-	\STATE{break}
-\ENDIF
+\STATE{Solve the equation
+\begin{align*}
+\displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) = k
+\end{align*}
+using binary search}
+\STATE{Computing mask of each layer
+\begin{align*}
+\hat{m}_l^d(\tau) &= \sigma(\frac{g_l^d + \Phi_l^d + \bar{\nu}}{\tau})
+\end{align*}}
+\STATE{Applying computed masks to their corresponding layer
+\begin{align*}
+  \forall l \in [0,\cdots, L-1]: \tilde{h}^l &= h^l \odot r_l^d ,\\
+  h^{l+1} &= \operatorname{LAYER}^{l+1}(\tilde{h}^l) ,
+\end{align*}
+}
+\STATE{Compute gradient of training loss over the underlying Transformer
+$$\Delta_{\theta} = \frac{\partial L}{\partial \theta}$$}
+\STATE{Compute gradient over the $\operatorname{Soft-Top-K}$ masks
+$$\frac{\partial D}{\partial \hat{m}_l^d(\tau)}$$}
+\STATE{Compute implicit gradient of the $\operatorname{Soft-Top-K}$ masks over $\Phi^d$
+$$- \big(\frac{\partial g}{\partial \bar{\nu}}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d}$$}
+\STATE{Compute the gradient the training over $\Phi$
+$$ - \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \big(\frac{\partial g}{\partial \bar{\nu}}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d} + \frac{\partial \mathbb{H} \big[ \operatorname{softmax}(\Phi_l^d)\big] }{\partial \Phi_l^d} $$}
+\STATE{Update $\theta$ and $\Phi^d$ with their gradients}
 \STATE{$i=i+1$}
 \UNTIL{$i> iter\_num$}
 \end{algorithmic}
 \end{breakablealgorithm}
-
+\section{Appendix D}
+\begin{figure*}[h!]
+\includegraphics[width=0.7\textwidth]{multi_domain}
+\caption{Visualization of domains according to their dropouts (a large vector concatenating the dropping masks of all the layers of the model) constructed by PCA.}
+\label{fig:domain}
+\end{figure*}
 \end{document}
