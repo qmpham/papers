@@ -776,7 +776,7 @@ We set the dropout probability as 0.3. We train the multilingual Transformer mod
  \end{itemize}}
 \REPEAT 
 \STATE{Pick a batch from domain $d$}
-\STATE{Sampling $\forall p,  g_l^d(p) & \displaystyle{\mathop{\sim}^{\text{i.i.d}}} \operatorname{Gumbel}(0,1)$}
+\STATE{Sampling $\forall l,p  g_l^d(p) & \displaystyle{\mathop{\sim}^{\text{i.i.d}}} \operatorname{Gumbel}(0,1)$}
 \IF{$Early\_stopping(Eval\_scores)$}
 	\STATE{break}
 \ENDIF
