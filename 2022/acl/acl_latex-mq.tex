@@ -1,0 +1,658 @@
+% This must be in the first 5 lines to tell arXiv to use pdfLaTeX, which is strongly recommended.
+\pdfoutput=1
+% In particular, the hyperref package requires pdfLaTeX in order to break URLs across lines.
+
+\documentclass[11pt]{article}
+
+% Remove the "review" option to generate the final version.
+%\usepackage[review,nohyperref]{acl}
+\usepackage[review]{acl}
+
+% Standard package includes
+\usepackage{times}
+\usepackage{latexsym}
+
+% For proper rendering and hyphenation of words containing Latin characters (including in bib files)
+\usepackage[T1]{fontenc}
+% For Vietnamese characters
+% \usepackage[T5]{fontenc}
+% See https://www.latex-project.org/help/documentation/encguide.pdf for other character sets
+
+% This assumes your files are encoded as UTF8
+\usepackage[utf8]{inputenc}
+
+% This is not strictly necessary, and may be commented out,
+% but it will improve the layout of the manuscript,
+% and will typically save some space.
+\usepackage{microtype}
+
+% If the title and author information does not fit in the area allocated, uncomment the following
+%
+%\setlength\titlebox{<dim>}
+%
+% and set <dim> to something 5cm or larger.
+
+%algo packages
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+%color packages
+\usepackage{xcolor}
+\colorlet{shadecolor}{orange!15}
+\usepackage{color,soul}
+\usepackage{soulutf8}
+\definecolor{bordeau}{rgb}{0.3515625,0,0.234375}
+
+% position of figure
+\usepackage[absolute,overlay]{textpos}
+
+%graphic packages
+\usepackage{graphicx}
+\graphicspath{ {figures/} }
+\usepackage{wrapfig}
+\usepackage{float} 
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+
+% table packages
+\usepackage{array}
+\usepackage{multirow,booktabs}
+\usepackage{multicol}
+\usepackage{tabularx}
+
+% font package
+\usepackage[utf8]{inputenc}	% Para caracteres en español
+\usepackage{textcomp}
+%\usepackage{times}
+%\usepackage{lmodern}
+\usepackage{mathptmx}
+
+% equation packages
+\usepackage{amsmath,amsthm,amsfonts,amssymb,amscd}
+\usepackage{mathrsfs}
+
+\usepackage{enumitem}
+\setlist{nosep}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage[draft]{todo}
+\usepackage[normalem]{ulem}
+\usepackage{xspace}
+\usepackage{amsmath,amsfonts,amssymb}
+
+\newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyTodostar}[1]{\Todo*[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyDone}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\fyFuture}[1]{\done[FY]\Todo[FY:]{\textcolor{red}{#1}}}
+\newcommand{\fyDonestar}[1]{\done[FY]\Todo[FY:]{\textcolor{orange}{#1}}}
+\newcommand{\jcTodo}[1]{\Todo[JC:]{\textcolor{red}{#1}}}
+\newcommand{\jcDone}[1]{\done[JC]\Todo[JC:]{\textcolor{red}{#1}}}
+\newcommand{\revision}[1]{\textcolor{black}{#1}}
+\newcommand{\revisiondone}[1]{\textcolor{black}{#1}}
+\newcommand{\revisiondel}[1]{}
+\newcommand{\src}{\ensuremath{\mathbf{f}}} % source sentence
+\newcommand{\trg}{\ensuremath{\mathbf{e}}} % target sentence
+\newcommand{\domain}[1]{\texttt{\textsc{#1}}}
+\newcommand{\system}[1]{\texttt{{#1}}}
+\newcommand{\SB}[1]{\textbf{#1}}
+\newcommand{\SW}[1]{\underline{#1}}
+\newcommand{\mtsquare}[0]{MT$^2$}
+
+\makeatletter
+\newenvironment{breakablealgorithm}
+  {% \begin{breakablealgorithm}
+   \begin{center}
+     \refstepcounter{algorithm}% New algorithm
+     \hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+     \renewcommand{\caption}[2][\relax]{% Make a new \caption
+       {\raggedright\textbf{\fname@algorithm~\thealgorithm} ##2\par}%
+       \ifx\relax##1\relax % #1 is \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+       \else % #1 is not \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+       \fi
+       \kern2pt\hrule\kern2pt
+     }
+  }{% \end{breakablealgorithm}
+     \kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+   \end{center}
+  }
+\makeatother
+
+%subfigure
+\usepackage{caption}
+\usepackage{subcaption}
+
+\title{Multi-domain, multilingual translation with latent multi-task group dropout}
+\title{Latent Group Dropout for Multilingual and Multidomain Machine Translation}
+% Author information can be set in various styles:
+% For several authors from the same institution:
+% \author{Author 1 \and ... \and Author n \\
+%         Address line \\ ... \\ Address line}
+% if the names do not fit well on one line use
+%         Author 1 \\ {\bf Author 2} \\ ... \\ {\bf Author n} \\
+% For authors from different institutions:
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \And  ... \And
+%         Author n \\ Address line \\ ... \\ Address line}
+% To start a seperate ``row'' of authors use \AND, as in
+% \author{Author 1 \\ Address line \\  ... \\ Address line
+%         \AND
+%         Author 2 \\ Address line \\ ... \\ Address line \And
+%         Author 3 \\ Address line \\ ... \\ Address line}
+
+\author{First Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\\And
+  Second Author \\
+  Affiliation / Address line 1 \\
+  Affiliation / Address line 2 \\
+  Affiliation / Address line 3 \\
+  \texttt{email@domain} \\}
+
+\begin{document}
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
+\maketitle
+
+\begin{abstract}
+  Multidomain and multilingual machine translation often rely on parameter sharing strategies, where large portions of the network are meant to capture the commonalties of the tasks at hand, while smaller parts are reserved to model the peculariaties of a language or a domain. In adapter-based approaches, these strategies are hard coded in the network architecture, independent of the similarities that exist between tasks. In this work, we propose a new method aimed at better taking advantage of these similarities, using a latent-variable model. We also develop new techniques to train this model end to end and report multiple experimental results that show the the learned patterns are both meaningful and yield improved translation performance, without any increase of the model size. 
+\end{abstract}
+
+\section{Introduction}
+Multidomain and multilingual machine translation aim to develop one single model to perform translations for multiple domains and multiple language pairs, respectively.\footnote{We will refer to these two situations as 'multi-task MT' and refer to individual domains and languages as 'tasks'.} These paradigms are motivated by the compactness of the resulting translation system \citep{Chu18multilingual,dabre20survey}, the hypothetical positive knowledge transfer between similar domains \citep{Pham21revisiting} or between languages in the same family \citep{Tan19multilingual}. However, having all the tasks use exactly the same model parameters can cause negative interference between unrelated tasks \citep{conneau20unsupervised,wang20negative}. Hence the recent development of approaches relying on a partial sharing of the parameters, eg.\ using adapter layers as studied in \citep{houlsby19parameter,Bapna19simple,Pham20Study,Philip20monolingual}. If these techniques have proven effective for building strong baselines, they fail to fully take advantage of the similarities that exist between domains and tasks, as documented eg.\ in \citep{Pham21revisiting}. This is because the partition of the parameter space between generic or task-specific subparts, and their allocation to each task is hard-coded in the network, irrespective of the actual commonalties and differences in the data space.   
+
+In this work, we develop techniques that can take the similarity between tasks into account in a more effective way, by learning the network organization from the data. To this end, we introduce a set of latent variables in the model, to account for the unseen association between tasks and regions of the parameter space, and show how training can still be performed end-to-end using a variational surrogate of the standard loss function. Our experiments with multilingual and multidomain machine translation confirm that this method can automatically detect similarities in the data, meaning that related tasks use the same subparts of the network. Our results also show that this method is comparable to using adapter layers in a number of empirical comparisons; however, contrarily to adapters, these performance are obtained without any increase of the model size. Our main contributions are summarized below:
+\begin{itemize}
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+\item We provide a rigorous mathematical formulation to the problem of jointly learning task-dependent sub-networks and the parameters of the underlying models using variational probabilistic modeling techniques;
+\item We present algorithms to train this model end to end with very little extra computational cost.
+\item We report, using an extensive experimental setting, significant gains of this method with respect to strong baselines;
+\item We study how this method can actually exploit the similarities between tasks to learn interpretable sub-networks.
+\end{itemize}
+\fyDone{Can you do distillation ? That is only keep the parameter for one domain and still get good results (better than DA ?)}
+
+\section{Multi-task group dropout \label{sec:architecture}}
+\subsection{Network architecture, groups and layers}
+Many architectures for multitask learning are based on a matching of subset of model parameters with tasks. Given the task and the input instance, only a subpart of the network will be involved in the computation of the output value, based on a predefined association between subnetworks and tasks. The adapter architecture of \citep{Bapna19simple} illustrates this strategy, where a task-dependent set of layers is activated for each task. 
+
+In our approach, we also require to know the task $d \in [0 \dots n_d-1]$ for each training and test instance. The structure of our Transformer networks \citep{Vaswani17attention} is however based on the notion of \emph{groups of nodes in the computation graph}. At the input of each Transformer layer $l \in [1 \dots L]$, we partition all input state vectors into $n_p$ groups of nodes, and zero-out a task-dependent subset of these groups.\fyDone{In the attention heads only? In the FF?} The assignment of tasks to groups will be learned from the data, under the constraint that each task only activates exactly $k$ groups of \emph{active nodes}, while the all the other values are nullified, akin to a dropout process (see Figure~\ref{fig:group_dropout}).
+\begin{figure}
+  \centering
+\includegraphics[width=0.4\textwidth]{group_dropout}
+\caption{Latent group dropout. The set of nodes\fyDone{parameters ?} in each layer is divided into equal-sized groups. For each task, we only keep a fixed number of active groups of nodes and nullify all the other nodes. Our method learns which groups will be kept / dropped for each task.}
+\label{fig:group_dropout}
+\end{figure}
+Formally, a \emph{group dropout mask} $m_l^d$ is a $n_p$-dimensional binary vector containing exactly $k$ ones: the group $p$ ($\in  [0,\dots,n_p\text{-}1]$) is retained for task $d$ if $m_l^d(p) =1$ and is dropped if $m_l^d(p) = 0$. We denote $\Delta^{n_p}_k = \{ m \in \{0,1\}^{n_p} \text{ such that }  \mid{} m \mid_{L_1} = k \}$ the set of all admissible dropout masks, with $\mid{} m \mid_{L_1}$ the $L_1$ norm of vector $m$; $\#\Delta^{n_p}_k$ is the cardinal of $\Delta^{n_p}$.
+
+Given $m_l^d$, the mask $r_l^d$ for task $d$ in layer $l$ is then derived as:
+\begin{align*}
+  r_l^d(i) &= \begin{cases}
+    1, & \text{if}\ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p} \\
+    & \text{AND} \  m_l^d(p) \text{\small =} 1 \\
+    0, & \text{otherwise},
+  \end{cases} 
+  % p & \in  \{0,\dots,n_p\text{-}1 \}, \\
+  % d & \in  \{0,\dots,n_d\text{-}1 \}, \\
+  % i & \in  \{0,\dots,d_k\text{-}1 \}, \\
+  % m_l^d & \in  \{0,1\}^{n_p} \ \forall d,l \, \\
+  % \mid m_l^d \mid_{L_1} & =  k , \\
+  % \Delta^{n_p}_k & =  \{ m \in \{0,1\}^{n_p} | \mid m \mid_{L_1} = k \},
+\end{align*}
+where $d_k$ is the dimension of the hidden state.\fyDone{Check this} The propagation of information within the network then depends on the current task value and can be formalized as:
+\begin{align*}
+  \forall l \in [0,\cdots, L-1]: \tilde{h}^l &= h^l \odot r_l^d ,\\
+  h^{l+1} &= \operatorname{LAYER}^{l+1}(\tilde{h}^l) ,
+\end{align*}
+where $\operatorname{LAYER}^l()$ represents all the computations in Transformer layer $l$. It is applied at all positions of each layer in the encoder and in the decoder.  
+% The dropping mask $r_l^d$ is computed as follows
+% where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. 
+
+\subsection{Training with latent dropout masks}
+Assuming standard notation for our translation model  $P(y|x,d;\theta)$ where $x$, $y$ and $\theta$ respectively refer to the input, output, and parameter vector, the latent variables $m_{l}^d, l \in[0,\dots,L], d \in [0, \dots, n_d-1]$ are introduced as follows. We chose the prior distribution for $m_{l}^d$ as the uniform distribution over $\Delta^{n_p}_k$: $P(m_l^d | x, d; \theta) = \operatorname{Unif}(\Delta^{n_p}_k)$; variables for each layer are independent and collectively refered to as $m^d$. For any (variational) distribution $Q(m^1 \dots m^{n_d}; \Phi)$ with parameters $\Phi=\{\phi_l^1, ..., \phi_L^{n_d}\}$, it is well-known that the log-likelihood is lower-bounded by the so-called $\operatorname{ELBO}$ function (hereafter denoted $\ell$), made of a summation of two terms: the \emph{distortion} $D$ and the \emph{rate} $R$ defined as follows:%\footnote{We drop the dependency in $x$ to avoid notational clutter.}
+\begin{align}
+  \log P(y|x,d;\theta) \ge & \ell(x,y,d; \theta, \Phi) \nonumber \\
+  \ell(x,y,d; \theta, \Phi) =&  D(x,y,d; \theta, \Phi) - R(x,y,d; \theta, \Phi) \label{eq:lower-bound}\\
+  D(x,y,d; \theta, \phi) = & \mathbb{E}_{m^d \sim Q(m^d |d,\Phi)} \log P(y | m^d, x, d; \theta) \nonumber\\
+  R(x,y,d; \theta, \phi) = & \operatorname{KL}(Q(m^d | x,d, \Phi)||P(m^d | x,d; \theta)), \nonumber
+\end{align}
+where $\operatorname{KL}$ is the Kullback-Leibler divergence. We use $-\ell{ELBO}(x,y,d; \theta,\Phi)$ as our surrogate training objective, as a tractable approximation of the untractable likelihood, and try to minimize this function in $\theta$ and $\Phi$.
+
+The variational distribution $Q$ of $m^d$ is defined independently on a layerwise basis; this means that each layer only involves a subset $\Phi_l^d$ of variational parameters. $Q$ is computed as follows:
+\begin{align}
+  \operatorname{Ind}^d = \{ i_1, \cdots, i_k \} & \sim \text{SRS}(\operatorname{softmax}(\Phi_l^d), k) \nonumber \\
+  m_l^d(i) & =  \text{$\mathbb{I}$}(i \in \operatorname{Ind}^d), \nonumber
+\end{align}
+where $\text{SRS}(\pi,k)$ denotes the process of sampling $k$ times without replacement from the distribution $\pi$, and $\mathbb{I}$ is the indicator function. This modeling choice for the latent vector $m_l^d$ is motivated by the Gumbel Top-K trick of \citet{Kool19stochastic} that we use below.  Given our assumptions for the prior distribution and our choice for the variational distribution, the two terms in Eq.~\eqref{eq:lower-bound} can be computed as:
+\begin{align}
+\hspace{-2.em}
+D(\dots) &= \mathbb{E}_{m^d \sim Q(m^d | d; \Phi)} \text{log} P(y | m^d, x, d, \theta) \nonumber \\
+&= \mathbb{E}_{g^d \sim^{\text{i.i.d}} G(0,1)} \big[ \log P(y |\tilde{m}^d, x, d, \theta,) \big] \nonumber
+\end{align}
+where the generation process $G(0,1)$ is a product of independent Gumbel distributions, yielding:
+\begin{align}
+  \hspace{-2.em}
+  \forall d,  g^d & =  [g_1^d, \dots, g_L^d],  \text{ with } g_l^d \in \mathbb{R}^{n_p} \nonumber \\
+  \forall p,  g_l^d(p) & \displaystyle{\mathop{\sim}^{\text{i.i.d}}} \operatorname{Gumbel}(0,1) \nonumber \\
+  \operatorname{Ind}^d = \{ i_1, \cdots, i_k \} &= \operatorname{Top-k} \ \{ \ g_l^d(0) + \Phi_l^d(0), \cdots, \nonumber \\ 
+       & \quad \quad g_l^d(n_p\text{-}1) + \Phi_l^d(n_p\text{-}1) \ \}\label{eq:top-k} \\
+\tilde{m}_l^d(p) &= \mathbb{I}(p \in Ind^d). \nonumber 
+\end{align}
+For the second term, the derivation is the following:\fyDone{Check this: we have a sum over layers ?Also: R or -R ?} 
+\begin{align}
+\hspace{-2.em}
+  R    &= \operatorname{KL}(Q(m^d | x, d, \Phi)||P(m^d | x, d; \theta)), \nonumber \\ 
+	&= -\sum_{l=1}^L \big(\mathbb{H} \big[ Q(m_l^d | x, d, \Phi) \big] - \text{log}(\#\Delta^{n_p}_k) \big) \nonumber \\ 
+	&= -\sum_{l=1}^L \big(\mathbb{H} \big[ Q(i_1,\cdots,i_k | x, d, \Phi) \big] - \text{log}(\#\Delta^{n_p}_k) \big)\nonumber \\
+	&\leqslant  -\sum_{l=1}^L \big(\mathbb{H} \big[ Q(i_1 | \Phi_l^d) \big] - \text{log}(\#\Delta^{n_p}_k) \big). \label{eq:entropy}
+\end{align}
+We prove inequality~\eqref{eq:entropy} in Appendix~\ref{appendix:b}.
+This inequality shows that an upperbound of $R$ is $\sum_{l=1}^L(\text{log}(\#\Delta^{n_p}_k) - \mathbb{H}(\text{softmax}(\Phi_l^d)))$ since $i_1 | \Phi_l^d \sim \operatorname{softmax}(\Phi_l^d)$. During training, we thus maximize a sum over layers of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$\fyDone{Check sum} which performs a regularization over the parameters $\Phi^d$ of the variational distribution. 
+
+Thanks to the Gumbel Top-K trick, we can move the parameters $\Phi$ into the objective function and get rid of policy gradients, which have been reported to be very unstable \citep{Diederick14auto}. However, the operator $\operatorname{Top-k}$, which serves to define $\tilde{m}_l^d$ in Equation~\eqref{eq:top-k}, is not differentiable. Therefore, we approximate this function by the $\operatorname{Soft-Top-K}$ function defined as follows:
+\begin{align}
+\hat{m}_l^d(\tau) &= \displaystyle{\mathop{argmin}_{\substack{
+                    0 \leqslant m_i \leqslant 1 \\
+  \forall 0 \leqslant i \leqslant n_d\text{-}1 \\
+        1^{T}.m = k
+      }}} -(g_l^d+\Phi_l^d)^{T} . m - \tau H_b(m) \label{eq:soft-top-k}
+\end{align}
+in which
+\begin{align}
+H_b(m) &= - \sum_i m_i \text{log}(m_i) + (1-m_i)\text{log}(1-m_i). \nonumber 
+\end{align}
+
+In Appendix \ref{appendix:a}, we prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. Furthermore, we also provide the computation of $\hat{m}_l^d(\tau)$ and prove that $\hat{m}_l^d(\tau)$ is a differentiable function w.r.t $\Phi_l^d$ and that its gradients can be computed using the implicit differentiation theorem. During training, we approximate $\tilde{m}_l^d$ by $\hat{m}_l^d(\tau)$ by gradually decaying the hyperparameter $\tau$ to $0$. The gradient of $D$ w.r.t $\Phi_l^d$ is computed using the chain rule as follows:
+\begin{equation}
+\frac{\partial D}{\partial \Phi_l^d} = \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d}
+\end{equation}
+The gradient $\frac{\partial D}{\partial \hat{m}_l^d(\tau)}$ is computed via autograd algorithm while $\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d}$ is computed via implicit differentiation, as explained in Appendix~\ref{appendix:a}.
+
+We jointly train the Transformer parameters $\theta$ and the parameters of the variational distribution $\Phi$ using the following multi-task loss.\fyDone{This is repeated}
+\begin{align}
+\hspace{-0.em}
+\mathcal{L}(\theta,\Phi) = \sum_{d=1}^{n_d} \mathbb{E}_{x \sim \mathcal{D}_s^d,y \sim g^d(x)} \big[-\ell(x,y,d; \theta,\Phi)\big]
+\end{align}
+
+in which $\mathcal{D}_s^d$ is distribution of task $d$ over the input space $\Omega^d_s$; $\operatorname{MT}^d: \Omega^d_s \rightarrow \Omega^d_t$\fyDone{already defined} is the translation function for task $d$, which our multi-task model needs to learn; $-\ell(x,y, d, \theta,\Phi)$ is the $\operatorname{ELBO}$ loss, defined in Equation~\ref{eq:lower-bound}.
+
+Finally, during inference, we define the dropout mask for layer $l$ and task $d$ as follows:
+\begin{align*}
+  Ind_l^d &= \operatorname{Top-k}(\Phi_l^d) \\
+  m_l^d &= \mathbb{I}(i\in Ind_l^d)
+\end{align*}
+meaning that we simply pick the $k$ most likely parameter groups for the task at hand, and define the state dropout mask accordingly.
+
+\section{Experimental settings \label{sec:experiments}}
+\subsection{Baselines}
+\subsubsection{Multi-domain translation}
+We describe the choice of our systems in multi-domain experiments as follows
+\begin{itemize}
+	\item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 2048, the multi-head attentions contain with 8 heads.
+	\item Adapter based Transformer: The intermediate feeforward dimension is set as 2048 as in \citet{Pham21revisiting}.
+	\item \system{LaMGD} Tranformer: There is no change in the architecture. We group 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 groups are selected. The number of parameters of variational distributions are $k \times L \times n_d$ which is tiny compared to the size of Transformer.
+\end{itemize}
+
+We set the dropout probability as 0.1. We train the multi-domain Transformer model in 200~K iterations with a batchsize of 12~K tokens. We train \system{LaMGD} Tranformer in 300~K iterations with a batchsize of 12~K tokens since \system{LaMGD} Tranformer has to learn both the sub-networks and the parameters of the underlying Transformer. Finally, we plug Domain Adapters to the multi-domain Transformer model and finetune them with 25~K iterations using the same batchsize as the former.
+\subsubsection{Multilingual translation}
+We describe the choice of our systems in multilingual experiments as follows
+\begin{itemize}
+	\item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 1024, the multi-head attentions contain with 8 heads as in \citet{Wang20balancing}.
+	\item Adapter based Transformer: The intermediate feeforward dimension is set as 128 as in \citet{Gong21adaptive}.
+	\item \system{LaMGD} Tranformer: There is no change in the architecture. We group 512 nodes in each layer into 16 groups We group 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 groups are selectedof 32 consecutive nodes. For each domain, only 12 groups are selected. 
+\end{itemize}
+
+We set the dropout probability as 0.3. We train the multilingual Transformer model in 40~K iterations with a batchsize of 9600 tokens on 16 GPUs as in \citet{Gong21adaptive}. We train \system{LaMGD} Tranformer in 50~K iterations with the same batchsize. Finally, we finetune the Language Adapters in 5~K iterations.
+\subsubsection{Hyperparameters}
+\label{ssec:hyperparams}
+We choose $n_d = 16$ so that the dropout groups' size is not too small or too large. In our future works, we will do more experiments by changing $n_d$ to examine how this hyperparameters affect the performance of the model. The second hyperparameter in \system{LaMGD} is the number of retained groups in each layer, $k$, which we predetermined as 12 in every experiments. By retaining $12/16$ groups, we share $75 \%$ active groups between two domains or languages in average.
+
+Furthermore, the temperature $\tau$ of our $\operatorname{Soft-Top-K}$ operator will be gradually decreased from $0.5$ to $0.2$ as follows
+\begin{align*}
+\tau = \operatorname{min}\{ 0.2, 0.5 * \exp^{-r*step} \}
+\end{align*}
+in which $r=0.0001$.
+
+Finally, we fix the weight of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ to $0.0001$ in the training loss in every experiments. The choice of the values for our hyperparameters was not optimized and selected by suggestions from previous papers \citep{Jang17categorical,Gong21pay,Gong21adaptive}.
+\subsection{Datasets}
+\subsubsection{Multi-domain translation}
+We reuse the same data as the recent work of \citet{Pham21revisiting} in multi-domain translation. We describe our datasets for multi-domain translation experiment in Table \ref{tab:Corpora-chap4}
+\begin{table*}[h!]
+  \centering
+  \begin{tabular}{|l|cccccc|} %*{4}{|r|}}
+    \cline{2-7} 
+    \multicolumn{1}{c|}{} & \multicolumn{1}{c}{\domain{med}} & \multicolumn{1}{c}{\domain{law}} & \multicolumn{1}{c}{\domain{bank}} & \multicolumn{1}{c}{\domain{it}} & \multicolumn{1}{c}{\domain{talk}} & \multicolumn{1}{c}{\domain{rel}} \\
+    \hline 
+    \# lines & 2609 (0.68) & 501 (0.13) & 190 (0.05) & 270 (0.07) & 160 (0.04) & 130 (0.03) \\
+    \# \revisiondone{tokens}  &  133 / 154  &  17.1 / 19.6 &  6.3 / 7.3 &  3.6 / 4.6 &  3.6 / 4.0 &  3.2 / 3.4 \\
+    \# \revisiondone{types}  & 771 / 720 & 52.7 / 63.1 & 92.3 / 94.7 & 75.8 / 91.4 & 61.5 / 73.3 & 22.4 / 10.5 \\
+    \# \revisiondone{uniq} & 700 / 640 & 20.2 / 23.7 & 42.9 / 40.1 & 44.7 / 55.7 & 20.7 / 25.6 & 7.1 / 2.1 \\
+    \hline
+  \end{tabular}
+  \caption{Corpora statistics: number of parallel lines ($\times 10^3$) and proportion in the basic domain mixture (which does not include the \domain{news} domain), number of tokens in English and French ($\times 10^6$), number of types in English and French ($\times 10^3$), number of types that only appear in a given domain ($\times 10^3$). \domain{med} is the largest domain, containing almost 70\% of the sentences, while \domain{rel} is the smallest, with only 3\% of the data.
+  }
+\label{tab:Corpora-chap4}
+\end{table*}
+\subsubsection{Multilingual translation}
+We evaluate our model on both one-to-many (O2M) and many-to-one (M2O)
+translation tasks. We evaluate models on widely used multilingual translation datasets.
+\begin{itemize}
+	\item TED8-Related. Following the setting of \citet{Wang20balancing}, we use a subset of translations of \citet{qi18when} between English and eight related languages.
+	\item TED8-Diverse. The dataset consists of parallel sentences between English and eight diverse languages as in \citet{Wang20balancing}.
+\end{itemize}
+We clarify the notation of the languages in multilingual experiments as follows
+\begin{itemize}
+	\item Diverse: bos (bosnia), mar(marathi),
+         hin(hindi), mkd(macedonia), ell(greek),
+         bulgaria(bul), french(fra), korean(kor) 
+	\item Related: azerbajiani (aze), belarusian(bel),
+          glacian(glg), slovak (slk), turkisk (tur),
+		  russian(rus), portugese(por),czech(ces)
+\end{itemize}
+Table \ref{tab:Corpora-multilingual} describes the subset of TED8 that we used in our experiments.
+\begin{table*}[h!]
+  \centering
+  \begin{tabular}{l|cccc|l|cccc} 
+  \hline
+    \multicolumn{1}{c|}{} & \multicolumn{1}{c}{\domain{lang}} & \multicolumn{1}{c}{\domain{train}} & \multicolumn{1}{c}{\domain{dev}} & \multicolumn{1}{c}{\domain{test}} & \multicolumn{1}{|c|}{} & \multicolumn{1}{c}{\domain{lang}} & \multicolumn{1}{c}{\domain{train}} & \multicolumn{1}{c}{\domain{dev}} & \multicolumn{1}{c}{\domain{test}} \\
+    \hline 
+    \multirow{2}{*}{Related} & Azerbaijani & 5.94k & 671 & 903 & \multirow{2}{*}{Diverse} & Bosnian & 5.64k & 474 & 463 \\
+							 & Belarusian & 4.51k & 248 & 664 & & Marathi & 9.84k & 767 & 1090\\
+							 & Glacian & 10.0k & 682 & 1007 & & Hindi & 18.79k & 854 & 1243\\
+							 & Slovak & 61.5k & 2271 & 2445 & & Macedonian & 25.33k & 640 & 438 \\
+							 & Turkish & 182k & 4045 & 5029 & & Greek & 134k & 3344 & 4433\\
+                             & Russian & 208k & 4814 & 5483 & & Bulgarian & 174k & 4082 & 5060 \\
+                             & Portuguese & 185k & 4035 & 4855 & & French & 192k & 4320 & 4866\\
+                             & Czech & 103k & 3462 & 3831 & & Korean & 205k & 4441 & 5637 \\
+    \hline
+  \end{tabular}
+  \caption{Data Statistics of TED8 Datasets}
+\label{tab:Corpora-multilingual}
+\end{table*}
+\section{Results and ablation studies}
+\subsection{Multi-domain translation}
+According to Table \ref{tab:mdmt}, \system{LaMGD} Tranformer shows a significant improvement (+2.78) over the generic system \system{Transformer} with zero extra parameters. Moreover, \system{LaMGD} Tranformer achieves equivalent performance in average compared to \system{Adapter}, which is carrefully finetuned with a approximately 12.4M additional parameters.
+\begin{table*}[h!]
+  \centering
+  \begin{tabular}{|p{4cm}|*{7}{r|}} \hline
+    Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
+    \system{Transformer}  \hfill{\footnotesize[65m]} & 40.3 & 59.5 & 49.8 & 36.4 & 49.0 & 80.0  & 52.5\\
+    \revision{\system{Adapter}}   \hfill{\footnotesize[+12.4m]}  & 39.5 & 61.0 & 53.1 & 37.5 & 49.6 & 91.0 & 55.28 \\ 
+    \system{LaMGD} Tranformer   \hfill{\footnotesize[+0m]}  & 40.3 & 60.4 & 52.4 & 39.0 & 52.4 & 87.5 & 55.33 \\ 
+    \hline
+  \end{tabular}
+  \caption{Multi-domain translation}
+  \label{tab:mdmt}
+\end{table*}
+\subsubsection{Fuzzy domain separation}
+\label{ssec:fuzzy}
+In this experiment, we reuse an experiment proposed by \citet{Pham21revisiting} which measures the efficiency of a multi-domain NMT system exploiting the proximity between domains. The experiment uses the same data as the previous experiment. However, the domain \domain{law} is now randomly split into two pseudo domains \domain{law$_1$} and \domain{law$_2$}. If the multi-domain system made full use of the proximity between \domain{law$_1$} and \domain{law$_2$}, there should be no significant difference between the performance of the system trained with six original domains and with seven domains replacing \domain{law} by \domain{law$_1$} and \domain{law$_2$}. \citet{Pham21revisiting} showed a large gap between two training settings when using residual adapters. We report below the gap between two settings when using \system{LaMGD} Tranformer. 
+
+\begin{table*}[h!]
+  \centering
+  \begin{tabular}{|p{4cm}|*{2}{r|}} \hline
+    Model / Domain & \multicolumn{1}{c|}{\domain{law$_1$}} & \multicolumn{1}{c|}{\domain{law$_2$}} \\ \hline 
+    \system{Adapter}   \hfill{\footnotesize[+25m]}  & -0.6 & -0.8 \\ 
+    \system{LaMGD} Tranformer   \hfill{\footnotesize[+0m]}  & 0.0 & 0.0 \\ 
+    \hline
+  \end{tabular}
+  \caption{Fuzzy domain separation}
+  \label{tab:fuzzy}
+\end{table*}
+
+Table \ref{tab:fuzzy} demonstrates a significant loss when training with two pseudo domains \domain{law$_1$} and \domain{law$_2$} compared to training with the real domain \domain{law}. Our system does not have this loss between two situations. In Section \ref{ssec:abalation}, we show that our algorithm outputs the same sub-network for \domain{law$_1$} and \domain{law$_2$}, that allows a full transfer between two domains.
+
+\subsection{Multilingual translation}
+According to Table \ref{tab:multilingual}, \system{LaMGD} Tranformer shows a boost of 0.42, 0.33, 0.32 in average over the multilingual \system{Transformer} in O2M-related, M2O-related, M2O-diverse respectively. Significant gains are observed in \domain{bel}, \domain{glg} (both direction), \domain{hin} and \domain{bos} (O2M direction) which are very low-resourced languages in the list. However, \system{LaMGD} Tranformer lags behind multilingual \system{Transformer} and Language Adapters in O2M-diverse. 
+\begin{table*}[h!]
+  \centering
+  \begin{tabular}{|p{4cm}|*{9}{r|}} \hline
+    O2M-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
+    \system{Transformer}  \hfill{\footnotesize[91.6m]} & 4.8 &7.3&20.8&21.1&39.7&19.8&22.6&15.2&18.9 \\
+    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]} &4.3&6.8&21.1&22&39.7&20&23&15.2&19 \\ 
+    \system{LaMGD} Tranformer  \hfill{\footnotesize[+0m]}  & 5.2&\SB{9.4}&20.6&\SB{22.8}&39.6&19.6&22.4&15.0&19.33 \\ 
+	\hline
+    \hline
+    M2O-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
+    \system{Transformer}  \hfill{\footnotesize[67.8m]} &11.4&16.6&28.5&	27.1&43.7&24.6&30.3&25.6&25.98 \\
+    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]} &10.1&15.8&28.4&26.8&43.7&24.5&30.2&25.6&25.64\\ 
+    \system{LaMGD} Tranformer   \hfill{\footnotesize[+0m]}  &11.3&\SB{17.4}&28.6&\SB{28.7}&43.7&24.5&30.7&25.6&26.31 \\ 
+    \hline
+    \hline
+    O2M-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
+    \system{Transformer}  \hfill{\footnotesize[96.9m]} & 10.2&4&12.7&22.2&31.8&\SB{34}&38.3&8.3&20.19 \\
+    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  &10.2&4&\SB{13.3}&21.9&32.2&\SB{34.1}&38.5&8.3&20.31 \\ 
+    \system{LaMGD} Tranformer   \hfill{\footnotesize[+0m]}&10.1&3.8&12.6&\SB{22.8}&31.8&33.4&38.1&8.1&20.09\\
+    \hline 
+    \hline
+    M2O-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
+    \system{Transformer}  \hfill{\footnotesize[70.4m]} &22.4&9.7&20.5&31.8&37.5&38.7&39.8&19&27.43 \\
+    \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  &22.5&9.4&20&30.6&37.2&38.2&39.3&19&27.03\\ 
+    \system{LaMGD} Tranformer  \hfill{\footnotesize[+0m]} &\SB{23.5}&9.6&\SB{21.5}&32.2&37.7&38.6&40&18.9&27.75 \\
+    \hline
+  \end{tabular}
+  \caption{Multilingual translation}
+  \label{tab:multilingual}
+\end{table*}
+
+\subsection{Similarity between dropping masks}
+\label{ssec:abalation}
+This section compares the sub-networks of the domains or the language pairs by computing the average of the similarities between the corresponding dropping masks concatenated through all the layers of the underlying model.
+
+For the multi-domain experiment, we analyze the case of fuzzy domain separation in Section \ref{ssec:fuzzy}. Table \ref{tab:fuzzy-sim} shows that the sub-networks of \domain{law$_1$} and \domain{law$_2$} are identical, which is one of the goals of our method. Furthermore, we remark a large distance between \domain{rel} and the rest of the domains, which correlates to the fact that \domain{rel} has the most distant topic to other domains. \domain{rel} only share around $75 \%$ its active groups with other domains whereas $75 \%$ is the average of sharing proportions by default (see Section \ref{ssec:hyperparams}). In Figure ~\ref{fig:domain}, we visualize the domains using their dropping masks concatenated and mapped to 2D space by PCA.
+\begin{table*}[h!]
+  \centering
+  \begin{tabular}{|p{1cm}|*{7}{r|}} \hline
+    & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{bank}}& \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{law$_1$}} & \multicolumn{1}{c|}{\domain{law$_2$}} & \multicolumn{1}{c|}{\domain{rel}} &\multicolumn{1}{c|}{\domain{talk}} \\ \hline 
+    \domain{med} &1.0&0.80&0.85&0.83&0.83&0.78&0.89\\
+    \domain{bank} &0.80&1.0&0.80&0.90&0.90&0.73&0.82\\
+    \domain{it} &0.85&0.80&1.0&0.80&0.80&0.78&0.85\\
+    \domain{law$_1$} &0.83&0.90&0.80&1.0&\SB{1.0}&0.75&0.82\\ 
+    \domain{law$_2$} &0.83&0.90&0.80&\SB{1.0}&1.0&0.75&0.82\\ 
+    \domain{rel} &0.78&0.73&0.78&0.75&0.75&1.0&0.77\\
+    \domain{talk} &0.89&0.82&0.85&0.82&0.82&0.77&1.0\\
+    \hline
+  \end{tabular}
+  \caption{Multi-domain sub-networks' similarities}
+  \label{tab:fuzzy-sim}
+\end{table*}      
+
+For multilingual (TED-related) case, the data contain four language families including (1) Turkic family with Azerbaijani and Turkish(\domain{aze},\domain{tur}); (2) Slavic family with Belarusian and Russian (\domain{bel},\domain{rus}); (3) Romance family with Galician and Portuguese (\domain{glg}, \domain{por}); and (4) Czech-Slovak family with Slovak and Czech (\domain{ces}, \domain{slk}). The similarities between the sub-networks for each pair are respectively 0.95, 0.94, 0.99 and 0.96: for each language, the maximally similar one (excluding the diagonoal) is always from the same language family. 
+\begin{table*}[h!]
+  \centering
+  \begin{tabular}{|p{1cm}|*{8}{r|}} \hline
+    & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{bel}}& \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} &\multicolumn{1}{c|}{\domain{slk}}&\multicolumn{1}{c|}{\domain{tur}} \\ \hline 
+    \domain{aze} &1.0&0.90&0.89&0.86&0.85&0.91&0.89&\SB{0.95}\\
+    \domain{bel} &0.90&1.0&0.94&0.91&0.91&\SB{0.94}&0.94&0.88\\
+    \domain{ces} &0.89&0.94&1.0&0.92&0.94&0.98&\SB{0.99}&0.91\\
+    \domain{glg} &0.86&0.91&0.92&1.0&\SB{0.96}&0.92&0.93&0.86\\ 
+    \domain{por} &0.85&0.91&0.94&\SB{0.96}&1.0&0.93&0.94&0.87\\ 
+    \domain{rus} &0.91&\SB{0.94}&0.98&0.92&0.93&1.0&0.98&0.93\\
+    \domain{slk} &0.89&0.94&\SB{0.99}&0.93&0.94&0.98&1.0&0.91\\
+    \domain{tur} &\SB{0.95}&0.88&0.91&0.86&0.87&0.93&0.91&1.0\\
+    \hline
+  \end{tabular}
+  \caption{Multilingual sub-networks' similarities (M2O Ted-related)}
+  \label{tab:related-sim}
+\end{table*}
+
+We also plot the languages based on their dropout masks in Figure~\ref{fig:visual} using a 2d projection computed by Principal Component Analysis (PCA).
+\begin{figure*}[htbp]
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  % include first image
+  \includegraphics[width=0.85\textwidth]{ted_related}  
+  \caption{TED-Related}
+  \label{fig:visual-related}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  % include second image
+  \includegraphics[width=0.85\textwidth]{ted_diverse}  
+  \caption{TED-Diverse}
+  \label{fig:visual-diverse}
+\end{subfigure}
+\caption{Visualization of languages according to their dropout masks (a large vector concatenating the dropping masks of all the layers of the model) constructed by PCA.}
+\label{fig:visual}
+\end{figure*}
+
+\begin{figure*}[h!]
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  % include first image
+  \includegraphics[width=0.9\textwidth]{phi_ted_related_o2m}  
+  \caption{TED-Related}
+  \label{fig:phi-related}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  % include second image
+  \includegraphics[width=0.85\textwidth]{phi_ted_diverse_o2m}  
+  \caption{TED-Diverse}
+  \label{fig:phi-diverse}
+\end{subfigure}
+\caption{$\Phi_L^{0}$ in O2M experiments}
+\label{fig:phi}
+\end{figure*}
+
+\section{Related work}\label{sec:related}
+Multidomain and multilingual translation systems have received considerable attention in the recent years, and a exhaustive survey is beyond the goal of this paper. Domain adaptation for neural MT is surveyed in \citep{Chu17comparison}, while multidomain MT systems are notably studied in \cite{Saunders21Asurvey,Pham21revisiting}; for multilingual MT, the reader is refered eg.\ to \citep{Chu18multilingual,dabre20survey}. We focus on the most relevant subset of this literature below.
+
+\textbf{Language similarity} The methods developed by \citep{sen19multilingual,kong21multilingual} use language proximity to design parameter sharing strategies. The authors propose a multi-decoder model sharing the same encoder among languages and routing languages in different families to different decoders. These approaches share the same interest in expressing the proximity between tasks in the selection of task-specific parameters as our approach. However, our method learn the selection from a latent commonality in data instead of using a predefined selection such as "One language family per decoder" in \cite{kong21multilingual}.
+
+\textbf{Sparse Transformer} The idea of adaptive sparsity is studied in several works. For instance, \citet{xian20deep} propose to use a variable depth for different tasks. The authors aimed to match the depth of the sub-network to the complexity of the task. \citet{Gong21pay,Gong21adaptive} also take an interest in the adaptive sparse Transformers, in which differ each task triggers the selection of specific heads in multi-head attention, layers, and blocks in feedforward matrices. Mixture-of-experts (MoE) constitute another effective approach to achieve sparsity. Using the Transformer architecture, the GShard model replaces a single feedforward (FFN) sub-layer with an MoE module consisting of multiple FFN sub-layers \citep{lepikhin21gshard,william21switch}.
+
+\textbf{Adapter modules} Adapters have proven to be very efficient for multi-task NLP \citep{houlsby19parameter,Bapna19simple,Pham20Study,pfeiffer20adapterhub}. In a nutshell, this technique consists in plugging several so-called adapter modules to the intermediate layers of a pretrained Transformer and finetuning these adapters on the downstream tasks. Adapters can also be trained without supervision for multilingual translation \citep{Philip20monolingual}. However, the hard-coded separation between the domains of different tasks may lead to a catastrophic forgetting effect \citep{pfeiffer21adapterfusion}, which is a common problem in multi-task modeling using neural networks \citep{Michael89catastrophic}. In multi-domain translation, \citet{Pham21revisiting} recently demonstrated the brittleness of domain adapters against fuzzy domain separations, out-of-domain distributions, and erroneous domain tags. Several subsequent studies have aimed to mitigate this weakness through a mixture of expert mechanism, for example,\cite{pfeiffer21adapterfusion}.
+
+Recently, \citet{biao21share} proposed jointly learning how to route between shared representation and language-specific representation via a conditional language-specific routing and the parameters of the underlying Transformer. This method is closely related to the FusionAdapters of \citet{pfeiffer21adapterfusion}. Both approaches assume that the final representation\fyTodo{??} is a combination or a choice between shared representation and task-specific representations. The proximity between tasks is not taken into account in the routing mechanism. Our method proposed a different approach to the problem of multi-task routing in the underlying network.
+
+\section{Conclusions and outlook}\label{sec:conclusion}
+In this work, we present a novel method for multdomain and multilingual translation. It allows us to jointly search for an optimal assignment of sub-networks to tasks and learn the parameters of the underlying network. Our method relies on a sound mathematical model and an end-to-end optimization with very little extra computational cost. Experimentally, we achieve a large improvement over Transformer baseline without zero additional parameters; our performance are also comparable to that of a strong a multi-task baseline using residual adapter modules which however includes a large number of extra parameters. For multilingual translation, our model outperforms multilingual Transformer and Language Adapters in 3 our of 4 cases. Besides, we provided an thorough analysis of the similarities between learned sub-networks and demonstrated a strong correlation between the sub-networks' similarity and the proximity of the corresponding tasks (domain or language).
+
+There are several ways in which our methodology could be improved and generalized. In future work, we would first like to provide an complete variational framework to model both the number of groups, $k$ and the selection of the dropout masks. Second, we also intend to get rid of the requirement of knowing the domain information during inference: this would mean replacing the dependency on $d$ in the variational distribution by a dependency in the input $x$. These two questions seem both very interesting and promising; they would allow to us to dispense with heuristic choices in the architecture, and replace them with an increase dependency on the training data.
+
+\bibliography{bibliography}
+\bibliographystyle{acl_natbib}
+\appendix
+\section{Appendix A}
+\label{appendix:a}
+This section explains how we calculate $\hat{m}_l^d(\tau)$ by solving the optimization problem \eqref{eq:soft-top-k} and then how to compute the gradient $\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d}$.
+
+First, to solve \eqref{eq:soft-top-k} we follow the same approach as in \cite{amos19lml,amos20differential} by applying the Karush–Kuhn–Tucker (KKT) conditions to \eqref{eq:soft-top-k}. The solution of \eqref{eq:soft-top-k} will have the following form
+
+\begin{align}
+\hat{m}_l^d(\tau) &= \sigma(\frac{g_l^d + \Phi_l^d + \bar{\nu}}{\tau}) \label{eq:soft-m}
+\end{align}
+in which $\sigma(.)$ is sigmoid function and $\bar{\nu}$ is the solution of the following equation
+\begin{align}
+\displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) = k \label{eq:nu}
+\end{align}
+
+Because sigmoid is monotonic, the equation \eqref{eq:nu} has unique solution. Furthermore,  because of the smoothness of $g(\nu,\Phi_l^d) = \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})$ w.r.t $\nu$ and $\Phi_l^d$, we could deduce the implicit differentiation of its solution $\bar{\nu}$ w.r.t $\Phi_l^d$ as below although the solution of \eqref{eq:nu} does not have explicit form.
+
+\begin{align*}
+&\frac{\partial g}{\partial \nu} \times \frac{\partial \nu}{\partial \Phi_l^d} + \frac{\partial g}{\partial \Phi_l^d} = 0 \\
+& \Rightarrow \frac{\partial \nu}{\partial \Phi_l^d} = - \big(\frac{\partial g}{\partial \nu}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d}
+\end{align*}
+
+Because the differentiation of sigmoid has exact forms, $\frac{\partial g}{\partial \nu}$ and $\frac{\partial g}{\partial \Phi_l^d}$ also have exact form. Therefore, we do not need autograd to compute the implicit gradient $\frac{\partial \nu}{\partial \Phi_l^d}$. The gradient of $\hat{m}_l^d(\tau)$ w.r.t $\Phi_l^d$ is deduced as follows
+\begin{align}
+\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} = \frac{\partial \hat{m}_l^d(\tau)}{\partial \nu} \times \frac{\partial \nu}{\partial \Phi_l^d}
+\end{align}
+
+In our algorithm, we solve \eqref{eq:nu} by binary search. The convergence of binary search is extremely fast and assured by the monotonicity of $g(\nu,\Phi_l^d)$. In our experiments, we set our search range to $[-100,100]$.
+
+Finally, we need prove the limit $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. We suppose $g_l^d(i_1) + \Phi_l^d(i_1) > g_l^d(i_2) + \Phi_l^d(i_2) > \cdots > g_l^d(i_{n_p}) + \Phi_l^d(i_{n_p})$.
+
+Because
+
+\begin{align*}
+\hspace{-3.em}
+\lim_{\tau \rightarrow 0} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) = \begin{cases}
+      1, & \text{if}\ \tau > - (g_l^d(i) + \Phi_l^d(i)), \\
+      0, & \text{if}\ \tau < - (g_l^d(i) + \Phi_l^d(i)), \\
+      \frac{1}{2} &\text{otherwise}\\
+    \end{cases}
+\end{align*}
+
+and 
+
+\begin{align*}
+\displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) = k
+\end{align*}
+
+there exist $\epsilon$ such that $\forall \tau < \epsilon$, the solution $\bar{\nu}$ of \eqref{eq:nu} is between $- (g_l^d(i_{k+1}) + \Phi_l^d(i_{k+1})) > \bar{\nu} > - (g_l^d(i_k) + \Phi_l^d(i_k))$. Furthermore, because sigmoid is monotonic,
+
+\begin{align*}
+&\sigma(\frac{g_l^d(i) + \Phi_l^d(i) - (g_l^d(i_{k}) + \Phi_l^d(i_{k}))}{\tau}) < \hat{m}_l^d(\tau)(i)  \\
+& < \sigma(\frac{g_l^d(i) + \Phi_l^d(i) - (g_l^d(i_{k+1}) + \Phi_l^d(i_{k+1}))}{\tau}) 
+\end{align*}
+
+By taking the limit of both sides, we have following limits
+
+\begin{align*}
+\lim_{\tau \rightarrow 0} \hat{m}_l^d(\tau)(i_u) = \begin{cases}
+      1, & \text{if}\ u > k \\
+      0, & \text{if}\ u < k \\
+    \end{cases}
+\end{align*}
+
+And, because $ \displaystyle{\mathop{\sum}_{u=1}^{n_p}}\hat{m}_l^d(\tau)(i_u) = k$, by taking the limit at both side, we will have $\lim_{\tau \rightarrow 0} \hat{m}_l^d(\tau)(i_k) = 1$. Finally, we have
+
+\begin{align*}
+\lim_{\tau \rightarrow 0} \hat{m}_l^d(\tau)(i_u) = \begin{cases}
+      1, & \text{if}\ u \geqslant k \\
+      0, & \text{if}\ u < k \\
+    \end{cases}
+\end{align*}
+
+which is equivalent to $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$.
+
+\section{Appendix B}
+\label{appendix:b}
+In this section, we give a simple proof of Inequality \ref{eq:entropy}. In fact, we only need to prove $\mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] \geqslant \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big]$. The proof is as follows
+\begin{align*}
+&\mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] = - \displaystyle{\mathop{\mathbb{E}}_{i_1,\cdots,i_k | \Phi_l^d}} \big[ \text{log}P(i_1,\cdots,i_k | \Phi_l^d) \big] \\
+&= -\displaystyle{\mathop{\mathbb{E}}_{i_1,\cdots,i_k | \Phi_l^d}} \big[ \displaystyle{\sum_{j=2}^k}\text{log}P(i_j | i_1,\cdots,j_{j-1},\Phi_l^d) +  \text{log} P(i_1 | \Phi_l^d) \big] \\
+&\geqslant -\displaystyle{\mathop{\mathbb{E}}_{i_1,\cdots,i_k | \Phi_l^d}} \big[ \text{log} P(i_1 | \Phi_l^d) \big] \\
+&= -\displaystyle{\mathop{\mathbb{E}}_{i_1 | \Phi_l^d}} \big[ \text{log} P(i_1 | \Phi_l^d) \big] = \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big]
+\end{align*}
+\section{Appendix C}
+\begin{figure*}
+\includegraphics[width=0.7\textwidth]{multi_domain}
+\caption{Visualization of domains according to their dropouts (a large vector concatenating the dropping masks of all the layers of the model) constructed by PCA.}
+\label{fig:domain}
+\end{figure*}
+
+\section{Appendix D}
+\begin{breakablealgorithm}
+\caption{Training \system{LaMGD}} \label{alg:mdmt}
+\begin{algorithmic}[1]
+\REQUIRE {
+  \begin{itemize}
+    \setlength{\itemsep}{-1pt}    \setlength{\parsep}{0pt}
+  \item[] 
+  \item $n_d$ corpora $C^d, d \in [1, \dots,n_d]$ for $n_d$ domains equipped by an empirical distribution $D_d(x)$
+  \item number of retained groups: k, number of groups: $n_p$
+ \end{itemize}}
+\REPEAT 
+\STATE{Pick a batch from domain $d$}
+\STATE{Sampling $\forall p,  g_l^d(p) \displaystyle{\mathop{\sim}^{\text{i.i.d}}} \operatorname{Gumbel}(0,1)$}
+\IF{$Early\_stopping(Eval\_scores)$}
+	\STATE{break}
+\ENDIF
+\STATE{$i=i+1$}
+\UNTIL{$i> iter\_num$}
+\end{algorithmic}
+\end{breakablealgorithm}
+
+\end{document}
