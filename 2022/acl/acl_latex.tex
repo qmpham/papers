@@ -293,39 +293,45 @@ Finally, during inference, we define the dropout mask for layer $l$ and task $d$
 meaning that we simply pick the $k$ most likely parameter groups for the task at hand, and define the state dropout mask accordingly.
 
 \section{Experimental settings \label{sec:experiments}}
-\subsection{Baselines}
-\subsubsection{Multi-domain translation}
-We describe the choice of our systems in multi-domain experiments as follows
+
+\subsection{System design and configuration}
+\subsubsection{Multidomain translation systems}
+Our systems for the multidomain experiments are designed as follows:
 \begin{itemize}
-	\item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 2048, the multi-head attentions contain with 8 heads.
-	\item Adapter based Transformer: The intermediate feeforward dimension is set as 2048 as in \citet{Pham21revisiting}.
-	\item \system{LaMGD} Tranformer: There is no change in the architecture. We group 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 groups are selected. The number of parameters of variational distributions are $k \times L \times n_d$ which is tiny compared to the size of Transformer.
+\item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 2048; the multi-head attention mechanism contains 8 heads;
+\item Adapter-based Transformer: The intermediate feedforward dimension is set to 2048;% as in \citet{Pham21revisiting}.
+\item \system{LaMGD} Transformer:\fyTodo{Explain acronym} There is no change in the architecture. We group the 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 out of the 16 groups are selected. The number of parameters of the variational distributions is $k \times L \times n_d$, which is negligible when compared to the size of the Transformer model;
 \end{itemize}
 
-We set the dropout probability as 0.1. We train the multi-domain Transformer model in 200~K iterations with a batchsize of 12~K tokens. We train \system{LaMGD} Tranformer in 300~K iterations with a batchsize of 12~K tokens since \system{LaMGD} Tranformer has to learn both the sub-networks and the parameters of the underlying Transformer. Finally, we plug Domain Adapters to the multi-domain Transformer model and finetune them with 25~K iterations using the same batchsize as the former.
-\subsubsection{Multilingual translation}
-We describe the choice of our systems in multilingual experiments as follows
+We set the dropout probability as 0.1. We train the multi-domain Transformer model for 20k iterations with a batch size of 12k tokens. We train \system{LaMGD} Tranformer for 300k iterations with a batch size of 12k tokens: these extra iterations are justified by the need for the \system{LaMGD} Tranformer to learn both the sub-networks and the parameters of the underlying Transformer. Finally, we plug domain Adapters to the multidomain Transformer model and finetune them for 25k iterations using the same batch size as the baseline.
+
+\subsubsection{Multilingual translation systems}
+The systems used in our multilingual experiments are implemented as follows:
 \begin{itemize}
-	\item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 1024, the multi-head attentions contain with 8 heads as in \citet{Wang20balancing}.
-	\item Adapter based Transformer: The intermediate feeforward dimension is set as 128 as in \citet{Gong21adaptive}.
-	\item \system{LaMGD} Tranformer: There is no change in the architecture. We group 512 nodes in each layer into 16 groups We group 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 groups are selectedof 32 consecutive nodes. For each domain, only 12 groups are selected. 
+\item Transformer models: the embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 1024, each multi-head attentions contains 8~heads as in \citep{Wang20balancing}.
+\item Adapter based Transformer: the intermediate feedforward dimension is set as 128 as in \citep{Gong21adaptive}.
+\item \system{LaMGD} Tranformer: There is no change in the architecture. We group 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each language, only 12 groups are selected. 
 \end{itemize}
 
-We set the dropout probability as 0.3. We train the multilingual Transformer model in 40~K iterations with a batchsize of 9600 tokens on 16 GPUs as in \citet{Gong21adaptive}. We train \system{LaMGD} Tranformer in 50~K iterations with the same batchsize. Finally, we finetune the Language Adapters in 5~K iterations.
+We set the dropout probability as 0.3. We train the multilingual Transformer model in 40~K iterations with a batch size of 9600 tokens on 16 GPUs as in \citet{Gong21adaptive}. We train \system{LaMGD} Tranformer for 50k iterations with the same batch size. Finally, we finetune the language-specific Adapters for 5k iterations.
+
+All the translation systems are implemented OpenNMT\fyTodo{Fix this, add reference to framework if needed}.
+
 \subsubsection{Hyperparameters}
 \label{ssec:hyperparams}
-We choose $n_d = 16$ so that the dropout groups' size is not too small or too large. In our future works, we will do more experiments by changing $n_d$ to examine how this hyperparameters affect the performance of the model. The second hyperparameter in \system{LaMGD} is the number of retained groups in each layer, $k$, which we predetermined as 12 in every experiments. By retaining $12/16$ groups, we share $75 \%$ active groups between two domains or languages in average.
+We choose $n_d = 16$ so that the size of the dropout group is neither too small nor too large. The second important hyperparameter in \system{LaMGD} is the number of selected groups in each layer, $k$, which we set to 12 in every experiments. By retaining $12/16$ groups, we share on average $75 \%$ active groups between two domains or languages. This design ensures that the percentage of sharing is in the same order of magnitude as what we obtain with adapter modules. In our future work, we intend to analyze how these choice affact affect the final performance of the model.
 
-Furthermore, the temperature $\tau$ of our $\operatorname{Soft-Top-K}$ operator will be gradually decreased from $0.5$ to $0.2$ as follows
+The temperature parameter $\tau$ for the $\operatorname{Soft-Top-K}$ operator is gradually decreased from $0.5$ to $0.2$ according to the following policy:
 \begin{align*}
-\tau = \operatorname{min}\{ 0.2, 0.5 * \exp^{-r*step} \}
+\tau = \operatorname{min}\{ 0.2, 0.5 * \exp^{-r*step} \},
 \end{align*}
 in which $r=0.0001$.
 
 Finally, we fix the weight of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ to $0.0001$ in the training loss in every experiments. The choice of the values for our hyperparameters was not optimized and selected by suggestions from previous papers \citep{Jang17categorical,Gong21pay,Gong21adaptive}.
+
 \subsection{Datasets}
-\subsubsection{Multi-domain translation}
-We reuse the same data as the recent work of \citet{Pham21revisiting} in multi-domain translation. We describe our datasets for multi-domain translation experiment in Table \ref{tab:Corpora-chap4}
+\subsubsection{Multidomain translation}
+We use the same data as in the recent work of \citet{Pham21revisiting} on multidomain translation.\fyTodo{Add public to the data link} We describe the datasets for multidomain translation experiments in Table~\ref{tab:Corpora-chap4}.
 \begin{table*}[h!]
   \centering
   \begin{tabular}{|l|cccccc|} %*{4}{|r|}}
@@ -344,21 +350,21 @@ We reuse the same data as the recent work of \citet{Pham21revisiting} in multi-d
 \end{table*}
 \subsubsection{Multilingual translation}
 We evaluate our model on both one-to-many (O2M) and many-to-one (M2O)
-translation tasks. We evaluate models on widely used multilingual translation datasets.
+translation tasks borrowing the multilingual translation datasets from past studies. More precisely, we used: 
 \begin{itemize}
-	\item TED8-Related. Following the setting of \citet{Wang20balancing}, we use a subset of translations of \citet{qi18when} between English and eight related languages.
-	\item TED8-Diverse. The dataset consists of parallel sentences between English and eight diverse languages as in \citet{Wang20balancing}.
+\item TED8-Related. Following the setting of \citet{Wang20balancing}, we use a subset of translations from \citet{qi18when} between English and eight \emph{related languages}.
+\item TED8-Diverse. The dataset consists of parallel sentences between English and eight \emph{diverse languages} as in \citet{Wang20balancing}.
 \end{itemize}
-We clarify the notation of the languages in multilingual experiments as follows
+
+The languages used in multilingual experiments are refered to by their ISO 639-1 code that we reproduce below for convenience:
 \begin{itemize}
-	\item Diverse: bos (bosnia), mar(marathi),
-         hin(hindi), mkd(macedonia), ell(greek),
-         bulgaria(bul), french(fra), korean(kor) 
-	\item Related: azerbajiani (aze), belarusian(bel),
-          glacian(glg), slovak (slk), turkisk (tur),
-		  russian(rus), portugese(por),czech(ces)
+\item \textbf{Diverse set}: bos (Bosnian), Bulgarian (bul), French (fra), ell (Greek),
+  hin (Hindi), Korean (kor) mkd (Macedonian), mar (Marathi);
+\item \textbf{Related set}: Azerbajiani (aze), Belarusian (bel),
+  Czech (ces), Galician (glg), Portuguese (por), Russian (rus), Slovak (slk), Turkish (tur).
 \end{itemize}
-Table \ref{tab:Corpora-multilingual} describes the subset of TED8 that we used in our experiments.
+
+Table~\ref{tab:Corpora-multilingual} describes the subsets of TED8 that were used in our experiments.
 \begin{table*}[h!]
   \centering
   \begin{tabular}{l|cccc} 
@@ -386,9 +392,11 @@ Table \ref{tab:Corpora-multilingual} describes the subset of TED8 that we used i
   \caption{Data Statistics of TED8 Datasets}
 \label{tab:Corpora-multilingual}
 \end{table*}
-\section{Results and ablation studies}
-\subsection{Multi-domain translation}
-According to Table \ref{tab:mdmt}, \system{LaMGD} Tranformer shows a significant improvement (+2.78) over the generic system \system{Transformer} with zero extra parameters. Moreover, \system{LaMGD} Tranformer achieves equivalent performance in average compared to \system{Adapter}, which is carrefully finetuned with a approximately 12.4M additional parameters.
+
+\section{Results and analyses}
+
+\subsection{Multidomain translation}
+For these experiments, our main results are in Table ~\ref{tab:mdmt}, where we observe that the \system{LaMGD} Tranformer achieves a significant improvement (+2.78) over the generic \system{Transformer} system with zero extra parameters. Moreover, \system{LaMGD} Tranformer achieves performance that are equivalent on average to that of the \system{Adapter} sytems, which is carrefully finetuned and contains approximately 12.4M additional parameters.
 \begin{table*}[h!]
   \centering
   \begin{tabular}{|p{4cm}|*{7}{r|}} \hline
