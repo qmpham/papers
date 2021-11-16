@@ -102,6 +102,7 @@
 \newcommand{\SB}[1]{\textbf{#1}}
 \newcommand{\SW}[1]{\underline{#1}}
 \newcommand{\mtsquare}[0]{MT$^2$}
+\newcommand{\lagd}[0]{LaGD$^2$}
 
 \makeatletter
 \newenvironment{breakablealgorithm}
@@ -167,9 +168,9 @@
 \end{abstract}
 
 \section{Introduction}
-Multidomain and multilingual machine translation aim to develop one single model to perform translations for multiple domains and multiple language pairs, respectively.\footnote{We will refer to these two situations as 'multi-task MT' and refer to individual domains and languages as 'tasks'.} These paradigms are motivated by the compactness of the resulting translation system \citep{Chu18multilingual,dabre20survey}, the hypothetical positive knowledge transfer between similar domains \citep{Pham21revisiting} or between languages in the same family \citep{Tan19multilingual}. However, having all the tasks use exactly the same model parameters can cause negative interference between unrelated tasks \citep{conneau20unsupervised,wang20negative}. Hence the recent development of approaches relying on a partial sharing of the parameters, eg.\ using adapter layers as studied in \citep{houlsby19parameter,Bapna19simple,Pham20Study,Philip20monolingual}. If these techniques have proven effective for building strong baselines, they fail to fully take advantage of the similarities that exist between domains and tasks, as documented eg.\ in \citep{Pham21revisiting}. This is because the partition of the parameter space between generic or task-specific subparts, and their allocation to each task is hard-coded in the network, irrespective of the actual commonalties and differences in the data space.   
+Multidomain and multilingual machine translation aim to develop one single model to perform translation for multiple domains and multiple language pairs, respectively.\footnote{We will refer to these two situations as 'multi-task MT' and refer to individual domains and languages as 'tasks'.} These paradigms are motivated by the compactness of the resulting translation system \citep{Chu18multilingual,dabre20survey}, the hypothetical positive knowledge transfer between similar domains \citep{Pham21revisiting} or between languages in the same family \citep{Tan19multilingual}. However, having all the tasks use exactly the same model parameters can cause negative interference between unrelated tasks \citep{conneau20unsupervised,wang20negative}. Hence, the recent development of approaches relying on a partial sharing of the parameters, eg.\ using adapter layers as studied in \citep{houlsby19parameter,Bapna19simple,Pham20Study,Philip20monolingual}. If these techniques have proven effective for building strong baselines, they fail to fully take advantage of the similarities that exist between domains and tasks, as documented eg.\ in \citep{Pham21revisiting}. This is because the partition of the parameter space between generic or task-specific subparts, and their allocation to each task, is hard-coded in the network, irrespective of the actual commonalties and differences in the data space.
 
-In this work, we develop techniques that can take the similarity between tasks into account in a more effective way, by learning the network organization from the data. To this end, we introduce a set of latent variables in the model, to account for the unseen association between tasks and regions of the parameter space, and show how training can still be performed end-to-end using a variational surrogate of the standard loss function. Our experiments with multilingual and multidomain machine translation confirm that this method can automatically detect similarities in the data, meaning that related tasks use the same subparts of the network. Our results also show that this method is comparable to using adapter layers in a number of empirical comparisons; however, contrarily to adapters, these performance are obtained without any increase of the model size. Our main contributions are summarized below:
+In this work, we develop techniques that can take the similarity between tasks into account in a more effective way, by \emph{learning the network organization from the data}. To this end, we introduce a set of latent variables in the model, to account for the unseen association between tasks and regions of the parameter space, and show how training can still be performed end-to-end using a variational surrogate of the log-likelihood loss function. Our experiments with multilingual and multidomain machine translation confirm that this method can automatically detect similarities in the data, meaning that related tasks use the same subparts of the network. Our results also show that this method is comparable to using adapter layers in a number of empirical comparisons; however, contrarily to adapters, these performance are obtained without any increase of the model size. Our main contributions are summarized below:
 \begin{itemize}
   \setlength{\itemsep}{1pt}
   \setlength{\parskip}{0pt}
@@ -298,12 +299,12 @@ meaning that we simply pick the $k$ most likely parameter groups for the task at
 \subsubsection{Multidomain translation systems}
 Our systems for the multidomain experiments are designed as follows:
 \begin{itemize}
-\item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 2048; the multi-head attention mechanism contains 8 heads;
+\item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 2048; the multi-head attention mechanism contains 8 heads;\fyTodo{How many layers}
 \item Adapter-based Transformer: The intermediate feedforward dimension is set to 2048;% as in \citet{Pham21revisiting}.
-\item Transformer using Latent multi-task group dropout (denoted \system{LaMGD} Transformer):\fyDone{Explain acronym} There is no change in the architecture. We group the 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 out of the 16 groups are selected. The number of parameters of the variational distributions is $k \times L \times n_d$, which is negligible in comparison to the size of the Transformer model.
+\item Transformer using Latent multi-task group dropout (\system{LaMGD} Transformers):\fyDone{Explain acronym} There is no change in the architecture. We group the 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 out of the 16 groups are selected. The number of parameters of the variational distribution is $L\times k \times L \times n_d$, which is negligible in comparison to the size of the Transformer model.
 \end{itemize}
 
-We set the dropout probability to 0.1. We train the multi-domain Transformer model for 20k iterations with a batch size of 12k tokens. We train \system{LaMGD} Tranformer for 300k iterations with a batch size of 12k tokens: these extra iterations are justified by the need for the \system{LaMGD} Tranformer to learn both the sub-networks and the parameters of the underlying Transformer. Finally, we plug domain Adapters to the multidomain Transformer model and finetune them for 25k iterations using the same batch size as the baseline.
+We set the dropout probability to 0.1. We train the multi-domain Transformer model for 20k iterations with a batch size of 12k tokens. We train \system{LaMGD} Tranformer for 300k iterations with a batch size of 12k tokens: these extra iterations are justified by the need for the \system{LaMGD} Tranformer to learn both the sub-networks and the parameters of the underlying Transformer.\fyTodo{Have we converged?} Finally, we plug domain adapters to the multidomain Transformer model and finetune them for 25k iterations using the same batch size as the baseline.
 
 \subsubsection{Multilingual translation systems}
 The systems used in our multilingual experiments are implemented as follows:
@@ -315,11 +316,11 @@ The systems used in our multilingual experiments are implemented as follows:
 
 We set the dropout probability to 0.3. We train the multilingual Transformer model for 40k iterations with a batch size of 9600 tokens on 16 V100 GPUs as in \citet{Gong21adaptive}. We train \system{LaMGD} Tranformer for 50k iterations with the same batch size. Finally, we finetune the language-specific Adapters for 5k iterations.
 
-All the translation systems are implemented with OpenNMT-tf \footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}\fyDone{Fix this, add reference to framework if needed}.
+All the translation systems are implemented with OpenNMT-tf \footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}.\fyDone{Fix this, add reference to framework if needed}
 
 \subsubsection{Hyperparameters}
 \label{ssec:hyperparams}
-We choose $n_d = 16$ so that the size of the dropout group is neither too small nor too large. The second important hyperparameter in \system{LaMGD} is the number of selected groups in each layer, $k$, which we set to 12 in every experiments. By retaining $12/16$ groups, we share on average $75 \%$ active groups between two domains or languages. This design ensures that the percentage of sharing is in the same order of magnitude as what we obtain with adapter modules. In our future work, we intend to analyze how these choice affact affect the final performance of the model.
+We choose $n_d = 16$ so that the size of the dropout group is neither too small nor too large. The second important hyperparameter in \system{LaMGD} is the number of selected groups in each layer, $k$, which we set to 12 in every experiments. By retaining $12/16$ groups, we share on average $75 \%$ active groups between two domains or languages. This design ensures that the percentage of sharing is in the same ballpark as what we obtain with adapter modules. In our future work, we intend to analyze how these choices affect the final performance of the model.
 
 The temperature parameter $\tau$ for the $\operatorname{Soft-Top-K}$ operator is gradually decreased from $0.5$ to $0.2$ according to the following policy:
 \begin{align*}
@@ -327,9 +328,9 @@ The temperature parameter $\tau$ for the $\operatorname{Soft-Top-K}$ operator is
 \end{align*}
 in which $r=0.0001$.
 
-Finally, we fix the weight of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ to $0.0001$ in the training loss in every experiments. The choice of the values for our hyperparameters was not optimized and selected by suggestions from previous papers \citep{Jang17categorical,Gong21pay,Gong21adaptive}.
+Finally, we fix the weight of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ to $0.0001$ in the training loss in every experiments. The choice of the values for our hyperparameters was not optimized and selected by suggestions from previous studies \citep{Jang17categorical,Gong21pay,Gong21adaptive}.
 
-For all experiments, we report the BLEU score of \citet{Papineni02bleu} computed with SacreBleu \cite{Post18call}.\fyDone{Check this}
+For all experiments, we report the BLEU score of \citet{Papineni02bleu} computed with SacreBleu \citep{Post18call}.\fyDone{Check this}
 
 \subsection{Datasets}
 \subsubsection{Multidomain translation}
@@ -367,20 +368,21 @@ The languages used in multilingual experiments are referred to by their ISO 639-
 \end{itemize}
 
 Table~\ref{tab:Corpora-multilingual} describes the subsets of TED8 that were used in our experiments.
-\begin{table*}[h!]
+\begin{table*}[h]
   \centering
-  \begin{tabular}{l|cccc|l|cccc} 
+  \begin{tabular}{|cccc||cccc|} 
   \hline
-    \multicolumn{1}{c|}{} & \multicolumn{1}{c}{\domain{lang}} & \multicolumn{1}{c}{\domain{train}} & \multicolumn{1}{c}{\domain{dev}} & \multicolumn{1}{c}{\domain{test}} & \multicolumn{1}{|c|}{} & \multicolumn{1}{c}{\domain{lang}} & \multicolumn{1}{c}{\domain{train}} & \multicolumn{1}{c}{\domain{dev}} & \multicolumn{1}{c}{\domain{test}} \\
+    \multicolumn{4}{|c||}{Related} & \multicolumn{4}{c|}{Diverse} \\
+                            \multicolumn{1}{|c}{\domain{lang}} & \multicolumn{1}{c}{\domain{train}} & \multicolumn{1}{c}{\domain{dev}} & \multicolumn{1}{c||}{\domain{test}} & \multicolumn{1}{c}{\domain{lang}} & \multicolumn{1}{c}{\domain{train}} & \multicolumn{1}{c}{\domain{dev}} & \multicolumn{1}{c|}{\domain{test}} \\
     \hline 
-    \multirow{2}{*}{Related} & Azerbaijani & 5.94k & 671 & 903 & \multirow{2}{*}{Diverse} & Bosnian & 5.64k & 474 & 463 \\
-							 & Belarusian & 4.51k & 248 & 664 & & Marathi & 9.84k & 767 & 1090\\
-							 & Glacian & 10.0k & 682 & 1007 & & Hindi & 18.79k & 854 & 1243\\
-							 & Slovak & 61.5k & 2271 & 2445 & & Macedonian & 25.33k & 640 & 438 \\
-							 & Turkish & 182k & 4045 & 5029 & & Greek & 134k & 3344 & 4433\\
-                             & Russian & 208k & 4814 & 5483 & & Bulgarian & 174k & 4082 & 5060 \\
-                             & Portuguese & 185k & 4035 & 4855 & & French & 192k & 4320 & 4866\\
-                             & Czech & 103k & 3462 & 3831 & & Korean & 205k & 4441 & 5637 \\
+    Azerbaijani & 5.94k & 671 & 903 & Bosnian & 5.64k & 474 & 463 \\
+    Belarusian & 4.51k & 248 & 664 & Marathi & 9.84k & 767 & 1090\\
+    Galician & 10.0k & 682 & 1007 & Hindi & 18.79k & 854 & 1243\\
+    Slovak & 61.5k & 2271 & 2445 & Macedonian & 25.33k & 640 & 438 \\
+    Turkish & 182k & 4045 & 5029 & Greek & 134k & 3344 & 4433\\
+    Russian & 208k & 4814 & 5483 &  Bulgarian & 174k & 4082 & 5060 \\
+    Portuguese & 185k & 4035 & 4855 & French & 192k & 4320 & 4866\\
+    Czech & 103k & 3462 & 3831 & Korean & 205k & 4441 & 5637 \\
     \hline
   \end{tabular}
   \caption{Data Statistics of TED8 Datasets}
@@ -405,14 +407,14 @@ For these experiments, our main results are in Table ~\ref{tab:mdmt}, where we o
 
 \subsubsection{Fuzzy domain separation}
 \label{ssec:fuzzy}
-For this experiment, we reuse proposal of \citet{Pham21revisiting}, who measure the efficiency of a multidomain NMT system exploiting the proximity between domains. It uses the same data as in the previous experiment; however, the domain \domain{law} is now randomly split into two pseudo-domains \domain{law$_1$} and \domain{law$_2$} of equal size. A truly multidomain system should be able to automatically detect the proximity between \domain{law$_1$} and \domain{law$_2$}, and there should be no significant difference between the performance of a system trained with the six original domains (including \domain{law}) or with the seven domains (including \domain{law} by \domain{law$_1$} and \domain{law$_2$}). The experiments in \citep{Pham21revisiting} reported a large gap between the two settings when using residual adapters. We replicated this setting and also report the results obtained with the \system{LaMGD} Tranformer system in Table~\ref{tab:fuzzy}. 
+For this experiment, we reuse proposal of \citet{Pham21revisiting}, who measure the efficiency of a multidomain NMT system exploiting the proximity between domains. It uses the same data as in the previous experiment; however, the domain \domain{law} is now randomly split into two pseudo-domains \domain{law$_1$} and \domain{law$_2$} of equal size. A truly multidomain system should be able to automatically detect the proximity between \domain{law$_1$} and \domain{law$_2$}, and there should be no significant difference between the performance of a system trained with the six original domains (including \domain{law}) or with the seven domains (including \domain{law} by \domain{law$_1$} and \domain{law$_2$}). The experiments in \citep{Pham21revisiting} reported a large gap between the two settings when using residual adapters. We replicated this setting and also report the results obtained with the \system{LaMGD} Transformer system in Table~\ref{tab:fuzzy}. 
 
 \begin{table*}[h!]
   \centering
   \begin{tabular}{|p{4cm}|*{3}{r|}} \hline
     Model / Domain & \multicolumn{1}{c|}{\domain{law}} & \multicolumn{1}{c|}{\domain{law$_1$}} & \multicolumn{1}{c|}{\domain{law$_2$}} \\ \hline 
-    \system{Adapter}   \hfill{\footnotesize[+25m]}  & 61.0 & 59.4 (-0.6) &  50.2 (-0.8) \\ 
-    \system{LaMGD} Tranformer   \hfill{\footnotesize[+0m]}  & 61.4 & 61.4 (=) & 61.4 (=) \\ 
+    \system{Adapter}   \hfill{\footnotesize[+25m]}  & 61.0 & 59.4 (-0.6) &  59.2 (-0.8) \\ 
+    \system{LaMGD} Transformer   \hfill{\footnotesize[+0m]}  & 61.4 & 61.4 (=) & 61.4 (=) \\ 
     \hline
   \end{tabular}
   \caption{Experiments with two similar pseudo-domains }
@@ -422,35 +424,35 @@ For this experiment, we reuse proposal of \citet{Pham21revisiting}, who measure 
 The results in Table~\ref{tab:fuzzy} show a performance decrease for the adapter-based system when training with two pseudo-domains \domain{law$_1$} and \domain{law$_2$}. In contrast, the \system{LaMGD} model obtains very stable results. In Section~\ref{ssec:abalation}, we show that our algorithm in fact computes the same sub-network for \domain{law$_1$} and \domain{law$_2$}, that allows a full sharing of information between these two pseudo-domains.
 
 \subsection{Multilingual translation}
-Results for the multilingual experiments are in Table~\ref{tab:multilingual}.  The \system{LaMGD} Tranformer achieves an improvement of 0.42, 0.33, 0.32 in average over the multilingual \system{Transformer} in the O2M-related, M2O-related, M2O-diverse conditions, respectively. Significant gains are observed for languages \domain{bel}, \domain{glg} (both direction), \domain{hin} and \domain{bos} (O2M direction) which are very low-resource languages in our sets. However, \system{LaMGD} Tranformer is outperformed by the multilingual \system{Transformer} and Language Adapters for the O2M-diverse condition.
+Results for the multilingual experiments are in Table~\ref{tab:multilingual}.  The \system{LaMGD} Transformer achieves an improvement of 0.42, 0.33, 0.32 in average over the multilingual \system{Transformer} in the O2M-related, M2O-related, M2O-diverse conditions, respectively. Significant gains are observed for languages \domain{bel}, \domain{glg} (both direction), \domain{hin} and \domain{bos} (O2M direction) which are very low-resource languages in our sets. However, \system{LaMGD} Transformer is outperformed by the multilingual \system{Transformer} and language Adapters for the O2M-diverse condition.
 \begin{table*}[h!]
   \centering
   \begin{tabular}{|p{4cm}|*{9}{r|}} \hline
     O2M-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[91.6m]} & 4.8 &7.3&20.8&21.1&39.7&19.8&22.6&15.2&18.9 \\
     \revision{\system{Adapter}}   \hfill{\footnotesize[13m]} &4.3&6.8&21.1&22&39.7&20&23&15.2&19 \\ 
-    \system{LaMGD} Tranformer  \hfill{\footnotesize[+0m]}  & 5.2&\SB{9.4}&20.6&\SB{22.8}&39.6&19.6&22.4&15.0&19.33 \\ 
+    \system{LaMGD} Transformer  \hfill{\footnotesize[+0m]}  & 5.2&\SB{9.4}&20.6&\SB{22.8}&39.6&19.6&22.4&15.0&19.33 \\ 
 	\hline
     \hline
     M2O-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[67.8m]} &11.4&16.6&28.5&	27.1&43.7&24.6&30.3&25.6&25.98 \\
     \revision{\system{Adapter}}   \hfill{\footnotesize[13m]} &10.1&15.8&28.4&26.8&43.7&24.5&30.2&25.6&25.64\\ 
-    \system{LaMGD} Tranformer   \hfill{\footnotesize[+0m]}  &11.3&\SB{17.4}&28.6&\SB{28.7}&43.7&24.5&30.7&25.6&26.31 \\ 
+    \system{LaMGD} Transformer   \hfill{\footnotesize[+0m]}  &11.3&\SB{17.4}&28.6&\SB{28.7}&43.7&24.5&30.7&25.6&26.31 \\ 
     \hline
     \hline
     O2M-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[96.9m]} & 10.2&4&12.7&22.2&31.8&\SB{34.0}&38.3&8.3&20.19 \\
     \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  &10.2&4&\SB{13.3}&21.9&32.2&\SB{34.1}&38.5&8.3&20.31 \\ 
-    \system{LaMGD} Tranformer   \hfill{\footnotesize[+0m]}&10.1&3.8&12.6&\SB{22.8}&31.8&33.4&38.1&8.1&20.09\\
+    \system{LaMGD} Transformer   \hfill{\footnotesize[+0m]}&10.1&3.8&12.6&\SB{22.8}&31.8&33.4&38.1&8.1&20.09\\
     \hline 
     \hline
     M2O-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[70.4m]} &22.4&9.7&20.5&31.8&37.5&38.7&39.8&19.0&27.43 \\
     \revision{\system{Adapter}}   \hfill{\footnotesize[13m]}  &22.5&9.4&20.0&30.6&37.2&38.2&39.3&19.0&27.03\\ 
-    \system{LaMGD} Tranformer  \hfill{\footnotesize[+0m]} &\SB{23.5}&9.6&\SB{21.5}&32.2&37.7&38.6&40.0&18.9&27.75 \\
+    \system{LaMGD} Transformer  \hfill{\footnotesize[+0m]} &\SB{23.5}&9.6&\SB{21.5}&32.2&37.7&38.6&40.0&18.9&27.75 \\
     \hline
   \end{tabular}
-  \caption{Experiments with multilingual translation. Boldface denotes significant gains over \system{Transformer}\fyDone{What is the bold for ?}}
+  \caption{Experiments with multilingual translation. Boldface denotes significant gains over \system{Transformer}.\fyDone{What is the bold for ?}}
   \label{tab:multilingual}
 \end{table*}
 
