@@ -299,17 +299,17 @@ meaning that we simply pick the $k$ most likely parameter groups for the task at
 \subsubsection{Multidomain translation systems}
 Our systems for the multidomain experiments are designed as follows:
 \begin{itemize}
-\item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 2048; the multi-head attention mechanism contains 8 heads;\fyTodo{How many layers}
+\item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 2048; the multi-head attention mechanism contains 8 heads; 6 layers in the encoder; 6 layers in the decoder.\fyDone{How many layers}
 \item Adapter-based Transformer: The intermediate feedforward dimension is set to 2048;% as in \citet{Pham21revisiting}.
 \item Transformer using Latent multi-task group dropout (\system{LaMGD} Transformers):\fyDone{Explain acronym} There is no change in the architecture. We group the 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 out of the 16 groups are selected. The number of parameters of the variational distribution is $L\times k \times L \times n_d$, which is negligible in comparison to the size of the Transformer model.
 \end{itemize}
 
-We set the dropout probability to 0.1. We train the multi-domain Transformer model for 20k iterations with a batch size of 12k tokens. We train \system{LaMGD} Tranformer for 300k iterations with a batch size of 12k tokens: these extra iterations are justified by the need for the \system{LaMGD} Tranformer to learn both the sub-networks and the parameters of the underlying Transformer.\fyTodo{Have we converged?} Finally, we plug domain adapters to the multidomain Transformer model and finetune them for 25k iterations using the same batch size as the baseline.
+We set the dropout probability to 0.1. We train the multi-domain Transformer model for 20k iterations with a batch size of 12k tokens. We train \system{LaMGD} Tranformer for 300k iterations with a batch size of 12k tokens: these extra iterations are justified by the need for the \system{LaMGD} Tranformer to learn both the sub-networks and the parameters of the underlying Transformer.\fyDone{Have we converged?} Finally, we plug domain adapters to the multidomain Transformer model and finetune them for 25k iterations using the same batch size as the baseline.
 
 \subsubsection{Multilingual translation systems}
 The systems used in our multilingual experiments are implemented as follows:
 \begin{itemize}
-\item Transformer models: the embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 1024, each multi-head attentions contains 8~heads as in \citep{Wang20balancing}.
+\item Multilingual Transformer: the embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 1024, each multi-head attentions contains 8~heads as in \citep{Wang20balancing}.
 \item Adapter based Transformer: the intermediate feedforward dimension is set as 128 as in \citep{Gong21adaptive}.
 \item \system{LaMGD} Tranformer: There is no change in the architecture. We group 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each language, only 12 groups are selected. 
 \end{itemize}
@@ -567,7 +567,7 @@ in which $\sigma(.)$ is the sigmoid function and $\bar{\nu}$ is the solution of 
 \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) = k \label{eq:nu}
 \end{align}
 
-Because sigmoid is monotonous, equation~\eqref{eq:nu} has a unique solution. Furthermore,  because of the smoothness of $g(\nu,\Phi_l^d) = \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})$ w.r.t $\nu$ and $\Phi_l^d$, we can perform the implicit differentiation of its solution $\bar{\nu}$ w.r.t $\Phi_l^d$ as below, even though the solution of \eqref{eq:nu} does not have an explicit form.
+Because sigmoid is monotonically increasing, equation~\eqref{eq:nu} has a unique solution. Furthermore,  because of the smoothness of $g(\nu,\Phi_l^d) = \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})$ w.r.t $\nu$ and $\Phi_l^d$, we can perform the implicit differentiation of its solution $\bar{\nu}$ w.r.t $\Phi_l^d$ as below, even though the solution of \eqref{eq:nu} does not have an explicit form.
 
 \begin{align*}
 &\frac{\partial g}{\partial \bar{\nu}} \times \frac{\partial \bar{\nu}}{\partial \Phi_l^d} + \frac{\partial g}{\partial \Phi_l^d} = 0 \\
@@ -598,7 +598,7 @@ and
 \begin{align*}
 \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) = k
 \end{align*}
-there exist $\epsilon$ such that $\forall \tau < \epsilon$, the solution $\bar{\nu}$ of \eqref{eq:nu} satisfies $- (g_l^d(i_{k+1}) + \Phi_l^d(i_{k+1})) > \bar{\nu} > - (g_l^d(i_k) + \Phi_l^d(i_k))$. Furthermore, because sigmoid is monotonous,
+there exist $\epsilon$ such that $\forall \tau < \epsilon$, the solution $\bar{\nu}$ of \eqref{eq:nu} satisfies $- (g_l^d(i_{k+1}) + \Phi_l^d(i_{k+1})) > \bar{\nu} > - (g_l^d(i_k) + \Phi_l^d(i_k))$. Furthermore, because sigmoid is monotonically increasing,
 
 \begin{align*}
 &\sigma(\frac{g_l^d(i) + \Phi_l^d(i) - (g_l^d(i_{k}) + \Phi_l^d(i_{k}))}{\tau}) < \hat{m}_l^d(\tau)(i)  \\
@@ -634,6 +634,13 @@ In this section, we give a simple proof of inequality~\eqref{eq:entropy}. In fac
 &= -\displaystyle{\mathop{\mathbb{E}}_{i_1 | \Phi_l^d}} \big[ \text{log} P(i_1 | \Phi_l^d) \big] = \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big]
 \end{align*}
 \section{Appendix C}
+\begin{figure}[H]
+\centering{
+\includegraphics[width=0.5\textwidth]{multi_domain}}
+\caption{Visualization of domains according to their dropout masks (a large vector concatenating the dropping masks of all the layers of the model) constructed by PCA.}
+\label{fig:domain}
+\end{figure}
+\section{Appendix D}
 \begin{breakablealgorithm}
 \caption{Training \system{LaMGD}} \label{alg:mdmt}
 \begin{algorithmic}[1]
@@ -643,7 +650,7 @@ In this section, we give a simple proof of inequality~\eqref{eq:entropy}. In fac
   \item[] 
   \item $n_d$ corpora $C^d, d \in [1, \dots,n_d]$ for $n_d$ domains equiped by an empirical distribution $D_d(x)$
   \item number of groups: $n_p$; number of retained groups: $k$ 
-  \item $i=0$
+  \item $i=0$; $iter\_num$
  \end{itemize}}
 \REPEAT 
 \STATE{Pick a batch from domain $d$}
@@ -667,19 +674,47 @@ using binary search}
 $$\Delta_{\theta} = \frac{\partial L}{\partial \theta}$$}
 \STATE{Compute gradient over the $\operatorname{Soft-Top-K}$ masks
 $$\frac{\partial D}{\partial \hat{m}_l^d(\tau)}$$}
-\STATE{Compute implicit gradient of the $\operatorname{Soft-Top-K}$ masks over $\Phi^d$
+\STATE{Compute implicit gradient of the $\operatorname{Soft-Top-K}$ masks over $\Phi_l^d$
 $$- \big(\frac{\partial g}{\partial \bar{\nu}}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d}$$}
-\STATE{Compute the gradient the training over $\Phi$
-$$ - \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \big(\frac{\partial g}{\partial \bar{\nu}}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d} + \frac{\partial \mathbb{H} \big[ \operatorname{softmax}(\Phi_l^d)\big] }{\partial \Phi_l^d} $$}
-\STATE{Update $\theta$ and $\Phi^d$ with their gradients}
+\STATE{Compute the gradient the training over $\Phi_l^d$
+$$\Delta_{\Phi_l^d} = - \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \big(\frac{\partial g}{\partial \bar{\nu}}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d} + \frac{\partial \mathbb{H} \big[ \operatorname{softmax}(\Phi_l^d)\big] }{\partial \Phi_l^d} $$}
+\STATE{Update $\theta$ and $\Phi_l^d$ with their gradients}
 \STATE{$i=i+1$}
 \UNTIL{$i> iter\_num$}
 \end{algorithmic}
 \end{breakablealgorithm}
-\section{Appendix D}\fyTodo{fix this}
-\begin{figure*}[h!]
-\includegraphics[width=0.7\textwidth]{multi_domain}
-\caption{Visualization of domains according to their dropouts (a large vector concatenating the dropping masks of all the layers of the model) constructed by PCA.}
-\label{fig:domain}
-\end{figure*}
+
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%\en
