@@ -556,36 +556,34 @@ There are several ways in which our methodology could be improved and generalize
 \appendix
 \section{Appendix A}
 \label{appendix:a}
-This section explains how we calculate $\hat{m}_l^d(\tau)$ by solving the optimization problem \eqref{eq:soft-top-k} and then how to compute the gradient $\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d}$.
+This section explains how to compute $\hat{m}_l^d(\tau)$ by solving the optimization problem \eqref{eq:soft-top-k} and then how to compute the gradients $\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d}$.
 
-First, to solve \eqref{eq:soft-top-k} we follow the same approach as in \cite{amos19lml,amos20differential} by applying the Karush–Kuhn–Tucker (KKT) conditions to \eqref{eq:soft-top-k}. The solution of \eqref{eq:soft-top-k} will have the following form
-
+First, to solve \eqref{eq:soft-top-k} we follow the same approach as in \cite{amos19lml,amos20differential} by applying the Karush–Kuhn–Tucker (KKT) conditions to~\eqref{eq:soft-top-k}. The solution of \eqref{eq:soft-top-k} will have the following form:
 \begin{align}
 \hat{m}_l^d(\tau) &= \sigma(\frac{g_l^d + \Phi_l^d + \bar{\nu}}{\tau}) \label{eq:soft-m}
 \end{align}
-in which $\sigma(.)$ is sigmoid function and $\bar{\nu}$ is the solution of the following equation
+in which $\sigma(.)$ is the sigmoid function and $\bar{\nu}$ is the solution of the following equation:
 \begin{align}
 \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) = k \label{eq:nu}
 \end{align}
 
-Because sigmoid is monotonic, the equation \eqref{eq:nu} has unique solution. Furthermore,  because of the smoothness of $g(\nu,\Phi_l^d) = \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})$ w.r.t $\nu$ and $\Phi_l^d$, we could deduce the implicit differentiation of its solution $\bar{\nu}$ w.r.t $\Phi_l^d$ as below although the solution of \eqref{eq:nu} does not have explicit form.
+Because sigmoid is monotonous, equation~\eqref{eq:nu} has a unique solution. Furthermore,  because of the smoothness of $g(\nu,\Phi_l^d) = \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})$ w.r.t $\nu$ and $\Phi_l^d$, we can perform the implicit differentiation of its solution $\bar{\nu}$ w.r.t $\Phi_l^d$ as below, even though the solution of \eqref{eq:nu} does not have an explicit form.
 
 \begin{align*}
 &\frac{\partial g}{\partial \bar{\nu}} \times \frac{\partial \bar{\nu}}{\partial \Phi_l^d} + \frac{\partial g}{\partial \Phi_l^d} = 0 \\
 & \Rightarrow \frac{\partial \bar{\nu}}{\partial \Phi_l^d} = - \big(\frac{\partial g}{\partial \bar{\nu}}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d}
 \end{align*}
 
-Because the differentiation of sigmoid has exact forms, $\frac{\partial g}{\partial \nu}$ and $\frac{\partial g}{\partial \Phi_l^d}$ also have exact form. Therefore, we do not need autograd to compute the implicit gradient $\frac{\partial \nu}{\partial \Phi_l^d}$. The gradient of $\hat{m}_l^d(\tau)$ w.r.t $\Phi_l^d$ is deduced as follows
+Because the differentiation of sigmoid has exact forms, $\frac{\partial g}{\partial \nu}$ and $\frac{\partial g}{\partial \Phi_l^d}$ also have exact form. Therefore, we do not need autograd to compute the implicit gradient $\frac{\partial \nu}{\partial \Phi_l^d}$. The gradient of $\hat{m}_l^d(\tau)$ w.r.t $\Phi_l^d$ is computed as follows:
 \begin{align}
 \frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} = \frac{\partial \hat{m}_l^d(\tau)}{\partial \nu} \times \frac{\partial \nu}{\partial \Phi_l^d}
 \end{align}
 
-In our algorithm, we solve \eqref{eq:nu} by binary search. The convergence of binary search is extremely fast and assured by the monotonicity of $g(\nu,\Phi_l^d)$. In our experiments, we set our search range to $[-100,100]$.
+In our algorithm, we solve \eqref{eq:nu} by binary search. The convergence of binary search is extremely fast and assured by the monotonicity of $g(\nu,\Phi_l^d)$. In our experiments, we set the search range to $[-100,100]$.
 
-Finally, we need prove the limit $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. We suppose $g_l^d(i_1) + \Phi_l^d(i_1) > g_l^d(i_2) + \Phi_l^d(i_2) > \cdots > g_l^d(i_{n_p}) + \Phi_l^d(i_{n_p})$.
+Finally, we need prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. We assume $g_l^d(i_1) + \Phi_l^d(i_1) > g_l^d(i_2) + \Phi_l^d(i_2) > \cdots > g_l^d(i_{n_p}) + \Phi_l^d(i_{n_p})$.
 
-Because
-
+Because:
 \begin{align*}
 \hspace{-3.em}
 \lim_{\tau \rightarrow 0} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) = \begin{cases}
@@ -600,16 +598,14 @@ and
 \begin{align*}
 \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) = k
 \end{align*}
-
-there exist $\epsilon$ such that $\forall \tau < \epsilon$, the solution $\bar{\nu}$ of \eqref{eq:nu} is between $- (g_l^d(i_{k+1}) + \Phi_l^d(i_{k+1})) > \bar{\nu} > - (g_l^d(i_k) + \Phi_l^d(i_k))$. Furthermore, because sigmoid is monotonic,
+there exist $\epsilon$ such that $\forall \tau < \epsilon$, the solution $\bar{\nu}$ of \eqref{eq:nu} satisfies $- (g_l^d(i_{k+1}) + \Phi_l^d(i_{k+1})) > \bar{\nu} > - (g_l^d(i_k) + \Phi_l^d(i_k))$. Furthermore, because sigmoid is monotonous,
 
 \begin{align*}
 &\sigma(\frac{g_l^d(i) + \Phi_l^d(i) - (g_l^d(i_{k}) + \Phi_l^d(i_{k}))}{\tau}) < \hat{m}_l^d(\tau)(i)  \\
 & < \sigma(\frac{g_l^d(i) + \Phi_l^d(i) - (g_l^d(i_{k+1}) + \Phi_l^d(i_{k+1}))}{\tau}) 
 \end{align*}
 
-By taking the limit of both sides, we have following limits
-
+By taking the limit on both sides, we get the following results:
 \begin{align*}
 \lim_{\tau \rightarrow 0} \hat{m}_l^d(\tau)(i_u) = \begin{cases}
       1, & \text{if}\ u > k \\
@@ -617,7 +613,7 @@ By taking the limit of both sides, we have following limits
     \end{cases}
 \end{align*}
 
-And, because $ \displaystyle{\mathop{\sum}_{u=1}^{n_p}}\hat{m}_l^d(\tau)(i_u) = k$, by taking the limit at both side, we will have $\lim_{\tau \rightarrow 0} \hat{m}_l^d(\tau)(i_k) = 1$. Finally, we have
+And, because $ \displaystyle{\mathop{\sum}_{u=1}^{n_p}}\hat{m}_l^d(\tau)(i_u) = k$, by taking the limit on both sides, we will have $\lim_{\tau \rightarrow 0} \hat{m}_l^d(\tau)(i_k) = 1$. Finally, we have
 
 \begin{align*}
 \lim_{\tau \rightarrow 0} \hat{m}_l^d(\tau)(i_u) = \begin{cases}
@@ -630,7 +626,7 @@ which is equivalent to $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l
 
 \section{Appendix B}
 \label{appendix:b}
-In this section, we give a simple proof of Inequality \ref{eq:entropy}. In fact, we only need to prove $\mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] \geqslant \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big]$. The proof is as follows
+In this section, we give a simple proof of inequality~\eqref{eq:entropy}. In fact, we only need to prove $\mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] \geqslant \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big]$. The proof is as follows:
 \begin{align*}
 &\mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] = - \displaystyle{\mathop{\mathbb{E}}_{i_1,\cdots,i_k | \Phi_l^d}} \big[ \text{log}P(i_1,\cdots,i_k | \Phi_l^d) \big] \\
 &= -\displaystyle{\mathop{\mathbb{E}}_{i_1,\cdots,i_k | \Phi_l^d}} \big[ \displaystyle{\sum_{j=2}^k}\text{log}P(i_j | i_1,\cdots,j_{j-1},\Phi_l^d) +  \text{log} P(i_1 | \Phi_l^d) \big] \\
@@ -641,26 +637,27 @@ In this section, we give a simple proof of Inequality \ref{eq:entropy}. In fact,
 \begin{breakablealgorithm}
 \caption{Training \system{LaMGD}} \label{alg:mdmt}
 \begin{algorithmic}[1]
-\REQUIRE {
+  \REQUIRE {%    
   \begin{itemize}
     \setlength{\itemsep}{-1pt}    \setlength{\parsep}{0pt}
-  \item $n_d$ corpora $C^d, d \in [1, \dots,n_d]$ for $n_d$ domains equipped by an empirical distribution $D_d(x)$
-  \item number of retained groups: k, number of groups: $n_p$
+  \item[] 
+  \item $n_d$ corpora $C^d, d \in [1, \dots,n_d]$ for $n_d$ domains equiped by an empirical distribution $D_d(x)$
+  \item number of groups: $n_p$; number of retained groups: $k$ 
   \item $i=0$
  \end{itemize}}
 \REPEAT 
 \STATE{Pick a batch from domain $d$}
-\STATE{Sampling $\forall p,  g_l^d(p) \displaystyle{\mathop{\sim}^{\text{i.i.d}}} \operatorname{Gumbel}(0,1)$}
-\STATE{Solve the equation
+\STATE{Sample $\forall l, \forall p:  g_l^d(p) \displaystyle{\mathop{\sim}^{\text{i.i.d}}} \operatorname{Gumbel}(0,1)$}
+\STATE{Solve the equation $\forall l$
 \begin{align*}
 \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) = k
 \end{align*}
 using binary search}
-\STATE{Computing mask of each layer
+\STATE{Compute mask of each layer
 \begin{align*}
-\hat{m}_l^d(\tau) &= \sigma(\frac{g_l^d + \Phi_l^d + \bar{\nu}}{\tau})
+\forall l, \hat{m}_l^d(\tau) &= \sigma(\frac{g_l^d + \Phi_l^d + \bar{\nu}}{\tau})
 \end{align*}}
-\STATE{Applying computed masks to their corresponding layer
+\STATE{Apply masks to their corresponding layer
 \begin{align*}
   \forall l \in [0,\cdots, L-1]: \tilde{h}^l &= h^l \odot r_l^d ,\\
   h^{l+1} &= \operatorname{LAYER}^{l+1}(\tilde{h}^l) ,
@@ -679,7 +676,7 @@ $$ - \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \big(\frac{\partial g}
 \UNTIL{$i> iter\_num$}
 \end{algorithmic}
 \end{breakablealgorithm}
-\section{Appendix D}
+\section{Appendix D}\fyTodo{fix this}
 \begin{figure*}[h!]
 \includegraphics[width=0.7\textwidth]{multi_domain}
 \caption{Visualization of domains according to their dropouts (a large vector concatenating the dropping masks of all the layers of the model) constructed by PCA.}
