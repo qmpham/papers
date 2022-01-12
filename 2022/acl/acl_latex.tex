@@ -197,11 +197,12 @@ Formally, a \emph{group dropout mask} $m_l^d$ is a $n_p$-dimensional binary vect
 
 Given $m_l^d$, the mask $r_l^d$ for task $d$ in layer $l$ is then derived as:
 \begin{align*}
-  r_l^d(i) &= \begin{cases}
-    1, & \text{if}\ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p} \\
-    & \text{AND} \  m_l^d(p) \text{\small =} 1 \\
-    0, & \text{otherwise},
-  \end{cases} 
+  r_l^d(i) = m_l^d(p) \ \ \ \text{if}\ \ \ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p}
+%  \begin{cases}
+%    1, & \text{if}\ p \times \frac{d_k}{n_p} \leqslant i < (p+1) \times \frac{d_k}{n_p} \\
+%    & \text{AND} \  m_l^d(p) \text{\small =} 1 \\
+%    0, & \text{otherwise},
+%  \end{cases} 
   % p & \in  \{0,\dots,n_p\text{-}1 \}, \\
   % d & \in  \{0,\dots,n_d\text{-}1 \}, \\
   % i & \in  \{0,\dots,d_k\text{-}1 \}, \\
@@ -214,7 +215,7 @@ where $d_k$ is the dimension of the hidden state.\fyDone{Check this} The propaga
   \forall l \in [0,\cdots, L-1]: \tilde{h}^l &= h^l \odot r_l^d ,\\
   h^{l+1} &= \operatorname{LAYER}^{l+1}(\tilde{h}^l) ,
 \end{align*}
-where $\operatorname{LAYER}^l()$ represents all the computations in Transformer layer $l$. It is applied at all positions of each layer in the encoder and in the decoder.  
+where $\operatorname{LAYER}^l()$ represents all the computations in Transformer layer $l$, $\odot$ is element-wise product. It is applied at all positions of each layer in the encoder and in the decoder.  
 % The dropping mask $r_l^d$ is computed as follows
 % where $n_p$ is the number of dropout groups; $n_d$ is the number of domains; $d_k$ is the size of Transformer layers; $k$ is the number of retained groups at each layer; $m_l^d$ is a binary vector indicating which group of the nodes of the $l^{th}$ layer is dropped in the sub-network modeling domain $d$. 
 
@@ -458,43 +459,62 @@ Results for the multilingual experiments are in Table~\ref{tab:multilingual}.  T
 
 \subsection{Similarity between dropping masks}
 \label{ssec:abalation}
-This section compares the sub-networks learnt for each domain or language pair by computing the average similarity between the corresponding dropout masks concatenated for all the layers of the underlying model. For the multidomain experiment, we analyze the case of pseud-domain separation reported in Section~\ref{ssec:fuzzy} in Table~\ref{tab:fuzzy-sim}. We see that the sub-networks for \domain{law$_1$} and \domain{law$_2$} are identical, yielding a full sharing between the corresponding training sets. Furthermore, we observe a large distance between \domain{rel} and the other domains, which is expected given that \domain{rel} is quite distinct from the other domains. \domain{rel} only share around $75 \%$ its active groups with other domains, as would be obtained by chance in our setting (see Section~\ref{ssec:hyperparams}). In Figure ~\ref{fig:domain}, we visualize the domains using their dropping masks concatenated and mapped to a 2d space using Principal Component Analysis (PCA).
+This section compares the sub-networks learnt for each domain or language pair by computing the average similarity between the corresponding dropout masks concatenated for all the layers of the underlying model. For the multidomain experiment, we analyze the case of pseud-domain separation reported in Section~\ref{ssec:fuzzy} in Figure ~\ref{fig:md-heatmap}. We see that the sub-networks for \domain{law$_1$} and \domain{law$_2$} are identical, yielding a full sharing between the corresponding training sets. Furthermore, we observe a large distance between \domain{rel} and the other domains, which is expected given that \domain{rel} is quite distinct from the other domains. \domain{rel} only share around $75 \%$ its active groups with other domains, as would be obtained by chance in our setting (see Section~\ref{ssec:hyperparams}). In Figure ~\ref{fig:domain}, we visualize the domains using their dropping masks concatenated and mapped to a 2d space using Principal Component Analysis (PCA).
 
-\begin{table*}[h!]
+\begin{figure}[h!]
+\begin{subfigure}{0.5\textwidth}
   \centering
-  \begin{tabular}{|p{1cm}|*{7}{r|}} \hline
-    & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{bank}}& \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{law$_1$}} & \multicolumn{1}{c|}{\domain{law$_2$}} & \multicolumn{1}{c|}{\domain{rel}} &\multicolumn{1}{c|}{\domain{talk}} \\ \hline 
-    \domain{med} &1.0&0.80&0.85&0.83&0.83&0.78&0.89\\
-    \domain{bank} &0.80&1.0&0.80&0.90&0.90&0.73&0.82\\
-    \domain{it} &0.85&0.80&1.0&0.80&0.80&0.78&0.85\\
-    \domain{law$_1$} &0.83&0.90&0.80&1.0&\SB{1.0}&0.75&0.82\\ 
-    \domain{law$_2$} &0.83&0.90&0.80&\SB{1.0}&1.0&0.75&0.82\\ 
-    \domain{rel} &0.78&0.73&0.78&0.75&0.75&1.0&0.77\\
-    \domain{talk} &0.89&0.82&0.85&0.82&0.82&0.77&1.0\\
-    \hline
-  \end{tabular}
-  \caption{Multidomain experiments: sub-network similarities}
-  \label{tab:fuzzy-sim}
-\end{table*}      
+  % include first image
+  \includegraphics[width=0.7\textwidth]{multi_domain_heatmap.png}  
+  \caption{Multidomain}
+  \label{fig:md-heatmap}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  % include second image
+  \includegraphics[width=0.7\textwidth]{multilingual_heatmap.png}  
+  \caption{Multilingual}
+  \label{fig:ml-heatmap}
+\end{subfigure}
+\caption{Heatmap visualization of the similarities between dropout masks of domains(languages)}
+\label{fig:heatmap}
+\end{figure}
 
-For multilingual (TED-related) experiments, the training data contains four language families: (1) Turkic, with Azerbaijani and Turkish(\domain{aze},\domain{tur}); (2) Slavic, with Belarusian and Russian (\domain{bel},\domain{rus}); (3) Romance, with Galician and Portuguese (\domain{glg}, \domain{por}); and (4) Czech-Slovak, with Slovak and Czech (\domain{ces}, \domain{slk}). The similarities between the sub-networks for each pair are respectively 0.95, 0.94, 0.99 and 0.96: for each language, the most similar language is always from the same language family. 
-\begin{table*}[h!]
-  \centering
-  \begin{tabular}{|p{1cm}|*{8}{r|}} \hline
-    & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{bel}}& \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} &\multicolumn{1}{c|}{\domain{slk}}&\multicolumn{1}{c|}{\domain{tur}} \\ \hline 
-    \domain{aze} &1.0&0.90&0.89&0.86&0.85&0.91&0.89&\SB{0.95}\\
-    \domain{bel} &0.90&1.0&0.94&0.91&0.91&\SB{0.94}&0.94&0.88\\
-    \domain{ces} &0.89&0.94&1.0&0.92&0.94&0.98&\SB{0.99}&0.91\\
-    \domain{glg} &0.86&0.91&0.92&1.0&\SB{0.96}&0.92&0.93&0.86\\ 
-    \domain{por} &0.85&0.91&0.94&\SB{0.96}&1.0&0.93&0.94&0.87\\ 
-    \domain{rus} &0.91&\SB{0.94}&0.98&0.92&0.93&1.0&0.98&0.93\\
-    \domain{slk} &0.89&0.94&\SB{0.99}&0.93&0.94&0.98&1.0&0.91\\
-    \domain{tur} &\SB{0.95}&0.88&0.91&0.86&0.87&0.93&0.91&1.0\\
-    \hline
-  \end{tabular}
-  \caption{Multilingual sub-networks' similarities (M2O Ted-related). Boldface denotes the similarity of languages in a same family.}
-  \label{tab:related-sim}
-\end{table*}
+%\begin{table*}[h!]
+%  \centering
+%  \begin{tabular}{|p{1cm}|*{7}{r|}} \hline
+%    & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{bank}}& \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{law$_1$}} & \multicolumn{1}{c|}{\domain{law$_2$}} & \multicolumn{1}{c|}{\domain{rel}} &\multicolumn{1}{c|}{\domain{talk}} \\ \hline 
+%    \domain{med} &1.0&0.80&0.85&0.83&0.83&0.78&0.89\\
+%    \domain{bank} &0.80&1.0&0.80&0.90&0.90&0.73&0.82\\
+%    \domain{it} &0.85&0.80&1.0&0.80&0.80&0.78&0.85\\
+%    \domain{law$_1$} &0.83&0.90&0.80&1.0&\SB{1.0}&0.75&0.82\\ 
+%    \domain{law$_2$} &0.83&0.90&0.80&\SB{1.0}&1.0&0.75&0.82\\ 
+%    \domain{rel} &0.78&0.73&0.78&0.75&0.75&1.0&0.77\\
+%    \domain{talk} &0.89&0.82&0.85&0.82&0.82&0.77&1.0\\
+%    \hline
+%  \end{tabular}
+%  \caption{Multidomain experiments: sub-network similarities}
+%  \label{tab:fuzzy-sim}
+%\end{table*}      
+
+For multilingual (TED-related) experiments, the training data contains four language families: (1) Turkic, with Azerbaijani and Turkish(\domain{aze},\domain{tur}); (2) Slavic, with Belarusian and Russian (\domain{bel},\domain{rus}); (3) Romance, with Galician and Portuguese (\domain{glg}, \domain{por}); and (4) Czech-Slovak, with Slovak and Czech (\domain{ces}, \domain{slk}). The similarities between the sub-networks for each pair are respectively 0.95, 0.94, 0.99 and 0.96: for each language, the most similar language is always from the same language family. We provide in Figure~\ref{fig:ml-heatmap} the heatmap of the similarities between the dropout masks of our objective languages.
+%\begin{table*}[h!]
+%  \centering
+%  \begin{tabular}{|p{1cm}|*{8}{r|}} \hline
+%    & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{bel}}& \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} &\multicolumn{1}{c|}{\domain{slk}}&\multicolumn{1}{c|}{\domain{tur}} \\ \hline 
+%    \domain{aze} &1.0&0.90&0.89&0.86&0.85&0.91&0.89&\SB{0.95}\\
+%    \domain{bel} &0.90&1.0&0.94&0.91&0.91&\SB{0.94}&0.94&0.88\\
+%    \domain{ces} &0.89&0.94&1.0&0.92&0.94&0.98&\SB{0.99}&0.91\\
+%    \domain{glg} &0.86&0.91&0.92&1.0&\SB{0.96}&0.92&0.93&0.86\\ 
+%    \domain{por} &0.85&0.91&0.94&\SB{0.96}&1.0&0.93&0.94&0.87\\ 
+%    \domain{rus} &0.91&\SB{0.94}&0.98&0.92&0.93&1.0&0.98&0.93\\
+%    \domain{slk} &0.89&0.94&\SB{0.99}&0.93&0.94&0.98&1.0&0.91\\
+%    \domain{tur} &\SB{0.95}&0.88&0.91&0.86&0.87&0.93&0.91&1.0\\
+%    \hline
+%  \end{tabular}
+%  \caption{Multilingual sub-networks' similarities (M2O Ted-related). Boldface denotes the similarity of languages in a same family.}
+%  \label{tab:related-sim}
+%\end{table*}
 
 We also plot the languages based on their dropout masks in Figure~\ref{fig:visual} using a 2d projection computed by PCA.
 \begin{figure*}[htbp]
@@ -534,11 +554,27 @@ We also plot the languages based on their dropout masks in Figure~\ref{fig:visua
 % \caption{$\Phi_L^{0}$ in O2M experiments}
 % \label{fig:phi}
 % \end{figure*}
-
+\subsection{Ablation study}
+We provide more analysis over the choice of hyperparameters $k$ which is the number of activated nodes in each layer, i.e, controls the sharing level between the tasks. Table ~\ref{tab:K} shows the degradation of the performance when the number of activated nodes is reduced, and the sharing level between tasks decreases in consequence. 
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{|c|c|} \hline
+    K & \domain{avg}\\ \hline 
+    8 & 18.1 \\
+    10 & 19.15 \\
+    12 & 19.33 \\
+    14 & 19.44 \\
+    \hline
+  \end{tabular}
+  \caption{Variation of the performance w.r.t K while we fix $n_p=16$}
+  \label{tab:K}
+\end{table}
 \section{Related work}\label{sec:related}
-Multidomain and multilingual translation systems have received considerable attention in the recent years, and a exhaustive survey is beyond the goal of this paper. Domain adaptation for neural MT is surveyed in \citep{Chu17comparison}, while multidomain MT systems are notably studied in \cite{Saunders21Asurvey,Pham21revisiting}; for multilingual MT, the reader is refered eg.\ to \citep{Chu18multilingual,dabre20survey}. We focus on the most relevant subset of this literature below.
+Multidomain and multilingual translation systems have received considerable attention in the recent years, and a exhaustive survey is beyond the goal of this paper. Domain adaptation for neural MT is surveyed in \citep{Chu17comparison}, while multidomain MT systems are notably studied in \cite{Saunders21Asurvey,Pham21revisiting}; for multilingual MT, the reader is referred eg.\ to \citep{Chu18multilingual,dabre20survey}. We focus on the most relevant subset of this literature below.
 
 \textbf{Language similarity} The methods developed by \citep{sen19multilingual,kong21multilingual} use language proximity to design parameter sharing strategies. The authors propose a multi-decoder model sharing the same encoder among languages and routing languages in different families to different decoders. These approaches share the same interest in expressing the proximity between tasks in the selection of task-specific parameters as our approach. However, our method learn the selection from a latent commonality in data instead of using a predefined selection such as "One language family per decoder" in \cite{kong21multilingual}.
+
+\textbf{Language-specific sub-networks}. \citet{Frankle19Lottery,liu18rethinking} proposed different techniques to locate most important parameters for the task so that when training the model while masking other parameters the performance of the model does not degrade.\citet{lin21learning} hypothesized that among parameters of a multilingual NMT model, there exists a subset of parameters more biased to a specific language. The authors proposed to locate these subsets by pruning the parameters of each fine-tuned model. Our approach also aims to assign a sub-network to each task by masking the output of each layer rather than masking the parameters. Furthermore, \citet{lin21learning} computes the masks via a heuristic selection while our approach learn the masks via a variational technique.
 
 \textbf{Sparse Transformer} The idea of adaptive sparsity is studied in several works. For instance, \citet{xian20deep} propose to use a variable depth for different tasks. The authors aimed to match the depth of the sub-network to the complexity of the task. \citet{Gong21pay,Gong21adaptive} also take an interest in the adaptive sparse Transformers, in which differ each task triggers the selection of specific heads in multi-head attention, layers, and blocks in feedforward matrices. Mixture-of-experts (MoE) constitute another effective approach to achieve sparsity. Using the Transformer architecture, the GShard model replaces a single feedforward (FFN) sub-layer with an MoE module consisting of multiple FFN sub-layers \citep{lepikhin21gshard,william21switch}.
 
@@ -685,6 +721,7 @@ $$\Delta_{\Phi_l^d} = - \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \bi
 \end{breakablealgorithm}
 
 \end{document}
+
 
 
 
