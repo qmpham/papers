@@ -476,7 +476,7 @@ This section compares the sub-networks learnt for each domain or language pair b
   \caption{Multilingual}
   \label{fig:ml-heatmap}
 \end{subfigure}
-\caption{Heatmap visualization of the similarities between dropout masks of domains(languages)}
+\caption{Heatmap visualization of the similarities between dropout masks of domains(languages). Brighter colors correspond to higher similarity scores.}
 \label{fig:heatmap}
 \end{figure}
 
@@ -497,7 +497,7 @@ This section compares the sub-networks learnt for each domain or language pair b
 %  \label{tab:fuzzy-sim}
 %\end{table*}      
 
-For multilingual (TED-related) experiments, the training data contains four language families: (1) Turkic, with Azerbaijani and Turkish(\domain{aze},\domain{tur}); (2) Slavic, with Belarusian and Russian (\domain{bel},\domain{rus}); (3) Romance, with Galician and Portuguese (\domain{glg}, \domain{por}); and (4) Czech-Slovak, with Slovak and Czech (\domain{ces}, \domain{slk}). The similarities between the sub-networks for each pair are respectively 0.95, 0.94, 0.99 and 0.96: for each language, the most similar language is always from the same language family. We provide in Figure~\ref{fig:ml-heatmap} the heatmap of the similarities between the dropout masks of our objective languages.
+For multilingual (TED-related) experiments, the training data contains four language families: (1) Turkic, with Azerbaijani and Turkish(\domain{aze},\domain{tur}); (2) Slavic, with Belarusian and Russian (\domain{bel},\domain{rus}); (3) Romance, with Galician and Portuguese (\domain{glg}, \domain{por}); and (4) Czech-Slovak, with Slovak and Czech (\domain{ces}, \domain{slk}). We provide in Figure~\ref{fig:ml-heatmap} the heatmap of the similarities between the dropout masks of our objective languages. We observe that each pair of languages in the same family correspond to brightest color except the diagonal in every column or every row.
 %\begin{table*}[h!]
 %  \centering
 %  \begin{tabular}{|p{1cm}|*{8}{r|}} \hline
