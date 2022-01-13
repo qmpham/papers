@@ -273,7 +273,7 @@ in which
 H_b(m) &= - \sum_i m_i \text{log}(m_i) + (1-m_i)\text{log}(1-m_i). \nonumber 
 \end{align}
 
-In Appendix \ref{appendix:a}, we prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. Furthermore, we also provide the computation of $\hat{m}_l^d(\tau)$ and prove that $\hat{m}_l^d(\tau)$ is a differentiable function w.r.t $\Phi_l^d$ and that its gradients can be computed using the implicit differentiation theorem. During training, we approximate $\tilde{m}_l^d$ by $\hat{m}_l^d(\tau)$ by gradually decaying the hyperparameter $\tau$ to $0$. The gradient of $D$ w.r.t $\Phi_l^d$ is computed using the chain rule as follows:
+In Appendix \ref{appendix:a}, we prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. Furthermore, we also provide the computation of $\hat{m}_l^d(\tau)$ and prove that $\hat{m}_l^d(\tau)$ is a differentiable function w.r.t $\Phi_l^d$ and that its gradients can be computed using the implicit differentiation theorem. During training, we approximate $\tilde{m}_l^d$ by $\hat{m}_l^d(\tau)$ by gradually decaying the hyper-parameter $\tau$ to $0$. The gradient of $D$ w.r.t $\Phi_l^d$ is computed using the chain rule as follows:
 \begin{equation}
 \frac{\partial D}{\partial \Phi_l^d} = \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d}
 \end{equation}
@@ -319,9 +319,9 @@ We set the dropout probability to 0.3. We train the multilingual Transformer mod
 
 All the translation systems are implemented with OpenNMT-tf \footnote{\url{https://github.com/OpenNMT/OpenNMT-tf}} \cite{Klein17opennmt}.\fyDone{Fix this, add reference to framework if needed}
 
-\subsubsection{Hyperparameters}
+\subsubsection{Hyper-parameters}
 \label{ssec:hyperparams}
-We choose $n_d = 16$ so that the size of the dropout group is neither too small nor too large. The second important hyperparameter in \system{LaMGD} is the number of selected groups in each layer, $k$, which we set to 12 in every experiments. By retaining $12/16$ groups, we share on average $75 \%$ active groups between two domains or languages. This design ensures that the percentage of sharing is in the same ballpark as what we obtain with adapter modules. In our future work, we intend to analyze how these choices affect the final performance of the model.
+We choose $n_d = 16$ so that the size of the dropout group is neither too small nor too large. The second important hyper-parameter in \system{LaMGD} is the number of selected groups in each layer, $k$, which we set to 12 in every experiments. By retaining $12/16$ groups, we share on average $75 \%$ active groups between two domains or languages. This design ensures that the percentage of sharing is in the same ballpark as what we obtain with adapter modules. In our future work, we intend to analyze how these choices affect the final performance of the model.
 
 The temperature parameter $\tau$ for the $\operatorname{Soft-Top-K}$ operator is gradually decreased from $0.5$ to $0.2$ according to the following policy:
 \begin{align*}
@@ -329,7 +329,7 @@ The temperature parameter $\tau$ for the $\operatorname{Soft-Top-K}$ operator is
 \end{align*}
 in which $r=0.0001$.
 
-Finally, we fix the weight of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ to $0.0001$ in the training loss in every experiments. The choice of the values for our hyperparameters was not optimized and selected by suggestions from previous studies \citep{Jang17categorical,Gong21pay,Gong21adaptive}.
+Finally, we fix the weight of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ to $0.0001$ in the training loss in every experiments. The choice of the values for our hyper-parameters was not optimized and selected by suggestions from previous studies \citep{Jang17categorical,Gong21pay,Gong21adaptive}.
 
 For all experiments, we report the BLEU score of \citet{Papineni02bleu} computed with SacreBleu \citep{Post18call}.\fyDone{Check this}
 
@@ -555,20 +555,21 @@ We also plot the languages based on their dropout masks in Figure~\ref{fig:visua
 % \label{fig:phi}
 % \end{figure*}
 \subsection{Ablation study}
-We provide more analysis over the choice of hyperparameters $k$ which is the number of activated nodes in each layer, i.e, controls the sharing level between the tasks. Table ~\ref{tab:K} shows the degradation of the performance when the number of activated nodes is reduced, and the sharing level between tasks decreases in consequence. 
+We discuss here the choice of the hyper-parameters $k$, the number of activated nodes in each layer, and its impact on the sharing level between the tasks. Table ~\ref{tab:K} shows the variance of performance when the number of activated nodes is changed, and the sharing level between tasks decreases in consequence.\Todo{add sharing results. }\Todo{check caption consistency}
 \begin{table}[h!]
   \centering
   \begin{tabular}{|c|c|} \hline
-    K & \domain{avg}\\ \hline 
+    $k$ & \domain{avg}\\ \hline 
     8 & 18.1 \\
     10 & 19.15 \\
     12 & 19.33 \\
     14 & 19.44 \\
     \hline
   \end{tabular}
-  \caption{Variation of the performance w.r.t K while we fix $n_p=16$}
+  \caption{Variation of the performance w.r.t $k$, while we fix $n_p=16$. These results correspond to the multilingual setting (o2m-diverse).}
   \label{tab:K}
 \end{table}
+
 \section{Related work}\label{sec:related}
 Multidomain and multilingual translation systems have received considerable attention in the recent years, and a exhaustive survey is beyond the goal of this paper. Domain adaptation for neural MT is surveyed in \citep{Chu17comparison}, while multidomain MT systems are notably studied in \cite{Saunders21Asurvey,Pham21revisiting}; for multilingual MT, the reader is referred eg.\ to \citep{Chu18multilingual,dabre20survey}. We focus on the most relevant subset of this literature below.
 
