@@ -38,9 +38,9 @@
 \usepackage{tikz}
 \usepackage{pgfplots}
 \usepackage{pgfplotstable}
-
 \usepackage{soulutf8}
 \usepackage{tabularx}
+\usepackage{url}
 
 \usepackage[draft]{todo}
 \newcommand{\fyTodo}[1]{\Todo[FY:]{\textcolor{orange}{#1}}}
@@ -89,12 +89,45 @@
 \title{Responses to the reviews of ACL rolling review paper \#162:
   ``Latent Group Dropout for Multilingual and Multidomain Machine Translation''
 }
+\author{}
 \date{}
 
 \begin{document}
 \maketitle
 
-\textcolor{blue}{We thank the reviewers for sharing their suggestions which will help us improve the clarity of our paper and strengthen the claim regarding the efficacy of our method.}
+\textcolor{blue}{We thank the meta-reviewer and reviewers for sharing their suggestions which will help us improve the clarity of our paper and strengthen the claim regarding the efficacy of our method.}
+
+\section*{Meta Review Tdeo}
+
+\subsubsection*{Meta-review:}
+
+This paper proposes a method for parameter sharing in multitask machine translation. For a given language or domain, the model learns which groups of nodes to activate in order to optimize the multitask loss.
+
+\subsubsection*{Summary Of Reasons To Publish:}
+
+The reviewers mostly agree that this is an interesting, well-presented method. Multitask training is very relevant for MT, and this method achieves comparable performance to an adapter-based method with fewer parameters.
+
+\subsubsection*{Summary Of Suggested Revisions:}
+
+From the reviews and the ensuing discussion, it seems that the paper would benefit from comparison to more baselines. In particular, comparisons to the paper highlighted by iMF4, or to other methods already mentioned in the paper: (Li et al., (2020), Gong et al., (2021a, b)). Some reviewers mention the need for more ablations and a better understanding of hyper-parameter sensitivity.
+
+\paragraph{}\textbf{Overall Assessment}: 3 = There are major points that may be revised
+\paragraph{}\textbf{Suggested Venues:} WMT.
+\paragraph{}\textbf{Ethical Concerns:} None.
+
+\subsubsection*{Rebuttal}
+{
+  \color{blue}
+  
+As a follow up to these comments, the paper has been revised to clarify the main claims, the description of the method and presentation of experimental results with new graphs. We have also included a comparison with a new baseline suggested by Reviewer iMf4, and an analysis of the impact of meta parameters.
+
+However, we would also like to outline the fact that our contribution, in this paper, is *not* to outperform the best published state-of-the-art results for multilingual / multidomain MT. Instead, our goal is to present a novel, mathematically sound, methodology to automatically learn shared nodes in multi-task (multi-domain, multi-lingual) systems and to show (a) that these new patterns yield performance that are better that alternative approaches for sharing / unsharing subpart of the computation graph accross tasks and also compare favorably in terms of computational cost; (b) that these patterns actually capture similarities between tasks. We have therefore planned our experiments, comparisons and analyses insofar as they were relevant to illustrate these aspects. This has notably motivate our choice the adaptor model, which has been used in many prior work, as a reasonable point of comparison. We however respectfully disagree on the fact that unpublished papers from mid 2021 should be the ``baseline'' for reporting experiments in november 2021.
+
+We discuss each review below, and explain the changes that have been made in response to each reviewers' suggestion.
+}
+
+% \todo{Make this contribution} Finally, we hope the reviewer change the view on the objective of our paper, reconsider the solid mathematical foundation of our method supported by an explicit implementation explained in the Appendix, the improvement with high margin in multi-domain, the reduced computational cost in the inference compared to the Adapters, and the novelty in the use of node-masking instead of weight-masking as in previous work such as in Lin et al.
+% }
 
 \section*{Reviewer iMf4}
 \subsubsection*{Paper Summary:}
@@ -120,7 +153,7 @@ This paper considers multidomain and multilingual NMT as multi-task learning and
 
 \subsubsection*{Comments, Suggestions And Typos:}
 
-I Table 7 can be improved in presentation by using heatmap.
+Table 7 can be improved in presentation by using heatmaps.
 
 \textbf{Overall Assessment:} 2
 
@@ -138,24 +171,25 @@ I Table 7 can be improved in presentation by using heatmap.
 
 \subsubsection*{Rebuttal}
 {\color{blue}%
-  We thank the reviewer for pointing additional relevant work. We cite and discuss it in the revised version.
+We thank the reviewer for pointing additional relevant work. We cite and discuss it in the revised version.\Todo{Check this}
 
 For the sake of the clarification of our approach, we would like to point out several misunderstandings in the summary made by Reviewer iMf4:
 \begin{itemize}
-\item Our approach does not aim to find task-specific and task-agnostic parameters in the neural network: there is no notion of domain specific or domain agnostic parameters. The objective of our algorithm is to optimize the assignment of a sub-group of "nodes", which are the dimensions of the output of each intermediate layer, to each task.
-\item Our approach does not mask the sub-parts of each weight matrix but masks a fixed number of sub-groups of elements of the output of each intermediate layer.
+\item Our approach does not aim to find task-specific and task-agnostic \textbf{parameters} in the neural network: there is no notion of domain-specific or domain-agnostic parameters in the approach we present. The objective of our algorithm is to optimize the assignment \emph{of a sub-group of "nodes"}, at the output of each intermediate layer, to each task.
+\item Our approach does not mask the sub-parts of each weight matrix, but instead it masks a fixed number of sub-groups of elements of the output of each intermediate layer.
 \end{itemize}
-We have tried to improve our presentation of our method in the revised version of the paper.\todo{Change presention, give line numbers}
+We have tried to improve our presentation of our method in the revised version of the paper to avoid further misunderstandings.\todo{Change presention, give line numbers}
 
-We would like to answer the other concerns of the reviewier as follows.
-\begin{itemize} CLAIM : baseline + parameter sharing + resultats CDR
-\item Regarding baselines, we insist ur claim is that embedding the similarity between tasks in the construction of the multi-task network is beneficial, and the fine-tuning-based approaches ignore these similarities. We prove our claim by proposing a method that automatically optimizes the structure of a multi-task network by learning from data, i.e., implicitly learning the similarity between tasks and embedding it to the organization of the network. Besides, the Adapters are a robust method for multi-task learning, and a comparison with this baseline strongly supports our claim over the efficiency of our proposed method.
-\item We are happy to provide more comparisons with heuristic strategies of the dropout group selection in the final version. The flaws of these heuristic strategies motivate us to develop this technique.
-\item We have included the analysis on the effect of $k$ on the performance in the revised version (see new section 4.4)
-\item The multilingual experiments use two groups of $8$ languages, which are all low-resourced; this might lower the significance of the improvement as observed in the paper of Lin et al. 21 (only +0.7 for low resource). Our method significantly improves the less resource languages among these groups.
+We would like to answer the other concerns of the reviewier as follows. \todo{CLAIM : baseline + parameter sharing + resultats CDR}
+\begin{itemize} 
+\item Regarding baselines, we generally refer to the rebuttal to the meta review. Note that according to your suggestion, we have added new multidomain experiments with a heuristic definition of blocks. See the updated table~XXX.\Todo{Add table}
+\item We have now included an analysis on the effect of $k$ on the performance in the revised version (see new section 4.4)
+\item The multilingual experiments use two groups of $8$ languages, which are all low-resourced; this might lower the significance of the improvement as observed in the paper of Lin et al. 21 (only +0.7 for low resource languages). Our method significantly improves the less resources languages among these groups.
+\item As suggested, we are now using heatmaps instead of Table 7.
+\item Statistical confidence scores are also reported. \todo{Add significancy tests}
 \end{itemize}
+}
 
-\todo{Make this contribution} Finally, we hope the reviewer change the view on the objective of our paper, reconsider the solid mathematical foundation of our method supported by an explicit implementation explained in the Appendix, the improvement with high margin in multi-domain, the reduced computational cost in the inference compared to the Adapters, and the novelty in the use of node-masking instead of weight-masking as in previous work such as in Lin et al.}
 \section*{Reviewer 681g}
 
 \subsubsection*{Paper Summary:}
@@ -184,7 +218,7 @@ It'd be good to also include a mixture-of-experts baseline.
 
 \textbf{Confidence:} 4 = Quite sure. I tried to check the important points carefully. It's unlikely, though conceivable, that I missed something that should affect my ratings.
 
-Best Paper: No
+\textbf{Best Paper}: No
 
 \textbf{Replicability:} 3 = They could reproduce the results with some difficulty. The settings of parameters are underspecified or subjectively determined, and/or the training/evaluation data are not widely available.
 
@@ -197,16 +231,18 @@ Best Paper: No
 \subsubsection*{Rebuttal}
 
 {\color{blue}
-\tofo{Keep this ?}We thank the reviewer for appreciating our mathematical work to support our implementation and the suggestions for a better understanding of our proposed approach. We would like to answer the reviewer's concerns as follows.
+We thank the reviewer for their suggestest improvements to this work. We would like to answer the reviewer's concerns as follows.
 
 \begin{itemize}
 \item % We did admit our lack of analysis on the hyperparameters in the conclusion of our paper.
-  We have now collected more data for better analyzing the effect of hyper-parameters on the performance of our method since the submission. These results in our revised version.
-\item We agree with the reviewer. However, we could reduce the group size to 1 node only and use hierarchical modeling to optimize the number of nodes to be activated. These changes would improve the method's flexibility in exchange for computational cost in training.
-\item We are aware of these works and they are discussed in related work section. However, we do not attempt to beat a race in the translation performance in multilingual translation or multi-domain translation. In this work, our claim is that embedding the similarity between tasks in the construction of the multi-task network is beneficial, and the fine-tuning-based approaches ignore these similarities. And, we prove our claim by proposing a method that automatically optimizes the structure of a multi-task network by learning from data, i.e., implicitly learning the similarity between tasks and embedding it to the organization of the network \Todo{Reponse à tous les reviewers}
+  We have now collected more data for better analyzing the effect of hyper-parameters on the performance of our method. These results in our revised version (section 4.4).
+  
+\item We agree with the reviewer that our method requires to set the number of blocks a priori: for us, this is just one more hyper-parameter on top of the many parameters in the Transformer (depth, number of heads, representation side) and should not be regarded as a lack of flexibility. Our analysis show that in our experimental conditions, the number of groups impacts the performance, which seem to quicly plateau as the number of blocks increase.
+  
+\item Regarding alternative approaches that have been recently proposed, we are aware of these works and they are duely discussed in related work section. However, as explain in our general rebutal above, we do not consider that comparing with these would change any of our claim in any way.\done\Todo{Reponse à tous les reviewers}
 \end{itemize}
 
-We agree that a mixture of experts is an relevant alternative baseline. Again resource limitation in training --  We have been working on their implementations but lack the computational resource for training. Finally we hope the reviewer change the view on the objective of our paper and reconsider our solid mathematical modeling supported by supported by an explicit implementation explained in the Appendix.
+We agree that a mixture of experts model would also provide yet another possible alternative baseline. Note however that mixture of experts are much costly to train, much more than our method, as we would need to fully train one model for each expert; furthermore, a mixture of expert would not bring us any insight regarding the benefits of sharing / unsharing patterns for related domains. Therefore, we do not see that the outcome of such comparison would allow us to revise or amend or main claims.
 }
 \section*{Reviewer 3koi}
 
@@ -257,17 +293,21 @@ While the proposed approach and results are quite interesting, there is some nee
 
 \subsubsection*{Rebuttal}
 {\color{blue}%
-We thank the reviewer for appreciating our mathematical modeling and the suggestions for a better understanding of our proposed technique. We would like to answer the concerns of the reviewer as follows.
+We thank the reviewer for their suggestest improvements to this work. We would like to answer the concerns of the reviewer as follows.
 
 \begin{itemize}
 \item We initialize the probabilistic distribution of the latent variables as uniform distribution. This is clarified in the revised text.\Todo{Check clarified which line}
 \item The revised version includes a discussion  regarding $k$ and how it affects the performance of our approach (section 4.4).
-\item As reported in many works using the Gumbel reparameterization trick, the effect of $\tau$ is relatively insignificant. This is discussed in the revised version in section. \Todo{which section}Therefore, we focused more on selecting $k$. \Todo{Add references}
-\item Because we would like to have the same total amount of training iterations between Adapter-based and LaMGD, we extend the training of LaMGD to 300K. The convergence of the standard Transformer is before 200K as its validation curve became flat near the 200K-th iteration. These has been clarified in the paper. \Todo{Which section ?}
-\item The previous reason is applied for the reviewer's concern over multilingual experiments.
-\item As we pointed out, the significant gains are observed in several very low-resourced languages, not globally. This might be explained by the fact that low-resourced languages benefit from the sharing nodes with their related well-resourced languages while less suffering from the inference of unrelated languages.
+\item As reported in many works using the Gumbel reparameterization trick, the effect of $\tau$ is relatively insignificant. This is discussed in the revised version in section XXXX. \Todo{which section}Therefore, we focused more on selecting $k$. \Todo{Add references}
+\item Because we would like to have the same \emph{total amount of training iterations between Adapter-based and LaMGD}, we extend the training of LaMGD to 300K. The convergence of the standard Transformer is achieved before 200K as its validation curve became flat near the 200K-th iteration. These has been clarified in the paper. \Todo{Which section ?}
+\item The same answer applies to the reviewer's concern regarding the multilingual experiments.
+\item As pointed out\todo{Where ?}, significant gains are observed in several very low-resourced languages, not globally. This might be explained by the fact that low-resourced languages benefit most from the sharing nodes with a related well-resourced languages, and are also less affected by the inference of unrelated languages.
 \end{itemize}
-Our claim on the advantage in computational cost repose on the inference stage while there are no extra parameters added to the standard Transformer compared to Adapter-based methods. However, the training time will cost more than usual because of the joint optimization of the network's organization and the parameters. Finally, we hope the reviewer change the view on the objective of our paper and reconsider our solid mathematical modeling supported by the explicit implementation explained in Appendix. \todo{Not so great. We cannot be sure the reviewers stay the same.}
+
+Our claim on the advantage in computational cost wrt. Adapters relies on the inference stage while there are no extra parameters added to the standard Transformer compared to Adapter-based methods. At the same time, the training time will  more than usual because of the joint optimization of the network's organization and the parameters. \todo{Not so great. Can we say more ? There is a nice blog post on FLOPS here: \url{%
+https://medium.com/@dzmitrybahdanau/the-flops-calculus-of-language-model-training-3b19c1f025e4
+}%
+}
 }%
 
 \end{document}
