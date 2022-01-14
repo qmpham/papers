@@ -303,7 +303,7 @@ Our systems for the multidomain experiments are designed as follows:
 \item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 2048; the multi-head attention mechanism contains 8 heads; 6 layers in the encoder; 6 layers in the decoder.\fyDone{How many layers}
 \item Adapter-based Transformer: The intermediate feedforward dimension is set to 2048;% as in \citet{Pham21revisiting}.
 \item Transformer using Latent multi-task group dropout (\system{LaMGD} Transformers):\fyDone{Explain acronym} There is no change in the architecture. We group the 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 out of the 16 groups are selected. The number of parameters of the variational distribution is $L\times k \times L \times n_d$, which is negligible in comparison to the size of the Transformer model.
-\item \item Transformer using heuristic multi-task group dropout (\system{HMGD} Transformer): we share 320 nodes for every task, and reserve 32 nodes for each task (making $320 + 32*6 = 512$ nodes in total).
+\item Transformer using heuristic multi-task group dropout (\system{HMGD} Transformer): we share 320 nodes for every task, and reserve 32 nodes for each task (making $320 + 32*6 = 512$ nodes in total).
 \end{itemize}
 
 We set the dropout probability to 0.1. We train the multi-domain Transformer model for 200k iterations with a batch size of 12k tokens. The convergence of the standard Transformer is before 200K as its validation curve became flat near the 200K-th iteration. The \system{LaMGD} Tranformer converged after 300k iterations with a batch size of 12k tokens. The convergence of \system{LaMGD} is controlled by its validation curve. Finally, we plug domain adapters to the multidomain Transformer model and finetune them for 25k iterations using the same batch size as the baseline. With approximately the same amount of training iterations, \system{LaMGD} and Adapter-based Transformer are trained.
@@ -329,7 +329,7 @@ The temperature parameter $\tau$ for the $\operatorname{Soft-Top-K}$ operator is
 \tau = \operatorname{min}\{ 0.2, 0.5 * \exp^{-r*step} \},
 \end{align*}
 in which $r=0.0001$.
-While \citet{Gong21pay,Gong21adaptive} fixed $\tau$ to be 0.2, we select an anneal policy for $\tau$ proposed by previous studies \citep{Jang17categorical}. Finally, we fix the weight of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ to $0.0001$ in the training loss in every experiments
+While \citet{Gong21pay,Gong21adaptive} fixed $\tau$ to be 0.2, we combine it with an anneal policy for $\tau$ proposed by previous studies \citep{Jang17categorical} to encourage the diversity in the beginning of the training. Finally, we fix the weight of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ to $0.0001$ in the training loss in every experiments.
 
 For all experiments, we report the BLEU score of \citet{Papineni02bleu} computed with SacreBleu \citep{Post18call}.\fyDone{Check this}
 \subsubsection{Latent variables' initialization}
