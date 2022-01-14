@@ -263,29 +263,29 @@ We prove inequality~\eqref{eq:entropy} in Appendix~\ref{appendix:b}.
 This inequality shows that an upperbound of $R$ is $\sum_{l=1}^L(\text{log}(\#\Delta^{n_p}_k) - \mathbb{H}(\text{softmax}(\Phi_l^d)))$ since $i_1 | \Phi_l^d \sim \operatorname{softmax}(\Phi_l^d)$. During training, we thus maximize a sum over layers of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$\fyDone{Check sum} which performs a regularization over the parameters $\Phi^d$ of the variational distribution. 
 
 Thanks to the Gumbel Top-K trick, we can move the parameters $\Phi$ into the objective function and get rid of policy gradients, which have been reported to be very unstable \citep{Diederick14auto}. However, the operator $\operatorname{Top-k}$, which serves to define $\tilde{m}_l^d$ in Equation~\eqref{eq:top-k}, is not differentiable. Therefore, we approximate this function by the $\operatorname{Soft-Top-K}$ function defined as follows:
-\begin{align}
+\begin{align}\label{eq:soft-top-k}
 \hat{m}_l^d(\tau) &= \displaystyle{\mathop{argmin}_{\substack{
                     0 \leqslant m_i \leqslant 1 \\
   \forall 0 \leqslant i \leqslant n_d\text{-}1 \\
         1^{T}.m = k
-      }}} -(g_l^d+\Phi_l^d)^{T} . m - \tau H_b(m) \label{eq:soft-top-k}
+      }}} -(g_l^d+\Phi_l^d)^{T} . m - \tau H_b(m) 
 \end{align}
 in which
 \begin{align}
 H_b(m) &= - \sum_i m_i \text{log}(m_i) + (1-m_i)\text{log}(1-m_i). \nonumber 
 \end{align}
 
-In Appendix \ref{appendix:a}, we prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. Furthermore, we also provide the computation of $\hat{m}_l^d(\tau)$ and prove that $\hat{m}_l^d(\tau)$ is a differentiable function w.r.t $\Phi_l^d$ and that its gradients can be computed using the implicit differentiation theorem. During training, we approximate $\tilde{m}_l^d$ by $\hat{m}_l^d(\tau)$ by gradually decaying the hyper-parameter $\tau$ to $0$. The gradient of $D$ w.r.t $\Phi_l^d$ is computed using the chain rule as follows:
-\begin{equation}
-\frac{\partial D}{\partial \Phi_l^d} = \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d}
-\end{equation}
+In Appendix \ref{appendix:a}, we prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. Furthermore, we also provide the computation of $\hat{m}_l^d(\tau)$ and prove that $\hat{m}_l^d(\tau)$ is a differentiable function w.r.t $\Phi_l^d$ and that its gradients can be computed using the implicit differentiation theorem. During training, we approximate $\tilde{m}_l^d$ by $\hat{m}_l^d(\tau)$ by gradually decaying the hyper-parameter $\tau$ to $0.2$. The gradient of $D$ w.r.t $\Phi_l^d$ is computed using the chain rule as follows:
+\begin{align*}
+\frac{\partial D}{\partial \Phi_l^d} = \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} 
+\end{align*}
 The gradient $\frac{\partial D}{\partial \hat{m}_l^d(\tau)}$ is computed via autograd algorithm while $\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d}$ is computed via implicit differentiation, as explained in Appendix~\ref{appendix:a}.
 
 We jointly train the Transformer parameters $\theta$ and the parameters of the variational distribution $\Phi$ using the following multi-task loss.\fyDone{This is repeated}
-\begin{align}
+\begin{align*}
 \hspace{-0.em}
 \mathcal{L}(\theta,\Phi) = \sum_{d=1}^{n_d} \mathbb{E}_{x \sim \mathcal{D}_s^d,y \sim MT^d(x)} \big[-\ell(x,y,d; \theta,\Phi)\big]
-\end{align}
+\end{align*}
 
 in which $\mathcal{D}_s^d$ is distribution of task $d$ over the input space $\Omega^d_s$; $\operatorname{MT}^d: \Omega^d_s \rightarrow \Omega^d_t$\fyDone{already defined} is the translation function for task $d$, which our multi-task model needs to learn; $-\ell(x,y, d, \theta,\Phi)$ is the $\operatorname{ELBO}$ loss, defined in Equation~\ref{eq:lower-bound}.
 
@@ -308,7 +308,8 @@ Our systems for the multidomain experiments are designed as follows:
 \item Transformer using heuristic multi-task group dropout (\system{HMGD} Transformer): we share 320 nodes for every task, and reserve 32 nodes for each task (totalling $320 + 32*6 = 512$ nodes).
 \end{itemize}
 
-We set the dropout probability to 0.1. We train the multi-domain Transformer model for 200k iterations with a batch size of 12k tokens. The convergence of the standard Transformer is before 200K as its validation curve became flat near the 200K-th iteration. The \system{LaMGD} Transformer converged after 300k iterations with a batch size of 12k tokens. The convergence of \system{LaMGD} is controlled by its validation curve. Finally, we plug domain adapters to the multidomain Transformer model and finetune them for 25k iterations using the same batch size as the baseline: this ensures that \system{LaMGD} and Adapter-based Transformer have the same amount of training iterations.
+We set the dropout probability to 0.1. We train the multidomain Transformer model for 200k iterations with a batch size of 12k tokens. The convergence of the standard Transformer is before 200K as its validation curve became flat near the 200K-th iteration. The \system{LaMGD} Transformer converged after 300k iterations with the same batch size. The convergence of \system{LaMGD} is controlled by its validation curve. Finally, we plug adapters to the multidomain Transformer model and finetune them for 25k iterations using the same batch size as the baseline.
+%: this ensures that \system{LaMGD} and Adapter-based Transformer have the same amount of training iterations.
 
 \subsubsection{Multilingual translation systems}
 The systems used in our multilingual experiments are implemented as follows:
@@ -331,7 +332,8 @@ The temperature parameter $\tau$ for the $\operatorname{Soft-Top-K}$ operator is
 \tau = \operatorname{min}\{ 0.2, 0.5 * \exp^{-r*step} \},
 \end{align*}
 in which $r=0.0001$.
-While \citet{Gong21pay,Gong21adaptive} fixed $\tau$ to be 0.2, we select an anneal policy for $\tau$ proposed by previous studies \citep{Jang17categorical}. Finally, we fix the weight of the entropy $\mathbb{H}(\text{softmax}(\Phi_l^d))$ to $0.0001$ in the training loss in every experiments
+While \citet{Gong21pay,Gong21adaptive} fixed $\tau$ to be 0.2, we select an anneal policy for $\tau$ proposed by previous studies \citep{Jang17categorical}. Finally, we set the weight of the entropy term to $0.0001$ in the training loss in every experiments.
+%$\mathbb{H}(\text{softmax}(\Phi_l^d))$
 \subsubsection{Latent variables initialization}
 We initialize the distribution of the latent variables uniformly. More precisely, we set $\Phi_l^d$, which generates the probability of the masks via the softmax activation function, to $0^{n_d}$.
 \subsection{Datasets and metrics}
@@ -349,8 +351,8 @@ We use the same data as in the recent work of \citet{Pham21revisiting} on multid
     \# \revisiondone{uniq} & 700 / 640 & 20.2 / 23.7 & 42.9 / 40.1 & 44.7 / 55.7 & 20.7 / 25.6 & 7.1 / 2.1 \\
     \hline
   \end{tabular}
-  \caption{Corpora statistics: number of parallel lines ($\times 10^3$) and proportion in the basic domain mixture (which does not include the \domain{news} domain), number of tokens in English and French ($\times 10^6$), number of types in English and French ($\times 10^3$), number of types that only appear in a given domain ($\times 10^3$). \domain{med} is the largest domain, containing almost 70\% of the sentences, while \domain{rel} is the smallest, with only 3\% of the data.
-  }
+  \caption{Corpora statistics: number of parallel lines ($\times 10^3$) and proportion in the basic domain mixture (which does not include the \domain{news} domain), number of tokens in English and French ($\times 10^6$), number of types in English and French ($\times 10^3$), number of types that only appear in a given domain ($\times 10^3$).}
+%\domain{med} is the largest domain, containing almost 70\% of the sentences, while \domain{rel} is the smallest, with only 3\% of the data.
 \label{tab:Corpora-chap4}
 \end{table*}
 \subsubsection{Multilingual translation}
@@ -400,10 +402,10 @@ For these experiments, our main results are in Table~\ref{tab:mdmt}, where we ob
   \centering
   \begin{tabular}{|p{4cm}|*{7}{r|}} \hline
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
-    \system{Transformer}  \hfill{\footnotesize[65m]} & \SB{40.3} & 59.5 & 49.8 & 36.4 & 49.0 & 80.0  & 52.5\\
-    \system{HMGD} Transformer   \hfill{\footnotesize[+0m]}  & \SB{40.4} & 60.4 & 51.9 & 38.7 &	50.80 &	86.80 & 54.8 \\ 
-    \revision{\system{Adapter}}   \hfill{\footnotesize[+151m]}  & 39.5 & \SB{61.0} & \SB{53.1} & 37.5 & 49.6 & \SB{91.0} & \SB{55.3} \\ 
-    \system{LaMGD} Transformer   \hfill{\footnotesize[+0m]}  & \SB{40.3} & 60.4 & 52.4 & \SB{39.0} & \SB{52.4} & 87.5 & \SB{55.3} \\ 
+    \system{Transformer}  \hfill{\footnotesize[65m]} & 40.3 & 59.5 & 49.8 & 36.4 & 49.0 & 80.0  & 52.5\\
+    \system{HMGD} Transformer   \hfill{\footnotesize[+0m]}  & 40.4 & 60.4 & 51.9 & 38.7 &	50.80 &	86.80 & 54.8 \\ 
+    \revision{\system{Adapter}}   \hfill{\footnotesize[+151m]}  & 39.5 & 61.0 & 53.1 & 37.5 & 49.6 & \SB{91.0} & \SB{55.3} \\ 
+    \system{LaMGD} Transformer   \hfill{\footnotesize[+0m]}  & 40.3 & 60.4 & 52.4 & \SB{39.0} & \SB{52.4} & 87.5 & \SB{55.3} \\ 
     \hline
   \end{tabular}
   \caption{Multi-domain translation}
@@ -412,7 +414,7 @@ For these experiments, our main results are in Table~\ref{tab:mdmt}, where we ob
 
 \subsubsection{Fuzzy domain separation}
 \label{ssec:fuzzy}
-For this experiment, we reuse proposal of \citet{Pham21revisiting}, who measure the efficiency of a multidomain NMT system exploiting the proximity between domains. It uses the same data as in the previous experiment; however, the domain \domain{law} is now randomly split into two pseudo-domains \domain{law$_1$} and \domain{law$_2$} of equal size. A truly multidomain system should be able to automatically detect the proximity between \domain{law$_1$} and \domain{law$_2$}, and there should be no significant difference between the performance of a system trained with the six original domains (including \domain{law}) or with the seven domains (including \domain{law} by \domain{law$_1$} and \domain{law$_2$}). The experiments in \citep{Pham21revisiting} reported a large gap between the two settings when using residual adapters. We replicated this setting and also report the results obtained with the \system{LaMGD} Transformer system in Table~\ref{tab:fuzzy}. 
+For this experiment, we reuse proposal of \citet{Pham21revisiting}, who measure the efficiency of a multidomain NMT system exploiting the proximity between domains. It uses the same data as in the previous experiment; however, the domain \domain{law} is now randomly split into two pseudo-domains \domain{law$_1$} and \domain{law$_2$} of equal size. A truly multidomain system should be able to automatically detect the proximity between \domain{law$_1$} and \domain{law$_2$}, and there should be no significant difference between the performance of a system trained with the six original domains (including \domain{law}) or with the seven domains (including \domain{law} by \domain{law$_1$} and \domain{law$_2$}). \citet{Pham21revisiting} reported a large gap between the two settings when using residual adapters. We replicated this setting and report the results obtained with the \system{LaMGD} Transformer system in Table~\ref{tab:fuzzy}. 
 
 \begin{table*}[h!]
   \centering
@@ -446,8 +448,8 @@ Results for the multilingual experiments are in Table~\ref{tab:multilingual}.  T
     \hline
     \hline
     O2M-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
-    \system{Transformer}  \hfill{\footnotesize[96.9m]} & 10.2&4&12.7&22.2&31.8&\SB{34.0}&38.3&8.3&20.19 \\
-    \revision{\system{Adapter}}   \hfill{\footnotesize[+13m]}  &10.2&4&\SB{13.3}&21.9&32.2&\SB{34.1}&38.5&8.3&20.31 \\ 
+    \system{Transformer}  \hfill{\footnotesize[96.9m]} & 10.2&4&12.7&22.2&31.8&34.0&38.3&8.3&20.19 \\
+    \revision{\system{Adapter}}   \hfill{\footnotesize[+13m]}  &10.2&4&\SB{13.3}&21.9&32.2&34.1&38.5&8.3&20.31 \\ 
     \system{LaMGD} Transformer   \hfill{\footnotesize[+0m]}&10.1&3.8&12.6&\SB{22.8}&31.8&33.4&38.1&8.1&20.09\\
     \hline 
     \hline
@@ -480,7 +482,7 @@ This section compares the sub-networks learnt for each domain or language pair b
   \caption{Multilingual}
   \label{fig:ml-heatmap}
 \end{subfigure}
-\caption{Heatmap visualization of the similarities between dropout masks of domains(languages). Brighter colors correspond to higher similarity scores.}
+\caption{Heatmap visualization of the similarities between dropout masks of domains(languages).}
 \label{fig:heatmap}
 \end{figure}
 
@@ -520,7 +522,7 @@ For multilingual (TED-related) experiments, the training data contains four lang
 %  \label{tab:related-sim}
 %\end{table*}
 
-We also plot the languages based on their dropout masks in Figure~\ref{fig:visual} using a 2d projection computed by PCA.
+We also plot the languages based on their dropout masks in Figure~\ref{fig:visual} using a 2d PCA projection.
 \begin{figure*}[htbp]
 \begin{subfigure}{0.5\textwidth}
   \centering
@@ -570,7 +572,7 @@ We discuss here the choice of the hyper-parameters $k$, the number of activated 
     14 & 19.44 & 0.88\\
     \hline
   \end{tabular}
-  \caption{Variation of the performance w.r.t $k$, while we fix $n_p=16$. These results correspond to the multilingual setting (o2m-related).}
+  \caption{Variation of the performance w.r.t $k$, while we fix $n_p=16$ (o2m-related experiment).}
   \label{tab:K}
 \end{table}
 
