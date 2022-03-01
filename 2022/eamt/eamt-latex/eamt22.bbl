@@ -1,0 +1,470 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citename{Aharoni \bgroup et al.\egroup
+  }2019]{Aharoni19massively}
+Aharoni, Roee, Melvin Johnson, and Orhan Firat.
+\newblock 2019.
+\newblock Massively multilingual neural machine translation.
+\newblock In {\em Proceedings of the 2019 Conference of the North {A}merican
+  Chapter of the Association for Computational Linguistics: Human Language
+  Technologies, Volume 1 (Long and Short Papers)}, pages 3874--3884,
+  Minneapolis, Minnesota, June. Association for Computational Linguistics.
+
+\bibitem[\protect\citename{Axelrod \bgroup et al.\egroup
+  }2011]{Axelrod11domain}
+Axelrod, Amittai, Xiaodong He, and Jianfeng Gao.
+\newblock 2011.
+\newblock Domain adaptation via pseudo in-domain data selection.
+\newblock In {\em Proceedings of the Conference on Empirical Methods in Natural
+  Language Processing}, EMNLP '11, pages 355--362, Edinburgh, United Kingdom.
+
+\bibitem[\protect\citename{Bengio \bgroup et al.\egroup
+  }2009]{Bengio09curriculum}
+Bengio, Yoshua, J\'{e}r\^{o}me Louradour, Ronan Collobert, and Jason Weston.
+\newblock 2009.
+\newblock Curriculum learning.
+\newblock In {\em Proceedings of the 26th Annual International Conference on
+  Machine Learning}, ICML '09, page 41–48, New York, NY, USA.
+
+\bibitem[\protect\citename{Britz \bgroup et al.\egroup }2017]{Britz17mixing}
+Britz, Denny, Quoc Le, and Reid Pryzant.
+\newblock 2017.
+\newblock Effective domain mixing for neural machine translation.
+\newblock In {\em Proceedings of the Second Conference on Machine Translation},
+  pages 118--126, Copenhagen, Denmark. Association for Computational
+  Linguistics.
+
+\bibitem[\protect\citename{Cettolo \bgroup et al.\egroup }2012]{Cettolo12wit}
+Cettolo, Mauro, Christian Girardi, and Marcello Federico.
+\newblock 2012.
+\newblock Wit$^3$: Web inventory of transcribed and translated talks.
+\newblock In {\em Proceedings of the 16$^{th}$ Conference of the European
+  Association for Machine Translation (EAMT)}, pages 261--268, Trento, Italy,
+  May.
+
+\bibitem[\protect\citename{Chen \bgroup et al.\egroup }2016]{Chen16guided}
+Chen, Wenhu, Evgeny Matusov, Shahram Khadivi, and Jan-Thorsten Peter.
+\newblock 2016.
+\newblock Guided alignment training for topic-aware neural machine translation.
+\newblock In {\em Proceedings of the Twelth Biennial Conference of the
+  Association for Machine Translation in the Americas}, AMTA 2012, Austin,
+  Texas.
+
+\bibitem[\protect\citename{Chu and Dabre}2018]{Chu18multilingual}
+Chu, Chenhui and Raj Dabre.
+\newblock 2018.
+\newblock Multilingual and multi-domain adaptation for neural machine
+  translation.
+\newblock In {\em Proceedings of the 24st Annual Meeting of the Association for
+  Natural Language Processing}, NLP 2018, pages 909--–912, Okayama, Japan.
+
+\bibitem[\protect\citename{Chu and Wang}2018]{Chu18asurvey}
+Chu, Chenhui and Rui Wang.
+\newblock 2018.
+\newblock A survey of domain adaptation for neural machine translation.
+\newblock In {\em Proceedings of the 27th International Conference on
+  Computational Linguistics}, COLING 2018, pages 1304--1319, Santa Fe, New
+  Mexico, USA.
+
+\bibitem[\protect\citename{Chu \bgroup et al.\egroup }2017]{Chu2017comparison}
+Chu, Chenhui, Raj Dabre, and Sadao Kurohashi.
+\newblock 2017.
+\newblock An empirical comparison of domain adaptation methods for neural
+  machine translation.
+\newblock In {\em Proceedings of the 55th Annual Meeting of the Association for
+  Computational Linguistics (Volume 2: Short Papers)}, ACL 2017, pages
+  385--391, Vancouver, Canada.
+
+\bibitem[\protect\citename{de Brébisson and
+  Vincent}2016]{Brebisson16anexploration}
+de~Brébisson, Alexandre and Pascal Vincent.
+\newblock 2016.
+\newblock An exploration of softmax alternatives belonging to the spherical
+  loss family.
+\newblock In Bengio, Yoshua and Yann LeCun, editors, {\em Proceedings of the
+  4th International Conference on Learning Representation}, ICLR, San Juan,
+  Puerto Rico.
+
+\bibitem[\protect\citename{Farajian \bgroup et al.\egroup
+  }2017]{Farajian17multidomain}
+Farajian, M.~Amin, Marco Turchi, Matteo Negri, and Marcello Federico.
+\newblock 2017.
+\newblock Multi-domain neural machine translation through unsupervised
+  adaptation.
+\newblock In {\em Proceedings of the Second Conference on Machine Translation},
+  pages 127--137, Copenhagen, Denmark, September.
+
+\bibitem[\protect\citename{Firat \bgroup et al.\egroup }2016]{Firat16multiway}
+Firat, Orhan, Kyunghyun Cho, and Yoshua Bengio.
+\newblock 2016.
+\newblock Multi-way, multilingual neural machine translation with a shared
+  attention mechanism.
+\newblock In {\em Proceedings of the 2016 Conference of the North American
+  Chapter of the Association for Computational Linguistics: Human Language
+  Technologies}, pages 866--875. Association for Computational Linguistics.
+
+\bibitem[\protect\citename{Freitag and Al-Onaizan}2016]{Freitag16fast}
+Freitag, Markus and Yaser Al-Onaizan.
+\newblock 2016.
+\newblock Fast domain adaptation for neural machine translation.
+\newblock {\em CoRR}, abs/1612.06897.
+
+\bibitem[\protect\citename{Graves \bgroup et al.\egroup
+  }2017]{Graves17automated}
+Graves, Alex, Marc~G. Bellemare, Jacob Menick, R{\'e}mi Munos, and Koray
+  Kavukcuoglu.
+\newblock 2017.
+\newblock Automated curriculum learning for neural networks.
+\newblock In Precup, Doina and Yee~Whye Teh, editors, {\em Proceedings of the
+  34th International Conference on Machine Learning}, volume~70 of {\em
+  Proceedings of Machine Learning Research}, pages 1311--1320. PMLR, 06--11
+  Aug.
+
+\bibitem[\protect\citename{Ha \bgroup et al.\egroup }2016]{Ha16towards}
+Ha, Thanh-He, Jan Niehues, and Alex Waibel.
+\newblock 2016.
+\newblock Toward multilingual neural machine translation with universal encoder
+  and decoder.
+\newblock In {\em Proceedings of the 13th International Workshop on Spoken
+  Language Translation}, IWSLT 2016, Vancouver, Canada.
+
+\bibitem[\protect\citename{Hoffman \bgroup et al.\egroup
+  }2018]{Hoffman18algorithms}
+Hoffman, Judy, Mehryar Mohri, and Ningshan Zhang.
+\newblock 2018.
+\newblock Algorithms and theory for multiple-source adaptation.
+\newblock In Bengio, S., H.~Wallach, H.~Larochelle, K.~Grauman,
+  N.~Cesa-Bianchi, and R.~Garnett, editors, {\em Advances in Neural Information
+  Processing Systems 31}, pages 8246--8256. Curran Associates, Inc.
+
+\bibitem[\protect\citename{Jiang \bgroup et al.\egroup
+  }2020]{Jiang19multidomain}
+Jiang, Haoming, Chen Liang, Chong Wang, and Tuo Zhao.
+\newblock 2020.
+\newblock Multi-domain neural machine translation with word-level adaptive
+  layer-wise domain mixing.
+\newblock In {\em Proceedings of the 58th Annual Meeting of the Association for
+  Computational Linguistics}, pages 1823--1834, Online, July. Association for
+  Computational Linguistics.
+
+\bibitem[\protect\citename{Johnson \bgroup et al.\egroup
+  }2017]{Johnson17google}
+Johnson, Melvin, Mike Schuster, Quoc Le, Maxim Krikun, Yonghui Wu, Zhifeng
+  Chen, Nikhil Thorat, Fernand~a Vi{\'e}gas, Martin Wattenberg, Greg Corrado,
+  Macduff Hughes, and Jeffrey Dean.
+\newblock 2017.
+\newblock Google's multilingual neural machine translation system: Enabling
+  zero-shot translation.
+\newblock {\em Transactions of the Association for Computational Linguistics},
+  5:339--351.
+
+\bibitem[\protect\citename{Klein \bgroup et al.\egroup }2017]{Klein17opennmt}
+Klein, Guillaume, Yoon Kim, Yuntian Deng, Jean Senellart, and Alexander Rush.
+\newblock 2017.
+\newblock {OpenNMT}: Open-source toolkit for neural machine translation.
+\newblock In {\em Proceedings of ACL 2017, System Demonstrations}, pages
+  67--72, Vancouver, Canada. Association for Computational Linguistics.
+
+\bibitem[\protect\citename{Kobus \bgroup et al.\egroup
+  }2017]{Kobus17domaincontrol}
+Kobus, Catherine, Josep Crego, and Jean Senellart.
+\newblock 2017.
+\newblock Domain control for neural machine translation.
+\newblock In {\em Proceedings of the International Conference Recent Advances
+  in Natural Language Processing}, RANLP 2017, pages 372--378, Varna, Bulgaria.
+
+\bibitem[\protect\citename{Koehn \bgroup et al.\egroup }2018]{koehn18findings}
+Koehn, Philipp, Huda Khayrallah, Kenneth Heafield, and Mikel~L. Forcada.
+\newblock 2018.
+\newblock Findings of the {WMT} 2018 shared task on parallel corpus filtering.
+\newblock In {\em Proceedings of the Third Conference on Machine Translation:
+  Shared Task Papers}, pages 726--739, Belgium, Brussels, October. Association
+  for Computational Linguistics.
+
+\bibitem[\protect\citename{Koehn}2004]{Koehn04statistical}
+Koehn, Philipp.
+\newblock 2004.
+\newblock Statistical significance tests for machine translation evaluation.
+\newblock In {\em Proceedings of the 2004 Conference on Empirical Methods in
+  Natural Language Processing}, pages 388--395, Barcelona, Spain, July.
+  Association for Computational Linguistics.
+
+\bibitem[\protect\citename{Kumar \bgroup et al.\egroup
+  }2019]{Kumar19reinforcement}
+Kumar, Gaurav, George Foster, Colin Cherry, and Maxim Krikun.
+\newblock 2019.
+\newblock Reinforcement learning based curriculum optimization for neural
+  machine translation.
+\newblock In {\em Proceedings of the 2019 Conference of the North {A}merican
+  Chapter of the Association for Computational Linguistics: Human Language
+  Technologies, Volume 1 (Long and Short Papers)}, pages 2054--2061,
+  Minneapolis, Minnesota, June. Association for Computational Linguistics.
+
+\bibitem[\protect\citename{Kumar \bgroup et al.\egroup }2021]{Kumar21learning}
+Kumar, Gaurav, Philipp Koehn, and Sanjeev Khudanpur.
+\newblock 2021.
+\newblock Learning policies for multilingual training of neural machine
+  translation systems.
+\newblock {\em CoRR}, abs/2103.06964.
+
+\bibitem[\protect\citename{Luong and Manning}2015]{Luong15stanford}
+Luong, Minh-Thang and Christopher~D. Manning.
+\newblock 2015.
+\newblock Stanford neural machine translation systems for spoken language
+  domain.
+\newblock In {\em Proceedings of the International Workshop on Spoken Language
+  Translation}, IWSLT, Da Nang, Vietnam.
+
+\bibitem[\protect\citename{Mansour \bgroup et al.\egroup
+  }2009a]{Mansour09domainadaptation}
+Mansour, Yishay, Mehryar Mohri, and Afshin Rostamizadeh.
+\newblock 2009a.
+\newblock Domain adaptation with multiple sources.
+\newblock In Koller, D., D.~Schuurmans, Y.~Bengio, and L.~Bottou, editors, {\em
+  Advances in Neural Information Processing Systems 21}, pages 1041--1048.
+  Curran Associates, Inc.
+
+\bibitem[\protect\citename{Mansour \bgroup et al.\egroup
+  }2009b]{Mansour09multiple}
+Mansour, Yishay, Mehryar Mohri, and Afshin Rostamizadeh.
+\newblock 2009b.
+\newblock Multiple source adaptation and the r{\'e}nyi divergence.
+\newblock In {\em Proceedings of the 25th Conference on Uncertainty in
+  Artificial Intelligence}, UAI 2009, pages 367--374, December.
+
+\bibitem[\protect\citename{Miceli~Barone \bgroup et al.\egroup
+  }2017]{Miceli-barone17regularization}
+Miceli~Barone, Antonio~Valerio, Barry Haddow, Ulrich Germann, and Rico
+  Sennrich.
+\newblock 2017.
+\newblock Regularization techniques for fine-tuning in neural machine
+  translation.
+\newblock In {\em Proceedings of the 2017 Conference on Empirical Methods in
+  Natural Language Processing}, pages 1489--1494, Copenhagen, Denmark,
+  September. Association for Computational Linguistics.
+
+\bibitem[\protect\citename{Moore and Lewis}2010]{Moore10selection}
+Moore, Robert~C. and William Lewis.
+\newblock 2010.
+\newblock Intelligent selection of language model training data.
+\newblock In {\em Proceedings of the ACL 2010 Conference Short Papers}, pages
+  220--224, Uppsala, Sweden. Association for Computational Linguistics.
+
+\bibitem[\protect\citename{Neubig \bgroup et al.\egroup
+  }2019]{Neubig19compare-mt}
+Neubig, Graham, Zi{-}Yi Dou, Junjie Hu, Paul Michel, Danish Pruthi, Xinyi Wang,
+  and John Wieting.
+\newblock 2019.
+\newblock compare-mt: {A} tool for holistic comparison of language generation
+  systems.
+\newblock {\em CoRR}, abs/1903.07926.
+
+\bibitem[\protect\citename{Niu \bgroup et al.\egroup }2018]{Niu18multitask}
+Niu, Xing, Sudha Rao, and Marine Carpuat.
+\newblock 2018.
+\newblock Multi-task neural models for translating between styles within and
+  across languages.
+\newblock In Bender, Emily~M., Leon Derczynski, and Pierre Isabelle, editors,
+  {\em Proceedings of the 27th International Conference on Computational
+  Linguistics}, COLING, pages 1008--1021, Santa Fe, New Mexico, USA.
+
+\bibitem[\protect\citename{{Pan} and {Yang}}2010]{Pan10asurvey}
+{Pan}, Sinno~Jialin and Qiang {Yang}.
+\newblock 2010.
+\newblock A survey on transfer learning.
+\newblock {\em IEEE Transactions on Knowledge and Data Engineering},
+  22(10):1345--1359.
+
+\bibitem[\protect\citename{Papineni \bgroup et al.\egroup
+  }2002]{Papineni02bleu}
+Papineni, Kishore, Salim Roukos, Todd Ward, and Wei-Jing Zhu.
+\newblock 2002.
+\newblock {BLEU:} a method for automatic evaluation of machine translation.
+\newblock In {\em Proceedings of the 40th Annual Meeting on Association for
+  Computational Linguistics}, ACL '02, pages 311--318, Stroudsburg, PA, USA.
+
+\bibitem[\protect\citename{Pham \bgroup et al.\egroup }2019]{Pham19generic}
+Pham, Minh~Quang, Josep-Maria Crego, Jean Senellart, and Fran\c{c}ois Yvon.
+\newblock 2019.
+\newblock {Generic and Specialized Word Embeddings for Multi-Domain Machine
+  Translation}.
+\newblock In {\em Proceedings of the 16th {International Workshop on Spoken
+  Language Translation}}, IWSLT, page~9p, Hong-Kong, CN.
+
+\bibitem[\protect\citename{Pham \bgroup et al.\egroup }2021]{Pham21revisiting}
+Pham, Minh~Quang, Josep Crego, and François Yvon.
+\newblock 2021.
+\newblock Revisiting multi-domain machine translation.
+\newblock {\em Transactions of the Association for Computational Linguistics},
+  9(0):17--35.
+
+\bibitem[\protect\citename{Platanios \bgroup et al.\egroup
+  }2019]{Platanios19competence}
+Platanios, Emmanouil~Antonios, Otilia Stretcu, Graham Neubig, Barnabas Poczos,
+  and Tom Mitchell.
+\newblock 2019.
+\newblock Competence-based curriculum learning for neural machine translation.
+\newblock In {\em Proceedings of the 2019 Conference of the North {A}merican
+  Chapter of the Association for Computational Linguistics: Human Language
+  Technologies, Volume 1 (Long and Short Papers)}, pages 1162--1172,
+  Minneapolis, Minnesota, June. Association for Computational Linguistics.
+
+\bibitem[\protect\citename{Post}2018]{Post18call}
+Post, Matt.
+\newblock 2018.
+\newblock A call for clarity in reporting {BLEU} scores.
+\newblock In {\em Proceedings of the Third Conference on Machine Translation:
+  Research Papers}, pages 186--191, Brussels, Belgium, October. Association for
+  Computational Linguistics.
+
+\bibitem[\protect\citename{Saunders}2021]{Saunders21asurvey}
+Saunders, Danielle.
+\newblock 2021.
+\newblock Domain adaptation and multi-domain adaptation for neural machine
+  translation: {A} survey.
+\newblock {\em CoRR}, abs/2104.06951.
+
+\bibitem[\protect\citename{Sennrich \bgroup et al.\egroup
+  }2016a]{Sennrich16politeness}
+Sennrich, Rico, Barry Haddow, and Alexandra Birch.
+\newblock 2016a.
+\newblock Controlling politeness in neural machine translation via side
+  constraints.
+\newblock In {\em Proceedings of the 2016 Conference of the North American
+  Chapter of the Association for Computational Linguistics: Human Language
+  Technologies}, pages 35--40, San Diego, California. Association for
+  Computational Linguistics.
+
+\bibitem[\protect\citename{Sennrich \bgroup et al.\egroup
+  }2016b]{Sennrich16BPE}
+Sennrich, Rico, Barry Haddow, and Alexandra Birch.
+\newblock 2016b.
+\newblock Neural machine translation of rare words with subword units.
+\newblock In {\em Proceedings of the 54th Annual Meeting of the Association for
+  Computational Linguistics (Volume 1: Long Papers)}, pages 1715--1725, Berlin,
+  Germany, August.
+
+\bibitem[\protect\citename{Steinberger \bgroup et al.\egroup
+  }2006]{Steinberger06acquis}
+Steinberger, Ralf, Bruno Pouliquen, Anna Widiger, Camelia Ignat, Tomaž
+  Erjavec, Dan Tufis, and Dániel Varga.
+\newblock 2006.
+\newblock The {JRC-Acquis}: A multilingual aligned parallel corpus with 20+
+  languages.
+\newblock In {\em Proceedings of the Fifth International Conference on Language
+  Resources and Evaluation}, LREC'06, Genoa, Italy, may. European Language
+  Resources Association (ELRA).
+
+\bibitem[\protect\citename{Tars and Fishel}2018]{Tars18multidomain}
+Tars, Sander and Mark Fishel.
+\newblock 2018.
+\newblock Multi-domain neural machine translation.
+\newblock In Pérez-Ortiz, Juan~Antonio, Felipe Sánchez-Martínez, Miquel
+  Esplà-Gomis, Maja Popović, Celia Rico, André Martins, Joachim~Van den
+  Bogaert, and Mikel~L. Forcada, editors, {\em Proceedings of the 21st Annual
+  Conference of the European Association for Machine Translation}, EAMT, pages
+  259--269, Alicante, Spain. EAMT.
+
+\bibitem[\protect\citename{Tiedemann}2009]{Tiedemann09news}
+Tiedemann, J\"org.
+\newblock 2009.
+\newblock News from {OPUS} - {A} collection of multilingual parallel corpora
+  with tools and interfaces.
+\newblock In Nicolov, N., K.~Bontcheva, G.~Angelova, and R.~Mitkov, editors,
+  {\em Recent Advances in Natural Language Processing}, volume~V, pages
+  237--248. John Benjamins, Amsterdam/Philadelphia, Borovets, Bulgaria.
+
+\bibitem[\protect\citename{Tiedemann}2012]{Tiedemann12parallel}
+Tiedemann, J\"org.
+\newblock 2012.
+\newblock Parallel data, tools and interfaces in {OPUS}.
+\newblock In Chair), Nicoletta Calzolari~(Conference, Khalid Choukri, Thierry
+  Declerck, Mehmet~Ugur Dogan, Bente Maegaard, Joseph Mariani, Jan Odijk, and
+  Stelios Piperidis, editors, {\em Proceedings of the Eight International
+  Conference on Language Resources and Evaluation}, LREC'12, Istanbul, Turkey,
+  may. European Language Resources Association (ELRA).
+
+\bibitem[\protect\citename{van~der Wees \bgroup et al.\egroup
+  }2017]{Vanderwees17dynamic}
+van~der Wees, Marlies, Arianna Bisazza, and Christof Monz.
+\newblock 2017.
+\newblock Dynamic data selection for neural machine translation.
+\newblock In {\em Proceedings of the 2017 Conference on Empirical Methods in
+  Natural Language Processing}, pages 1400--1410, Copenhagen, Denmark,
+  September. Association for Computational Linguistics.
+
+\bibitem[\protect\citename{Vaswani \bgroup et al.\egroup
+  }2017]{Vaswani17attention}
+Vaswani, Ashish, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones,
+  Aidan~N. Gomez, {\L}ukasz Kaiser, and Illia Polosukhin.
+\newblock 2017.
+\newblock Attention is all you need.
+\newblock In Guyon, I., U.~V. Luxburg, S.~Bengio, H.~Wallach, R.~Fergus,
+  S.~Vishwanathan, and R.~Garnett, editors, {\em Advances in Neural Information
+  Processing Systems 30}, pages 5998--6008. Curran Associates, Inc.
+
+\bibitem[\protect\citename{Wang \bgroup et al.\egroup
+  }2020a]{Wang20learning-multi}
+Wang, Wei, Ye~Tian, Jiquan Ngiam, Yinfei Yang, Isaac Caswell, and Zarana
+  Parekh.
+\newblock 2020a.
+\newblock Learning a multi-domain curriculum for neural machine translation.
+\newblock In {\em Proceedings of the 58th Annual Meeting of the Association for
+  Computational Linguistics}, pages 7711--7723, Online, July. Association for
+  Computational Linguistics.
+
+\bibitem[\protect\citename{Wang \bgroup et al.\egroup }2020b]{Wang20balancing}
+Wang, Xinyi, Yulia Tsvetkov, and Graham Neubig.
+\newblock 2020b.
+\newblock Balancing training for multilingual neural machine translation.
+\newblock In {\em Proceedings of the 58th Annual Meeting of the Association for
+  Computational Linguistics}, pages 8526--8537, Online, July. Association for
+  Computational Linguistics.
+
+\bibitem[\protect\citename{Williams}1992]{Williams92simple}
+Williams, Ronald~J.
+\newblock 1992.
+\newblock Simple statistical gradient-following algorithms for connectionist
+  reinforcement learning.
+\newblock {\em Machine learning}, 8(3-4):229--256.
+
+\bibitem[\protect\citename{Zeng \bgroup et al.\egroup }2018]{Zeng18multidomain}
+Zeng, Jiali, Jinsong Su, Huating Wen, Yang Liu, Jun Xie, Yongjing Yin, and
+  Jianqiang Zhao.
+\newblock 2018.
+\newblock Multi-domain neural machine translation with word-level domain
+  context discrimination.
+\newblock In {\em Proceedings of the 2018 Conference on Empirical Methods in
+  Natural Language Processing}, pages 447--457, Brussels, Belgium. Association
+  for Computational Linguistics.
+
+\bibitem[\protect\citename{Zhang \bgroup et al.\egroup
+  }2016]{Zhang16topicinformed}
+Zhang, Jian, Liangyou Li, Andy Way, and Qun Liu.
+\newblock 2016.
+\newblock Topic-informed neural machine translation.
+\newblock In {\em Proceedings of the 26th International Conference on
+  Computational Linguistics: Technical Papers}, COLING 2016, pages 1807--1817,
+  Osaka, Japan. The COLING 2016 Organizing Committee.
+
+\bibitem[\protect\citename{Zhang \bgroup et al.\egroup
+  }2019]{Zhang19curriculum}
+Zhang, Xuan, Pamela Shapiro, Gaurav Kumar, Paul McNamee, Marine Carpuat, and
+  Kevin Duh.
+\newblock 2019.
+\newblock Curriculum learning for domain adaptation in neural machine
+  translation.
+\newblock In {\em Proceedings of the 2019 Conference of the North {A}merican
+  Chapter of the Association for Computational Linguistics: Human Language
+  Technologies, Volume 1 (Long and Short Papers)}, pages 1903--1915,
+  Minneapolis, Minnesota, June. Association for Computational Linguistics.
+
+\bibitem[\protect\citename{Zhou \bgroup et al.\egroup }2020]{Zhou20uncertainty}
+Zhou, Yikai, Baosong Yang, Derek~F. Wong, Yu~Wan, and Lidia~S. Chao.
+\newblock 2020.
+\newblock Uncertainty-aware curriculum learning for neural machine translation.
+\newblock In {\em Proceedings of the 58th Annual Meeting of the Association for
+  Computational Linguistics}, pages 6934--6944, Online, July. Association for
+  Computational Linguistics.
+
+\end{thebibliography}
