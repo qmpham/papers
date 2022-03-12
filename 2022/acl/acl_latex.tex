@@ -129,7 +129,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 
-\title{Multi-domain, multilingual translation with latent multi-task group dropout}
+%\title{Multi-domain, multilingual translation with latent multi-task group dropout}
 \title{Latent Group Dropout for Multilingual and Multidomain Machine Translation}
 % Author information can be set in various styles:
 % For several authors from the same institution:
@@ -177,7 +177,7 @@ In this work, we study and develop a new method, \emph{multi-task group dropout}
   \setlength{\parsep}{0pt}
 \item We introduce a novel, sound mathematical formulation to the problem of jointly learning task-dependent sub-networks and the parameters of the underlying models using variational probabilistic modeling techniques;
 \item We present algorithms to train this model end-to-end with very little extra parameters;
-\item We report, using an extensive set of experiments, significant gains with respect to strong baselines for low-resource multilingual MT;
+\item We report, using an extensive set of experiments, gains for multidomain MT and very low-resourced languages in multilingual MT;
 \item We study how this method can actually exploit the similarities between tasks to learn interpretable sub-networks.
 \end{enumerate}
 \fyDone{Can you do distillation ? That is only keep the parameter for one domain and still get good results (better than DA ?)}
@@ -308,7 +308,7 @@ Our systems for the multidomain experiments are designed as follows:
 \item Transformer using heuristic multi-task group dropout (\system{HMGD} Transformer): we share 320 nodes for every task, and reserve 32 nodes for each task (totalling $320 + 32*6 = 512$ nodes).
 \end{itemize}
 
-We set the dropout probability to 0.1. We train the multidomain Transformer model for 200k iterations with a batch size of 12k tokens. The convergence of the standard Transformer is before 200K as its validation curve became flat near the 200K-th iteration. The \system{LaMGD} Transformer converged after 300k iterations with the same batch size. The convergence of \system{LaMGD} is controlled by its validation curve. Finally, we plug adapters to the multidomain Transformer model and finetune them for 25k iterations using the same batch size as the baseline.
+We set the dropout probability to 0.1. We train the multidomain Transformer model for 200k iterations with a batch size of 12k tokens using 4 V100 GPUs. The convergence of the standard Transformer is before 200K as its validation curve became flat near the 200K-th iteration. The \system{LaMGD} Transformer converged after 300k iterations with the same batch size. The convergence of \system{LaMGD} is controlled by its validation curve. Finally, we plug adapters to the multidomain Transformer model and finetune them for 25k iterations using the same batch size as the baseline.
 %: this ensures that \system{LaMGD} and Adapter-based Transformer have the same amount of training iterations.
 
 \subsubsection{Multilingual translation systems}
@@ -338,7 +338,7 @@ While \citet{Gong21pay,Gong21adaptive} fixed $\tau$ to be 0.2, we select an anne
 We initialize the distribution of the latent variables uniformly. More precisely, we set $\Phi_l^d$, which generates the probability of the masks via the softmax activation function, to $0^{n_d}$.
 \subsection{Datasets and metrics}
 \subsubsection{Multidomain translation}
-We use the same data as in the recent work of \citet{Pham21revisiting} on multidomain translation.\fyDone{Add public to the data link} The datasets \footnote{See \url{https://github.com/qmpham/experiments/tree/main/tacl20}} for the multidomain translation experiments are detailed in Table~\ref{tab:Corpora-chap4}.
+We use the same data as in the recent work of \citet{Pham21revisiting} on multidomain translation.\fyDone{Add public to the data link} The datasets \footnote{See \url{https://github.com/qmpham/experiments/tree/main/tacl20}} for the multidomain translation experiments are detailed in Table~\ref{tab:Corpora-chap4}. For each domain, the size of the dev set and the test set is 1~K. 
 \begin{table*}[h!]
   \centering
   \begin{tabular}{|l|cccccc|} %*{4}{|r|}}
@@ -404,11 +404,11 @@ For these experiments, our main results are in Table~\ref{tab:mdmt}, where we ob
     Model / Domain & \multicolumn{1}{c|}{\domain{ med}} & \multicolumn{1}{c|}{\domain{ law}} & \multicolumn{1}{c|}{\domain{bank}} & \multicolumn{1}{c|}{\domain{talk}} & \multicolumn{1}{c|}{\domain{ it }} & \multicolumn{1}{c|}{\domain{ rel}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[65m]} & 40.3 & 59.5 & 49.8 & 36.4 & 49.0 & 80.0  & 52.5\\
     \system{HMGD} Transformer   \hfill{\footnotesize[+0m]}  & 40.4 & 60.4 & 51.9 & 38.7 &	50.80 &	86.80 & 54.8 \\ 
-    \revision{\system{Adapter}}   \hfill{\footnotesize[+151m]}  & 39.5 & 61.0 & 53.1 & 37.5 & 49.6 & \SB{91.0} & \SB{55.3} \\ 
-    \system{LaMGD} Transformer   \hfill{\footnotesize[+0m]}  & 40.3 & 60.4 & 52.4 & \SB{39.0} & \SB{52.4} & 87.5 & \SB{55.3} \\ 
+    \revision{\system{Adapter}}   \hfill{\footnotesize[+151m]}  & 39.5 & 61.0 & 53.1 & 37.5 & 49.6 & 91.0 & 55.3 \\ 
+    \system{LaMGD} Transformer   \hfill{\footnotesize[+0m]}  & 40.3 & \SB{60.4} & \SB{52.4} & \SB{39.0} & \SB{52.4} & \SB{87.5} & \SB{55.3} \\ 
     \hline
   \end{tabular}
-  \caption{Multi-domain translation}
+  \caption{Multidomain translation experiment. Boldface denotes significant gains over \system{Transformer} ($p=0.05$)}
   \label{tab:mdmt}
 \end{table*}
 
@@ -424,7 +424,7 @@ For this experiment, we reuse proposal of \citet{Pham21revisiting}, who measure 
     \system{LaMGD} Transformer   \hfill{\footnotesize[+0m]}  & 60.4 & 60.4 (=) & 60.4 (=) \\ 
     \hline
   \end{tabular}
-  \caption{Experiments with two similar pseudo-domains }
+  \caption{Experiments with two similar pseudo-domains}
   \label{tab:fuzzy}
 \end{table*}
 
@@ -449,7 +449,7 @@ Results for the multilingual experiments are in Table~\ref{tab:multilingual}.  T
     \hline
     O2M-diverse & \multicolumn{1}{c|}{\domain{bos}} & \multicolumn{1}{c|}{\domain{mar}} & \multicolumn{1}{c|}{\domain{hin}} & \multicolumn{1}{c|}{\domain{mkd}} & \multicolumn{1}{c|}{\domain{ell}} & \multicolumn{1}{c|}{\domain{bul}} & \multicolumn{1}{c|}{\domain{fra}} & \multicolumn{1}{c|}{\domain{kor}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[96.9m]} & 10.2&4&12.7&22.2&31.8&34.0&38.3&8.3&20.19 \\
-    \revision{\system{Adapter}}   \hfill{\footnotesize[+13m]}  &10.2&4&\SB{13.3}&21.9&32.2&34.1&38.5&8.3&20.31 \\ 
+    \revision{\system{Adapter}}   \hfill{\footnotesize[+13m]}  &10.2&4&13.3&21.9&32.2&34.1&38.5&8.3&20.31 \\ 
     \system{LaMGD} Transformer   \hfill{\footnotesize[+0m]}&10.1&3.8&12.6&\SB{22.8}&31.8&33.4&38.1&8.1&20.09\\
     \hline 
     \hline
@@ -479,7 +479,7 @@ This section compares the sub-networks learnt for each domain or language pair b
   \centering
   % include second image
   \includegraphics[width=0.7\textwidth]{multilingual_heatmap.png}  
-  \caption{Multilingual}
+  \caption{Multilingual (Related)}
   \label{fig:ml-heatmap}
 \end{subfigure}
 \caption{Heatmap visualization of the similarities between dropout masks of domains(languages).}
@@ -561,7 +561,7 @@ We also plot the languages based on their dropout masks in Figure~\ref{fig:visua
 % \label{fig:phi}
 % \end{figure*}
 \subsection{Ablation study}
-We discuss here the choice of the hyper-parameters $k$, the number of activated nodes in each layer, and its impact on the sharing level between the tasks. Table ~\ref{tab:K} shows the variance of performance when the number of activated nodes is changed, and the sharing level between tasks decreases in consequence.\Todo{add sharing results. }\Todo{check caption consistency}
+We discuss here the choice of the hyper-parameters $k$, the number of activated nodes in each layer, and its impact on the sharing level between the tasks. Table ~\ref{tab:K} shows the variance of performance when the number of activated nodes is changed, and the sharing level between tasks decreases in consequence.
 \begin{table}[h!]
   \centering
   \begin{tabular}{|c|c|c|} \hline
@@ -619,7 +619,8 @@ Because sigmoid is monotonically increasing, equation~\eqref{eq:nu} has a unique
 
 Because the differentiation of sigmoid has exact forms, $\frac{\partial g}{\partial \nu}$ and $\frac{\partial g}{\partial \Phi_l^d}$ also have exact form. Therefore, we do not need autograd to compute the implicit gradient $\frac{\partial \nu}{\partial \Phi_l^d}$. The gradient of $\hat{m}_l^d(\tau)$ w.r.t $\Phi_l^d$ is computed as follows:
 \begin{align}
-\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} = \frac{\partial \hat{m}_l^d(\tau)}{\partial \nu} \times \frac{\partial \nu}{\partial \Phi_l^d}
+\hspace{-3.em}
+\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} = \frac{\partial \hat{m}_l^d(\tau)}{\partial \nu} \times \frac{\partial \nu}{\partial \Phi_l^d} + \frac{1}{\tau} \frac{exp(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})}{(1+exp(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}))^2}
 \end{align}
 
 In our algorithm, we solve \eqref{eq:nu} by binary search. The convergence of binary search is extremely fast and assured by the monotonicity of $g(\nu,\Phi_l^d)$. In our experiments, we set the search range to $[-100,100]$.
@@ -718,9 +719,10 @@ $$\Delta_{\theta} = \frac{\partial L}{\partial \theta}$$}
 \STATE{Compute gradient over the $\operatorname{Soft-Top-K}$ masks
 $$\frac{\partial D}{\partial \hat{m}_l^d(\tau)}$$}
 \STATE{Compute implicit gradient of the $\operatorname{Soft-Top-K}$ masks over $\Phi_l^d$
-$$- \big(\frac{\partial g}{\partial \bar{\nu}}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d}$$}
+$$\frac{\partial \bar{\nu}}{\partial \Phi_l^d} = - \big(\frac{\partial g}{\partial \bar{\nu}}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d}$$
+$$\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} = \frac{\partial \hat{m}_l^d(\tau)}{\partial \nu} \times \frac{\partial \nu}{\partial \Phi_l^d} + \frac{1}{\tau} \frac{exp(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})}{(1+exp(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}))^2}$$}
 \STATE{Compute the gradient the training over $\Phi_l^d$
-$$\Delta_{\Phi_l^d} = - \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \big(\frac{\partial g}{\partial \bar{\nu}}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d} + \frac{\partial \mathbb{H} \big[ \operatorname{softmax}(\Phi_l^d)\big] }{\partial \Phi_l^d} $$}
+$$\Delta_{\Phi_l^d} = \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} + \frac{\partial \mathbb{H} \big[ \operatorname{softmax}(\Phi_l^d)\big] }{\partial \Phi_l^d} $$}
 \STATE{Update $\theta$ and $\Phi_l^d$ with their gradients}
 \STATE{$i=i+1$}
 \UNTIL{$i> iter\_num$}
