@@ -15,7 +15,6 @@
 \setlength\titlebox{6.5cm}    % Expanding the titlebox
 %%% YOUR PACKAGES BELOW THIS LINE %%%
 
-
 \newcommand{\confname}{EAMT 2022}
 \newcommand{\website}{https://eamt2022.com/}
 \newcommand{\urlwebsite}{https://eamt2022.com/}
@@ -34,12 +33,12 @@
 \author{First Author\\
   Affiliation / Address line 1\\
   Affiliation / Address line 2\\
-  Affiliation / Address line 3\\
+%  Affiliation / Address line 3\\
   {\tt email@domain}  \And
   Second Author\\
   Affiliation / Address line 1\\
   Affiliation / Address line 2\\
-  Affiliation / Address line 3\\
+%  Affiliation / Address line 3\\
   {\tt email@domain}}
 
 \date{}
@@ -146,26 +145,28 @@
 \setlength{\abovedisplayskip}{2pt}
 \setlength{\belowdisplayskip}{2pt}
 \begin{abstract}
-  Building effective Neural Machine Translation models often implies accommodating diverse sets of heterogeneous data so as to optimize performance for the domain(s) of interest. Such multi-source / multi-domain adaptation problems are typically approached through instance selection or reweighting strategies, based on a static assessment of the relevance of training instances with respect to the task at hand. In this paper, we study dynamic data selection strategies that are able to automatically re-evaluate the usefulness of data samples and to evolve a data selection policy in the course of training. Based on the results of multiple experiments, we show that such methods constitute a generic framework to automatically and effectively handle a variety of real-world situations, from multi-source domain adaptation to multi-domain learning and unsupervised domain adaptation. 
+  Building effective Neural Machine Translation models often implies accommodating diverse sets of heterogeneous data so as to optimize performance for the domain(s) of interest. Such multi-source / multi-domain adaptation problems are typically approached through instance selection or reweighting strategies, based on a static assessment of the relevance of training instances with respect to the task at hand. In this paper, we study dynamic data selection strategies that are able to automatically re-evaluate the usefulness of data samples
+  % and to evolve a data selection policy
+  in the course of training. Based on the results of multiple experiments, we show that our method offer a generic framework to automatically
+  % and effectively
+  handle several real-world situations, from multi-source or unsupervised domain adaptation to multidomain learning.
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
-A typical setting in machine translation (MT) is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for the task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen and fixed; a key component in training is then to mitigate the detrimental effects of a possible mismatch between these distributions. Single-source and multi-source\footnote{In this paper, multi-source DA means having multiple domains to adapt from and should not be confused with multi-source translation, where several \emph{source languages} are considered.} domain adaptation (DA) is a well-studied instance of this setting (see \newcite{Chu2017comparison,Saunders21asurvey} for a review), and so is multi-domain (MD) learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain,Pham21revisiting}. A related situation is multilingual machine translation \cite{Firat16multiway,Ha16towards,Johnson17google,Aharoni19massively},\fyDone{Fix ref}
+A typical setting in machine translation (MT) is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for the task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen and fixed; a key aspect of training is then to mitigate the detrimental effects of a mismatch between these distributions. Single-source and multi-source\footnote{In this paper, multi-source DA means having multiple domains to adapt from; this setting differs from multi-source translation, where several \emph{source languages} are considered.} domain adaptation (DA) is a well-studied instance of this setting (see \newcite{Chu2017comparison,Saunders21asurvey} for a review), and so is multi-domain (MD) learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain,Pham21revisiting}. A related situation is multilingual MT \cite{Firat16multiway,Ha16towards,Johnson17google,Aharoni19massively},\fyDone{Fix ref}
 % \revision{cite also \cite{Shen21source}} -> I think this is not so appropriate here
-where the heterogeneity of training data not only corresponds to variations in the topic, genre, or register but also in language.
+where the diversity of training data not only corresponds to variations in the topic, genre, or register but also in language.
 
-This problem is often approached by \emph{static} instance selection or re-weighting strategies, where the available training data is used in proportion to its relevance for the test conditions \cite{Moore10selection,Axelrod11domain}. Finding the optimal balance of training data is, however, a challenging task due, for instance, to the similarity between domains/languages, but also due to regularization effects of out-of-domain data \cite{Miceli-barone17regularization}. It may also be suboptimal, as some target domains or languages might be easier to train than others. Finally, improving the performance of the MT system in one domain will often hurt that of another \cite{Vanderwees17dynamic,Britz17mixing}, and improving model generalization across all domains \cite{koehn18findings} may not achieve optimally for any particular domain. 
+This problem is often approached by \emph{static} instance selection or re-weighting strategies, where the available training data is used in proportion to its relevance for the testing conditions \cite{Moore10selection,Axelrod11domain}. Finding the optimal balance of training data is however, a challenging task due, for instance, to the similarity between domains/languages, or to the regularization effects of out-of-domain data \cite{Miceli-barone17regularization}. A static policy may also be suboptimal when some target domains or languages are easier to train than others. Finally, improving the performance of the MT system in one domain will often hurt that of another \cite{Vanderwees17dynamic,Britz17mixing} and improving model generalization across all domains \cite{koehn18findings} may not achieve optimally for any particular domain. 
 
 Several recent proposals
 % \cite{Vanderwees17dynamic,Graves17automated,platanios19competence,Zhang19curriculum,Kumar19reinforcement,Wang20learning-multi,Wang20balancing,Wang20learning-multi}
-have explored ways to instead consider \emph{dynamic} data selection and sampling strategies that surpass static strategies. Notably, \newcite{Vanderwees17dynamic,Zhang19curriculum} construct a static curriculum, while \newcite{Graves17automated,Platanios19competence,Kumar19reinforcement,Wang20learning-multi,Wang20balancing} build curricula that automatically adapt to the training data.
-
-In this paper, we contribute to this line of research in several ways. 
+explore ways to instead consider \emph{dynamic} data selection and sampling strategies: \newcite{Vanderwees17dynamic,Zhang19curriculum} construct a static curriculum, while \newcite{Graves17automated,Platanios19competence,Kumar19reinforcement,Wang20learning-multi,Wang20balancing} build curricula that automatically adapt to the training data. In this paper, we contribute to this line of research in several ways. 
 \begin{itemize}
-	\item First, we propose a novel framework (\emph{Multi-Domain Automated Curriculum}, MDAC for short), a variant of Differentiable Data Selection (DDS) of \newcite{Wang20balancing} initially applied to multilingual NMT, that simultaneously accounts for the domain adaptation and the multi-domain adaptation problems.
-	\item We demonstrate MDAC's equivalent performance compared to fine-tuning for domain adaptation \ref{ssec:da} and better performance compared to classical choices of static data sampling strategies for multi-domain settings \ref{ssec:mda}.
-	\item We show that our variant MDAC mitigates some failures of DDS in handling multi-domain training.
-	\item We demonstrate various exotic use cases of differentiable data selection frameworks (MDAC and original DDS), including domain adaptation using unsupervised clustering instead of using domain label a priori \ref{ssec:clda}, which is barely available in real context; domain adaptation using out-of-domain training data and small in-domain validation data \ref{ssec:uda}; and bi-domain adaptation in which we are only interested in two domain of the training mixture \ref{ssec:bida}.
+	\item First, we propose a novel framework (\emph{Multi-Domain Automated Curriculum}, MDAC for short), a variant of Differentiable Data Selection (DDS) of \newcite{Wang20balancing}, initially applied to multilingual NMT, that simultaneously accounts for the domain adaptation and the multidomain adaptation problems.
+	\item We show that MDAC achieves performance that compare to fine-tuning strategies for DA (\textsection~\ref{ssec:da}) and outperform some static data sampling strategies for multidomain settings (\ref{ssec:mda}).
+	\item We show that our variant MDAC mitigates some failures of DDS in multidomain training.
+	\item We illustrate the generality of differentiable data selection frameworks (both MDAC and DDS) on less common situations such as DA using unsupervised clustering (\textsection~\ref{ssec:clda}); DA using out-of-domain training data and small in-domain validation data (\textsection~\ref{ssec:uda}); and two-domain adaptation where the test distribution only mixes two of the training domain (\textsection~\ref{ssec:bida}).
 \end{itemize}
 
 
