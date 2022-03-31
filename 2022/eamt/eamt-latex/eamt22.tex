@@ -195,18 +195,18 @@ Assuming training data in each of the $n_d$ domains $d_1 \dots d_{n_d}$, the siz
 % Our method
 MDAC builds an adaptative training distribution $\vlambda^{l}$ that optimizes the data selection policy along with the training of the model. We parameterize $\vlambda^{l}$ by a differentiable function $\vlambda^l(\psi)$, which is described in \textsection~\ref{ssec:dds-sys}. We divide the training into many short sessions; in each session $t$, the model is trained with a static data distribution $\vlambda^{l}(\psi_t)$. After one learning session, we update the data distribution using the REINFORCE algorithm of \newcite{Williams92simple}. The evolution of $\psi$ is thus defined by:\fyTodo{$t$ is both for time, and for test - change into $\tau$?}
 \begin{align*}
-\psi_{t+1} &= \psi_t + \mathbf{lr}_{1} * \displaystyle{\mathop{\sum}_{d=1}^{n_d}} R(d) * \frac{\partial \lambda^l(d;\psi_t)}{\partial \psi},
+\psi_{\tau+1} &= \psi_{\tau} + \mathbf{lr}_{1} * \displaystyle{\mathop{\sum}_{d=1}^{n_d}} R(d) * \frac{\partial \lambda^l(d;\psi_{\tau})}{\partial \psi},
 \end{align*}
 \begingroup
 \allowdisplaybreaks
 where the reward $R(d)$ is computed as:
 \begin{align}
-  R(d) = J^t(\theta_{t+k},\vlambda^t) - J^t(\theta_t,\vlambda^t), \label{eq:reward}
+  R(d) = J^t(\theta_{\tau+k},\vlambda^t) - J^t(\theta_\tau,\vlambda^t), \label{eq:reward}
 \end{align}
 and where we also define:
 \begin{equation}
 \begin{array}{rcl}
-\theta_{t+i} &=& Update\big(\theta_{t+i-1},[x^i_j,y^i_j]_{j=1}^N\big) \\ \nonumber
+\theta_{\tau+i} &=& Update\big(\theta_{\tau+i-1},[x^i_j,y^i_j]_{j=1}^N\big) \\ \nonumber
 x^i_j, y^i_j &\sim& \widehat{D^l_d}(x) \\
 J^t(\theta,\vlambda^t) &=& \displaystyle{\mathop{\sum}_{d=1}^{n_d}}\lambda^t(d)\displaystyle{\mathop{\sum}_{x^t_d,y^t_d \in \widehat{D^t_d}}} l(\theta,x^t_d,y^t_d).
 \end{array}
