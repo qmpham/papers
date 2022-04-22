@@ -6,7 +6,7 @@
 
 % Remove the "review" option to generate the final version.
 %\usepackage[review,nohyperref]{acl}
-\usepackage[review]{acl}
+\usepackage{acl}
 
 % Standard package includes
 \usepackage{times}
@@ -147,16 +147,14 @@
 %         Author 2 \\ Address line \\ ... \\ Address line \And
 %         Author 3 \\ Address line \\ ... \\ Address line}
 
-\author{First Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  \texttt{email@domain} \\\And
-  Second Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  \texttt{email@domain} \\}
+\author{
+  MinhQuang Pham$^{\dag\ddag}$, \ \ Josep Crego$^\dag$,\ \ Fran\c cois Yvon$^\ddag$ \\
+  $^\dag$SYSTRAN / 5 rue Feydeau, 75002 Paris, France\\
+  {\tt firstname.lastname@systrangroup.com}\\
+  $^\ddag$Universit\'e Paris-Saclay, CNRS, LISN,  91405 Orsay, France\\
+  {\tt firstname.lastname@limsi.fr}
+} 
+
 
 \begin{document}
 \setlength{\abovedisplayskip}{3pt}
@@ -303,7 +301,7 @@ meaning that we simply pick the $k$ most likely parameter groups for the task at
 Our systems for the multidomain experiments are designed as follows:
 \begin{itemize}
 \item Transformer: The embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 2048; the multi-head attention mechanism contains 8 heads; 6 layers in the encoder; 6 layers in the decoder.\fyDone{How many layers}
-\item Adapter-based Transformer: The intermediate feedforward dimension is set to 2048;% as in \citet{Pham21revisiting}.
+\item Adapter-based Transformer: the intermediate feedforward dimension is set to 2048, as in \citet{Pham21revisiting}.
 \item Transformer using Latent multi-task group dropout (\system{LaMGD} Transformers):\fyDone{Explain acronym} There is no change in the architecture. We group the 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each domain, only 12 out of the 16 groups are selected. The number of parameters of the variational distribution is $L\times k \times L \times n_d$, which is negligible in comparison to the size of the Transformer model.
 \item Transformer using heuristic multi-task group dropout (\system{HMGD} Transformer): we share 320 nodes for every task, and reserve 32 nodes for each task (totalling $320 + 32*6 = 512$ nodes).
 \end{itemize}
@@ -315,7 +313,7 @@ We set the dropout probability to 0.1. We train the multidomain Transformer mode
 The systems used in our multilingual experiments are implemented as follows:
 \begin{itemize}
 \item Multilingual Transformer: the embedding dimension for both encoder and decoder is set as 512, and the feedforward dimension is 1024, each multi-head attentions contains 8~heads as in \citep{Wang20balancing}.
-\item Adapter based Transformer: the intermediate feedforward dimension is set as 128 as in \citep{Gong21adaptive}.
+\item Adapter based Transformer: the intermediate feedforward dimension is set as 128. We follow here the parameter setting of \citep{Gong21adaptive}.
 \item \system{LaMGD} Transformer: There is no change in the architecture. We group 512 nodes in each layer into 16 groups of 32 consecutive nodes. For each language, we select 12 groups.
 \end{itemize}
 
@@ -435,7 +433,7 @@ Results for the multilingual experiments are in Table~\ref{tab:multilingual}.  T
 \begin{table*}[h!]
   \centering
   \begin{tabular}{|p{4cm}|*{9}{r|}} \hline
-    O2M-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{ bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
+    O2M-related & \multicolumn{1}{c|}{\domain{aze}} & \multicolumn{1}{c|}{\domain{bel}} & \multicolumn{1}{c|}{\domain{ces}} & \multicolumn{1}{c|}{\domain{glg}} & \multicolumn{1}{c|}{\domain{por}} & \multicolumn{1}{c|}{\domain{rus}} & \multicolumn{1}{c|}{\domain{slk}} & \multicolumn{1}{c|}{\domain{tur}} & \multicolumn{1}{c|}{\domain{avg}} \\ \hline 
     \system{Transformer}  \hfill{\footnotesize[91.6m]} & 4.8 &7.3&20.8&21.1&39.7&19.8&22.6&15.2&18.9 \\
     \revision{\system{Adapter}}   \hfill{\footnotesize[+13m]} &4.3&6.8&21.1&22&39.7&20&23&15.2&19 \\ 
     \system{LaMGD} Transformer  \hfill{\footnotesize[+0m]}  & 5.2&\SB{9.4}&20.6&\SB{22.8}&39.6&19.6&22.4&15.0&19.3 \\ 
@@ -575,7 +573,18 @@ We discuss here the choice of the hyper-parameters $k$, the number of activated 
   \caption{Variation of the performance w.r.t $k$, while we fix $n_p=16$ (o2m-related experiment).}
   \label{tab:K}
 \end{table}
-
+In addition, we also report in this section the effect of not choosing the number of groups $n_p$, which is assigned to 16 in the comparison of \system{LaMGD} and the contrasting methods. We show that setting $n_p$ to the layer's size, which means the group size is 1, has a very similar performance as choosing $n_p$ heuristically. 
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{|c|c|c|} \hline
+    $k$/$n_p$ & \domain{avg} \\ \hline 
+    12 / 16 & 19.33\\
+    384 / 512 & 19.26\\
+    \hline
+  \end{tabular}
+  \caption{Setting the size of group to 1 (o2m-related experiment). The quota of activated nodes is keep unchanged to $75$\%}
+  \label{tab:K}
+\end{table}
 \section{Related work}\label{sec:related}
 Multidomain and multilingual translation systems have received considerable attention in the recent years, and a exhaustive survey is beyond the goal of this paper. Domain adaptation for neural MT is surveyed in \citep{Chu17comparison}, while multidomain MT systems are notably studied in \cite{Saunders21Asurvey,Pham21revisiting}; for multilingual MT, the reader is referred eg.\ to \citep{Chu18multilingual,dabre20survey}. We focus on the most relevant subset of this literature below.
 
@@ -590,9 +599,15 @@ Multidomain and multilingual translation systems have received considerable atte
 \citet{biao21share} propose to learn to route between shared and language-specific representations with a conditional language-specific routing while training the parameters of the underlying Transformer. This method is related to the FusionAdapters of \citet{pfeiffer21adapterfusion}. Both approaches aim to select between shared and task-specific representations. The proximity between tasks is not taken into account in the routing mechanism. We propose a different approach to the problem of multi-task routing in the underlying network.
 
 \section{Conclusions and outlook}\label{sec:conclusion}
-In this work, we have presented a novel method for multdomain and multilingual translation. It allows us to jointly search for an optimal assignment of sub-networks to tasks and to learn the parameters of the underlying network. Our method relies on a sound mathematical framework and an end-to-end optimization procedure; it only adds a small number of extra parameters. The additional training cost is also reasonable, amounting to 100k iterations in the multidomain setting, given the observed gains in performance.\fyDone{There is a computational cost = 100k iterations} Experimentally, we achieve a large improvement over a Transformer baseline; our performance are also comparable to that of a strong a multi-task baseline using residual adapter modules which rely on a large number of extra parameters. For multilingual translation, our model outperforms multilingual Transformer and Language Adapters in 3 our of 4 settings. Besides, we provided an thorough analysis of the similarities between learned sub-networks and demonstrate a strong correlation between the learned similarities and the proximity of the corresponding tasks (domain or language).
+In this work, we have presented a novel method for multdomain and multilingual translation. It allows us to jointly search for an optimal assignment of sub-networks to tasks and to learn the parameters of the underlying network. Our method relies on a sound mathematical framework and an end-to-end optimization procedure; it only adds a small number of extra parameters. The additional training cost is also reasonable, amounting to 100k iterations in the multidomain setting, given the observed gains in performance.\fyDone{There is a computational cost = 100k iterations} Experimentally, we achieve a large improvement over a Transformer baseline; our performance are also comparable to that of a strong a multi-task baseline using residual adapter modules which rely on a large number of extra parameters. For multilingual translation, our model outperforms multilingual Transformer and Language Adapters in 3 our of 4 settings. LAMGD seems specially beneficial for training languages with little parallel data, which can take advantage of the resources that are available for related languages. Besides, we provided an thorough analysis of the similarities between learned sub-networks and demonstrate a strong correlation between the learned similarities and the proximity of the corresponding tasks (domain or language).
 
-There are several ways in which our methodology can be improved. In future work, we would first like to provide an complete variational framework to model both the number of groups, $k$ and the selection of the dropout masks. Second, we also intend to dispense with the domain information during inference: this would mean replacing the dependency on $d$ in the variational distribution by a dependency on the input $x$. Adressing these two questions will allow to us replace heuristic choices in the architecture design with an increased dependency on the training data.
+There are several ways in which our methodology can be improved. In future work, we would first like to provide an complete variational framework to model both the number of groups, $k$ and the selection of the dropout masks. Second, we also intend to dispense with the domain information during inference: this would mean replacing the dependency on $d$ in the variational distribution by a dependency on the input $x$. Another interesting direction will be to consider adapting the size and capacity allocated to each domain / language, depending on the difficulty of the associated translation task. Addressing these questions will allow to us replace heuristic choices in the architecture design with an increased dependency on the training data.
+
+\section{Ethical Considerations}
+MT technologies are generally intended to facilitate cross-lingual as well as cross-cultural communications. The methods presented here are notably interesting in the view to improve MT from and into English for low-resource languages, subject to the availability of data for a related language. We acknowledge that (a) our results should ultimately be backed-up large scale experiments involving much more languages -- even though this goes against the idea of limiting the computing cost our experiments; (b) better architectures and training regimes can improve the translation quality for low-resource languages, yet will not solve the problem entirely. This means that additional work focusing specifically on developing resources for these languages should remain an important objective for future work.
+
+\section{Acknowledgements}
+This work was granted access to the Jean Zay HPC resources of [TGCC/CINES/IDRIS] under the allocation 2020-[AD011011270] made by GENCI (Grand Equipement National de Calcul Intensif).
 
 \bibliography{bibliography}
 \bibliographystyle{acl_natbib}
