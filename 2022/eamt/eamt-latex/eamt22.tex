@@ -30,16 +30,30 @@
 
 \title{Multi-Domain Adaptation in Neural Machine Translation with Dynamic Sampling Strategies}
 
-\author{First Author\\
-  Affiliation / Address line 1\\
-  Affiliation / Address line 2\\
-%  Affiliation / Address line 3\\
-  {\tt email@domain}  \And
-  Second Author\\
-  Affiliation / Address line 1\\
-  Affiliation / Address line 2\\
-%  Affiliation / Address line 3\\
-  {\tt email@domain}}
+%\author{First Author\\
+%  Affiliation / Address line 1\\
+%  Affiliation / Address line 2\\
+%%  Affiliation / Address line 3\\
+%  {\tt email@domain}  \And
+%  Second Author\\
+%  Affiliation / Address line 1\\
+%  Affiliation / Address line 2\\
+%%  Affiliation / Address line 3\\
+%  {\tt email@domain}}
+
+\author{Minh-Quang Pham\\
+  Universit\'e Paris-Saclay, \\
+  CNRS, LISN,  91405 Orsay, France \\
+  {\tt minhquang.pham@limsi.fr}  \\ \\
+  \textbf{Josep Crego}\\
+  SYSTRAN ,\\
+  5 rue Feydeau, 75002 Paris, France\\
+  {\tt josep.crego@systrangroup.com} \And
+  Fran\c cois Yvon\\
+  Universit\'e Paris-Saclay, \\
+  CNRS, LISN,  91405 Orsay, France\\
+  {\tt francois.yvon@limsi.fr}}
+
 
 \date{}
 % This assumes your files are encoded as UTF8
@@ -117,7 +131,7 @@
 \newcommand{\sbcl}[2]{{\scriptsize #1 \hfill $|$ \hfill  #2}}
 \usepackage{multirow}
 \usepackage{adjustbox}
-
+\usepackage[hidelinks]{hyperref}
 \makeatletter
 \newenvironment{breakablealgorithm}
   {% \begin{breakablealgorithm}
@@ -152,7 +166,7 @@
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
-A typical setting in machine translation (MT) is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for the task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen and fixed; a key aspect of training is then to mitigate the detrimental effects of a mismatch between these distributions. Single-source and multi-source\footnote{In this paper, multi-source DA means having multiple domains to adapt from; this setting differs from multi-source translation, where several \emph{source languages} are considered.} domain adaptation (DA) is a well-studied instance of this setting (see \newcite{Chu2017comparison,Saunders21asurvey} for a review), and so is multi-domain (MD) learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain,Pham21revisiting}. A related situation is multilingual MT \cite{Firat16multiway,Ha16towards,Johnson17google,Aharoni19massively},\fyDone{Fix ref}
+A typical setting in machine translation (MT) is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for the task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen and fixed; a key aspect of training is then to mitigate the detrimental effects of a mismatch between these distributions. Single-source and multi-source\footnote{In this paper, multi-source DA means having multiple domains to adapt from; this setting differs from multi-source translation, where several \emph{source languages} are considered.} domain adaptation (DA) is a well-studied instance of this setting (see \newcite{Chu2017comparison}; \newcite{Saunders21asurvey} for a review), and so is multi-domain (MD) learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain,Pham21revisiting}. A related situation is multilingual MT \cite{Firat16multiway,Ha16towards,Johnson17google,Aharoni19massively},\fyDone{Fix ref}
 % \revision{cite also \cite{Shen21source}} -> I think this is not so appropriate here
 where the diversity of training data not only corresponds to variations in the topic, genre, or register but also in language.
 
@@ -160,7 +174,7 @@ This problem is often approached by \emph{static} instance selection or re-weigh
 
 Several recent proposals
 % \cite{Vanderwees17dynamic,Graves17automated,platanios19competence,Zhang19curriculum,Kumar19reinforcement,Wang20learning-multi,Wang20balancing,Wang20learning-multi}
-explore ways to instead consider \emph{dynamic} data selection and sampling strategies: \newcite{Vanderwees17dynamic,Zhang19curriculum} construct a static curriculum, while \newcite{Wang20learning-multi,Wang20balancing} build curricula that automatically adapt to the training data. In this paper, we contribute to this line of research in several ways. 
+explore ways to instead consider \emph{dynamic} data selection and sampling strategies: \newcite{Vanderwees17dynamic}; \newcite{Zhang19curriculum} construct a static curriculum, while \newcite{Wang20learning-multi}; \newcite{Wang20balancing} build curricula that automatically adapt to the training data. In this paper, we contribute to this line of research in several ways. 
 \begin{itemize}
 	\item First, we propose a novel framework (\emph{Multi-Domain Automated Curriculum}, MDAC for short), a variant of Differentiable Data Selection (DDS) of \newcite{Wang20balancing}, initially applied to multilingual NMT, that simultaneously accounts for the domain adaptation and the multidomain adaptation problems.
 	\item We show that MDAC achieves performance that compare to fine-tuning strategies for DA (\textsection~\ref{ssec:da}) and outperform some static data sampling strategies for multidomain settings (\ref{ssec:mda}).
@@ -180,10 +194,10 @@ The main challenge in this situation is to make the best of heterogeneous data, 
   \centering
   \vspace{-\baselineskip}
   \includegraphics[width=0.48\textwidth]{mdmt-lambdas}
-  \caption{Training and testing with distribution mismatch. We consider three domains and represent $\vlambda^{s}$ and $\vlambda^{t}$ in the 3-dimensional simplex. Training with weights in (a) and testing with weights in (c) is supervised multi-source domain adaptation to domain~2 ($d_2$), while (b)-(c) is the unsupervised\fyDone{Unseen ?} version, with no training data from $d_2$; training with weights in (a) and testing with weights in (d) is multi-domain learning, also illustrated with settings (a)-(e) (training domain $d_1$ is not seen in test), and (b)-(d)  (test domain $d_2$ is unseen in training).}\label{fig:mdmt-lambdas}
+  \caption{Training and testing with distribution mismatch. We consider three domains and represent $\vlambda^{s}$ and $\vlambda^{t}$ in the 3-dimensional simplex. Training with weights in (a) and testing with weights in (c) is supervised multi-source domain adaptation to domain~2 ($d_2$), while (b)-(c) is the unsupervised version, with no training data from $d_2$; training with weights in (a) and testing with weights in (d) is multi-domain learning, also illustrated with settings (a)-(e) (training domain $d_1$ is not seen in test), and (b)-(d)  (test domain $d_2$ is unseen in training).}\label{fig:mdmt-lambdas}
 \end{figure}
 
-These situations have been amply documented from a theoretical perspective (eg.\ \newcite{Mansour09multiple,Mansour09domainadaptation,Hoffman18algorithms}). A general recommendation in the DA setting is to adjust the sampling distribution used to optimize the system so as to compensate for the mismatch between $\mathcal{D}^s(x)$ and $\mathcal{D}^t(x)$. This can be approximated by reweighting instances, or more conveniently domains, which are selected during training with a probability $\lambda^{l}(d)$, with $\lambda^{l}(d) \neq \lambda^{s}(d)$.
+These situations have been amply documented from a theoretical perspective (eg.\ \newcite{Mansour09multiple}; \newcite{Mansour09domainadaptation}; \newcite{Hoffman18algorithms}). A general recommendation in the DA setting is to adjust the sampling distribution used to optimize the system so as to compensate for the mismatch between $\mathcal{D}^s(x)$ and $\mathcal{D}^t(x)$. This can be approximated by reweighting instances, or more conveniently domains, which are selected during training with a probability $\lambda^{l}(d)$, with $\lambda^{l}(d) \neq \lambda^{s}(d)$.
 
 A widely-used approach to supervised DA is \emph{fine-tuning} \cite{Luong15stanford}, where $\vlambda^{l}$ varies during learning. With our notations, this approach first learns an initial parameter value with all the data ($\forall d, \lambda^{l}(d) = \lambda^{s}(d)$), then continues training with only batches from the test domain $d_t$ ($\lambda^{l}(d) = \indic{d = d_t}$), with $\indic{A}$ the indicator function for predicate $A$. This strategy is potentially suboptimal as some out-of-domain samples may contribute to the final performance due to e.g.\ domain similarity. Optimizing the learning distribution in multidomain settings is even more challenging as the learner needs to take advantage of possible domains overlaps and also of the fact that some domains might be easier to learn than others.\fyDone{How to measure this?}
 % \revision{Answer: The graphic of \system{Mixed-0} shows that with the same amount of data(batches) the convergences of the domains vary significantly}
@@ -193,20 +207,20 @@ A widely-used approach to supervised DA is \emph{fine-tuning} \cite{Luong15stanf
 Assuming training data in each of the $n_d$ domains $d_1 \dots d_{n_d}$, the size of the training corpus in domain $d$ is denoted $N^{s}_d$, and $N^{s} = \sum_d N^{s}_d$ is the total number of training samples. $\widehat{\mathcal{D}^l_d}$ and $\widehat{\mathcal{D}^t_d}$ denote the empirical train and test distributions for domain $d$ and $\widehat{\mathcal{D}^{u}}(x;\vlambda^{u}) = \sum_{d} \lambda^{u}(d) \widehat{\mathcal{D}^{u}_d}(x)$ for $u\in\{l,t\}$. In our setting,  $\vlambda^{t}$ and hence $\widehat{\mathcal{D}^t}(x;\vlambda^t)$ are fixed and predefined, approximated with an equivalent number of development corpora. 
 
 % Our method
-MDAC builds an adaptative training distribution $\vlambda^{l}$ that optimizes the data selection policy along with the training of the model. We parameterize $\vlambda^{l}$ by a differentiable function $\vlambda^l(\psi)$, which is described in \textsection~\ref{ssec:dds-sys}. We divide the training into many short sessions; in each session $t$, the model is trained with a static data distribution $\vlambda^{l}(\psi_t)$. After one learning session, we update the data distribution using the REINFORCE algorithm of \newcite{Williams92simple}. The evolution of $\psi$ is thus defined by:\fyTodo{$t$ is both for time, and for test - change into $\tau$?}
+MDAC builds an adaptative training distribution $\vlambda^{l}$ that optimizes the data selection policy along with the training of the model. We parameterize $\vlambda^{l}$ by a differentiable function $\vlambda^l(\psi)$, which is described in \textsection~\ref{ssec:dds-sys}. We divide the training into many short sessions; in each session $t$, the model is trained with a static data distribution $\vlambda^{l}(\psi_t)$. After one learning session, we update the data distribution using the REINFORCE algorithm of \newcite{Williams92simple}. The evolution of $\psi$ is thus defined by:\fyDone{$t$ is both for time, and for test - change into $\tau$?}
 \begin{align*}
-\psi_{\tau+1} &= \psi_{\tau} + \mathbf{lr}_{1} * \displaystyle{\mathop{\sum}_{d=1}^{n_d}} R(d) * \frac{\partial \lambda^l(d;\psi_{\tau})}{\partial \psi},
+\psi_{t+1} &= \psi_t + \mathbf{lr}_{1} * \displaystyle{\mathop{\sum}_{d=1}^{n_d}} R(d) * \frac{\partial \lambda^l(d;\psi_t)}{\partial \psi},
 \end{align*}
 \begingroup
 \allowdisplaybreaks
 where the reward $R(d)$ is computed as:
 \begin{align}
-  R(d) = J^t(\theta_{\tau+k},\vlambda^t) - J^t(\theta_\tau,\vlambda^t), \label{eq:reward}
+  R(d) = J^t(\theta_{t+k},\vlambda^t) - J^t(\theta_t,\vlambda^t), \label{eq:reward}
 \end{align}
 and where we also define:
 \begin{equation}
 \begin{array}{rcl}
-\theta_{\tau+i} &=& Update\big(\theta_{\tau+i-1},[x^i_j,y^i_j]_{j=1}^N\big) \\ \nonumber
+\theta_{t+i} &=& Update\big(\theta_{t+i-1},[x^i_j,y^i_j]_{j=1}^N\big) \\ \nonumber
 x^i_j, y^i_j &\sim& \widehat{D^l_d}(x) \\
 J^t(\theta,\vlambda^t) &=& \displaystyle{\mathop{\sum}_{d=1}^{n_d}}\lambda^t(d)\displaystyle{\mathop{\sum}_{x^t_d,y^t_d \in \widehat{D^t_d}}} l(\theta,x^t_d,y^t_d).
 \end{array}
@@ -215,7 +229,7 @@ J^t(\theta,\vlambda^t) &=& \displaystyle{\mathop{\sum}_{d=1}^{n_d}}\lambda^t(d)\
 % \theta_{t+i-1} - \mathbf{lr_2} \frac{1}{N}\displaystyle{\mathop{\sum}_{j=1}^N}\frac{\partial l(\theta_{t+i-1}, x^i_j,y^i_j)}{\partial \theta}
 In these equations, $N$ denotes the size of a batch; $\mathbf{lr}_{1}$ is the learning rate of the sampling distribution; $l(\theta,x,y)$ is the loss of the NMT model on sample $(x,y)$; $J^t(\theta,\vlambda^t)$ is the weighted loss aggregated over $n_d$ dev-sets corresponding to the $n_d$ domains.
 
-To compute the reward $R(d)$ associated to training the model with data from domain $d$, we simulate $k$ training steps from the current checkpoint, using $k$ batches sampled from $D^l(d)$ and computing the gain of the weighted dev-loss. This computation is inspired by the target prediction gain of \newcite{Graves17automated}. However, where \newcite{Graves17automated} used accumulated gains from the past as rewards, we instead predict the usefulness of each domain for improving the future performance of the system given its current state. This is achieved by simulating a round of training with only the data from one domain. We also differ from this authors in the parameterization of the sampling distribution.
+To compute the reward $R(d)$ associated to training the model with data from domain $d$, we simulate $k$ training steps from the current checkpoint, using $k$ batches sampled from $D^l(d)$ and computing the gain of the weighted dev-loss. This computation is inspired by the target prediction gain of \newcite{Graves17automated}. However, where \newcite{Graves17automated} used accumulated gains from the past as rewards, we instead predict the usefulness of each domain for improving the future performance of the system given its current state. This is achieved by simulating a round of training with only the data from one domain. We also differ from these authors in the parameterization of the sampling distribution.
 % Furthermore, the choice of the parameterization of the sampling distribution in our method differs from that of \newcite{Graves17automated}, although this choice is empirical.
 
 The work of \newcite{Wang20balancing} is also related: it is based on the bi-level optimization framework, which aims to find an optimal static distribution $\vlambda^{l}$ that will result in the best model with respect to a given target dev set at the end of training. These authors also derive a similar form of update for $\psi$. However, their reward is the cosine similarity between the gradient computed with the training data from one domain and the gradient computed with the dev set. We compare this approach with ours in the experiment section.
@@ -252,7 +266,7 @@ These questions are further explored in Section~\ref{sec:results}. We now turn t
 \label{tab:Corpora}
 \end{table*}
 
-We experiment with translation from English into French in 6~domains, corresponding to the following data sources: the UFAL Medical corpus V1.0 (\domain{med})\footnote{\url{https://ufal.mff.cuni.cz/ufal_medical_corpus}. We only use the in-domain (medical) subcorpora: PATR, EMEA, CESTA, ECDC.}; the European Central Bank corpus (\domain{bank}); the JRC-Acquis Communautaire corpus (\domain{law}) \cite{Steinberger06acquis}; documentations for KDE, Ubuntu, GNOME and PHP from the Opus collection, merged in a \domain{it}-domain; TedTalks (\domain{talk}) \cite{Cettolo12wit}, and the Koran (\domain{rel}). Additional experiments use the News Commentary corpus (\domain{news}). Most corpora are available from the Opus website \cite{Tiedeman12parallel}.\footnote{\url{http://opus.nlpl.eu}} These corpora were deduplicated and tokenized with in-house tools; statistics are in Table~\ref{tab:Corpora}. To reduce the number of types, we use Byte-Pair Encoding \cite{Sennrich16BPE} with 30,000 merge operations on a corpus containing all sentences in both languages.\fyDone{Add \# number of tokens, also specificity ?}%
+We experiment with translation from English into French in 6~domains, corresponding to the following data sources: the UFAL Medical corpus V1.0 (\domain{med})\footnote{\url{https://ufal.mff.cuni.cz/ufal_medical_corpus}. We only use the in-domain (medical) subcorpora: PATR, EMEA, CESTA, ECDC.}; the European Central Bank corpus (\domain{bank}); the JRC-Acquis Communautaire corpus (\domain{law}) \cite{Steinberger06acquis}; documentations for KDE, Ubuntu, GNOME and PHP from the Opus collection, merged in a \domain{it}-domain; TedTalks (\domain{talk}) \cite{Cettolo12wit}, and the Koran (\domain{rel}). Additional experiments use the News Commentary corpus (\domain{news}). Most corpora are available from the Opus website\footnote{\url{http://opus.nlpl.eu}}. These corpora were deduplicated and tokenized with in-house tools; statistics are in Table~\ref{tab:Corpora}. To reduce the number of types, we use Byte-Pair Encoding \cite{Sennrich16BPE} with 30,000 merge operations on a corpus containing all sentences in both languages.\fyDone{Add \# number of tokens, also specificity ?}%
 %
 We randomly select in each corpus a development and a test set of 1,000 lines and keep the rest for training. Validation sets are used to chose the best model according to the average BLEU score \cite{Papineni02bleu}.\footnote{We use truecasing and \texttt{sacrebleu} \cite{Post18call}.}\fyDone{A word about meta-parameter settings} Significance testing is performed using bootstrap resampling \cite{Koehn04statistical}, implemented in compare-mt\footnote{\url{https://github.com/neulab/compare-mt}} \cite{Neubig19compare-mt}. We report significant differences at the level of $p=0.05$.\fyDone{Fix correct p value}
 
