@@ -42,18 +42,17 @@
 %  {\tt email@domain}}
 
 \author{Minh-Quang Pham\\
-  Universit\'e Paris-Saclay, \\
-  CNRS, LISN,  91405 Orsay, France \\
-  {\tt minhquang.pham@limsi.fr}  \\ \\
+  Uni. Paris-Saclay,  CNRS, LISN \\
+  F-91405 Orsay \\
+  {\tt pham@limsi.fr}  \And
   \textbf{Josep Crego}\\
   SYSTRAN ,\\
-  5 rue Feydeau, 75002 Paris, France\\
-  {\tt josep.crego@systrangroup.com} \And
+  5 rue Feydeau, F-75002 Paris\\
+  {\tt crego@systrangroup.com} \And
   Fran\c cois Yvon\\
-  Universit\'e Paris-Saclay, \\
-  CNRS, LISN,  91405 Orsay, France\\
-  {\tt francois.yvon@limsi.fr}}
-
+  Uni. Paris-Saclay, CNRS, LISN\\
+  F-91405 Orsay, France\\
+  {\tt yvon@limsi.fr}}
 
 \date{}
 % This assumes your files are encoded as UTF8
@@ -166,7 +165,7 @@
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
-A typical setting in machine translation (MT) is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for the task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen and fixed; a key aspect of training is then to mitigate the detrimental effects of a mismatch between these distributions. Single-source and multi-source\footnote{In this paper, multi-source DA means having multiple domains to adapt from; this setting differs from multi-source translation, where several \emph{source languages} are considered.} domain adaptation (DA) is a well-studied instance of this setting (see \newcite{Chu2017comparison}; \newcite{Saunders21asurvey} for a review), and so is multi-domain (MD) learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain,Pham21revisiting}. A related situation is multilingual MT \cite{Firat16multiway,Ha16towards,Johnson17google,Aharoni19massively},\fyDone{Fix ref}
+A typical setting in machine translation (MT) is to collect the largest possible collection of parallel data for the chosen language pair, with the intent to achieve optimal performance for the task of interest. In such situations, the training data distribution is opportunistic, while the test data distribution is chosen and fixed; a key aspect of training is then to mitigate the detrimental effects of a mismatch between these distributions. Single-source and multi-source\footnote{In this paper, multi-source DA means having multiple domains to adapt from; this setting differs from multi-source translation, where several \emph{source languages} are considered.} domain adaptation (DA) is a well-studied instance of this setting (see \cite{Chu2017comparison,Saunders21asurvey} for a review), and so is multi-domain (MD) learning \cite{Chu18multilingual,Zeng18multidomain,Jiang19multidomain,Pham21revisiting}. A related situation is multilingual MT \cite{Firat16multiway,Ha16towards,Johnson17google,Aharoni19massively},\fyDone{Fix ref}
 % \revision{cite also \cite{Shen21source}} -> I think this is not so appropriate here
 where the diversity of training data not only corresponds to variations in the topic, genre, or register but also in language.
 
@@ -174,7 +173,7 @@ This problem is often approached by \emph{static} instance selection or re-weigh
 
 Several recent proposals
 % \cite{Vanderwees17dynamic,Graves17automated,platanios19competence,Zhang19curriculum,Kumar19reinforcement,Wang20learning-multi,Wang20balancing,Wang20learning-multi}
-explore ways to instead consider \emph{dynamic} data selection and sampling strategies: \newcite{Vanderwees17dynamic}; \newcite{Zhang19curriculum} construct a static curriculum, while \newcite{Wang20learning-multi}; \newcite{Wang20balancing} build curricula that automatically adapt to the training data. In this paper, we contribute to this line of research in several ways. 
+explore ways to instead consider \emph{dynamic} data selection and sampling strategies: \newcite{Vanderwees17dynamic} and \newcite{Zhang19curriculum} construct a static curriculum, while \newcite{Wang20learning-multi} and \newcite{Wang20balancing} build curricula that automatically adapt to the training data. In this paper, we contribute to this line of research in several ways. 
 \begin{itemize}
 	\item First, we propose a novel framework (\emph{Multi-Domain Automated Curriculum}, MDAC for short), a variant of Differentiable Data Selection (DDS) of \newcite{Wang20balancing}, initially applied to multilingual NMT, that simultaneously accounts for the domain adaptation and the multidomain adaptation problems.
 	\item We show that MDAC achieves performance that compare to fine-tuning strategies for DA (\textsection~\ref{ssec:da}) and outperform some static data sampling strategies for multidomain settings (\ref{ssec:mda}).
@@ -197,7 +196,7 @@ The main challenge in this situation is to make the best of heterogeneous data, 
   \caption{Training and testing with distribution mismatch. We consider three domains and represent $\vlambda^{s}$ and $\vlambda^{t}$ in the 3-dimensional simplex. Training with weights in (a) and testing with weights in (c) is supervised multi-source domain adaptation to domain~2 ($d_2$), while (b)-(c) is the unsupervised version, with no training data from $d_2$; training with weights in (a) and testing with weights in (d) is multi-domain learning, also illustrated with settings (a)-(e) (training domain $d_1$ is not seen in test), and (b)-(d)  (test domain $d_2$ is unseen in training).}\label{fig:mdmt-lambdas}
 \end{figure}
 
-These situations have been amply documented from a theoretical perspective (eg.\ \newcite{Mansour09multiple}; \newcite{Mansour09domainadaptation}; \newcite{Hoffman18algorithms}). A general recommendation in the DA setting is to adjust the sampling distribution used to optimize the system so as to compensate for the mismatch between $\mathcal{D}^s(x)$ and $\mathcal{D}^t(x)$. This can be approximated by reweighting instances, or more conveniently domains, which are selected during training with a probability $\lambda^{l}(d)$, with $\lambda^{l}(d) \neq \lambda^{s}(d)$.
+These situations have been amply documented from a theoretical perspective (eg.\ \cite{Mansour09multiple,Mansour09domainadaptation,Hoffman18algorithms}). A general recommendation in the DA setting is to adjust the sampling distribution used to optimize the system so as to compensate for the mismatch between $\mathcal{D}^s(x)$ and $\mathcal{D}^t(x)$. This can be approximated by reweighting instances, or more conveniently domains, which are selected during training with a probability $\lambda^{l}(d)$, with $\lambda^{l}(d) \neq \lambda^{s}(d)$.
 
 A widely-used approach to supervised DA is \emph{fine-tuning} \cite{Luong15stanford}, where $\vlambda^{l}$ varies during learning. With our notations, this approach first learns an initial parameter value with all the data ($\forall d, \lambda^{l}(d) = \lambda^{s}(d)$), then continues training with only batches from the test domain $d_t$ ($\lambda^{l}(d) = \indic{d = d_t}$), with $\indic{A}$ the indicator function for predicate $A$. This strategy is potentially suboptimal as some out-of-domain samples may contribute to the final performance due to e.g.\ domain similarity. Optimizing the learning distribution in multidomain settings is even more challenging as the learner needs to take advantage of possible domains overlaps and also of the fact that some domains might be easier to learn than others.\fyDone{How to measure this?}
 % \revision{Answer: The graphic of \system{Mixed-0} shows that with the same amount of data(batches) the convergences of the domains vary significantly}
@@ -452,27 +451,26 @@ In comparison to Section~\ref{ssec:da}, the training data is distributed in 30 a
 
 Domain adaptation is an old problem that has been studied from many angles, both for SMT and NMT. A survey of supervised and unsupervised DA for NMT is in \cite{Chu2017comparison}, where the authors distinguish between data-centric and model-centric DA, a view also adopted in the recent survey of \newcite{Saunders21asurvey}. Our approach to DA in this paper falls under the former category. We refer readers interested in DA to these papers.
 
-Multidomain NMT (MDMT) aims to develop systems that simultaneously bode well for several domains. Like for DA, techniques for supervised MDMT combine one or several ingredients: (a) the specialization of data representations \cite{Kobus17domaincontrol} or of sub-networks \cite{Pham19generic} to differentiate the processing of each domain; (b) the use of adversarial techniques to neutralize differences between domains \cite{Britz17mixing,Zeng18multidomain}; (c) the use of automatic domain identification e.g.\ \newcite{Jiang19multidomain}. Unsupervised MDMT is studied in \newcite{Farajian17multidomain}, as an instance of unsupervised DA.
+Multidomain NMT (MDMT) aims to develop systems that simultaneously bode well for several domains. Like for DA, techniques for supervised MDMT combine one or several ingredients: (a) the specialization of data representations \cite{Kobus17domaincontrol} or of sub-networks \cite{Pham19generic} to differentiate the processing of each domain; (b) the use of adversarial techniques to neutralize differences between domains \cite{Britz17mixing,Zeng18multidomain}; (c) the use of automatic domain identification e.g.\ \cite{Jiang19multidomain}. Unsupervised MDMT is studied in \newcite{Farajian17multidomain}, as an instance of unsupervised DA.
 
-Most approaches to adaptive/dynamic data selection take inspiration from \newcite{Bengio09curriculum}, where the notion of curriculum learning is introduced. CL relies on the notion of the ``easiness'' of a sample to schedule the presentation of training data so that the easiest examples are presented first and the hardest last. Various ways to automate CL using the framework of multi-armed bandits are explored in \cite{Graves17automated}, which has been an inspiration for our implementation. While the initial aim was primarily to improve and speed up training, CL has also proven useful for domain adaptive / multidomain / multilingual MT, based on alternative definitions of ``easiness''.\fyDone{Ajouter Grave}
+Most approaches to adaptive/dynamic data selection take inspiration from \newcite{Bengio09curriculum}, where the notion of curriculum learning is introduced. CL relies on the notion of the ``easiness'' of a sample to schedule the presentation of training data so as to start with the easiest examples and end with the hardest. Various ways to automate CL in the framework of multi-armed bandits are explored in \cite{Graves17automated}, which has been an inspiration for our implementation. While the initial aim was primarily to improve and speed up training, CL has also proven useful for multidomain and multilingual MT, based on alternative definitions of ``easiness''.\fyDone{Ajouter Grave}
 For instance, \newcite{Zhang19curriculum} study supervised DA and propose a curriculum approach which progressively augments the training data: early stages only use in-data, while less relevant\footnote{Domain distance is computed with Lewis-Moore scores (based on the cross-entropy of in-domain LM).} data are introduced in later stages. This is opposite to the policy of \newcite{Vanderwees17dynamic}, whose \emph{gradual fine-tuning} progressively increases the focus on in-domain data.\fyDone{These have not been compared? and also to what we do ?} 
 
-\newcite{Kumar19reinforcement} use reinforcement techniques (deep Q-learning) to learn the curriculum strategy: in this work, complexity corresponds to difficulty levels which are binned using contrastive data selection. The reward is based on the increase of the development set loss that results from the current data selection strategy.\fyDone{Alert: what do we do during warm-up ?} This technique is applied to multilingual NMT in \cite{Kumar21learning}. \newcite{Zhou20uncertainty} propose another curriculum-based approach which relies on \emph{instance uncertainty} as a measure of their difficulty and presents data samples starting with the easiest (more predictable) first. Another contribution of this paper is an alternative stopping criterium. Closest to our problems, \newcite{Wang20learning-multi} adapt CL for multidomain NMT, where an optimal instance weighting scheme is found using Bayesian optimization techniques. Each step consists of (a) weighting instances based on relevance features, (b) fine-tuning a pretrained model using the weighted training set, and is applied iteratively to train a sequence of models. The one that maximizes the dev set performance is finally retained.
+\newcite{Kumar19reinforcement} use reinforcement learning to learn the curriculum strategy: in this work, complexity corresponds to difficulty levels which are binned using contrastive data selection. The reward is based on the increase of the devset loss that results from the current data selection strategy.\fyDone{Alert: what do we do during warm-up ?} This technique is applied to multilingual NMT in \cite{Kumar21learning}. \newcite{Zhou20uncertainty} propose another CL-based approach which relies on \emph{instance uncertainty} as a measure of their difficulty and presents data samples starting with the easiest. Another contribution of this work is a new stopping criterium. Closest to our problems, \newcite{Wang20learning-multi} adapt CL for multidomain NMT, where an optimal instance weighting scheme is found using Bayesian optimization techniques. Each step consists of (a) weighting instances based on relevance features, (b) fine-tuning a pretrained model using the weighted training set, and is applied to train a sequence of models. The one that maximizes the devset performance is finally retained.
 
 \section{Conclusion and outlook \label{sec:conclusion}}
 \fyDone{Write conclusion}
-In this study, we have presented a generic framework to perform a variety of adaptation tasks for machine translation, ranging from conventional supervised domain adaptation to multidomain NMT and unseen domain adaptation. By experimenting with all these settings, we have shown that the same algorithm, aimed at automatically finding an effective data sampling scheme during the course of training, can be used in all these situations. This algorithm, we believe, provides us with a more sound approach to (multi-domain) DA than existing heuristics and dispenses with the costly search of optimal meta-parameters. Another contribution of our work is an experimental comparison of recent approaches to dynamic data selection.
+In this study, we have presented a generic framework to perform multiple adaptation tasks for machine translation, ranging from supervised domain adaptation to multidomain NMT and unseen domain adaptation. In our experiments, we have shown that the same algorithm, aimed at automatically finding an effective data sampling scheme during the course of training, can be used in all these situations. This algorithm, we believe, provides us with a more sound approach to (multi-domain) DA than existing heuristics and dispenses with the costly search of optimal meta-parameters. Another contribution of our work is an experimental comparison of recent approaches to dynamic data selection.
 
 Our future work will continue developing this approach and improve its effectiveness. One issue that we have left unaddressed is reward normalization, which is especially important in the early stages of training \cite{Kumar19reinforcement}. Another area where we need to progress is the unsupervised learning setting of \textsection~\ref{ssec:clda}, where our results lag behind supervised DA. This might be due to the inability of our simplistic optimization strategy to handle situations where the number of clusters is large.
 %\clearpage{}
 % slow down learning during warm up or normalize reward; handle large number of classes;
 % too much importance to the dev ? randomize ?
 
-% \section*{Acknowledgments}
-%The work presented in this paper was partially sup-ported by the European Commission under contractH2020-787061 ANITA
 \bibliography{multidomain}
 \bibliographystyle{eamt22}
-%\clearpage{}
-%\appendix
+% \clearpage{}
+
+% \appendix
 %\input{appendix.tex}
 \end{document}
