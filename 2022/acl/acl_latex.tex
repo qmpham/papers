@@ -47,6 +47,7 @@
 \usepackage[absolute,overlay]{textpos}
 
 %graphic packages
+\usepackage[export]{adjustbox}
 \usepackage{graphicx}
 \graphicspath{ {figures/} }
 \usepackage{wrapfig}
@@ -557,7 +558,7 @@ We also plot the languages based on their dropout masks in Figure~\ref{fig:visua
 % \label{fig:phi}
 % \end{figure*}
 \subsection{Ablation study}
-We discuss here the choice of the hyper-parameters $k$, the number of activated nodes in each layer, and its impact on the sharing level between the tasks. Table ~\ref{tab:K} shows the variance of performance when the number of activated nodes is changed, and the sharing level between tasks decreases in consequence.
+We discuss here the choice of the hyper-parameters $k$, the number of activated nodes in each layer, and its impact on the sharing level between the tasks. Table~\ref{tab:K} reports the variance of performance when the number of activated nodes is changed and the sharing level between tasks decreases accordingly.
 \begin{table}[h!]
   \centering
   \begin{tabular}{|c|c|c|} \hline
@@ -571,7 +572,7 @@ We discuss here the choice of the hyper-parameters $k$, the number of activated 
   \caption{Variation of the performance w.r.t $k$, while we fix $n_p=16$ (o2m-related experiment).}
   \label{tab:K}
 \end{table}
-In addition, we also report in this section the effect of not choosing the number of groups $n_p$, which is assigned to 16 in the comparison of \system{LaMGD} and the contrasting methods. We show that setting $n_p$ to the layer's size, which means the group size is 1, has a very similar performance as choosing $n_p$ heuristically. 
+In addition, we also report in this section the effect of not choosing the number of groups $n_p$, which is assigned to 16 in the comparison of \system{LaMGD} and the contrasting methods. We show that setting $n_p$ to the layer's size, which means the group size is 1, has a very similar performance as choosing $n_p$ heuristically (Table~\ref{tab:K2}). 
 \begin{table}[h!]
   \centering
   \begin{tabular}{|c|c|c|} \hline
@@ -581,8 +582,9 @@ In addition, we also report in this section the effect of not choosing the numbe
     \hline
   \end{tabular}
   \caption{Setting the size of group to 1 (o2m-related experiment). The quota of activated nodes is keep unchanged to $75$\%}
-  \label{tab:K}
+  \label{tab:K2}
 \end{table}
+
 \section{Related work}\label{sec:related}
 Multidomain and multilingual translation systems have received considerable attention in the recent years, and a exhaustive survey is beyond the goal of this paper. Domain adaptation for neural MT is surveyed in \citep{Chu17comparison}, while multidomain MT systems are notably studied in \cite{Saunders21Asurvey,Pham21revisiting}; for multilingual MT, the reader is referred eg.\ to \citep{Chu18multilingual,dabre20survey}. We focus on the most relevant subset of this literature below.
 
@@ -626,19 +628,20 @@ in which $\sigma(.)$ is the sigmoid function and $\bar{\nu}$ is the solution of 
 Because sigmoid is monotonically increasing, equation~\eqref{eq:nu} has a unique solution. Furthermore,  because of the smoothness of $g(\nu,\Phi_l^d) = \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})$ w.r.t $\nu$ and $\Phi_l^d$, we can perform the implicit differentiation of its solution $\bar{\nu}$ w.r.t $\Phi_l^d$ as below, even though the solution of \eqref{eq:nu} does not have an explicit form.
 
 \begin{align*}
-&\frac{\partial g}{\partial \bar{\nu}} \times \frac{\partial \bar{\nu}}{\partial \Phi_l^d} + \frac{\partial g}{\partial \Phi_l^d} = 0 \\
+  &\frac{\partial g}{\partial \bar{\nu}} \times \frac{\partial \bar{\nu}}{\partial \Phi_l^d} + \frac{\partial g}{\partial \Phi_l^d} = 0 \\
 & \Rightarrow \frac{\partial \bar{\nu}}{\partial \Phi_l^d} = - \big(\frac{\partial g}{\partial \bar{\nu}}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d}
 \end{align*}
 
 Because the differentiation of sigmoid has exact forms, $\frac{\partial g}{\partial \nu}$ and $\frac{\partial g}{\partial \Phi_l^d}$ also have exact form. Therefore, we do not need autograd to compute the implicit gradient $\frac{\partial \nu}{\partial \Phi_l^d}$. The gradient of $\hat{m}_l^d(\tau)$ w.r.t $\Phi_l^d$ is computed as follows:
 \begin{align}
 \hspace{-3.em}
-\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} = \frac{\partial \hat{m}_l^d(\tau)}{\partial \nu} \times \frac{\partial \nu}{\partial \Phi_l^d} + \frac{1}{\tau} \frac{exp(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})}{(1+exp(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}))^2}
+  \frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} = & \frac{\partial \hat{m}_l^d(\tau)}{\partial \nu} \times \frac{\partial \nu}{\partial \Phi_l^d} +  \nonumber \\
+  & \quad \frac{1}{\tau} \frac{exp(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})}{(1+exp(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}))^2}
 \end{align}
 
 In our algorithm, we solve \eqref{eq:nu} by binary search. The convergence of binary search is extremely fast and assured by the monotonicity of $g(\nu,\Phi_l^d)$. In our experiments, we set the search range to $[-100,100]$.
 
-Finally, we need prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. We assume $g_l^d(i_1) + \Phi_l^d(i_1) > g_l^d(i_2) + \Phi_l^d(i_2) > \cdots > g_l^d(i_{n_p}) + \Phi_l^d(i_{n_p})$.
+Finally, we need to prove that $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l^d$. We assume $g_l^d(i_1) + \Phi_l^d(i_1) > g_l^d(i_2) + \Phi_l^d(i_2) > \cdots > g_l^d(i_{n_p}) + \Phi_l^d(i_{n_p})$.
 
 Because:
 \begin{align*}
@@ -648,6 +651,13 @@ Because:
       0, & \text{if}\ \tau < - (g_l^d(i) + \Phi_l^d(i)), \\
       \frac{1}{2} &\text{otherwise}\\
     \end{cases}
+%% \hspace{-3.em}
+%  \lim_{\tau \rightarrow 0} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) & = \\
+%  \quad \begin{cases}
+%    1, & \text{if}\ \tau > - (g_l^d(i) + \Phi_l^d(i)), \\
+%    0, & \text{if}\ \tau < - (g_l^d(i) + \Phi_l^d(i)), \\
+%    \frac{1}{2} &\text{otherwise}\\
+%  \end{cases}
 \end{align*}
 
 and 
@@ -685,15 +695,15 @@ which is equivalent to $\lim_{\tau \rightarrow 0}\hat{m}_l^d(\tau) = \tilde{m}_l
 \label{appendix:b}
 In this section, we give a simple proof of inequality~\eqref{eq:entropy}. In fact, we only need to prove $\mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] \geqslant \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big]$. The proof is as follows:
 \begin{align*}
-&\mathbb{H} \big[ P(i_1,\cdots,i_k | \Phi_l^d) \big] = - \displaystyle{\mathop{\mathbb{E}}_{i_1,\cdots,i_k | \Phi_l^d}} \big[ \text{log}P(i_1,\cdots,i_k | \Phi_l^d) \big] \\
-&= -\displaystyle{\mathop{\mathbb{E}}_{i_1,\cdots,i_k | \Phi_l^d}} \big[ \displaystyle{\sum_{j=2}^k}\text{log}P(i_j | i_1,\cdots,j_{j-1},\Phi_l^d) +  \text{log} P(i_1 | \Phi_l^d) \big] \\
-&\geqslant -\displaystyle{\mathop{\mathbb{E}}_{i_1,\cdots,i_k | \Phi_l^d}} \big[ \text{log} P(i_1 | \Phi_l^d) \big] \\
+&\mathbb{H} \big[ P(i_1\cdots i_k | \Phi_l^d) \big] = - \displaystyle{\mathop{\mathbb{E}}_{i_1\cdots i_k | \Phi_l^d}} \big[ \text{log}P(i_1 \cdots i_k | \Phi_l^d) \big] \\
+&= -\!\! \!\!\!\! \displaystyle{\mathop{\mathbb{E}}_{i_1\cdots i_k | \Phi_l^d}} \big[ \displaystyle{\sum_{j=2}^k}\text{log}P(i_j | i_1 \cdots j_{j-1},\Phi_l^d) +  \text{log} P(i_1 | \Phi_l^d) \big] \\
+&\geqslant -\!\! \!\! \!\!\displaystyle{\mathop{\mathbb{E}}_{i_1 \cdots i_k | \Phi_l^d}} \big[ \text{log} P(i_1 | \Phi_l^d) \big] \\
 &= -\displaystyle{\mathop{\mathbb{E}}_{i_1 | \Phi_l^d}} \big[ \text{log} P(i_1 | \Phi_l^d) \big] = \mathbb{H} \big[ P(i_1 | \Phi_l^d) \big]
 \end{align*}
 \section{Appendix C}
 \begin{figure}[H]
 \centering{
-\includegraphics[width=0.5\textwidth]{multi_domain}}
+\includegraphics[width=0.5\textwidth,frame]{multi_domain}}
 \caption{Visualization of domains according to their dropout masks (a large vector concatenating the dropping masks of all the layers of the model) constructed by PCA.}
 \label{fig:domain}
 \end{figure}
@@ -717,25 +727,26 @@ In this section, we give a simple proof of inequality~\eqref{eq:entropy}. In fac
 \displaystyle{\mathop{\sum}_{i=1}^{n_p}} \sigma(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}) = k
 \end{align*}
 using binary search}
-\STATE{Compute mask of each layer
+\STATE{Compute mask of each layer:
 \begin{align*}
 \forall l, \hat{m}_l^d(\tau) &= \sigma(\frac{g_l^d + \Phi_l^d + \bar{\nu}}{\tau})
 \end{align*}}
-\STATE{Apply masks to their corresponding layer
+\STATE{Apply masks to their corresponding layer:
 \begin{align*}
   \forall l \in [0,\cdots, L-1]: \tilde{h}^l &= h^l \odot r_l^d ,\\
   h^{l+1} &= \operatorname{LAYER}^{l+1}(\tilde{h}^l) ,
 \end{align*}
 }
-\STATE{Compute gradient of training loss over the underlying Transformer
+\STATE{Compute gradient of training loss over the underlying Transformer:
 $$\Delta_{\theta} = \frac{\partial L}{\partial \theta}$$}
-\STATE{Compute gradient over the $\operatorname{Soft-Top-K}$ masks
+\STATE{Compute gradient over the $\operatorname{Soft-Top-K}$ masks:
 $$\frac{\partial D}{\partial \hat{m}_l^d(\tau)}$$}
-\STATE{Compute implicit gradient of the $\operatorname{Soft-Top-K}$ masks over $\Phi_l^d$
+\STATE{Compute implicit gradient of the $\operatorname{Soft-Top-K}$ masks over $\Phi_l^d$:
 $$\frac{\partial \bar{\nu}}{\partial \Phi_l^d} = - \big(\frac{\partial g}{\partial \bar{\nu}}\big)^{-1} \times \frac{\partial g}{\partial \Phi_l^d}$$
-$$\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} = \frac{\partial \hat{m}_l^d(\tau)}{\partial \nu} \times \frac{\partial \nu}{\partial \Phi_l^d} + \frac{1}{\tau} \frac{exp(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})}{(1+exp(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}))^2}$$}
-\STATE{Compute the gradient the training over $\Phi_l^d$
-$$\Delta_{\Phi_l^d} = \frac{\partial D}{\partial \hat{m}_l^d(\tau)} \times \frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} + \frac{\partial \mathbb{H} \big[ \operatorname{softmax}(\Phi_l^d)\big] }{\partial \Phi_l^d} $$}
+$$\frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} = \frac{\partial \hat{m}_l^d(\tau)}{\partial \nu} \times \frac{\partial \nu}{\partial \Phi_l^d}  + $$
+$$ \quad\quad \frac{1}{\tau} \frac{exp(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau})}{(1+exp(\frac{g_l^d(i) + \Phi_l^d(i) + \nu}{\tau}))^2}$$}
+\STATE{Compute the gradient the training over $\Phi_l^d$:
+$$ \Delta_{\Phi_l^d} = \frac{\partial D}{\partial \hat{m}_l^d(\tau)}  \frac{\partial \hat{m}_l^d(\tau)}{\partial \Phi_l^d} + \frac{\partial \mathbb{H} \big[ \operatorname{softmax}(\Phi_l^d)\big] }{\partial \Phi_l^d} $$}
 \STATE{Update $\theta$ and $\Phi_l^d$ with their gradients}
 \STATE{$i=i+1$}
 \UNTIL{$i> iter\_num$}
